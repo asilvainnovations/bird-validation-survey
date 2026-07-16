@@ -1,15 +1,13 @@
 import React, { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AppProvider } from '@/contexts/AppContext';
-import { Toaster as Sonner } from '@/components/ui/sonner';
+import { Toaster } from 'sonner';
 
 // ─── LAZY LOADED PAGE COMPONENTS ────────────────────────────────────────────
-const Index          = lazy(() => import('@/pages/Index'));
-const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
-const SharedPlanView = lazy(() => import('@/pages/SharedPlanView'));
-const NotFound       = lazy(() => import('@/pages/NotFound'));
+const Index    = lazy(() => import('@/pages/Index'));
+const NotFound = lazy(() => import('@/pages/NotFound'));
 
 // ─── LOADING FALLBACK ───────────────────────────────────────────────────────
 const AppLoadingFallback = React.memo(() => (
@@ -25,8 +23,8 @@ const AppLoadingFallback = React.memo(() => (
       </div>
       <div className="absolute -bottom-2 -right-2 w-8 h-8 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
     </div>
-    <h2 className="text-[#ecfdf5] font-bold text-xl mb-2">Loading BIRD 2026-2035</h2>
-    <p className="text-[#64748b] text-sm">Initializing your strategic workspace…</p>
+    <h2 className="text-[#ecfdf5] font-bold text-xl mb-2">Loading BIRD Validation Survey</h2>
+    <p className="text-[#64748b] text-sm">Preparing the stakeholder validation instrument…</p>
   </div>
 ));
 
@@ -64,7 +62,7 @@ class ErrorBoundary extends React.Component<
               onClick={() => window.location.reload()}
               className="px-4 py-2 rounded-lg bg-[#C9A84C] text-[#011a12] font-semibold text-sm hover:bg-[#C9A84C]/90 transition-all"
             >
-              Reload Application
+              Reload Survey
             </button>
           </div>
         </div>
@@ -86,32 +84,23 @@ const queryClient = new QueryClient({
 });
 
 // ─── MAIN APP ───────────────────────────────────────────────────────────────
+// Standalone BIRD Validation Survey — the 16-section stakeholder validation
+// instrument is the only view; every alias routes to it.
 const App: React.FC = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="dark" storageKey="bird-theme">
+      <ThemeProvider defaultTheme="dark" storageKey="bird-survey-theme">
         <AppProvider>
           <BrowserRouter>
             <Suspense fallback={<AppLoadingFallback />}>
               <Routes>
                 <Route path="/" element={<Index />} />
-                <Route path="/mel-dashboard" element={<Index />} />
-                <Route path="/swot-analysis" element={<Index />} />
-                <Route path="/systems-thinking" element={<Index />} />
-                <Route path="/strategy-matrix" element={<Index />} />
-                <Route path="/balanced-scorecard" element={<Index />} />
-                <Route path="/paps-management" element={<Index />} />
-                <Route path="/templates-library" element={<Index />} />
-                <Route path="/team-collaboration" element={<Index />} />
-                <Route path="/settings" element={<Index />} />
-                <Route path="/export-plan" element={<Index />} />
                 <Route path="/validation-survey" element={<Index />} />
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/share/:shareId" element={<SharedPlanView />} />
+                <Route path="/survey" element={<Navigate to="/" replace />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
-            <Sonner
+            <Toaster
               position="top-right"
               richColors
               closeButton
