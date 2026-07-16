@@ -6,6 +6,59 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## v3.0.0 — Standalone Survey Extraction & Repository Cleanup (2026-07-16)
+**Developer:** ASilva Innovations for BOI-MTIT, BARMM
+
+Complete separation of the Validation Survey from the BIRD platform. The repository
+now builds cleanly and contains only survey-relevant code.
+
+### 💥 Breaking / Build Fixes
+
+| # | Area | Issue | Fix |
+|---|------|-------|-----|
+| 1 | `App.tsx` | Lazy-imported missing `AdminDashboard` / `SharedPlanView` pages and missing `@/components/ui/sonner` | Survey-only routes (`/`, `/validation-survey`); `Toaster` from `sonner` package directly |
+| 2 | `AppLayout.tsx` | Referenced 14 non-existent platform components (Sidebar, Topbar, MELDashboard, SWOTAnalysis, TemplatesLibrary…) and the phantom `useStrategicPlan` store | Rewritten as a focused survey shell: brand header → `SurveyWizard` → policy footer, optional sign-in |
+| 3 | `vite.config.ts` | `manualChunks` pointed at missing modules (`TemplatesLibrary`, `SystemsThinking`) and unused `recharts` | Vendor chunks for actual dependencies only |
+| 4 | `index.html` | `<base target="_blank">` forced every link into a new tab; broken favicon (`/src/assets/...`); wrong manifest path (`manifest.webmanifest.json`); platform-oriented meta | Full rewrite: survey branding, valid links, removed `<base>` |
+| 5 | `src/pages/api/` | 110 KB of Express scaffolding (`server.js`, `route.js`, `cron`, `service -worker.js`) for an endpoint (`/api/submit`) that was never wired to the Vite/Vercel deployment | Deleted — replaced by a real Supabase Edge Function |
+
+### ✨ Added
+
+- `supabase/functions/survey-submit/` — Edge Function that validates consent, links the auth user when present, and stores submissions in `survey_responses`
+- `supabase/migrations/20260716000000_survey_responses.sql` — table supporting **both** writers (edge function + static page legacy blob), RLS policies, and `survey_response_stats`: a **PII-stripped, shape-normalized view** for the public dashboard
+- `src/lib/api.ts` — submission client now targets the Edge Function with an **offline localStorage queue** and automatic flush on reconnect
+- `package.json` scripts: `typecheck`
+
+### 🗑️ Removed (platform-only / dead code)
+
+`useStrategicPlan.ts`, `useBIRDData.ts`, `use-mobile.tsx`, `use-toast.ts`,
+`strategicPlanStore.ts`, `templateData.ts`, `bird-urls.ts`, `motion-shim.tsx`,
+`ContextPanel.tsx`, `FloatingAIAssistant.tsx`, `App.css`,
+`ui/accordion.tsx` (unused), `components.json`,
+`supabase/functions/strategic-planner-sync`, `supabase/functions/ai-strategy-assistant`,
+`yarn.lock` (standardized on npm), **30 unused npm dependencies**
+(express, helmet, cors, compression, morgan, node-cron, node-fetch, dotenv,
+marked, highlight.js, recharts, cmdk, vaul, input-otp, next-themes,
+react-day-picker, embla-carousel-react, react-resizable-panels, react-hook-form,
+@hookform/resolvers, uuid, @types/uuid, date-fns, react-is + all @radix-ui/*)
+
+### 🔧 Changed
+
+- `theme-provider.tsx` — now honors the `storageKey` prop (was silently ignored)
+- `useAuth.ts` — welcome email uses the shared `EDGE_FUNCTIONS.EMAIL_NOTIFICATIONS` endpoint instead of a hardcoded URL
+- `supabase.ts` — trimmed dead planner-sync helpers; `EDGE_FUNCTIONS` now lists only `SURVEY_SUBMIT` + `EMAIL_NOTIFICATIONS`
+- `survey-dashboard.html` — reads the PII-stripped `survey_response_stats` view instead of the raw table (DPA 2012)
+- `public/manifest.json` — survey branding (deep-green theme, valid shortcuts to pages that exist)
+- `public/resources.html`, `survey-orientation.html`, `validation-survey.html` — fixed 20+ broken internal links (platform pages now absolute URLs; local pages verified to exist)
+- `README.md` / `USER_MANUAL.md` — rewritten for the standalone survey
+- `vercel.json` — npm-based build commands
+
+### ✅ Verification
+
+`npm run build` ✅ · `npm run typecheck` ✅ (0 errors) · `npm run lint` ✅ (0 errors) · preview smoke test ✅
+
+---
+
 ## v2.2.0 — Complete Survey Rebuild & Integration Fix (2026-07-16)
 **Developer:** ASilva Innovations for BOI-MTIT, BARMM
 
