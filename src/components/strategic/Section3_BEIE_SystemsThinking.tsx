@@ -101,15 +101,14 @@ const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({ data, onChange
         <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg aspect-video">
           <iframe
             src="https://www.youtube.com/embed/0J491Vqya_4"
-            title="Systems Thinking: Moving from Checklists to Interconnected Investment Ecosystem"
+            title="Bangsamoro Economic & Investment Ecosystem (BEIE) Framework | Discover how an ecosystem mindset unlocks unstoppable growth. This short video reveals how powerful forces- Operating Systems, Foundations, Transformers, Enablers, Connectors, and Financiers—synchronize to create a thriving ecosystem."
             className="w-full h-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
         </div>
         <p className="text-sm text-[#065f46] mt-4">
-          Discover how BIRD turns fragmented efforts into a unified engine of growth through Systems Thinking,
-          Feedback Loops, Causal Loop Diagrams, and Leverage Strategies.
+Don’t just read about the framework—see it in action. Watch now to understand how these drivers of change will shape the future of Bangsamoro’s economy and investment landscape.
         </p>
       </GlassCard>
 
