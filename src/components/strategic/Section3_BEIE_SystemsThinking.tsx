@@ -93,23 +93,21 @@ const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({ data, onChange
       {/* 1. Video Card */}
       <GlassCard className="!p-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base font-semibold text-[#022c22]">
-            Systems Thinking: Moving from Checklists to Interconnected Investment Ecosystem
+          <h3 className="text-base font-semibold text-[#022c22]">Bangsamoro Economic & Investment Ecosystem (BEIE) Framework
           </h3>
           <span className="px-2 py-1 rounded text-xs font-semibold bg-[#C9A84C]/10 text-[#C9A84C]">~4 mins</span>
         </div>
         <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg aspect-video">
           <iframe
-            src="https://www.youtube.com/embed/VBAHk0WYz_c"
-            title="Systems Thinking: Moving from Checklists to Interconnected Investment Ecosystem"
+            src="https://www.youtube.com/embed/0J491Vqya_4"
+            title="Bangsamoro Economic & Investment Ecosystem (BEIE) Framework"
             className="w-full h-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
         </div>
         <p className="text-sm text-[#065f46] mt-4">
-          Discover how BIRD turns fragmented efforts into a unified engine of growth through Systems Thinking,
-          Feedback Loops, Causal Loop Diagrams, and Leverage Strategies.
+"Discover how the Bangsamoro Economic and Investment Ecosystem (BEIE) Framework is transforming BARMM into a resilient, ethical, and globally connected hub. This video explains the 2026‑2035 Investment Roadmap, highlighting how synchronized ecosystems—Foundations, Transformers, Enablers, Connectors, and Financiers—work together to drive unstoppable growth.''
         </p>
       </GlassCard>
 
