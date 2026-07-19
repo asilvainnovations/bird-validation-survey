@@ -90,7 +90,7 @@ const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({ data, onChange
         shifts from siloed sector planning to an interconnected ecosystem approach.
       </p>
 
-      {/* 1. Video Card */}
+      {/* 1. Video Card - Updated URL */}
       <GlassCard className="!p-6">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-base font-semibold text-[#022c22]">
@@ -100,7 +100,7 @@ const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({ data, onChange
         </div>
         <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg aspect-video">
           <iframe
-            src="https://www.youtube.com/embed/VBAHk0WYz_c"
+            src="https://www.youtube.com/embed/0J491Vqya_4"
             title="Systems Thinking: Moving from Checklists to Interconnected Investment Ecosystem"
             className="w-full h-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -113,44 +113,59 @@ const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({ data, onChange
         </p>
       </GlassCard>
 
-      {/* 2. Image: From Sector-Based Planning to BEIE Approach */}
+      {/* 2. Operating Systems Image - NEW POSITION */}
       <GlassCard className="!p-6">
         <h3 className="text-base font-semibold text-[#022c22] mb-3">
-          From Sector-Based Planning to BEIE Approach
+          The Operating System: Moral Governance at the Core
         </h3>
         <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
           <img
-            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/From%20Sector-Based%20Planning%20to%20BEIE%20Approach.png"
-            alt="From Sector-Based Planning to BEIE Approach"
+            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/OS.png"
+            alt="Moral Governance Operating System"
             className="w-full h-auto max-h-[500px] object-contain transition-transform group-hover:scale-[1.02]"
             loading="lazy"
           />
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
-            <p className="text-xs italic text-white/70">From Sector-Based Planning to BEIE Approach</p>
+            <p className="text-xs italic text-white/70">Moral Governance: The Operating System of the Bangsamoro Economy</p>
           </div>
         </div>
         <p className="text-sm text-[#065f46] mt-4">
-          The image illustrates a mental model shift—from siloed development to an interconnected ecosystem.
-          On the left, sector-based planning is reactive and fragmented. On the right, the BEIE approach
-          integrates systems thinking: infrastructure is primed first, equity extends across island provinces,
-          financing is synchronized through Shariah-compliant instruments, and market access connects to global
-          halal and green economies.
+          At the core of the Bangsamoro Economic and Investment Ecosystem is <strong>Moral Governance</strong>—
+          ensuring justice, transparency, accountability, and Islamic ethics (khalifa stewardship). 
+          Surrounding it are three foundational pillars that serve as the operating system determining 
+          whether all other clusters function effectively, equitably, and sustainably.
         </p>
       </GlassCard>
 
-      {/* 3. BEIE Paradigm Question */}
+      {/* 3. Five Interconnected Clusters Image - NEW POSITION */}
       <GlassCard className="!p-6">
         <h3 className="text-base font-semibold text-[#022c22] mb-3">
-          Q3.1 How can stakeholders across government, business, and civil society work together to make
-          the BEIE ecosystem approach more actionable in real investment planning?
+          The Five Interconnected Clusters: "The Parts of the Engine"
         </h3>
-        <textarea
-          value={data.q3_1_beie_collaboration || ""}
-          onChange={(e) => update("q3_1_beie_collaboration", e.target.value)}
-          placeholder="Write your answer in one to two sentences..."
-          rows={3}
-          className="w-full rounded-lg border border-[#C9A84C]/30 bg-white px-4 py-3 text-sm text-[#022c22] placeholder:text-[#065f46]/50 focus:outline-none focus:ring-2 focus:ring-[#C9A84C] focus:border-transparent resize-none"
-        />
+        <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
+          <img
+            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/5%20Interconnected%20Clusters.png"
+            alt="Five Interconnected Clusters"
+            className="w-full h-auto max-h-[500px] object-contain transition-transform group-hover:scale-[1.02]"
+            loading="lazy"
+          />
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+            <p className="text-xs italic text-white/70">Five Clusters Working Together as One Economic Engine</p>
+          </div>
+        </div>
+        <div className="mt-4 space-y-3">
+          <p className="text-sm text-[#065f46]">
+            The Bangsamoro economy functions as an interconnected system driven by Moral Governance at its core. 
+            These five clusters work together:
+          </p>
+          <ul className="text-sm text-[#065f46] space-y-2 ml-4">
+            <li><strong>Foundations</strong> – provide natural and energy resources (agriculture, fisheries, forestry)</li>
+            <li><strong>Financiers</strong> – supply capital through Islamic banking, waqf, and microfinance</li>
+            <li><strong>Transformers</strong> – create value via industry and halal manufacturing</li>
+            <li><strong>Enablers</strong> – support movement through infrastructure, health, education, and connectivity</li>
+            <li><strong>Connectors</strong> – open markets through exports, trade, and tourism</li>
+          </ul>
+        </div>
       </GlassCard>
 
       {/* 4. BEIE Framework Image */}
@@ -170,15 +185,29 @@ const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({ data, onChange
           </div>
         </div>
         <p className="text-sm text-[#065f46] mt-4">
-          The BEIE presents a circular system powered by Moral Governance at its center. Five interconnected
-          components surround it: Foundations (agriculture, forestry, energy), Transformers (industries, halal
-          manufacturing), Financiers (Islamic banking, waqf, sukuk), Connectors (trade, tourism, BIMP-EAGA),
-          and Enablers (infrastructure, health, education). Together they form a cohesive ecosystem.
+          The complete BEIE Framework presents a circular system powered by Moral Governance at its center, 
+          with the five interconnected clusters working in synchronization to create a cohesive, 
+          self-reinforcing economic ecosystem.
         </p>
       </GlassCard>
 
       {/* 5. BEIE Validation Questions */}
       <GlassCard className="!p-6 space-y-6">
+        {/* Q3.1 */}
+        <div>
+          <h3 className="text-base font-semibold text-[#022c22] mb-3">
+            Q3.1 How can stakeholders across government, business, and civil society work together to make
+            the BEIE ecosystem approach more actionable in real investment planning?
+          </h3>
+          <textarea
+            value={data.q3_1_beie_collaboration || ""}
+            onChange={(e) => update("q3_1_beie_collaboration", e.target.value)}
+            placeholder="Write your answer in one to two sentences..."
+            rows={3}
+            className="w-full rounded-lg border border-[#C9A84C]/30 bg-white px-4 py-3 text-sm text-[#022c22] placeholder:text-[#065f46]/50 focus:outline-none focus:ring-2 focus:ring-[#C9A84C] focus:border-transparent resize-none"
+          />
+        </div>
+
         {/* Q3.2 */}
         <div>
           <h3 className="text-base font-semibold text-[#022c22] mb-3">
@@ -254,12 +283,15 @@ const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({ data, onChange
         </div>
       </GlassCard>
 
-      {/* 6. SWOT Scale: Key Strengths */}
+      {/* 6. SWOT Scale: Key Strengths (S1-S3) - MOVED TO END */}
       <GlassCard className="!p-6">
         <div className="flex items-center gap-2 mb-4">
           <span className="px-2 py-1 rounded text-xs font-semibold bg-emerald-100 text-emerald-700">
             STRENGTH
           </span>
+          <h3 className="text-base font-semibold text-[#022c22] ml-2">
+            Foundational Strengths of BARMM
+          </h3>
         </div>
         <p className="text-xs text-[#065f46] mb-4 italic">
           Rate each factor: Impact (1 = very small effect, 5 = very large effect) × Likelihood (1 = very
