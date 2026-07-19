@@ -94,7 +94,7 @@ const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({ data, onChange
       <GlassCard className="!p-6">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-base font-semibold text-[#022c22]">
-            Systems Thinking: Moving from Checklists to Interconnected Investment Ecosystem
+          The Bangsamoro Economic and Investment Ecosytem (BEIE) Framework
           </h3>
           <span className="px-2 py-1 rounded text-xs font-semibold bg-[#C9A84C]/10 text-[#C9A84C]">~4 mins</span>
         </div>
