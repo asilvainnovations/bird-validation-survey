@@ -1,14 +1,15 @@
-import React from "react";
-import { Leaf, AlertTriangle } from "lucide-react";
+import React from "react"; 
+import { Leaf, AlertTriangle, GitBranch, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ------------------------------------------------------------------
 // Types
 // ------------------------------------------------------------------
 export interface Section4Data {
-  q4_1_priorities: string[];
-  q4_2_maguindanao_logistics: string;
-  q4_3_feasibility?: number;
+  // S3 from Section 3 - moved here as first question
+  q_s3_strength_1_impact?: number;
+  q_s3_strength_1_likelihood?: number;
+  
   // SWOT Threats
   q_s4_climate_impact?: number;
   q_s4_climate_likelihood?: number;
@@ -18,10 +19,11 @@ export interface Section4Data {
   q_s4_postharvest_likelihood?: number;
   q_s4_poverty_impact?: number;
   q_s4_poverty_likelihood?: number;
+  
   // Archetypes
+  q_s4_limits_growth: string;
   q_s4_tragedy_commons: string;
   q_s4_tragedy_followup: string;
-  q_s4_limits_growth: string;
 }
 
 interface Section4Props {
@@ -55,17 +57,6 @@ const Section4_Foundations: React.FC<Section4Props> = ({ data, onChange }) => {
     value: Section4Data[K]
   ) => onChange({ ...data, [field]: value });
 
-  const toggle = (field: keyof Section4Data, val: string) => {
-    const arr = (data[field] as string[] | undefined) || [];
-    update(
-      field,
-      (arr.includes(val)
-        ? arr.filter((v) => v !== val)
-        : [...arr, val]) as Section4Data[typeof field]
-    );
-  };
-
-  // Archetype "agree" responses
   const tragedyAgree =
     data.q_s4_tragedy_commons === "Very accurately" ||
     data.q_s4_tragedy_commons === "Somewhat accurately";
@@ -116,63 +107,80 @@ const Section4_Foundations: React.FC<Section4Props> = ({ data, onChange }) => {
       </GlassCard>
 
       {/* ============================================================ */}
-      {/* 3. Priority Question (Q4.1)                                  */}
+      {/* 3. S3: Strong AFF Base (MOVED FROM SECTION 3)                */}
       {/* ============================================================ */}
       <GlassCard className="!p-6">
-        <h3 className="text-base font-semibold text-[#022c22] mb-3">
-          Q4.1: Which Foundations sub-sectors should be the highest
-          investment priorities? (Select all)
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {[
-            "Agriculture modernization",
-            "Fisheries & aquaculture",
-            "Forestry & eco-tourism",
-            "Renewable energy",
-            "Water resource management",
-            "Climate adaptation",
-          ].map((opt) => {
-            const selected = (data.q4_1_priorities || []).includes(opt);
-            return (
-              <button
-                key={opt}
-                onClick={() => toggle("q4_1_priorities", opt)}
-                className={cn(
-                  "p-3 rounded-lg border text-sm text-left transition-all flex items-center gap-2",
-                  selected
-                    ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                    : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
-                )}
-              >
-                <span
-                  className={cn(
-                    "w-4 h-4 rounded-sm border flex items-center justify-center text-[10px]",
-                    selected
-                      ? "bg-[#C9A84C] border-[#C9A84C]"
-                      : "border-[#C9A84C]/50"
-                  )}
-                >
-                  {selected && "✓"}
-                </span>
-                {opt}
-              </button>
-            );
-          })}
+        <div className="flex items-center gap-2 mb-4">
+          <span className="px-2 py-1 rounded text-xs font-semibold bg-emerald-100 text-emerald-700">
+            STRENGTH
+          </span>
+        </div>
+        <p className="text-xs text-[#065f46] mb-4 italic">
+          Rate this foundational strength: Impact (1 = very small effect, 5 = very large effect) × Likelihood (1 = very unlikely, 5 = very likely)
+        </p>
+        
+        <div className="space-y-3 mb-6">
+          <p className="text-sm font-medium text-[#022c22]">
+            <strong>S3: Strong Agriculture, Fisheries, Forestry Base.</strong> BARMM has strong resources in rubber, coconut, seaweed, fisheries, halal farm products, and rice.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs text-[#065f46] mb-2">Impact (1–5)</p>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => update("q_s3_strength_1_impact", v)}
+                    className={cn(
+                      "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
+                      data.q_s3_strength_1_impact === v
+                        ? "bg-[#C9A84C] text-white border-[#C9A84C]"
+                        : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                    )}
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-xs text-[#065f46] mb-2">Likelihood (1–5)</p>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => update("q_s3_strength_1_likelihood", v)}
+                    className={cn(
+                      "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
+                      data.q_s3_strength_1_likelihood === v
+                        ? "bg-[#C9A84C] text-white border-[#C9A84C]"
+                        : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                    )}
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </GlassCard>
 
       {/* ============================================================ */}
-      {/* 4. SWOT Scale Questions — THREAT                             */}
+      {/* 4. SWOT Scale Questions — THREATS                            */}
       {/* ============================================================ */}
       <GlassCard className="!p-6">
         <div className="flex items-center gap-2 mb-4">
           <span className="px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-700">
             THREAT
           </span>
+          <h3 className="text-base font-semibold text-[#022c22] ml-2">
+            External Threats to Foundations Cluster
+          </h3>
         </div>
-        <p className="text-xs text-[#065f46] mb-4 italic">
-          Rate each factor: Impact (1 = very small, 5 = very large) × Likelihood
-          (1 = very unlikely, 5 = very likely)
+        <p className="text-xs text-[#065f46] mb-6 italic">
+          The following threats could undermine BARMM's resource base. Rate each factor: 
+          Impact (1 = very small, 5 = very large) × Likelihood (1 = very unlikely, 5 = very likely)
         </p>
 
         {/* T1 — Climate Change Vulnerabilities */}
@@ -372,83 +380,71 @@ const Section4_Foundations: React.FC<Section4Props> = ({ data, onChange }) => {
       </GlassCard>
 
       {/* ============================================================ */}
-      {/* 5. Systems Archetype: Tragedy of the Commons                 */}
+      {/* 5. Introduction to Systems Thinking Tools                    */}
       {/* ============================================================ */}
       <GlassCard className="!p-6">
         <div className="flex items-center gap-2 mb-4">
-          <AlertTriangle className="w-5 h-5 text-amber-600" />
+          <GitBranch className="w-5 h-5 text-[#C9A84C]" />
           <h3 className="text-base font-semibold text-[#022c22]">
-            Archetype: Tragedy of the Commons
+            Understanding Systems Dynamics in BARMM
           </h3>
         </div>
-        <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 mb-4">
-          <img
-            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Tragedy%20of%20the%20Commons%20Archetype.png"
-            alt="Tragedy of the Commons Archetype"
-            className="w-full h-auto object-contain"
-            loading="lazy"
-          />
-        </div>
-        <p className="text-sm text-[#022c22] mb-4">
-          Shared resources get over-exploited when governance is fragmented. Each
-          actor gains individually, but collective impact depletes the resource
-          base.
+        <p className="text-sm text-[#065f46] mb-4">
+          Before assessing systemic patterns, let's understand the tools we use to map 
+          complex dynamics in BARMM's economic ecosystem.
         </p>
-        <p className="text-sm font-medium text-[#022c22] mb-3">
-          How accurately does the &quot;Tragedy of the Commons&quot; reflect resource
-          management challenges in BARMM&apos;s agriculture, fisheries, and forestry
-          sectors?
-        </p>
-        <div className="grid grid-cols-2 gap-3">
-          {["Very accurately", "Somewhat accurately", "Needs revision", "Not accurate"].map(
-            (opt) => (
-              <button
-                key={opt}
-                onClick={() => update("q_s4_tragedy_commons", opt)}
-                className={cn(
-                  "p-3 rounded-lg border text-sm text-left transition-all",
-                  data.q_s4_tragedy_commons === opt
-                    ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                    : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
-                )}
-              >
-                {opt}
-              </button>
-            )
-          )}
+        
+        {/* Anatomy of Causal Loop Diagram */}
+        <div className="mb-6 pb-6 border-b border-[#C9A84C]/20">
+          <h4 className="text-sm font-semibold text-[#022c22] mb-3">
+            Anatomy of Causal Loop Diagrams (CLDs)
+          </h4>
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 mb-4">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/3-Anatomy%20of%20CLD.png"
+              alt="Anatomy of Causal Loop Diagram"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <div className="space-y-2 text-sm text-[#065f46]">
+            <p>A Causal Loop Diagram (CLD) has interconnected elements:</p>
+            <ul className="list-disc list-inside space-y-1 ml-2">
+              <li><strong>Variables</strong> — factors that change over time, such as Governance Capacity and Investor Confidence</li>
+              <li><strong>Links</strong> — arrows showing how one variable directly influences another</li>
+              <li><strong>Polarity</strong> — marked as 's' for same-direction effects (e.g., higher governance increases confidence) and 'o' for opposite-direction effects (e.g., more bottlenecks reduce private investment)</li>
+              <li><strong>Feedback Loops</strong> — the circular layout illustrates how these relationships form reinforcing or balancing loops that drive system behavior</li>
+            </ul>
+            <p className="italic mt-2">
+              In short, a CLD visually maps cause-and-effect relationships that drive dynamic change within a system.
+            </p>
+          </div>
         </div>
 
-        {/* Follow-up (conditional) */}
-        {tragedyAgree && (
-          <div className="mt-4 pt-4 border-t border-[#C9A84C]/20">
-            <p className="text-sm font-medium text-[#022c22] mb-3">
-              Which shared resource is most at risk — watersheds, fishing
-              grounds, forest reserves, or agricultural land?
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              {["Watersheds", "Fishing grounds", "Forest reserves", "Agricultural land"].map(
-                (opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => update("q_s4_tragedy_followup", opt)}
-                    className={cn(
-                      "p-3 rounded-lg border text-sm text-left transition-all",
-                      data.q_s4_tragedy_followup === opt
-                        ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                        : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
-                    )}
-                  >
-                    {opt}
-                  </button>
-                )
-              )}
-            </div>
+        {/* Anatomy of Systems Archetypes */}
+        <div>
+          <h4 className="text-sm font-semibold text-[#022c22] mb-3">
+            Anatomy of Systems Archetypes
+          </h4>
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 mb-4">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/6-Anatomy%20of%20Systems%20Traps.png"
+              alt="Anatomy of Systems Archetypes"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
           </div>
-        )}
+          <p className="text-sm text-[#065f46]">
+            Systems archetypes are recurring patterns of behavior that appear across different 
+            contexts. They help us diagnose why certain problems persist despite repeated interventions. 
+            In the next questions, you'll assess which archetypes accurately describe the dynamics 
+            in BARMM's Foundations cluster.
+          </p>
+        </div>
       </GlassCard>
 
       {/* ============================================================ */}
-      {/* 6. Systems Archetype: Limits to Growth                       */}
+      {/* 6. Systems Archetype: Limits to Growth (SECOND TO LAST)      */}
       {/* ============================================================ */}
       <GlassCard className="!p-6">
         <div className="flex items-center gap-2 mb-4">
@@ -457,9 +453,22 @@ const Section4_Foundations: React.FC<Section4Props> = ({ data, onChange }) => {
             Archetype: Limits to Growth
           </h3>
         </div>
+        <p className="text-sm text-[#065f46] mb-4">
+          This archetype describes a common pattern: initial success triggers growth, 
+          but eventually the system encounters constraints that slow or halt progress. 
+          Without addressing these limiting factors, the system plateaus or declines.
+        </p>
+        <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 mb-4">
+          <img
+            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Limits%20to%20Growth%20Archetype.png"
+            alt="Limits to Growth Archetype"
+            className="w-full h-auto object-contain"
+            loading="lazy"
+          />
+        </div>
         <p className="text-sm text-[#022c22] mb-4">
-          Growth encounters balancing loops — infrastructure gaps, climate
-          shocks, and funding limits slow progress despite initial gains.
+          In BARMM's context: Agricultural and energy sector growth encounters balancing loops — 
+          infrastructure gaps, climate shocks, and funding limits slow progress despite initial gains.
         </p>
         <p className="text-sm font-medium text-[#022c22] mb-3">
           How accurately does &quot;Limits to Growth&quot; describe the barriers facing
@@ -486,88 +495,96 @@ const Section4_Foundations: React.FC<Section4Props> = ({ data, onChange }) => {
       </GlassCard>
 
       {/* ============================================================ */}
-      {/* 7. Provincial Profile: Maguindanao del Sur                    */}
+      {/* 7. Systems Archetype: Tragedy of the Commons (LAST)          */}
       {/* ============================================================ */}
-      <GlassCard className="!p-6">
-        <h3 className="text-base font-semibold text-[#022c22] mb-3">
-          Provincial Profile: Maguindanao del Sur
-        </h3>
+      <GlassCard className="!p-6 border-2 border-amber-500/40 bg-amber-50/30">
+        <div className="flex items-center gap-2 mb-4">
+          <AlertTriangle className="w-6 h-6 text-amber-600" />
+          <h3 className="text-base font-semibold text-[#022c22]">
+            Archetype: Tragedy of the Commons — A Warning
+          </h3>
+        </div>
+        
+        <div className="bg-amber-100/50 border-l-4 border-amber-600 p-4 mb-4 rounded-r-lg">
+          <p className="text-sm text-amber-900 font-medium mb-2">
+            ️ This archetype represents a critical warning scenario
+          </p>
+          <p className="text-sm text-amber-800">
+            The &quot;Tragedy of the Commons&quot; occurs when shared resources are over-exploited 
+            due to lack of proper governance. It is <strong>not inevitable</strong> — it serves as 
+            a warning of what happens when individual actors prioritize short-term gains over 
+            collective long-term sustainability.
+          </p>
+        </div>
+
         <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 mb-4">
           <img
-            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Maguidano-del-Sur.png"
-            alt="Maguindanao del Sur Provincial Profile"
-            className="w-full h-auto max-h-[400px] object-contain"
+            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Tragedy%20of%20the%20Commons%20Archetype.png"
+            alt="Tragedy of the Commons Archetype"
+            className="w-full h-auto object-contain"
             loading="lazy"
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4">
-            <p className="text-xs italic text-white/70">
-              Source: Maguindanao del Sur: The Agro-Industrial Breadbasket
+        </div>
+        
+        <p className="text-sm text-[#022c22] mb-4">
+          Shared resources get over-exploited when governance is fragmented. Each actor gains 
+          individually, but collective impact depletes the resource base — watersheds degrade, 
+          fisheries collapse, forests disappear.
+        </p>
+        
+        <p className="text-sm font-medium text-[#022c22] mb-3">
+          How accurately does the &quot;Tragedy of the Commons&quot; reflect <strong>potential</strong> resource
+          management challenges in BARMM&apos;s agriculture, fisheries, and forestry sectors?
+        </p>
+        <div className="grid grid-cols-2 gap-3">
+          {["Very accurately", "Somewhat accurately", "Needs revision", "Not accurate"].map(
+            (opt) => (
+              <button
+                key={opt}
+                onClick={() => update("q_s4_tragedy_commons", opt)}
+                className={cn(
+                  "p-3 rounded-lg border text-sm text-left transition-all",
+                  data.q_s4_tragedy_commons === opt
+                    ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
+                    : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                )}
+              >
+                {opt}
+              </button>
+            )
+          )}
+        </div>
+
+        {/* Follow-up (conditional) */}
+        {tragedyAgree && (
+          <div className="mt-4 pt-4 border-t border-[#C9A84C]/20">
+            <p className="text-sm font-medium text-[#022c22] mb-3">
+              If this archetype applies, which shared resource is <strong>most at risk</strong> of over-exploitation?
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              {["Watersheds", "Fishing grounds", "Forest reserves", "Agricultural land"].map(
+                (opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => update("q_s4_tragedy_followup", opt)}
+                    className={cn(
+                      "p-3 rounded-lg border text-sm text-left transition-all",
+                      data.q_s4_tragedy_followup === opt
+                        ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
+                        : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                    )}
+                  >
+                    {opt}
+                  </button>
+                )
+              )}
+            </div>
+            <p className="text-xs text-amber-800 mt-3 italic">
+              Identifying the most vulnerable resource helps prioritize governance interventions 
+              to prevent the tragedy before it occurs.
             </p>
           </div>
-        </div>
-        <p className="text-sm text-[#065f46] mb-4">
-          Shows three layers: Raw Inputs (Pulangi River basin), Modern Processing
-          (VCO, desiccated coconut, corn starch, premium rice), Logistics Grid
-          (farm-to-market roads, solar-dryer warehousing).
-        </p>
-        <p className="text-sm font-medium text-[#022c22] mb-3">
-          Do you agree that improving processing and logistics infrastructure in
-          Maguindanao del Sur will significantly increase the value of its
-          agricultural output?
-        </p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {[
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-          ].map((opt) => (
-            <button
-              key={opt}
-              onClick={() => update("q4_2_maguindanao_logistics", opt)}
-              className={cn(
-                "p-3 rounded-lg border text-sm text-left transition-all",
-                data.q4_2_maguindanao_logistics === opt
-                  ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                  : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
-              )}
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
-      </GlassCard>
-
-      {/* ============================================================ */}
-      {/* 8. Feasibility Question (Q4.3)                               */}
-      {/* ============================================================ */}
-      <GlassCard className="!p-6">
-        <h3 className="text-base font-semibold text-[#022c22] mb-3">
-          Q4.3: How feasible is it for BARMM to achieve food security and
-          agricultural self-sufficiency by 2030?
-        </h3>
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-xs text-[#065f46]">1 = Not feasible</span>
-          <div className="flex-1 h-px bg-[#C9A84C]/20" />
-          <span className="text-xs text-[#065f46]">5 = Very feasible</span>
-        </div>
-        <div className="flex gap-3">
-          {[1, 2, 3, 4, 5].map((v) => (
-            <button
-              key={v}
-              onClick={() => update("q4_3_feasibility", v)}
-              className={cn(
-                "w-14 h-14 rounded-lg border text-lg font-semibold transition-all",
-                data.q4_3_feasibility === v
-                  ? "bg-[#C9A84C] text-white border-[#C9A84C]"
-                  : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
-              )}
-            >
-              {v}
-            </button>
-          ))}
-        </div>
+        )}
       </GlassCard>
     </div>
   );
