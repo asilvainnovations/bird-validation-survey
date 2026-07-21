@@ -1,5 +1,5 @@
 import React from "react";
-import { Sparkles, Play, ArrowRight, BookOpen, BarChart3, Users, GitBranch, Target } from "lucide-react";
+import { Sparkles, Play, ArrowRight, BookOpen, BarChart3, Users, GitBranch, Target, Circle, TrendingUp, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ── GlassCard helper (survey context variant) ──────────────────────────────
@@ -168,7 +168,7 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
         </p>
       </GlassCard>
 
-      {/* ── 4. NEW: Anatomy of Causal Loop Diagrams ───────────────── */}
+      {/* ── 4. Anatomy of Causal Loop Diagrams ───────────────── */}
       <GlassCard className="!p-6">
         <div className="flex items-center gap-2 mb-4">
           <GitBranch className="w-5 h-5 text-[#C9A84C]" />
@@ -217,7 +217,7 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
         </div>
       </GlassCard>
 
-      {/* ── 5. NEW: Feedback Loops & Leverage Points ──────────────── */}
+      {/* ─ 5. Feedback Loops & Leverage Points ──────────────── */}
       <GlassCard className="!p-6">
         <div className="flex items-center gap-2 mb-4">
           <Target className="w-5 h-5 text-[#C9A84C]" />
@@ -263,6 +263,13 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
                 </p>
               </div>
             </div>
+            <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+              <p className="text-xs text-[#065f46]">
+                <strong>Polarity:</strong> Marked as <strong>'s' or '+'</strong> for same-direction effects (e.g., higher governance increases confidence) 
+                and <strong>'o' or '-'</strong> for opposite-direction effects (e.g., more bottlenecks reduce private investment). 
+                An even number of 'o' or '-' indicates a Balancing Loop.
+              </p>
+            </div>
           </div>
 
           <div className="rounded-lg border border-[#C9A84C]/20 bg-white p-4">
@@ -298,7 +305,85 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
         </div>
       </GlassCard>
 
-      {/* ── 6. Quick-Start Questions ─────────────────────────────── */}
+      {/* ── 6. Systems Archetypes ───────────────────────────── */}
+      <GlassCard className="!p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Circle className="w-5 h-5 text-[#C9A84C]" />
+          <h3 className="text-base font-semibold text-[#022c22]">
+            Systems Archetypes: Common Storylines
+          </h3>
+        </div>
+        <p className="text-sm text-[#065f46] mb-4">
+          In systems thinking, archetypes are like common <strong>"storylines"</strong> that show how things go wrong 
+          or get stuck in repeating patterns. They help us see why problems keep coming back even when we try to fix them.
+        </p>
+
+        <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group mb-4">
+          <img
+            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/19.%20The%20Archetypes.png"
+            alt="Systems Archetypes Overview"
+            className="w-full h-auto max-h-[500px] object-contain transition-transform group-hover:scale-[1.02]"
+            loading="lazy"
+          />
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+            <p className="text-xs italic text-white/70">
+              Common Systems Archetypes: Thinking Templates for Diagnosing Complex Problems
+            </p>
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-[#C9A84C]/20 bg-white overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead className="bg-[#C9A84C]/10">
+                <tr>
+                  <th className="text-left p-3 font-semibold text-[#022c22]">Archetype</th>
+                  <th className="text-left p-3 font-semibold text-[#022c22]">What It Means</th>
+                  <th className="text-left p-3 font-semibold text-[#022c22]">Everyday Example</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#C9A84C]/10">
+                <tr className="hover:bg-emerald-50/30">
+                  <td className="p-3 font-medium text-[#022c22]">Growth & Underinvestment</td>
+                  <td className="p-3 text-[#065f46]">When something grows fast but we don't invest enough to support it, progress slows down.</td>
+                  <td className="p-3 text-[#065f46]">A city expands quickly but doesn't build enough roads or schools, so everything becomes congested.</td>
+                </tr>
+                <tr className="hover:bg-emerald-50/30">
+                  <td className="p-3 font-medium text-[#022c22]">Fixes that Fail</td>
+                  <td className="p-3 text-[#065f46]">Quick fixes solve problems for now but make them worse later.</td>
+                  <td className="p-3 text-[#065f46]">Using painkillers instead of treating the cause of back pain — relief now, bigger problem later.</td>
+                </tr>
+                <tr className="hover:bg-emerald-50/30">
+                  <td className="p-3 font-medium text-[#022c22]">Success to the Successful</td>
+                  <td className="p-3 text-[#065f46]">People or groups who are already doing well get more support, leaving others behind.</td>
+                  <td className="p-3 text-[#065f46]">A popular school gets more funding, while smaller schools struggle even more.</td>
+                </tr>
+                <tr className="hover:bg-emerald-50/30">
+                  <td className="p-3 font-medium text-[#022c22]">The Big Man</td>
+                  <td className="p-3 text-[#065f46]">Power gets concentrated in one person or group, creating dependency and limiting innovation.</td>
+                  <td className="p-3 text-[#065f46]">A company where only the CEO makes decisions — employees stop thinking creatively.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="mt-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-700 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-semibold text-amber-800 mb-1">Why This Matters for BARMM:</p>
+              <p className="text-xs text-amber-900">
+                These archetypes act as thinking templates that help us diagnose and improve systems — whether it's 
+                an organization, a community, or even a disaster response network. By recognizing these patterns in 
+                BARMM's investment ecosystem, we can design smarter interventions that create lasting change.
+              </p>
+            </div>
+          </div>
+        </div>
+      </GlassCard>
+
+      {/* ── 7. Quick-Start Questions ─────────────────────────────── */}
       <GlassCard className="!p-6">
         <div className="flex items-center gap-2 mb-1">
           <ArrowRight className="w-5 h-5 text-[#C9A84C]" />
