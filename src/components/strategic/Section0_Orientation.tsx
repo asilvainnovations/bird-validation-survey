@@ -1,10 +1,8 @@
 import React from "react";
 import { Sparkles, Play, ArrowRight, BookOpen, BarChart3, Users, GitBranch, Target, AlertTriangle } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 // ✅ IMPORT: Single source of truth for types and assets
 import type { SurveySchemaType } from "@/lib/survey-schema";
-import { BIRD_IMAGES, BIRD_VIDEOS } from "@/lib/bird-urls";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 // ✅ TYPE SAFETY: Extract only the fields this section manages
