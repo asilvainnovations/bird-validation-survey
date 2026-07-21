@@ -444,7 +444,7 @@ const Section4_Foundations: React.FC<Section4Props> = ({ data, onChange }) => {
       </GlassCard>
 
       {/* ============================================================ */}
-      {/* 6. Systems Archetype: Limits to Growth                       */}
+      {/* 6. Systems Archetype: Limits to Growth (SECOND TO LAST)      */}
       {/* ============================================================ */}
       <GlassCard className="!p-6">
         <div className="flex items-center gap-2 mb-4">
