@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // BIRD 2026–2035 · Supabase Client & Edge Function Service Layer
 // Primary Supabase project: lydsisparsmvextskevw.supabase.co
-// Edge functions hosted on: lydsisparsmvextskevw.supabase.co
+// Edge functions hosted on: cacimkjpkxflrtgspiay.supabase.co/functions/v1/
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { createClient } from '@supabase/supabase-js';
@@ -10,10 +10,10 @@ import { createClient } from '@supabase/supabase-js';
 // Values sourced from VITE_ env vars; hard-coded fallbacks for runtime resilience
 const supabaseUrl =
   (import.meta.env.VITE_SUPABASE_URL as string) ||
-  'https://lydsisparsmvextskevw.supabase.co';
+  '<VITE_SUPABASE_URL>';
 
 const supabaseKey =
-  (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZHNpc3BhcnNtdmV4dHNrZXZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NzIxNzEsImV4cCI6MjA5NzU0ODE3MX0.VM8BPXPLw7wGYCcUvwlTGeP4qB-M02Nq3x';
+  (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || '<VITE_SUPABASE_ANON_KEY>';
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
@@ -27,25 +27,27 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 // NOTE: Edge functions are deployed on a separate Supabase project.
 //       Use direct fetch() for these endpoints rather than supabase.functions.invoke()
 //       when calling from the primary project's client.
-const EDGE_BASE = 'https://lydsisparsmvextskevw.supabase.co/functions/v1';
+const EDGE_BASE = 'https://lydsisparsmvextskevw.supabase.co/functions/v1'; 'https://cacimkjpkxflrtgspiay.supabase.co/functions/v1/';
 
 export const EDGE_FUNCTIONS = {
   AI_STRATEGY_ASSISTANT: `${EDGE_BASE}/ai-strategy-assistant`,
   STRATEGIC_PLANNER_SYNC: `${EDGE_BASE}/strategic-planner-sync`,
   EMAIL_NOTIFICATIONS:    `${EDGE_BASE}/email-notifications`,
   CRM_DISPATCHER:         `${EDGE_BASE}/crm-dispatcher`,
+  SURVEY_SUBMIT:          `${EDGE_BASE}/survey-submit`, 
 } as const;
 
 // ── Branding Assets (CDN) ─────────────────────────────────────────────────────
 export const BRAND_ASSETS = {
   LOGO_URL: import.meta.env.VITE_BRAND_LOGO_URL || 'https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/MTIT%20Logo.png',
-  AI_AVATAR_URL: import.meta.env.VITE_AI_STRATEGIST_AVATAR_URL || 'https://appimize.app/assets/apps/user_1097/images/2c7d825bf937_232_1097.png',
-  BANNER_URL: import.meta.env.VITE_BANNER_INVESTMENT_URL || 'https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/1.Banner.png',
+  AI_AVATAR_URL: import.meta.env.VITE_AI_STRATEGIST_AVATAR_URL || 'https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/ASilva%20Innovations%20Logo.png',
+  BANNER_URL: import.meta.env.VITE_SURVEY_BANNER_URL || 'https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Validation%20Survey%20Banner.png',
 } as const;
 
 // ── External URLs ──────────────────────────────────────────────────────────────
 export const EXTERNAL_URLS = {
   PWA:          import.meta.env.VITE_PWA_EXTERNAL_URL      || 'https://bangsamoro-investment-roadmap.asilvainnovations.com',
+  APP:          import.meta.env.VITE_APP_EXTERNAL_URL      || 'https://bird-app.bolt.host',
   USER_MANUAL:  import.meta.env.VITE_USER_MANUAL_URL       || 'https://bird-user-manual.asilvainnovations.com',
   DEV_DOCS:     import.meta.env.VITE_DEVELOPER_DOCS_URL    || 'https://asilvainnovations.github.io/strat-planner-pwa/developer-doc.html',
 } as const;
