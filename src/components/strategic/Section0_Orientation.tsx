@@ -3,7 +3,6 @@ import { Sparkles, Play, ArrowRight, BookOpen, BarChart3, Users, GitBranch, Targ
 
 // ✅ IMPORT: Single source of truth for types and assets
 import type { SurveySchemaType } from "@/lib/survey-schema";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 // ✅ TYPE SAFETY: Extract only the fields this section manages
 export type Section0Data = Pick<
