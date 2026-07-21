@@ -5,11 +5,6 @@ import { cn } from "@/lib/utils";
 // ✅ IMPORT: Single source of truth for types and assets
 import type { SurveySchemaType } from "@/lib/survey-schema";
 import { BIRD_IMAGES, BIRD_VIDEOS } from "@/lib/bird-urls";
-
-// ✅ IMPORT: Standard shadcn/ui components (NO GlassCard)
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 // ✅ TYPE SAFETY: Extract only the fields this section manages
