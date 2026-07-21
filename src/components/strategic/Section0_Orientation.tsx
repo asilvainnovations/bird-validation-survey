@@ -1,5 +1,5 @@
 import React from "react";
-import { Sparkles, Play, ArrowRight, BookOpen, BarChart3, Users } from "lucide-react";
+import { Sparkles, Play, ArrowRight, BookOpen, BarChart3, Users, GitBranch, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ── GlassCard helper (survey context variant) ──────────────────────────────
@@ -42,7 +42,7 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
       <div className="flex items-center gap-3 mb-4">
         <Sparkles className="w-6 h-6 text-[#C9A84C]" />
         <h2 className="text-xl font-bold text-[#022c22]">
-          Section 0: Welcome &amp; Orientation
+          Section 0: Welcome & Orientation
         </h2>
       </div>
       <p className="text-sm text-[#065f46] mb-4 -mt-5">
@@ -72,7 +72,6 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
         <p className="text-sm text-[#065f46] mb-5">
           Your voice shapes the future of the Bangsamoro Autonomous Region
         </p>
-
         <div className="space-y-4 mb-6">
           <p className="text-sm text-[#022c22] leading-relaxed">
             The{" "}
@@ -133,10 +132,8 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
             growth?
           </em>
         </p>
-
         <p className="text-xs text-[#065f46] italic">
-          The survey has 12 thematic sections. Most use 1–5 scales. All fields
-          optional. Takes ~20–30 minutes.
+          The survey has 16 sections. Most use 1–5 scales. All fields optional. Takes ~20–30 minutes.
         </p>
       </GlassCard>
 
@@ -149,7 +146,6 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
             Investment Ecosystem
           </h3>
         </div>
-
         <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg aspect-video mb-4">
           <iframe
             src="https://www.youtube.com/embed/VBAHk0WYz_c"
@@ -159,14 +155,12 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
             allowFullScreen
           />
         </div>
-
         <div className="flex items-center gap-2 mb-2">
           <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
             <Play className="w-3 h-3 mr-1" />
             ~4 mins
           </span>
         </div>
-
         <p className="text-sm text-[#065f46] leading-relaxed">
           Discover how BIRD turns fragmented efforts into a unified engine of
           growth. Unpacks: Systems Thinking, Feedback Loops, Causal Loop
@@ -174,7 +168,137 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
         </p>
       </GlassCard>
 
-      {/* ── 4. Quick-Start Questions ──────────────────────────────── */}
+      {/* ── 4. NEW: Anatomy of Causal Loop Diagrams ───────────────── */}
+      <GlassCard className="!p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <GitBranch className="w-5 h-5 text-[#C9A84C]" />
+          <h3 className="text-base font-semibold text-[#022c22]">
+            Understanding Causal Loop Diagrams (CLDs)
+          </h3>
+        </div>
+        <p className="text-sm text-[#065f46] mb-4">
+          A Causal Loop Diagram maps the interconnected elements that drive system behavior.
+          Instead of linear cause-and-effect, CLDs reveal the <strong>circular relationships</strong> that
+          create complex dynamics in BARMM's investment ecosystem.
+        </p>
+        
+        <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group mb-4">
+          <img
+            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Anatomy%20of%20CLD.png"
+            alt="Anatomy of Causal Loop Diagram"
+            className="w-full h-auto max-h-[500px] object-contain transition-transform group-hover:scale-[1.02]"
+            loading="lazy"
+          />
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+            <p className="text-xs italic text-white/70">
+              Anatomy of a Causal Loop Diagram: Variables, Links, Polarity, and Feedback
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="rounded-lg border border-[#C9A84C]/20 bg-emerald-50/60 p-4">
+            <h4 className="text-sm font-semibold text-[#022c22] mb-2">Key Components:</h4>
+            <ul className="text-xs text-[#065f46] space-y-1">
+              <li>• <strong>Variables:</strong> Factors that change over time (e.g., Governance Capacity, Investor Confidence)</li>
+              <li>• <strong>Links:</strong> Arrows showing how one variable influences another</li>
+              <li>• <strong>Polarity:</strong> Marked as <strong>(s)</strong> for same-direction or <strong>(o)</strong> for opposite-direction effects</li>
+              <li>• <strong>Feedback Loops:</strong> Circular relationships that reinforce or balance system behavior</li>
+            </ul>
+          </div>
+          <div className="rounded-lg border border-[#C9A84C]/20 bg-emerald-50/60 p-4">
+            <h4 className="text-sm font-semibold text-[#022c22] mb-2">Why CLDs Matter:</h4>
+            <p className="text-xs text-[#065f46] leading-relaxed">
+              CLDs visually map the cause-and-effect relationships that drive dynamic change.
+              They help us see why interventions sometimes fail, why problems persist despite
+              good intentions, and where to find high-leverage intervention points.
+            </p>
+          </div>
+        </div>
+      </GlassCard>
+
+      {/* ── 5. NEW: Feedback Loops & Leverage Points ──────────────── */}
+      <GlassCard className="!p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Target className="w-5 h-5 text-[#C9A84C]" />
+          <h3 className="text-base font-semibold text-[#022c22]">
+            Feedback Loops & Leverage Points
+          </h3>
+        </div>
+        <p className="text-sm text-[#065f46] mb-4">
+          Systems don't just react — they <strong>feedback</strong>. Understanding these loops and where to
+          intervene is the key to transforming BARMM's investment ecosystem.
+        </p>
+
+        <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group mb-4">
+          <img
+            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/6-Anatomy%20of%20Systems%20Traps.png"
+            alt="Feedback Loops and Leverage Points"
+            className="w-full h-auto max-h-[500px] object-contain transition-transform group-hover:scale-[1.02]"
+            loading="lazy"
+          />
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+            <p className="text-xs italic text-white/70">
+              Left: Feedback Loops (Reinforcing & Balancing) | Right: Meadows' Leverage Hierarchy
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="rounded-lg border border-[#C9A84C]/20 bg-white p-4">
+            <h4 className="text-sm font-semibold text-[#022c22] mb-2">Two Types of Feedback Loops:</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <p className="text-xs font-medium text-emerald-700 mb-1">Reinforcing Loop (R)</p>
+                <p className="text-xs text-[#065f46]">
+                  Growth accelerators — investment increases revenue, which enables more investment.
+                  Can create virtuous cycles of growth or vicious cycles of decline.
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-amber-700 mb-1">Balancing Loop (B)</p>
+                <p className="text-xs text-[#065f46]">
+                  Stabilizing forces — as growth causes bottlenecks, constraints slow further growth.
+                  Maintains equilibrium but can trap systems in low-performance states.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-[#C9A84C]/20 bg-white p-4">
+            <h4 className="text-sm font-semibold text-[#022c22] mb-2">Meadows' Leverage Hierarchy:</h4>
+            <p className="text-xs text-[#065f46] mb-3">
+              A <strong>leverage point</strong> is where a small shift can produce big changes. Donella Meadows
+              ranked intervention points from least to most powerful:
+            </p>
+            <div className="space-y-2">
+              <div className="flex items-start gap-2">
+                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-700 text-xs font-bold flex-shrink-0">1-2</span>
+                <div>
+                  <p className="text-xs font-medium text-[#022c22]">Transformative (Highest Leverage)</p>
+                  <p className="text-xs text-[#065f46]">Changing mindsets and paradigms — shifting from "power over" to "power with"</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 text-amber-700 text-xs font-bold flex-shrink-0">5-6</span>
+                <div>
+                  <p className="text-xs font-medium text-[#022c22]">Systemic (Moderate Leverage)</p>
+                  <p className="text-xs text-[#065f46]">Altering rules and information flows — transparency, milestones, feedback mechanisms</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex-shrink-0">10</span>
+                <div>
+                  <p className="text-xs font-medium text-[#022c22]">Incremental (Lowest Leverage)</p>
+                  <p className="text-xs text-[#065f46]">Modifying physical structures — infrastructure, parameters, numbers</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </GlassCard>
+
+      {/* ── 6. Quick-Start Questions ─────────────────────────────── */}
       <GlassCard className="!p-6">
         <div className="flex items-center gap-2 mb-1">
           <ArrowRight className="w-5 h-5 text-[#C9A84C]" />
@@ -189,8 +313,7 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
         {/* Q0.1 */}
         <div className="mb-6 pb-6 border-b border-[#C9A84C]/20">
           <p className="text-sm font-medium text-[#022c22] mb-3">
-            How ready do you feel to contribute to shaping BARMM&apos;s
-            investment future?
+            How ready do you feel to contribute to shaping BARMM&apos;s investment future?
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
@@ -218,8 +341,7 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
         {/* Q0.2 */}
         <div className="mb-6 pb-6 border-b border-[#C9A84C]/20">
           <p className="text-sm font-medium text-[#022c22] mb-3">
-            How would you describe your understanding of an &quot;investment
-            ecosystem&quot; versus traditional sector-based planning?
+            How would you describe your understanding of an &quot;investment ecosystem&quot; versus traditional sector-based planning?
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
@@ -247,8 +369,8 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
         {/* Q0.3 */}
         <div>
           <p className="text-sm font-medium text-[#022c22] mb-3">
-            After watching the video, how valuable is systems thinking for BARMM
-            investment planning? (1 = not valuable, 5 = extremely valuable)
+            After watching the video and reviewing systems thinking concepts, how valuable is this approach for BARMM investment planning?
+            <span className="text-xs text-[#065f46] block mt-1">(1 = not valuable, 5 = extremely valuable)</span>
           </p>
           <div className="flex gap-2 flex-wrap">
             {[1, 2, 3, 4, 5].map((v) => (
