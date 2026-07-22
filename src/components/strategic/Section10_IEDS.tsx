@@ -1,6 +1,11 @@
 import React from "react";
 import { Rocket, CheckCircle2, AlertTriangle, TrendingUp, Users, Leaf, Building2, Globe, Zap, Wifi, BarChart3, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BIRD_IMAGES, BIRD_VIDEOS } from "@/lib/bird-urls";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 
 // ── Data Interface ──────────────────────────────────────────────
 export interface Section10Data {
@@ -11,22 +16,13 @@ export interface Section10Data {
   q10_5_sequencing_logic: string;
   q10_6_risk_mitigation: string;
   q10_7_outcomes_achievable?: number;
+  q10_1_leverage_points?: number;
+  q10_2_activating_leverage?: number;
+  q10_3_capacity_traps?: number;
+  q10_4_iceberg_model?: number;
+  q10_5_collaborative_governance?: number;
+  q10_6_strategic_ranking?: string;
 }
-
-// ── GlassCard Helper ────────────────────────────────────────────
-const GlassCard: React.FC<{ children: React.ReactNode; className?: string }> = ({
-  children,
-  className,
-}) => (
-  <div
-    className={cn(
-      "rounded-xl border border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm shadow-sm p-6",
-      className
-    )}
-  >
-    {children}
-  </div>
-);
 
 // ── Component ───────────────────────────────────────────────────
 interface Section10Props {
@@ -39,86 +35,21 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
     onChange({ ...data, [field]: value });
   };
 
-  // ── Evaluation Matrix Data ──
-  const criteria = [
-    { name: "Economic Impact", weight: "25%", score: 9.5, weighted: 2.38 },
-    { name: "Feasibility", weight: "20%", score: 8.0, weighted: 1.60 },
-    { name: "Alignment with BARMM Identity", weight: "15%", score: 9.0, weighted: 1.35 },
-    { name: "Systems Leverage", weight: "15%", score: 10.0, weighted: 1.50 },
-    { name: "Risk-Return Profile", weight: "10%", score: 7.5, weighted: 0.75 },
-    { name: "Inclusivity", weight: "10%", score: 9.0, weighted: 0.90 },
-    { name: "Sustainability", weight: "5%", score: 9.0, weighted: 0.45 },
-  ];
+  const activeBtnClass = "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90";
+  const inactiveBtnClass = "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]";
+  const activeScaleClass = "bg-[#C9A84C] text-white border-[#C9A84C] hover:bg-[#C9A84C]/90";
+  const inactiveScaleClass = "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]";
 
-  // ── Strategic Options Data ──
-  const options = [
-    {
-      code: "HEDS",
-      name: "Halal Economy Dominance Strategy",
-      score: "7.61/10",
-      grdp: "₱150–200B",
-      focus: "Halal certification, export expansion, MSME clustering",
-    },
-    {
-      code: "GEMS",
-      name: "Green Economy Monetization Strategy",
-      score: "7.16/10",
-      grdp: "₱80–120B",
-      focus: "Carbon credits, PES, biodiversity assets",
-    },
-    {
-      code: "IFES",
-      name: "Infrastructure-First Enabling Strategy",
-      score: "7.48/10",
-      grdp: "₱200–280B",
-      focus: "Binding constraint removal, roads, power, digital",
-    },
-    {
-      code: "IEDS",
-      name: "Integrated Ecosystem Development Strategy",
-      score: "8.93/10",
-      grdp: "₱550B+",
-      focus: "SYNCHRONIZES all clusters — Halal, Green, Infra, Finance",
-      highlight: true,
-    },
-  ];
-
-  // ── 2035 Outcomes Data ──
-  const outcomes = [
-    {
-      icon: BarChart3,
-      category: "Macroeconomic",
-      items: ["GRDP ₱550B+", "₱15B+ annual investment approvals", "₱40B+ export value"],
-    },
-    {
-      icon: Users,
-      category: "Employment & Poverty",
-      items: ["20,000+ BOI-registered jobs", "Poverty incidence <20%"],
-    },
-    {
-      icon: Leaf,
-      category: "Halal & Green Economy",
-      items: ["5,000+ halal-certified MSMEs", "₱500M+ annual carbon/PES revenue"],
-    },
-    {
-      icon: Wallet,
-      category: "Financial Inclusion",
-      items: ["₱20B+ Islamic banking assets", "25% adult financial penetration"],
-    },
-    {
-      icon: Building2,
-      category: "Governance & OS",
-      items: ["90%+ budget execution", "8/10 inter-agency coordination", "1-day digital registration"],
-    },
-    {
-      icon: Zap,
-      category: "Infrastructure",
-      items: ["100% electrification", "85% household broadband", "30% logistics cost reduction"],
-    },
+  // Strategic Options Data
+  const strategicOptions = [
+    { code: "HEDS", name: "Halal Economy Dominance Strategy", score: "7.61/10", grdp: "₱150–200B" },
+    { code: "GEMS", name: "Green Economy Monetization Strategy", score: "7.16/10", grdp: "₱80–120B" },
+    { code: "IFES", name: "Infrastructure-First Enabling Strategy", score: "7.48/10", grdp: "₱200–280B" },
+    { code: "IEDS", name: "Integrated Ecosystem Development Strategy", score: "8.93/10", grdp: "550B+", highlight: true },
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* ═══════════════════════════════════════════ HEADER */}
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-lg bg-[#022c22] flex items-center justify-center">
@@ -129,402 +60,570 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
             Section 10: Integrated Ecosystem Development Strategy (IEDS)
           </h2>
           <p className="text-sm text-[#065f46]">
-            The IEDS sequences three strategic options — Halal Economy Dominance (HEDS), Green Economy Monetization (GEMS), and Infrastructure-First Enabling (IFES) — into a coherent, time-bound execution plan. It is the only pathway projected to achieve the full ₱550B GRDP target by 2035.
+            The IEDS sequences three strategic options into a coherent, time-bound execution plan 
+            to achieve the full ₱550B GRDP target by 2035.
           </p>
         </div>
       </div>
 
-      {/* ═══════════════════════════════════════════ BLOCK 1: Execution Engine Image */}
-      <GlassCard>
-        <h3 className="text-lg font-semibold text-[#022c22] mb-3">
-          The Execution Engine
-        </h3>
-        <p className="text-sm text-[#065f46] mb-4">
-          The Execution Engine presents the best pathway among four strategic options by sequencing the first three into a coherent, time-bound execution plan.
-        </p>
-        <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
-          <img
-            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/The%20Execution%20Engine%20-IEDS.png"
-            alt="The Execution Engine: Integrated Ecosystem Development Strategy (IEDS)"
-            className="w-full h-auto max-h-[500px] object-contain transition-transform group-hover:scale-[1.02]"
-            loading="lazy"
-          />
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
-            <p className="text-xs italic text-white/70">
-              Source: BIRD Strategic Options Analysis
-            </p>
+      {/* ═══════════════════════════════════════════ VIDEO: STRATEGIC OPTIONS */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base text-[#022c22]">
+            Strategic Options & Path to Growth
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg aspect-video">
+            <iframe
+              src="https://www.youtube.com/embed/kb_snh8mo1k"
+              title="Strategic Options & Path to Growth"
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
           </div>
-        </div>
-      </GlassCard>
-
-      {/* ═══════════════════════════════════════════ BLOCK 2: Four Strategic Options Overview */}
-      <GlassCard>
-        <h3 className="text-lg font-semibold text-[#022c22] mb-2 flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-[#C9A84C]" />
-          Four Strategic Options Overview
-        </h3>
-        <p className="text-sm text-[#065f46] mb-5">
-          Compare the four strategic options evaluated across seven criteria. IEDS outperforms all standalone strategies by integrating their best elements.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {options.map((opt) => (
-            <div
-              key={opt.code}
-              className={cn(
-                "rounded-xl border p-4 transition-all",
-                opt.highlight
-                  ? "border-[#C9A84C] bg-[#1B4D3E]/5 shadow-md"
-                  : "border-[#C9A84C]/20 bg-white hover:border-[#C9A84C]/40"
-              )}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span
-                    className={cn(
-                      "inline-block px-2 py-0.5 rounded text-xs font-bold",
-                      opt.highlight
-                        ? "bg-[#1B4D3E] text-white"
-                        : "bg-[#022c22] text-[#C9A84C]"
-                    )}
-                  >
-                    {opt.code}
-                  </span>
-                  {opt.highlight && (
-                    <CheckCircle2 className="w-4 h-4 text-[#C9A84C]" />
-                  )}
-                </div>
-                <span
-                  className={cn(
-                    "text-sm font-bold",
-                    opt.highlight ? "text-[#1B4D3E]" : "text-[#022c22]"
-                  )}
-                >
-                  {opt.score}
-                </span>
-              </div>
-              <h4
-                className={cn(
-                  "text-sm font-semibold mb-1",
-                  opt.highlight ? "text-[#1B4D3E]" : "text-[#022c22]"
-                )}
-              >
-                {opt.name}
-              </h4>
-              <p className="text-xs text-[#065f46] mb-1.5">{opt.focus}</p>
-              <div className="flex items-center gap-1.5">
-                <Globe className="w-3.5 h-3.5 text-[#C9A84C]" />
-                <span className="text-xs font-medium text-[#022c22]">
-                  GRDP: {opt.grdp}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </GlassCard>
-
-      {/* ═══════════════════════════════════════════ BLOCK 3: IEDS Evaluation Matrix */}
-      <GlassCard>
-        <h3 className="text-lg font-semibold text-[#022c22] mb-2 flex items-center gap-2">
-          <BarChart3 className="w-5 h-5 text-[#C9A84C]" />
-          IEDS Evaluation Matrix
-        </h3>
-        <p className="text-sm text-[#065f46] mb-5">
-          IEDS was evaluated across seven weighted criteria, scoring <strong>8.93/10</strong> — the highest of all four options.
-        </p>
-
-        {/* Table Header */}
-        <div className="hidden md:grid grid-cols-12 gap-2 px-3 py-2 bg-[#022c22]/5 rounded-t-lg text-xs font-semibold text-[#022c22]">
-          <span className="col-span-4">Criterion</span>
-          <span className="col-span-2 text-center">Weight</span>
-          <span className="col-span-3 text-center">Score</span>
-          <span className="col-span-3 text-center">Weighted</span>
-        </div>
-
-        {/* Table Rows */}
-        <div className="space-y-1">
-          {criteria.map((c) => (
-            <div
-              key={c.name}
-              className="grid grid-cols-12 gap-2 px-3 py-2.5 bg-white rounded-lg border border-[#C9A84C]/10 items-center"
-            >
-              <span className="col-span-12 md:col-span-4 text-xs font-medium text-[#022c22]">
-                {c.name}
-              </span>
-              <span className="col-span-4 md:col-span-2 text-center text-xs text-[#065f46]">
-                {c.weight}
-              </span>
-              <span className="col-span-4 md:col-span-3 text-center text-xs font-semibold text-[#022c22]">
-                {c.score}
-              </span>
-              <span className="col-span-4 md:col-span-3 text-center text-xs font-bold text-[#1B4D3E]">
-                {c.weighted.toFixed(2)}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        {/* Total */}
-        <div className="mt-3 grid grid-cols-12 gap-2 px-3 py-3 bg-[#1B4D3E]/10 rounded-lg border border-[#C9A84C]/30 items-center">
-          <span className="col-span-4 text-xs font-bold text-[#022c22]">TOTAL</span>
-          <span className="col-span-2 text-center text-xs font-bold text-[#022c22]">100%</span>
-          <span className="col-span-3 text-center text-xs font-bold text-[#1B4D3E]">—</span>
-          <span className="col-span-3 text-center text-sm font-bold text-[#1B4D3E]">8.93</span>
-        </div>
-
-        {/* Question */}
-        <div className="mt-6 pt-6 border-t border-[#C9A84C]/20">
-          <p className="text-sm font-medium text-[#022c22] mb-3">
-            Given the evaluation scores, do you agree that IEDS is the optimal strategy for BARMM?
+          <p className="text-sm text-[#065f46]">
+            Discover the strategic choices shaping Bangsamoro's Investment Roadmap 2026–2035. 
+            This video shows how well-crafted strategies and priorities can fuel inclusive growth, 
+            sustainability, and regional competitiveness in BARMM.
           </p>
-          <div className="grid grid-cols-2 gap-3">
-            {["Yes", "Partially agree", "Need more evidence", "Prefer a different option"].map(
-              (opt) => (
-                <button
-                  key={opt}
-                  onClick={() => update("q10_1_ieds_preference", opt)}
-                  className={cn(
-                    "p-3 rounded-lg border text-sm text-left transition-all",
-                    data.q10_1_ieds_preference === opt
-                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                      : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
-                  )}
-                >
-                  {opt}
-                </button>
-              )
-            )}
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ LEVERAGE POINTS: HOW TO IDENTIFY */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base text-[#022c22]">
+            How to Identify Leverage Points
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/How%20to%20Identify%20Leverage%20Points.png"
+              alt="How to Identify Leverage Points"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
           </div>
-        </div>
-      </GlassCard>
-
-      {/* ═══════════════════════════════════════════ BLOCK 4: Three-Phase Implementation */}
-      <GlassCard>
-        <h3 className="text-lg font-semibold text-[#022c22] mb-2 flex items-center gap-2">
-          <Rocket className="w-5 h-5 text-[#C9A84C]" />
-          Three-Phase Implementation (2026–2035)
-        </h3>
-        <p className="text-sm text-[#065f46] mb-5">
-          The IEDS unfolds across three sequential phases, each building on the prior to create a compounding growth trajectory toward ₱550B+ GRDP by 2035.
-        </p>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* ── Sequence A: ACTIVATE (2026-2028) ── */}
-          <div className="rounded-xl border-2 border-[#1B4D3E]/40 bg-[#1B4D3E]/5 p-5">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-full bg-[#1B4D3E] flex items-center justify-center">
-                <span className="text-xs font-bold text-white">A</span>
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-[#022c22]">ACTIVATE</h4>
-                <p className="text-xs text-[#065f46]">2026 – 2028</p>
-              </div>
-            </div>
-            <p className="text-xs font-semibold text-[#1B4D3E] mb-2">
-              Allocation: ₱35–45 billion
-            </p>
-            <p className="text-xs text-[#065f46] mb-3">
-              <strong>Focus:</strong> Enablers, Cross-Cutting OS, Foundation &amp; Enablers (Governance)
-            </p>
-            <div className="bg-white rounded-lg p-3 border border-[#C9A84C]/10 mb-4">
-              <p className="text-xs font-semibold text-[#022c22] mb-1.5">Key Deployments</p>
-              <ul className="space-y-1">
-                {[
-                  "₱6.67B ZBIP",
-                  "800km farm-to-market roads",
-                  "Digital backbone (fiber optic, BEGMP)",
-                  "BHB operationalization",
-                  "Forestry Code & JMC 2026-01",
-                  "Islamic finance regulatory sandbox",
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-1.5 text-xs text-[#022c22]">
-                    <CheckCircle2 className="w-3 h-3 text-[#1B4D3E] mt-0.5 shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            {/* Question */}
-            <div className="mt-auto">
-              <p className="text-xs font-medium text-[#022c22] mb-2">
-                Rate the priority of Sequence A investments
-              </p>
-              <div className="flex gap-2">
-                {[1, 2, 3, 4, 5].map((v) => (
-                  <button
-                    key={v}
-                    onClick={() => update("q10_2_sequence_a_priority", v)}
-                    className={cn(
-                      "w-10 h-10 rounded-lg border text-xs font-semibold transition-all",
-                      data.q10_2_sequence_a_priority === v
-                        ? "bg-[#C9A84C] text-white border-[#C9A84C]"
-                        : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
-                    )}
-                  >
-                    {v}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* ── Sequence B: SCALE (2029-2031) ── */}
-          <div className="rounded-xl border-2 border-[#C9A84C]/40 bg-[#C9A84C]/5 p-5">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-full bg-[#C9A84C] flex items-center justify-center">
-                <span className="text-xs font-bold text-white">B</span>
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-[#022c22]">SCALE</h4>
-                <p className="text-xs text-[#065f46]">2029 – 2031</p>
-              </div>
-            </div>
-            <p className="text-xs font-semibold text-[#C9A84C] mb-2">
-              Allocation: ₱50–65 billion
-            </p>
-            <p className="text-xs text-[#065f46] mb-3">
-              <strong>Focus:</strong> Transformers, Foundations, Green Economy, Financiers
-            </p>
-            <div className="bg-white rounded-lg p-3 border border-[#C9A84C]/10 mb-4">
-              <p className="text-xs font-semibold text-[#022c22] mb-1.5">Key Deployments</p>
-              <ul className="space-y-1">
-                {[
-                  "Bangsamoro Halal Park (Matanog)",
-                  "10 agro-industrial corridors",
-                  "Rubber/coconut/seaweed processing",
-                  "REDD+ registry & MRV systems",
-                  "Al-Amanah/CARD branch expansion",
-                  "TESDA–industry alignment academies",
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-1.5 text-xs text-[#022c22]">
-                    <CheckCircle2 className="w-3 h-3 text-[#C9A84C] mt-0.5 shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            {/* Question */}
-            <div className="mt-auto">
-              <p className="text-xs font-medium text-[#022c22] mb-2">
-                Rate the priority of Sequence B investments
-              </p>
-              <div className="flex gap-2">
-                {[1, 2, 3, 4, 5].map((v) => (
-                  <button
-                    key={v}
-                    onClick={() => update("q10_3_sequence_b_priority", v)}
-                    className={cn(
-                      "w-10 h-10 rounded-lg border text-xs font-semibold transition-all",
-                      data.q10_3_sequence_b_priority === v
-                        ? "bg-[#C9A84C] text-white border-[#C9A84C]"
-                        : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
-                    )}
-                  >
-                    {v}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* ── Sequence C: CONSOLIDATE (2032-2035) ── */}
-          <div className="rounded-xl border-2 border-sky-500/40 bg-sky-50/50 p-5">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center">
-                <span className="text-xs font-bold text-white">C</span>
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-[#022c22]">CONSOLIDATE</h4>
-                <p className="text-xs text-[#065f46]">2032 – 2035</p>
-              </div>
-            </div>
-            <p className="text-xs font-semibold text-sky-700 mb-2">
-              Allocation: ₱35–50 billion
-            </p>
-            <p className="text-xs text-[#065f46] mb-3">
-              <strong>Focus:</strong> Connectors, Cross-Cutting OS, Global Integration
-            </p>
-            <div className="bg-white rounded-lg p-3 border border-[#C9A84C]/10 mb-4">
-              <p className="text-xs font-semibold text-[#022c22] mb-1.5">Key Deployments</p>
-              <ul className="space-y-1">
-                {[
-                  "UAE/GCC halal export logistics hubs",
-                  "Eco-tourism infrastructure & marine sanctuaries",
-                  "Carbon credit/PES monetization (₱500M+/yr)",
-                  "Innovation hubs & halal R&D",
-                  "Cross-border certification MRA",
-                  "Aftercare service scaling",
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-1.5 text-xs text-[#022c22]">
-                    <CheckCircle2 className="w-3 h-3 text-sky-600 mt-0.5 shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            {/* Question */}
-            <div className="mt-auto">
-              <p className="text-xs font-medium text-[#022c22] mb-2">
-                Rate the priority of Sequence C investments
-              </p>
-              <div className="flex gap-2">
-                {[1, 2, 3, 4, 5].map((v) => (
-                  <button
-                    key={v}
-                    onClick={() => update("q10_4_sequence_c_priority", v)}
-                    className={cn(
-                      "w-10 h-10 rounded-lg border text-xs font-semibold transition-all",
-                      data.q10_4_sequence_c_priority === v
-                        ? "bg-[#C9A84C] text-white border-[#C9A84C]"
-                        : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
-                    )}
-                  >
-                    {v}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </GlassCard>
-
-      {/* ═══════════════════════════════════════════ BLOCK 5: Sequencing Logic Validation */}
-      <GlassCard>
-        <h3 className="text-lg font-semibold text-[#022c22] mb-2 flex items-center gap-2">
-          <AlertTriangle className="w-5 h-5 text-[#C9A84C]" />
-          Sequencing Logic Validation
-        </h3>
-        <p className="text-sm text-[#065f46] mb-5">
-          The sequencing deliberately front-loads enabling infrastructure and governance (Sequence A) to prevent "Limits to Growth" constraints from derailing later phases.
-        </p>
-
-        {/* Question 5 */}
-        <div className="mb-6 pb-6 border-b border-[#C9A84C]/20">
-          <p className="text-sm font-medium text-[#022c22] mb-3">
-            Do you agree with this sequencing logic?
+          <p className="text-sm text-[#065f46]">
+            Three-step process using Donella Meadows' Hierarchy of System Change (L1–L12):
+            <br />
+            <strong>1. Diagnostic Synthesis</strong> – identifying recurring patterns and limiting factors.
+            <br />
+            <strong>2. Mapping the Loops</strong> – visualizing reinforcing (R) and balancing (B) feedback loops.
+            <br />
+            <strong>3. Tiered Selection</strong> – categorizing interventions as Transformative (L1–L3), 
+            Systemic (L4–L6), or Incremental (L10–L12).
           </p>
-          <div className="grid grid-cols-2 gap-3">
-            {["Strongly agree", "Agree", "Neutral", "Disagree"].map((opt) => (
-              <button
-                key={opt}
-                onClick={() => update("q10_5_sequencing_logic", opt)}
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] mb-3 block">
+              How clear is this methodology for identifying leverage points? (1-5)
+            </Label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-12 h-12 rounded-lg text-sm font-semibold",
+                    data.q10_1_leverage_points === v ? activeScaleClass : inactiveScaleClass
+                  )}
+                  onClick={() => update("q10_1_leverage_points", v)}
+                >
+                  {v}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ ACTIVATING LEVERAGE POINTS */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base text-[#022c22]">
+            Activating Strategic Leverage Points
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/Activating%20Leverage%20Points.png"
+              alt="Activating Leverage Points"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#065f46]">
+            Three tiers of interventions to dismantle structural constraints:
+            <br />
+            <strong>L3 (Goals & Operating System):</strong> Link political legitimacy to investment climate.
+            <br />
+            <strong>L5 (Rules & Incentives):</strong> Align investment incentives with institutional capacity.
+            <br />
+            <strong>L6 (Information Flows):</strong> Deploy digital traceability for halal supply chains.
+          </p>
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] mb-3 block">
+              How effective will these leverage points be in accelerating BARMM's growth? (1-5)
+            </Label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-12 h-12 rounded-lg text-sm font-semibold",
+                    data.q10_2_activating_leverage === v ? activeScaleClass : inactiveScaleClass
+                  )}
+                  onClick={() => update("q10_2_activating_leverage", v)}
+                >
+                  {v}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ LEVERAGE POINTS IN CAPACITY TRAPS */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base text-[#022c22]">
+            Leverage Points for Capacity Traps
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Leverage%20Points%20for%20Capacity%20Traps.png"
+              alt="Leverage Points for Capacity Traps"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#065f46]">
+            <strong>Prescription: Front-Loading the Ecosystem Enablers</strong> — Leverage Point L10 
+            (Stock-Flow Structure) expands system capacity ahead of market demand to break the 
+            Limits to Growth and Growth and Underinvestment archetypes.
+          </p>
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] mb-3 block">
+              How critical is front-loading enablers before scaling production? (1-5)
+            </Label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-12 h-12 rounded-lg text-sm font-semibold",
+                    data.q10_3_capacity_traps === v ? activeScaleClass : inactiveScaleClass
+                  )}
+                  onClick={() => update("q10_3_capacity_traps", v)}
+                >
+                  {v}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ══════════════════════════════════════════ ICEBERG MODEL */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base text-[#022c22]">
+            The Iceberg Model: Systems Thinking Paradigm
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Iceberg%20Model%20Paradigm.png"
+              alt="Iceberg Model Paradigm"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#065f46]">
+            Three layers of the system:
+            <br />
+            <strong>Events (Top 10%):</strong> Visible outcomes like investment approvals.
+            <br />
+            <strong>Structures (Body 40%):</strong> Systemic traps like fragmented plans.
+            <br />
+            <strong>Mental Models (Base 50%):</strong> Deep-rooted beliefs shaping policy behavior.
+          </p>
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] mb-3 block">
+              How important is addressing mental models and structures vs. just events? (1-5)
+            </Label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-12 h-12 rounded-lg text-sm font-semibold",
+                    data.q10_4_iceberg_model === v ? activeScaleClass : inactiveScaleClass
+                  )}
+                  onClick={() => update("q10_4_iceberg_model", v)}
+                >
+                  {v}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ══════════════════════════════════════════ COLLABORATIVE GOVERNANCE */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base text-[#022c22]">
+            Architecting Collaborative Governance
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Leverage%20Points%20in%20Governance.png"
+              alt="Leverage Points in Governance"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#065f46]">
+            Transition from disconnected, clashing nodes to a unified, synchronized network through:
+            <br />
+            <strong>L1 (Paradigm):</strong> Shift from Power Over to Power With.
+            <br />
+            <strong>L2 (Mindset):</strong> Institutionalize inter-provincial development compacts.
+            <br />
+            <strong>L5 (Rules):</strong> Establish transparent, formula-based resource allocation.
+          </p>
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] mb-3 block">
+              How transformative will collaborative governance be for BARMM? (1-5)
+            </Label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-12 h-12 rounded-lg text-sm font-semibold",
+                    data.q10_5_collaborative_governance === v ? activeScaleClass : inactiveScaleClass
+                  )}
+                  onClick={() => update("q10_5_collaborative_governance", v)}
+                >
+                  {v}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ ARCHETYPES & LEVERAGE POINTS */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base text-[#022c22]">
+            6 Archetypes and Leverage Points
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Archetypes%20&%20Leverage%20Points.png"
+              alt="Archetypes and Leverage Points"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ FOUR STRATEGIC OPTIONS */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base text-[#022c22]">
+            Four Strategic Options
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/Strategic%20Options.png"
+              alt="Strategic Options"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#065f46]">
+            Four distinct pathways to scale regional value creation:
+            <br />
+            <strong>1. HEDS:</strong> Halal Economy Dominance — leverage cultural authenticity.
+            <br />
+            <strong>2. GEMS:</strong> Green Economy Monetization — convert environmental assets.
+            <br />
+            <strong>3. IFES:</strong> Infrastructure-First Enabling — remove energy and logistics constraints.
+            <br />
+            <strong>4. IEDS:</strong> Integrated Ecosystem Development — synchronize all three strategies.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ STRATEGIC OPTIONS RANKING */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base text-[#022c22]">
+            Strategic Options Ranking and Scoring Matrix
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/3.%20Strategic%20Options%20Ranking.png"
+              alt="Strategic Options Ranking"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#065f46]">
+            Comparative evaluation across seven weighted criteria: Economic Impact (25%), 
+            Systems Leverage (15%), Identity Alignment (15%), Inclusivity (10%), 
+            Sustainability (5%), Feasibility (20%), and Risk-Return (10%).
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+            {strategicOptions.map((opt) => (
+              <Button
+                key={opt.code}
+                type="button"
+                variant="outline"
                 className={cn(
-                  "p-3 rounded-lg border text-sm text-left transition-all",
-                  data.q10_5_sequencing_logic === opt
+                  "justify-start h-auto py-3 text-left",
+                  opt.highlight 
                     ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                    : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                    : data.q10_6_strategic_ranking === opt.code 
+                      ? "bg-[#C9A84C] text-white border-[#C9A84C]"
+                      : inactiveBtnClass
                 )}
+                onClick={() => update("q10_6_strategic_ranking", opt.code)}
               >
-                {opt}
-              </button>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <Badge variant={opt.highlight ? "default" : "outline"} className="text-xs">
+                      {opt.code}
+                    </Badge>
+                    {opt.highlight && <CheckCircle2 className="w-4 h-4" />}
+                  </div>
+                  <p className="text-sm font-semibold mt-1">{opt.name}</p>
+                  <p className="text-xs text-[#065f46] mt-1">
+                    Score: {opt.score} | GRDP: {opt.grdp}
+                  </p>
+                </div>
+              </Button>
             ))}
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        {/* Question 6 */}
-        <div>
-          <p className="text-sm font-medium text-[#022c22] mb-3">
-            Which risk mitigation measure is most critical for IEDS success?
+      {/* ═══════════════════════════════════════════ IEDS EXECUTION ENGINE */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base text-[#022c22]">
+            The Execution Engine: Integrated Ecosystem Development Strategy
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/The%20Execution%20Engine%20-IEDS.png"
+              alt="The Execution Engine - IEDS"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#065f46]">
+            Three golden phases flowing forward:
+            <br />
+            <strong>Phase 1 (2026–2028): Activate Enablers & Governance</strong> — build enabling infrastructure.
+            <br />
+            <strong>Phase 2 (2029–2032): Scale Transformers</strong> — activate Bangsamoro Halal Park.
+            <br />
+            <strong>Phase 3 (2033–2035): Consolidate Connectors</strong> — distribute wealth through BIMP-EAGA corridors.
           </p>
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ IEDS PREFERENCE */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base text-[#022c22]">
+            IEDS Strategy Preference
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Label className="text-sm font-medium text-[#022c22] mb-3 block">
+            Given the evaluation scores, do you agree that IEDS is the optimal strategy for BARMM?
+          </Label>
+          <div className="grid grid-cols-2 gap-3">
+            {["Yes", "Partially agree", "Need more evidence", "Prefer a different option"].map((opt) => (
+              <Button
+                key={opt}
+                type="button"
+                variant="outline"
+                className={cn(
+                  "justify-start h-auto py-3 text-sm text-left",
+                  data.q10_1_ieds_preference === opt ? activeBtnClass : inactiveBtnClass
+                )}
+                onClick={() => update("q10_1_ieds_preference", opt)}
+              >
+                {opt}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ SEQUENCE PRIORITIES */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base text-[#022c22]">
+            Three-Phase Implementation Priorities
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Sequence A */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-[#022c22]">
+              Rate the priority of Sequence A investments (2026-2028: Enablers & Governance)
+            </Label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-12 h-12 rounded-lg text-sm font-semibold",
+                    data.q10_2_sequence_a_priority === v ? activeScaleClass : inactiveScaleClass
+                  )}
+                  onClick={() => update("q10_2_sequence_a_priority", v)}
+                >
+                  {v}
+                </Button>
+              ))}
+            </div>
+            <p className="text-xs text-[#065f46]">1 = Low priority, 5 = Critical priority</p>
+          </div>
+
+          {/* Sequence B */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-[#022c22]">
+              Rate the priority of Sequence B investments (2029-2032: Transformers)
+            </Label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-12 h-12 rounded-lg text-sm font-semibold",
+                    data.q10_3_sequence_b_priority === v ? activeScaleClass : inactiveScaleClass
+                  )}
+                  onClick={() => update("q10_3_sequence_b_priority", v)}
+                >
+                  {v}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Sequence C */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-[#022c22]">
+              Rate the priority of Sequence C investments (2033-2035: Connectors)
+            </Label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-12 h-12 rounded-lg text-sm font-semibold",
+                    data.q10_4_sequence_c_priority === v ? activeScaleClass : inactiveScaleClass
+                  )}
+                  onClick={() => update("q10_4_sequence_c_priority", v)}
+                >
+                  {v}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ══════════════════════════════════════════ SEQUENCING LOGIC */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base text-[#022c22]">
+            Sequencing Logic Validation
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Label className="text-sm font-medium text-[#022c22] mb-3 block">
+            Do you agree with this sequencing logic (Enablers → Transformers → Connectors)?
+          </Label>
+          <div className="grid grid-cols-2 gap-3">
+            {["Strongly agree", "Agree", "Neutral", "Disagree"].map((opt) => (
+              <Button
+                key={opt}
+                type="button"
+                variant="outline"
+                className={cn(
+                  "justify-start h-auto py-3 text-sm text-left",
+                  data.q10_5_sequencing_logic === opt ? activeBtnClass : inactiveBtnClass
+                )}
+                onClick={() => update("q10_5_sequencing_logic", opt)}
+              >
+                {opt}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ RISK MITIGATION */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base text-[#022c22]">
+            Risk Mitigation
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Label className="text-sm font-medium text-[#022c22] mb-3 block">
+            Which risk mitigation measure is most critical for IEDS success?
+          </Label>
           <div className="grid grid-cols-1 gap-3">
             {[
               "Bangsamoro Investment Command Center",
@@ -532,92 +631,54 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
               "ODA climate finance for green sequencing",
               "20% contingency reserve",
             ].map((opt) => (
-              <button
+              <Button
                 key={opt}
-                onClick={() => update("q10_6_risk_mitigation", opt)}
+                type="button"
+                variant="outline"
                 className={cn(
-                  "p-3 rounded-lg border text-sm text-left transition-all",
-                  data.q10_6_risk_mitigation === opt
-                    ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                    : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                  "justify-start h-auto py-3 text-sm text-left",
+                  data.q10_6_risk_mitigation === opt ? activeBtnClass : inactiveBtnClass
                 )}
+                onClick={() => update("q10_6_risk_mitigation", opt)}
               >
                 {opt}
-              </button>
+              </Button>
             ))}
           </div>
-        </div>
-      </GlassCard>
+        </CardContent>
+      </Card>
 
-      {/* ═══════════════════════════════════════════ BLOCK 6: Expected 2035 Outcomes */}
-      <GlassCard>
-        <h3 className="text-lg font-semibold text-[#022c22] mb-2 flex items-center gap-2">
-          <CheckCircle2 className="w-5 h-5 text-[#C9A84C]" />
-          Expected 2035 Outcomes
-        </h3>
-        <p className="text-sm text-[#065f46] mb-5">
-          The following targets are projected outcomes if IEDS is fully implemented across all three sequences.
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          {outcomes.map((cat) => {
-            const Icon = cat.icon;
-            return (
-              <div
-                key={cat.category}
-                className="rounded-xl border border-[#C9A84C]/20 bg-white p-4"
+      {/* ═══════════════════════════════════════════ OUTCOMES ACHIEVABLE */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base text-[#022c22]">
+            Expected 2035 Outcomes
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Label className="text-sm font-medium text-[#022c22] mb-3 block">
+            How achievable are the IEDS 2035 targets (₱550B+ GRDP, <20% poverty, 100% electrification)?
+          </Label>
+          <div className="flex gap-2">
+            {[1, 2, 3, 4, 5].map((v) => (
+              <Button
+                key={v}
+                type="button"
+                variant="outline"
+                size="icon"
+                className={cn(
+                  "w-12 h-12 rounded-lg text-sm font-semibold",
+                  data.q10_7_outcomes_achievable === v ? activeScaleClass : inactiveScaleClass
+                )}
+                onClick={() => update("q10_7_outcomes_achievable", v)}
               >
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-7 h-7 rounded-md bg-[#1B4D3E]/10 flex items-center justify-center">
-                    <Icon className="w-4 h-4 text-[#1B4D3E]" />
-                  </div>
-                  <h4 className="text-xs font-bold text-[#022c22]">{cat.category}</h4>
-                </div>
-                <ul className="space-y-1.5">
-                  {cat.items.map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-start gap-1.5 text-xs text-[#022c22]"
-                    >
-                      <CheckCircle2 className="w-3 h-3 text-[#C9A84C] mt-0.5 shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Question 7 */}
-        <div className="pt-6 border-t border-[#C9A84C]/20">
-          <p className="text-sm font-medium text-[#022c22] mb-3">
-            How achievable are these 2035 targets?
-          </p>
-          <div className="flex flex-col gap-2">
-            <div className="flex gap-2">
-              {[1, 2, 3, 4, 5].map((v) => (
-                <button
-                  key={v}
-                  onClick={() => update("q10_7_outcomes_achievable", v)}
-                  className={cn(
-                    "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
-                    data.q10_7_outcomes_achievable === v
-                      ? "bg-[#C9A84C] text-white border-[#C9A84C]"
-                      : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
-                  )}
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
-            <div className="flex justify-between text-xs text-[#065f46] px-1 mt-1">
-              <span>Unrealistic</span>
-              <span>Very achievable</span>
-            </div>
+                {v}
+              </Button>
+            ))}
           </div>
-        </div>
-      </GlassCard>
+          <p className="text-xs text-[#065f46] mt-2">1 = Unrealistic, 5 = Very achievable</p>
+        </CardContent>
+      </Card>
     </div>
   );
 };
