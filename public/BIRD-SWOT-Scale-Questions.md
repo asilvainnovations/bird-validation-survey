@@ -20,7 +20,7 @@
 *These are positive factors already inside BARMM. Rate how much each one helps the region grow (Impact) and how certain it is to continue (Likelihood).*
 
 | # | Factor | Impact (1–5) | Likelihood (1–5) | BEIE |
-|---|--------|:----------:|:----------:|
+|---|--------|:----------:|:----------:||:----:|
 | S1 | **Halal Legitimacy & Cultural Credibility.** BARMM is an authentic Muslim-majority region, giving it a unique and trusted position in the global halal market. | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 | Cluster 2-Transformers | 
 | S2 | **Strategic BIMP-EAGA Location.** BARMM is close to Sabah and ASEAN trade routes, making it a natural gateway for regional trade. | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 |
 | S3 | **Strong Agriculture, Fisheries, and Forestry (AFF) Base.** BARMM has strong resources in rubber, coconut, seaweed, fisheries, halal farm products, and rice. | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 |
