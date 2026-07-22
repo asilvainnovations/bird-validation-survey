@@ -19,9 +19,9 @@
 
 *These are positive factors already inside BARMM. Rate how much each one helps the region grow (Impact) and how certain it is to continue (Likelihood).*
 
-| # | Factor | Impact (1–5) | Likelihood (1–5) |
+| # | Factor | Impact (1–5) | Likelihood (1–5) | BEIE |
 |---|--------|:----------:|:----------:|
-| S1 | **Halal Legitimacy & Cultural Credibility.** BARMM is an authentic Muslim-majority region, giving it a unique and trusted position in the global halal market. | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 |
+| S1 | **Halal Legitimacy & Cultural Credibility.** BARMM is an authentic Muslim-majority region, giving it a unique and trusted position in the global halal market. | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 | Cluster 2-Transformers | 
 | S2 | **Strategic BIMP-EAGA Location.** BARMM is close to Sabah and ASEAN trade routes, making it a natural gateway for regional trade. | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 |
 | S3 | **Strong Agriculture, Fisheries, and Forestry (AFF) Base.** BARMM has strong resources in rubber, coconut, seaweed, fisheries, halal farm products, and rice. | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 |
 | S4 | **Large Domestic Halal Market.** With 5.69 million Muslim consumers in BARMM, there is strong built-in local demand for halal products and services. | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 |
@@ -80,7 +80,7 @@
 
 *These are risks coming from outside BARMM that could hurt investment and growth. Rate how much damage each one could cause (Impact) and how likely it is to happen (Likelihood).*
 
-| # | Factor | Impact (1–5) | Likelihood (1–5) |
+| # | Factor | Impact (1–5) | Likelihood (1–5) | 
 |---|--------|:----------:|:----------:|
 | T1 | **Climate Change Vulnerabilities.** El Niño, floods, and changing rainfall patterns already caused a 4.2% drop in agriculture in 2024 and threaten food security. | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 |
 | T2 | **Competition from Established Halal Hubs.** Countries like Malaysia, Indonesia, and Thailand already dominate the halal market, making it hard for BARMM to break in. | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 | ☐ 1 ☐ 2 ☐ 3 ☐ 4 ☐ 5 |
