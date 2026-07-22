@@ -112,13 +112,23 @@ This archetype reveals how **initial advantages create a self-reinforcing cycle 
 
 ---
 
-### 7. Tragedy of the Commons — Resource Over-Exploitation in the Foundations Cluster
+### 7. Tragedy of the Commons - A Warning
+
+The "Tragedy of the Commons" occurs when shared resources are over-exploited due to lack of proper governance. It is not inevitable — it serves as a warning of what happens when individual actors prioritize short-term gains over collective long-term sustainability.
 
 **Diagram:** https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Tragedy%20of%20the%20Commons%20Archetype.png
 
 **Description:**
 
-This archetype captures the **over-exploitation of shared natural resources** across BARMM's Foundations cluster (agriculture, fisheries, forestry, energy, and environment). When governance remains fragmented and agencies operate in silos, individual actors — farmers, fishers, loggers, energy users — rationally maximize their short-term gains from shared resources such as watersheds, fishing grounds, forest reserves, and power grids. Each actor's individual gain is positive, so intensified resource use continues. However, the **collective impact** depletes the very ecological and infrastructural base that all downstream value creation depends upon. Two reinforcing loops drive this: (R1) increased extraction boosts individual economic gains, attracting more actors and intensifying resource use; and (R2) growing communities and industries place even greater pressure on finite resources. There is a **dangerous delay** between over-exploitation and visible depletion — by the time impacts are felt (e.g., forest degradation threatening hydropower, fishery collapse, El Niño-induced drought causing ₱346M in crop losses), the system may have already crossed irreversible thresholds. Weak balancing mechanisms mean individual actors continue extracting even as collective losses mount. Without governance intervention — such as the Bangsamoro Forestry Code, carbon markets, and community co-management — the Foundations cluster risks **systemic collapse**.
+The "Tragedy of the Commons" occurs when shared resources are over-exploited due to lack of proper governance. It is not inevitable — it serves as a warning of what happens when actors prioritize short-term gains over collective long-term sustainability. It visualizes how uncoordinated exploitation of shared natural resources leads to systemic collapse across BARMM’s Foundations cluster — agriculture, fisheries, forestry, energy, and environment.
+* Reinforcing Loop 1 (R1): Economic gains attract more actors. As individuals profit from resource extraction, others join in, increasing activities and further boosting gains — a self‑amplifying cycle of overuse.
+* Reinforcing Loop 2 (R2): Growing communities and industries intensify resource use. Population and industrial growth expand demand, accelerating depletion of shared resources.
+* Reinforcing Loop 3 (R3): Increase activities, further boosting gains. Each round of intensified extraction temporarily raises economic benefits, reinforcing the illusion of prosperity while masking long‑term damage.
+* Reinforcing Loop 4 (R4): Larger communities and industries intensify resource use. Expanding settlements and enterprises multiply consumption, compounding ecological strain.
+* Balancing Loop 5 (B5): Resource limits push back. The finite ecological capacity eventually constrains extraction, but the feedback arrives too late to prevent degradation.
+* Balancing Loop 6 (B6): Delayed impact and collapse. Environmental decline lags behind exploitation; by the time depletion becomes visible, the system nears failure.  Without governance intervention — such as the Bangsamoro Forestry Code, carbon markets, and community co-management — the Foundations cluster risks **systemic collapse**.
+Overall, it serves as a caution to fragmented governance and delayed feedback allow short‑term economic incentives to overpower sustainability, risking irreversible loss of BARMM’s natural resource base.
+
 
 **Validation Question:**
 
