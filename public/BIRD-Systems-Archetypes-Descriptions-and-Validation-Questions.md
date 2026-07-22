@@ -18,9 +18,13 @@ An investment expands rapidly but eventually hits hard ceilings such as unreliab
 
 ### 2. Growth and Underinvestment
 
-**Diagram:** https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Growth%20and%20Underinvestment.png
+**Diagram:** [https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Growth%20and%20Underinvestment%20(1).png]
 
-**Description:**  Rising demand outpaces institutional capacity (certifiers, staff, infrastructure). Delays and inefficiencies reduce investor confidence, creating a self‑reinforcing cycle of stagnation.
+**Description:**  “Growth and Underinvestment” illustrates how rapid investment expansion can stall when institutional capacity fails to keep pace — a classic systems archetype showing the tension between growth and resource limits.
+* Reinforcing Loop 1 (R1): Investment → Capacity → Processing → Approvals. As investment increases, facilitation capacity (certifiers, staff, infrastructure) expands, improving processing rates and approvals — fueling further growth.
+* Balancing Loop 2 (B2): Capacity constraints → backlog → delays. When facilitation capacity hits its ceiling, processing slows, creating backlogs that limit performance and dampen growth.
+* Balancing Loop 3 (B3): Reduced attractiveness → lower demand. Delays and inefficiencies erode investor confidence, reducing perceived attractiveness and slowing new investment.
+In essence, it narrates  how underinvestment in institutional capacity transforms a virtuous growth cycle into stagnation — emphasizing the need for timely scaling of systems to sustain momentum.
 
 ---
 
