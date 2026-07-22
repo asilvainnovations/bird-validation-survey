@@ -1,6 +1,6 @@
 // src/components/strategic/SurveyWizard.tsx
 // BIRD 2026–2035 · 16-Step Validation Survey Wizard
-// Updated: 2026-07-23 · Production-ready, fully typed, schema-aligned
+// Updated: 2026-07-23 · Production-ready, fully typed, schema-aligned, Edge Function integrated
 
 import React, { useState, useCallback } from "react";
 import { submitSurvey } from "@/lib/api";
@@ -540,18 +540,21 @@ const SurveyWizard: React.FC = () => {
 
   const totalSteps = STEP_LABELS.length; // 16 steps (0–15)
 
-  // ── Submission ──
+  // ── Submission (Integrated with Edge Function via @/lib/api) ──
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
       const payload: Partial<SurveySchemaType> = {
         // Step 0
-        q00_ready_to_begin: s0.ready_to_begin === "Very ready" || s0.ready_to_begin === "Somewhat ready",
+        q0_1_ready: s0.ready_to_begin,
+        q0_2_ecosystem_understanding: s0.ecosystem_understanding,
+        q0_3_systems_thinking_value: s0.systems_thinking_value,
         
         // Step 1
         q01_consent_participate: s1.consent_participate,
         q01_consent_anonymize: s1.consent_anonymize,
         q01_consent_email_copy: s1.consent_email_copy,
+        q1_4_consent_voluntary: s1.consent_voluntary,
         
         // Step 2
         q02_demo_category: s2.demo_category,
@@ -562,86 +565,108 @@ const SurveyWizard: React.FC = () => {
         q02_demo_organization: s2.demo_organization,
         
         // Step 3
-        q03_beie_understanding: s3.q3_2_beie_understanding,
-        q03_beie_relevance: s3.q3_3_beie_relevance,
-        q03_beie_collaboration: s3.q3_1_beie_collaboration,
-        q03_systems_thinking_value: s0.systems_thinking_value,
+        q3_1_beie_collaboration: s3.q3_1_beie_collaboration,
+        q3_2_beie_understanding: s3.q3_2_beie_understanding,
+        q3_3_beie_relevance: s3.q3_3_beie_relevance,
+        q3_4_cluster_position: s3.q3_4_cluster_position,
         
         // Step 4
-        q04_priorities: s4.q4_1_priorities,
-        q04_feasibility: s4.q4_3_feasibility,
-        q04_mag_logistics: s4.q4_2_maguindanao_logistics,
-        q04_s_climate_impact: s4.q_s4_climate_impact,
-        q04_s_climate_likelihood: s4.q_s4_climate_likelihood,
-        q04_s_tragedy_commons: s4.q_s4_tragedy_commons,
-        q04_s_limits_growth: s4.q_s4_limits_growth,
+        q4_1_priorities: s4.q4_1_priorities,
+        q4_2_maguindanao_logistics: s4.q4_2_maguindanao_logistics,
+        q4_3_feasibility: s4.q4_3_feasibility,
         
         // Step 5
-        q05_barrier: s5.q5_3_barrier,
-        q05_halal_park: s5.q5_4_halal_park,
-        q05_s_fixes_fail: s5.q_s5_fixes_fail,
-        q05_s_successful: s5.q_s5_successful,
-        q05_s_halal_cert_impact: s5.q_s5_halal_cert_impact,
-        q05_s_halal_cert_likelihood: s5.q_s5_halal_cert_likelihood,
+        q5_1_cold_chain: s5.q5_1_cold_chain,
+        q5_2_economic_zones: s5.q5_2_economic_zones,
+        q5_3_barrier: s5.q5_3_barrier,
+        q5_4_halal_park: s5.q5_4_halal_park,
         
         // Step 6
-        q06_infra: s6.q6_2_sequencing_effectiveness,
-        q06_sectors: s6.q6_5_digital_tourism_rank,
-        q06_s_shifting_burden: s6.q_s6_shifting_burden,
-        q06_s_growth_underinvest: s6.q_s6_growth_underinvest,
-        q06_s_skills_mismatch_impact: s6.q_s6_skills_mismatch_impact,
-        q06_s_skills_mismatch_likelihood: s6.q_s6_skills_mismatch_likelihood,
+        q6_1_halal_sector_rank: s6.q6_1_halal_sector_rank,
+        q6_2_sequencing_effectiveness: s6.q6_2_sequencing_effectiveness,
+        q6_3_begmp_confidence: s6.q6_3_begmp_confidence,
+        q6_4_tourism_confidence: s6.q6_4_tourism_confidence,
+        q6_5_digital_tourism_rank: s6.q6_5_digital_tourism_rank,
+        q6_6_moral_governance_realistic: s6.q6_6_moral_governance_realistic,
         
         // Step 7
-        q07_bimpeaga: s7.q7_9_bimpeaga_leverage,
-        q07_markets: s6.q6_5_digital_tourism_rank,
-        q07_s_escalation: s7.q_s7_escalation,
-        q07_s_limits_growth: s7.q_s7_limits_growth,
-        q07_s_uae_corridor_impact: s7.q_s7_uae_corridor_impact,
-        q07_s_uae_corridor_likelihood: s7.q_s7_uae_corridor_likelihood,
+        q7_1_connectivity_priority: s7.q7_1_connectivity_priority,
+        q7_2_integration_challenge: s7.q7_2_integration_challenge,
+        q7_3_priority_node: s7.q7_3_priority_node,
+        q7_4_trapped_value_province: s7.q7_4_trapped_value_province,
+        q7_5_bridge_impact: s7.q7_5_bridge_impact,
+        q7_6_gateway_province: s7.q7_6_gateway_province,
+        q7_7_priority_vector: s7.q7_7_priority_vector,
+        q7_8_uae_feasibility: s7.q7_8_uae_feasibility,
+        q7_9_bimpeaga_leverage: s7.q7_9_bimpeaga_leverage,
         
         // Step 8
-        q08_finance_tier: s8.q8_1_finance_tier_priority,
-        q08_instruments: s8.q8_3_priority_action ? [s8.q8_3_priority_action] : [],
-        q08_s_big_man: s8.q_s8_big_man,
-        q08_s_shifting_burden: s8.q_s8_shifting_burden,
-        q08_s_islamic_finance_impact: s8.q_s8_islamic_finance_fw_impact,
-        q08_s_islamic_finance_likelihood: s8.q_s8_islamic_finance_fw_likelihood,
+        q8_1_finance_tier_priority: s8.q8_1_finance_tier_priority,
+        q8_2_roadmap_achievable: s8.q8_2_roadmap_achievable,
+        q8_3_priority_action: s8.q8_3_priority_action,
+        q8_4_islamic_authority: s8.q8_4_islamic_authority,
         
         // Step 9
-        q09_moral_governance_importance: s9.q9_1_moral_governance_derisk,
-        q09_archetype: s9.q9_2_critical_loop,
-        q09_s_governance_loop: s9.q_s9_governance_loop,
-        q09_s_investment_loop: s9.q_s9_investment_loop,
+        q9_1_moral_governance_derisk: s9.q9_1_moral_governance_derisk,
+        q9_2_critical_loop: s9.q9_2_critical_loop,
+        q9_3_regulatory_priority: s9.q9_3_regulatory_priority,
+        q9_4_revenue_channel: s9.q9_4_revenue_channel,
+        q9_5_stakeholder_alignment: s9.q9_5_stakeholder_alignment,
+        q9_6_reform_priority: s9.q9_6_reform_priority,
         
         // Step 10
-        q10_ieds_preference: s10.q10_1_ieds_preference,
+        q10_1_ieds_preference: s10.q10_1_ieds_preference,
+        q10_2_sequence_a_priority: s10.q10_2_sequence_a_priority,
+        q10_3_sequence_b_priority: s10.q10_3_sequence_b_priority,
+        q10_4_sequence_c_priority: s10.q10_4_sequence_c_priority,
+        q10_5_sequencing_logic: s10.q10_5_sequencing_logic,
+        q10_6_risk_mitigation: s10.q10_6_risk_mitigation,
+        q10_7_outcomes_achievable: s10.q10_7_outcomes_achievable,
         q10_matrix: s10.q10_matrix,
-        q10_sequencing_logic: s10.q10_5_sequencing_logic,
         
         // Step 11
-        q11_calibration_appropriate: s11.q11_1_calibration_appropriate,
-        q11_governance_kpi_importance: s11.q11_2_governance_kpi_importance,
-        q11_resilience_kpi_importance: s11.q11_3_resilience_kpi_importance,
+        q11_1_calibration_appropriate: s11.q11_1_calibration_appropriate,
+        q11_2_governance_kpi_importance: s11.q11_2_governance_kpi_importance,
+        q11_3_resilience_kpi_importance: s11.q11_3_resilience_kpi_importance,
+        q11_4_inclusivity_kpi_importance: s11.q11_4_inclusivity_kpi_importance,
+        q11_5_peace_kpi_importance: s11.q11_5_peace_kpi_importance,
+        q11_6_cluster_kpi_sufficient: s11.q11_6_cluster_kpi_sufficient,
+        q11_7_benchmark_priority: s11.q11_7_benchmark_priority,
         
         // Step 12
-        q12_learning_growth_alignment: s12.q12_1_learning_growth_alignment,
-        q12_strongest_pathway: s12.q12_5_strongest_pathway,
-        q12_vision_clarity: s12.q12_6_vision_clarity,
+        q12_1_learning_growth_alignment: s12.q12_1_learning_growth_alignment,
+        q12_2_internal_process_alignment: s12.q12_2_internal_process_alignment,
+        q12_3_stakeholder_alignment: s12.q12_3_stakeholder_alignment,
+        q12_4_financial_alignment: s12.q12_4_financial_alignment,
+        q12_5_strongest_pathway: s12.q12_5_strongest_pathway,
+        q12_6_vision_clarity: s12.q12_6_vision_clarity,
+        q12_7_vision_achievable: s12.q12_7_vision_achievable,
+        q12_8_mission_alignment: s12.q12_8_mission_alignment,
+        q12_9_bsc_useful: s12.q12_9_bsc_useful,
+        q12_10_adaptive_frequency: s12.q12_10_adaptive_frequency,
         
         // Step 13
-        q13_budget_priority_phase: s13.q13_6_budget_priority_phase,
-        q13_budget_priority_cluster: s13.q13_7_budget_priority_cluster,
-        q13_targets_realistic: s13.q13_2_targets_realistic,
+        q13_1_funding_mix_fair: s13.q13_1_funding_mix_fair,
+        q13_2_targets_realistic: s13.q13_2_targets_realistic,
+        q13_3_high_risk_concern: s13.q13_3_high_risk_concern,
+        q13_4_medium_risk_concern: s13.q13_4_medium_risk_concern,
+        q13_5_low_risk_concern: s13.q13_5_low_risk_concern,
+        q13_6_budget_priority_phase: s13.q13_6_budget_priority_phase,
+        q13_7_budget_priority_cluster: s13.q13_7_budget_priority_cluster,
+        q13_8_blended_finance_opinion: s13.q13_8_blended_finance_opinion,
         
         // Step 14
-        q14_engagement_type: s14.q14_1_engagement_type,
-        q14_contact_method: s14.q14_2_contact_method,
-        q14_additional_comments: s14.q14_5_additional_comments,
+        q14_1_engagement_type: s14.q14_1_engagement_type,
+        q14_2_contact_method: s14.q14_2_contact_method,
+        q14_3_timing: s14.q14_3_timing,
+        q14_4_role_contribution: s14.q14_4_role_contribution,
+        q14_5_additional_comments: s14.q14_5_additional_comments,
         
         // Step 15
-        q15_confirm_accurate: s15.q15_1_confirm_accurate,
-        q15_consent_voluntary: s15.q15_3_consent_voluntary,
+        q15_1_confirm_accurate: s15.q15_1_confirm_accurate,
+        q15_2_consent_anonymous_use: s15.q15_2_consent_anonymous_use,
+        q15_3_consent_voluntary: s15.q15_3_consent_voluntary,
+        q15_4_ready_to_submit: s15.q15_4_ready_to_submit,
         consent_final: true,
 
         // ── Explicit SWOT Field Mapping (to satisfy strict Zod schema) ──
@@ -816,7 +841,8 @@ const SurveyWizard: React.FC = () => {
         q_s9_governance_loop_followup: s9.q_s9_governance_loop_followup,
       };
 
-      await submitSurvey(payload as any); // Type assertion handled by partial mapping
+      // This calls the Edge Function via your centralized api.ts wrapper
+      await submitSurvey(payload as any); 
       toast.success("Survey submitted successfully! Your input shapes the Emerging Bangsamoro.");
     } catch (err) {
       toast.error("Submission failed. Please try again or contact support.");
@@ -951,35 +977,6 @@ const SurveyWizard: React.FC = () => {
             </button>
           )}
         </div>
-        // In SurveyWizard.tsx handleSubmit function:
-const handleSubmit = async () => {
-  setSubmitting(true);
-  try {
-    // Combine all section states into single payload
-    const payload: Partial<SurveySchemaType> = {
-      // Map s0, s1, s2... s15 to schema fields
-      q0_1_ready: s0.q0_1_ready,
-      q0_2_ecosystem_understanding: s0.q0_2_ecosystem_understanding,
-      // ... all other fields from all sections
-      consent_final: true,
-    };
-
-    // Call the edge function
-    const response = await fetch('https://lydsisparsmvextskevw.supabase.co/functions/v1/survey-submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) throw new Error('Submission failed');
-    
-    toast.success("Survey submitted successfully!");
-  } catch (err) {
-    toast.error("Submission failed. Please try again.");
-  } finally {
-    setSubmitting(false);
-  }
-};
       </div>
     </div>
   );
