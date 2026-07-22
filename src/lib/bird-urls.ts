@@ -1,524 +1,604 @@
 // src/lib/bird-urls.ts
 // BIRD 2026–2035 · Centralized URL Registry
 // Videos, Images, and Site Pages for Context, Reference, Visualizations & Interactions
-// Updated: 2026-07-16 | 63+ images, 5 videos, 12 sites | All URLs validated
+// Updated: 2026-07-23 — Complete URL mapping per user specifications
 
 export const BIRD_VIDEOS = {
   overview: {
     title: "Bangsamoro Investment Roadmap 2026‑2035 | Southeast Asia's Hub for Ethical & Sustainable Growth",
     url: "https://youtu.be/UCi2dVUmSbE",
-    duration: "~15 min",
+    duration: "~7 min",
     section: "general",
-    description: "Comprehensive overview of the BIRD 2026-2035 strategic vision, BEIE framework, and the path to making BARMM Southeast Asia's premier ethical investment destination.",
-  },
-  contextBEIE: {
-    title: "Context Analysis and the BEIE Framework",
-    url: "https://youtu.be/Li7lpyWWMcE",
-    duration: "~12 min",
-    section: "section1",
-    description: "Deep dive into the Bangsamoro Economic and Investment Ecosystem (BEIE) Framework context analysis methodology, covering all 5 clusters and their interdependencies.",
-  },
-  swotSystems: {
-    title: "SWOT Analysis and Systems Mapping",
-    url: "https://youtu.be/LSmBzwyX2uw",
-    duration: "~18 min",
-    section: "section2",
-    description: "How to conduct comprehensive SWOT analysis integrated with systems thinking causal loop diagrams and archetype identification for strategic planning.",
-  },
-  strategicOptions: {
-    title: "Strategic Options and the Investment Roadmap",
-    url: "https://youtu.be/kb_snh8mo1k",
-    duration: "~20 min",
-    section: "section8",
-    description: "Formulating strategic options using the TOWS matrix, 7-criteria evaluation, and building the phased investment roadmap with IEDS sequencing.",
+    description: "Discover how the Bangsamoro Investment Roadmap (BIRD) 2026‑2035 positions BARMM as Southeast Asia's hub for resilient, ethical, and sustainable investments — highlighting its growth momentum, the risks ahead, and the frameworks driving transformation.",
   },
   systemsThinking: {
-    title: "On Systems Thinking",
+    title: "Systems Thinking: Moving from Checklists to Interconnected Investment Ecosystem",
     url: "https://youtu.be/VBAHk0WYz_c",
     duration: "~10 min",
-    section: "section2",
-    description: "Introduction to systems thinking for strategic planning — understanding feedback loops, delays, and non-linear causality in the BARMM economic ecosystem.",
+    section: "section0",
+    description: "Discover how the Bangsamoro Investment Roadmap (BIRD 2026–2035) turns fragmented efforts into a unified engine of growth. This video unpacks: Systems Thinking — shifting from checklists to interconnected strategies; Feedback Loops — cycles that amplify progress and stabilize change; Causal Loop Diagrams — visuals that expose traps and leverage points; and Leverage Strategies — small shifts sparking big gains in governance, infrastructure, and equity.",
+  },
+  beieFramework: {
+    title: "Bangsamoro Economic & Investment Ecosystem (BEIE) Framework",
+    url: "https://youtu.be/0J491Vqya_4",
+    duration: "~3 min",
+    section: "section3",
+    description: "Discover how the Bangsamoro Economic and Investment Ecosystem (BEIE) Framework is transforming BARMM into a resilient, ethical, and globally connected hub. This video explains the 2026‑2035 Investment Roadmap, highlighting how synchronized ecosystems—Foundations, Transformers, Enablers, Connectors, and Financiers—work together to drive unstoppable growth.",
+  },
+  strategicOptions: {
+    title: "Strategic Options & Path to Growth",
+    url: "https://youtu.be/kb_snh8mo1k",
+    duration: "~7 min",
+    section: "section10",
+    description: "Discover the strategic choices shaping Bangsamoro's Investment Roadmap 2026–2035. This video shows how well-crafted strategies and priorities can fuel inclusive growth, sustainability, and regional competitiveness in BARMM.",
   },
 } as const;
 
 export const BIRD_IMAGES = {
   // ═══════════════════════════════════════════════════════════════════════════════
-  // SECTION 0: VALIDATION SURVEY & PLATFORM
+  // SECTION 0: VALIDATION SURVEY & ORIENTATION
   // ═══════════════════════════════════════════════════════════════════════════════
   validationSurveyBanner: {
     title: "BIRD Validation Survey 2026-2035",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/0-Survey.png",
-    category: "survey", section: "general", alt: "BIRD validation survey banner",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Validation%20Survey%20Banner.png",
+    category: "survey",
+    section: "section0",
+    alt: "BIRD validation survey banner",
     description: "Official validation survey banner for the BIRD 2026-2035 stakeholder consultation process.",
   },
-  validationProcess: {
-    title: "Validation Process Flow",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/2-Process.png",
-    category: "survey", section: "general", alt: "Validation process workflow",
-    description: "Step-by-step validation process from survey distribution through stakeholder feedback to roadmap finalization.",
-  },
-  surveyAnalytics: {
-    title: "Survey Analytics Dashboard",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/3-Dashboard.png",
-    category: "survey", section: "general", alt: "Survey analytics dashboard",
-    description: "Real-time analytics dashboard showing survey response rates, stakeholder engagement metrics, and thematic analysis.",
-  },
-
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // SECTION 1: BEIE FRAMEWORK & STRATEGIC CONTEXT
-  // ═══════════════════════════════════════════════════════════════════════════════
-  vision: {
-    title: "BIRD Vision 2026-2035",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/18.%20Vision.png",
-    category: "framework", section: "section1", alt: "BIRD strategic vision diagram",
-    description: "The strategic vision for BIRD 2026-2035: positioning BARMM as Southeast Asia's premier ethical and sustainable investment destination.",
-  },
-  beieFramework: {
-    title: "Bangsamoro BEIE Framework",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-context-beie-framework/public/19.%20Bangsamoro%20BEIE%20Framework.png",
-    category: "framework", section: "section1", alt: "BEIE Framework structure diagram",
-    description: "The complete Bangsamoro Economic and Investment Ecosystem (BEIE) Framework showing all 5 clusters, their nodes, and interconnections.",
-  },
-  operatingSystemsTrust: {
-    title: "Operating Systems: Trust as the Currency",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-context-beie-framework/public/20.%20Operating%20Systems_%20Trust%20as%20the%20Currency.png",
-    category: "framework", section: "section2", alt: "Trust-based operating systems diagram",
-    description: "How trust functions as the core operating currency across the BEIE framework, enabling transactions, governance, and investment flows.",
-  },
-  beieEcosystem: {
-    title: "BEIE Ecosystem Map",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/4-Ecosystem.png",
-    category: "framework", section: "section1", alt: "BEIE ecosystem map",
-    description: "Comprehensive ecosystem map showing the relationships between government institutions, private sector, civil society, and international partners.",
-  },
-  moralGovernance: {
-    title: "Moral Governance Framework",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/21.png",
-    category: "governance", section: "section1", alt: "Moral governance framework",
-    description: "The Moral Governance framework that anchors the BEIE, integrating Islamic principles, transparency, and accountability mechanisms.",
-  },
-  strategicPillars: {
-    title: "Four Strategic Pillars",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/27.png",
-    category: "framework", section: "section1", alt: "Four strategic pillars diagram",
-    description: "The four strategic pillars of BIRD 2026-2035: Halal Industry, Governance Reform, Infrastructure & Connectivity, and Islamic Finance.",
-  },
-
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // SECTION 2: SYSTEMS THINKING & SWOT
-  // ═══════════════════════════════════════════════════════════════════════════════
-  systemsThinkingBanner: {
-    title: "Systems Thinking for BIRD",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/1-Systems%20Thinking%20Banner.png",
-    category: "systems", section: "section2", alt: "Systems thinking banner",
-    description: "Banner image introducing systems thinking methodology applied to the Bangsamoro Investment Roadmap development.",
-  },
-  icebergParadigm: {
-    title: "Iceberg Paradigm",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/5-Paradigm.png",
-    category: "systems", section: "section2", alt: "Iceberg model of systems thinking",
-    description: "The iceberg paradigm showing visible events above the waterline and underlying patterns, structures, and mental models below.",
+  anatomyCLD: {
+    title: "Anatomy of Causal Loop Diagram",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/3-Anatomy%20of%20CLD.png",
+    category: "systems",
+    section: "section0",
+    alt: "Anatomy of Causal Loop Diagram",
+    description: "A Causal Loop Diagram (CLD) has interconnected elements: Variables — factors that change over time; Links — arrows showing influence; Polarity — marked as 's' for same-direction and 'o' for opposite-direction effects.",
   },
   anatomySystemTraps: {
-    title: "Anatomy of System Traps",
+    title: "Anatomy of Systems Traps",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/6-Anatomy%20of%20Systems%20Traps.png",
-    category: "systems", section: "section2", alt: "System traps anatomy diagram",
-    description: "Diagram illustrating common system traps that undermine strategic initiatives and how to identify and escape them.",
+    category: "systems",
+    section: "section0",
+    alt: "Feedback Loops and Leverage Points",
+    description: "Visual explanation of feedback loops (Reinforcing and Balancing) and Meadows' Leverage Hierarchy showing Transformative (L1–L2), Systemic (L5–L6), and Incremental (L10) leverage points.",
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // SECTION 3: BEIE FRAMEWORK & SYSTEMS THINKING
+  // ═══════════════════════════════════════════════════════════════════════════════
+  systemsBasedReframing: {
+    title: "Why the Need for Systems-Based Reframing",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Why%20the%20need%20for%20Systems-Based%20reframing.png",
+    category: "framework",
+    section: "section3",
+    alt: "Systems-Based Reframing",
+    description: "Conveys the shift from traditional, siloed approaches to investment planning toward a more integrated, systems-oriented perspective.",
+  },
+  sectorToEcosystem: {
+    title: "From Sector-Based Planning to BEIE Approach",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/From%20Sector-Based%20Planning%20to%20BEIE%20Approach.png",
+    category: "framework",
+    section: "section3",
+    alt: "Mental Model Shift",
+    description: "Illustrates the mental model shift from siloed development to an interconnected ecosystem that drives inclusive and sustainable growth.",
+  },
+  beieFramework: {
+    title: "Bangsamoro Economic and Investment Ecosystem (BEIE)",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/BEIE%20Framework%20-1%20.png",
+    category: "framework",
+    section: "section3",
+    alt: "BEIE Framework",
+    description: "Presents a circular system powered by Moral Governance at its center, with five interconnected components: Foundations, Transformers, Financiers, Connectors, and Enablers.",
+  },
+  operatingSystems: {
+    title: "Operating Systems: Moral Governance",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/OS.png",
+    category: "governance",
+    section: "section3",
+    alt: "Moral Governance Operating System",
+    description: "Moral Governance serves as the central operating system with three foundational pillars: Peace, Resilience, and Inclusivity.",
+  },
+  fiveClusters: {
+    title: "Five Interconnected Clusters",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/5%20Interconnected%20Clusters.png",
+    category: "framework",
+    section: "section3",
+    alt: "Five Clusters",
+    description: "The Parts of the Engine: Foundations, Financiers, Transformers, Enablers, and Connectors working together as one economic engine.",
   },
   investmentVirtuousCycle: {
     title: "Investment-Development Virtuous Cycle",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/14.%20Investment-Development%20Virtuous%20Cycle.png",
-    category: "systems", section: "section2", alt: "Virtuous cycle diagram",
-    description: "The virtuous cycle connecting investment inflows to infrastructure development, job creation, and further investment attraction.",
+    category: "systems",
+    section: "section3",
+    alt: "Virtuous Cycle",
+    description: "Reinforcing loop showing how strategic investment triggers a self-sustaining cycle of growth across BARMM's economy.",
   },
   investmentGovernanceCycles: {
     title: "Investment and Governance Cycles",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/public/15.%20Investment%20and%20Governance%20Cycles.png",
-    category: "systems", section: "section2", alt: "Investment governance cycles",
-    description: "How investment flows interact with governance reforms to create reinforcing or balancing feedback loops.",
-  },
-  swotMatrix: {
-    title: "SWOT Analysis Matrix",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/7-SWOT.png",
-    category: "systems", section: "section2", alt: "SWOT analysis matrix",
-    description: "The comprehensive SWOT analysis matrix for BARMM, identifying internal strengths/weaknesses and external opportunities/threats.",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/Investment%20and%20Governance%20Cycles.png",
+    category: "systems",
+    section: "section3",
+    alt: "Investment Governance Cycles",
+    description: "Two interconnected reinforcing loops (R1: Investment-Development, R2: Governance-Investor Confidence) that drive sustained development.",
   },
 
   // ═══════════════════════════════════════════════════════════════════════════════
-  // SECTION 3-7: CLUSTERS 1-5
+  // SECTION 4: CLUSTER 1 - FOUNDATIONS
   // ═══════════════════════════════════════════════════════════════════════════════
   cluster1Foundations: {
     title: "Cluster 1: Foundations",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-context-beie-framework/public/25.%20Cluster%201_%20Foundations.png",
-    category: "cluster", section: "section3", alt: "Foundations cluster diagram",
-    description: "Cluster 1 — Foundations: Islamic governance, legal frameworks, land tenure, and institutional capacity building.",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Cluster%201-Foundations.png",
+    category: "cluster",
+    section: "section4",
+    alt: "Foundations Cluster",
+    description: "The Infrastructure-First Resource Base: Agri-Fisheries, Energy, Forestry, and Environment forming the groundwork for economic development.",
   },
+  tragedyCommons: {
+    title: "Tragedy of the Commons Archetype",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Tragedy%20of%20the%20Commons%20Archetype.png",
+    category: "archetype",
+    section: "section4",
+    alt: "Tragedy of the Commons",
+    description: "Warning of how uncoordinated exploitation of shared natural resources leads to systemic collapse across BARMM's Foundations cluster.",
+  },
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // SECTION 5: CLUSTER 2 - TRANSFORMERS
+  // ═══════════════════════════════════════════════════════════════════════════════
   cluster2Transformers: {
     title: "Cluster 2: Transformers",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-context-beie-framework/public/26.%20Cluster%202%20_%20Transformers.png",
-    category: "cluster", section: "section4", alt: "Transformers cluster diagram",
-    description: "Cluster 2 — Transformers: Halal industry, agribusiness, manufacturing, and export-oriented sectors driving economic transformation.",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Cluster%202%20_%20Transformers.png",
+    category: "cluster",
+    section: "section5",
+    alt: "Transformers Cluster",
+    description: "Engines of Value Creation: Raw Material → High-Value Processing → Premium Export targeting the ASEAN Halal market.",
   },
+  halalIndustryAdvantage: {
+    title: "The Halal Industry Advantage: Capitalizing Cultural Advantage",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Capitalizing%20Cultural%20Advantage%20-%20Halal%20Industry%20Adv.png",
+    category: "cluster",
+    section: "section5",
+    alt: "Halal Industry Advantage",
+    description: "Highlights Bangsamoro's cultural and geographic strengths in capturing the ASEAN halal market through Food & Beverage, Cosmetics, and Pharmaceuticals.",
+  },
+  farmToMarketPipeline: {
+    title: "Transformers: MAFAR Halal Farm-to-Market Pipeline",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Transformers-Farm-to-Market%20Pipeline%20.png",
+    category: "cluster",
+    section: "section5",
+    alt: "Farm-to-Market Pipeline",
+    description: "Structured value chain: Input Supply → Cold Chain & Logistics → Processing → Market Linkage with BIMP-EAGA integration.",
+  },
+  industrialEconomicZones: {
+    title: "Industrial & Economic Zones",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Industrial%20and%20Economic%20Zones.png",
+    category: "cluster",
+    section: "section5",
+    alt: "Industrial Zones",
+    description: "Strategic hubs: Polloc Freeport & EcoZone and WOW Matanog Special Economic Zone (Bangsamoro Halal Park).",
+  },
+  growthUnderinvestment: {
+    title: "Growth and Underinvestment Archetype",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Growth%20and%20Underinvestment%20(1).png",
+    category: "archetype",
+    section: "section5",
+    alt: "Growth and Underinvestment",
+    description: "Illustrates how rapid investment expansion stalls when institutional capacity fails to keep pace.",
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // SECTION 6: CLUSTER 3 - ENABLERS
+  // ═══════════════════════════════════════════════════════════════════════════════
   cluster3Enablers: {
     title: "Cluster 3: Enablers",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-context-beie-framework/public/28.%20Cluster%203%20_%20Enablers.png",
-    category: "cluster", section: "section5", alt: "Enablers cluster diagram",
-    description: "Cluster 3 — Enablers: Infrastructure, energy, digital connectivity, and human capital development enabling growth.",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Cluster%203%20Enablers.png",
+    category: "cluster",
+    section: "section6",
+    alt: "Enablers Cluster",
+    description: "Constructing the Support Architecture: Digital Connectivity, Physical Infrastructure, Education & Skills, Health & Social Protection.",
   },
+  skillsEducationGap: {
+    title: "Skills and Education Gap",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Skills%20and%20Education%20Gap.png",
+    category: "cluster",
+    section: "section6",
+    alt: "Skills Gap Analysis",
+    description: "Gap Analysis Matrix showing how Bangsamoro's workforce training lags behind industry needs in Agriculture, Infrastructure, and Halal Industry.",
+  },
+  enablingGrid: {
+    title: "The Enabling Grid & The Law of Sequencing",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Layer%202%20-%20The%20Enabling%20Grid%20and%20Lawof%20Sequencing.png",
+    category: "cluster",
+    section: "section6",
+    alt: "Enabling Grid",
+    description: "Sequential stages: Energy Priming → Physical Mobility → Logistics Integrity → Industrial Scaling.",
+  },
+  digitalTransformation: {
+    title: "Digital Transformation Master Plan",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Digital%20Transformation%20Master%20Plan.png",
+    category: "cluster",
+    section: "section6",
+    alt: "Digital Transformation",
+    description: "BEGMP roadmap: Broadband & Connectivity, Smart Cities, E-Government, and Cybersecurity.",
+  },
+  tourismMasterPlan: {
+    title: "Tourism Master Plan (BTDP 2024–2033)",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Tourism%20Master%20Plan.png",
+    category: "cluster",
+    section: "section6",
+    alt: "Tourism Master Plan",
+    description: "Ten-year strategy with three phases: Organizing (2025–2026), Stabilizing (2027–2028), Institutionalizing (2029–2033).",
+  },
+  tourismDigitalConnectivity: {
+    title: "Tourism and Digital Connectivity",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Tourism%20and%20Digital%20Connectivity.png",
+    category: "cluster",
+    section: "section6",
+    alt: "Tourism Digital",
+    description: "Reinforcing Loop II: Digital Infrastructure & Smart Tourism enabling broader economic development.",
+  },
+  activatingEnablers: {
+    title: "Activating the Enablers: Infra Primed by Moral Governance",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Activating%20the%20Enablers%20-%20Infra%20Primed%20by%20Moral%20Governance.png",
+    category: "governance",
+    section: "section6",
+    alt: "Activating Enablers",
+    description: "Moral Governance as operating system powering physical development: 100% Electrification, 85% Broadband, 30% Logistics Cost Reduction.",
+  },
+  limitsGrowth: {
+    title: "Limits to Growth Archetype",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Limits%20to%20Growth%20Archetype.png",
+    category: "archetype",
+    section: "section6",
+    alt: "Limits to Growth",
+    description: "Illustrates how rapid investment expansion slows when structural ceilings are reached.",
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // SECTION 7: CLUSTER 4 - CONNECTORS
+  // ═══════════════════════════════════════════════════════════════════════════════
   cluster4Connectors: {
     title: "Cluster 4: Connectors",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-context-beie-framework/public/33.%20Cluster%204_%20Connectors.png",
-    category: "cluster", section: "section6", alt: "Connectors cluster diagram",
-    description: "Cluster 4 — Connectors: Trade corridors, logistics hubs, BIMP-EAGA integration, and international partnerships.",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Cluster%204_%20Connectors.png",
+    category: "cluster",
+    section: "section7",
+    alt: "Connectors Cluster",
+    description: "Linking Local Value to Global Demand: BIMP-EAGA Corridor and UAE & GCC trade routes.",
   },
-  cluster5Financiers: {
-    title: "Cluster 5: Financiers",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-context-beie-framework/public/38.%20Cluster%205_%20Financiers.png",
-    category: "cluster", section: "section7", alt: "Financiers cluster diagram",
-    description: "Cluster 5 — Financiers: Islamic finance institutions, development banks, venture capital, and investment funds.",
+  connectivityCapital: {
+    title: "The Connectivity Capital",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/The%20Connectivity%20Capital%20.png",
+    category: "connectivity",
+    section: "section7",
+    alt: "Connectivity Capital",
+    description: "Categorizing the Investment Pipeline: Physical Pipelines, Digital Backbones, Market-Access Assets.",
   },
-
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // CONNECTIVITY & TRADE CORRIDORS
-  // ═══════════════════════════════════════════════════════════════════════════════
-  connectivityUAE: {
-    title: "BARMM Strategic Connectivity vis-à-vis UAE",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/UAE%20&%20GCC.png",
-    category: "connectivity", section: "section6", alt: "UAE and GCC connectivity map",
-    description: "Strategic connectivity map showing BARMM's trade and investment linkages with UAE and Gulf Cooperation Council countries.",
+  integratingZones: {
+    title: "Critical Test: Integrating Zones & Scaling Capital",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/Critical%20Test%20-%20Integrating%20Zones%20and%20Scaling%20Capiral%20-%20Think%20of%20one%20challenge%20%20we%20must%20overcome%20to%20achieve%20this%20vision.png",
+    category: "connectivity",
+    section: "section7",
+    alt: "Integrating Zones",
+    description: "Visualizes challenge of linking physical connectivity with ethical financing.",
   },
-  connectivityBIMPEAGA: {
-    title: "BARMM Strategic Connectivity vis-à-vis BIMP-EAGA",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/BARMM%20Connectivity%20%20.png",
-    category: "connectivity", section: "section6", alt: "BIMP-EAGA connectivity map",
-    description: "Connectivity map illustrating BARMM's integration within the BIMP-EAGA growth area and regional trade corridors.",
+  provincialSpecializedNode: {
+    title: "Layer 1: Provincial Specialized Node and Equity - One Bangsamoro",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Layer%201%20-%20Provincial%20-%20Geopolitical%20Specialized%20Nodes.png",
+    category: "provincial",
+    section: "section7",
+    alt: "Provincial Nodes",
+    description: "Geopolitical Specialized Nodes: Mainland Nodes (Maguindanao, Lanao, SGA) and Archipelagic Hubs (Basilan, Tawi-Tawi).",
   },
-
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // PROVINCIAL DIAGNOSTICS & OUTLOOKS
-  // ═══════════════════════════════════════════════════════════════════════════════
-  provincialEndowments: {
-    title: "Provincial Endowments Leverages (LDS and Maguindanao)",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/13.%20Provincial%20Endowments-Mainlands.png",
-    category: "provincial", section: "section14", alt: "Provincial endowments map",
-    description: "Endowment leverage analysis for mainland provinces (Lanao del Sur and Maguindanao) showing comparative advantages.",
+  trappedValue: {
+    title: "The Trapped Value",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/The%20Trapped%20Value.png",
+    category: "provincial",
+    section: "section7",
+    alt: "Trapped Value",
+    description: "Geographic Reality: We Cannot Export Value We Cannot Move — farm-to-market roads and ports must precede agro-industrial scale-up.",
   },
-  provincialDiagnostics: {
-    title: "Provincial Diagnostics Overview",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Provincial%20Diagnostics.png",
-    category: "provincial", section: "section14", alt: "Provincial diagnostics dashboard",
-    description: "Comprehensive diagnostics dashboard for all BARMM provinces covering economic, social, infrastructure, and governance indicators.",
+  revitalizingMaritime: {
+    title: "Revitalizing the Maritime Trade",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Revitalizing%20the%20Maritime%20Trade.png",
+    category: "connectivity",
+    section: "section7",
+    alt: "Maritime Trade",
+    description: "Mapping maritime trade flows and proposed port and logistics upgrades to unlock regional exports.",
   },
-  maguindanaoNorte: {
-    title: "Maguindanao del Norte",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Maguindanao-del-Norte.png",
-    category: "provincial", section: "section14", alt: "Maguindanao del Norte profile",
-    description: "Provincial profile for Maguindanao del Norte including resource endowments, infrastructure status, and investment opportunities.",
+  shatteringIsolation: {
+    title: "Shattering Geographic Isolation",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Shattering%20Geographical%20Isolation.png",
+    category: "connectivity",
+    section: "section7",
+    alt: "Archipelagic Bridge",
+    description: "Strategic infrastructure: Zamboanga-Basilan Interconnection (₱6.67B), Basilan-Zamboanga Bridge (31km), Bongao Bridge (541m).",
   },
   basilanTawiTawi: {
     title: "Basilan and Tawi-Tawi",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Basilan%20and%20tawi-Tawi.png",
-    category: "provincial", section: "section14", alt: "Basilan and Tawi-Tawi profile",
-    description: "Island province profiles for Basilan and Tawi-Tawi highlighting fisheries, agriculture, and maritime trade potential.",
+    category: "provincial",
+    section: "section7",
+    alt: "Island Provinces",
+    description: "Provincial Endowments & Strategic Leverages: Basilan (Logistics Gateway) and Tawi-Tawi (Maritime & Eco-Tourism Hub).",
   },
-  maguindanaoSur: {
-    title: "Maguindanao del Sur",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Maguidano-del-Sur.png",
-    category: "provincial", section: "section14", alt: "Maguindanao del Sur profile",
-    description: "Provincial profile for Maguindanao del Sur covering agricultural potential, infrastructure gaps, and development priorities.",
+  globalIntegration: {
+    title: "Global Integration Vectors",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Global%20Integration%20Vectors.png",
+    category: "connectivity",
+    section: "section7",
+    alt: "Global Integration",
+    description: "Layer 3: BIMP-EAGA Corridor (3% ASEAN halal market) and UAE & GCC Corridor ($2.3T global halal market).",
   },
-  provincialOutlookLDS: {
-    title: "Provincial Outlook: Lanao del Sur",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/1.%20Lanao%20del%20Sur.png",
-    category: "provincial-outlook", section: "section14", alt: "Lanao del Sur provincial outlook",
-    description: "Detailed provincial outlook for Lanao del Sur with key economic indicators, investment climate, and priority sectors.",
+  uaeGccConnectivity: {
+    title: "BARMM Strategic Connectivity vis-à-vis UAE & GCC",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/UAE%20&%20GCC.png",
+    category: "connectivity",
+    section: "section7",
+    alt: "UAE GCC",
+    description: "Geographic map linking Bangsamoro's key provinces to the $2.3 trillion global halal market.",
   },
-  provincialOutlookMaguindanao: {
-    title: "Provincial Outlook: Maguindanao",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/2.%20Maguindanao%20del%20Sur.png",
-    category: "provincial-outlook", section: "section14", alt: "Maguindanao provincial outlook",
-    description: "Comprehensive outlook for Maguindanao province with growth projections, sectoral analysis, and investment readiness assessment.",
+  barmmConnectivityBIMPEAGA: {
+    title: "BARMM Strategic Connectivity Map",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/BARMM%20Connectivity-BIMP-EAGA.png",
+    category: "connectivity",
+    section: "section7",
+    alt: "BIMP-EAGA",
+    description: "Links provincial hubs to BIMP-EAGA Corridor and UAE & GCC Route.",
   },
-  provincialOutlookBasilan: {
-    title: "Provincial Outlook: Basilan",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/3.%20Basilan.png",
-    category: "provincial-outlook", section: "section14", alt: "Basilan provincial outlook",
-    description: "Investment outlook for Basilan province focusing on fisheries, coconut processing, and emerging halal sectors.",
-  },
-  provincialOutlookTawiTawi: {
-    title: "Provincial Outlook: Tawi-Tawi",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/4.%20Tawi-Tawi.png",
-    category: "provincial-outlook", section: "section14", alt: "Tawi-Tawi provincial outlook",
-    description: "Tawi-Tawi provincial outlook highlighting seaweed industry, tourism potential, and maritime connectivity opportunities.",
-  },
-  provincialOutlookSulu: {
-    title: "Provincial Outlook: Sulu",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/5.%20Sulu.png",
-    category: "provincial-outlook", section: "section14", alt: "Sulu provincial outlook",
-    description: "Provincial outlook for Sulu with focus on pearl industry, tourism, and peace-building economic initiatives.",
-  },
-  provincialOutlookCotabato: {
-    title: "Provincial Outlook: Special Geographic Area",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/6.%20Cotabato.png",
-    category: "provincial-outlook", section: "section14", alt: "Cotabato special geographic area outlook",
-    description: "Economic outlook for the Special Geographic Area of Cotabato within the BARMM territory.",
+  successSuccessful: {
+    title: "Success to the Successful Archetype",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Success%20to%20the%20Successful%20Aarchetype.png",
+    category: "archetype",
+    section: "section7",
+    alt: "Success to Successful",
+    description: "Illustrates how initial advantages reinforce uneven development between mainland and island provinces.",
   },
 
   // ═══════════════════════════════════════════════════════════════════════════════
-  // SYSTEMS ARCHETYPES
+  // SECTION 8: CLUSTER 5 - FINANCIERS
   // ═══════════════════════════════════════════════════════════════════════════════
+  cluster5Financiers: {
+    title: "Cluster 5: Financiers",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/38.%20Cluster%205_%20Financiers.png",
+    category: "cluster",
+    section: "section8",
+    alt: "Financiers Cluster",
+    description: "Powering the Bloodstream of the Economy: Islamic finance through ethical and faith-aligned capital mechanisms.",
+  },
+  financiersCapitalBloodstream: {
+    title: "The Capital Bloodstream",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Financiers.png",
+    category: "cluster",
+    section: "section8",
+    alt: "Capital Bloodstream",
+    description: "Scaling Shariah-Compliant Finance: Macro-Capital (Islamic Banking & Sukuk), Risk Mitigation (Takaful), Micro-Access (Islamic Microfinance & Waqf).",
+  },
+  islamicFinanceRoadmap: {
+    title: "Islamic Finance Roadmap (2024–2028)",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Islamic%20Finance%20Roadmap.png",
+    category: "cluster",
+    section: "section8",
+    alt: "Islamic Finance",
+    description: "Six progressive layers from Strengthen Islamic Banking Foundation to Develop Human Capital.",
+  },
   shiftingBurden: {
-    title: "Shifting the Burden",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/9.png",
-    category: "archetype", section: "section2", alt: "Shifting the burden archetype",
-    description: "Shifting the Burden archetype: when symptomatic solutions divert attention from fundamental systemic issues.",
+    title: "Shifting the Burden Archetype",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Shifting%20the%20Burden.png",
+    category: "archetype",
+    section: "section8",
+    alt: "Shifting Burden",
+    description: "BARMM's reliance on conventional banking instead of fully investing in Islamic finance institutions.",
   },
-  fixesFail: {
-    title: "Fixes that Fail",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/8-FtF.png",
-    category: "archetype", section: "section2", alt: "Fixes that fail archetype",
-    description: "Fixes that Fail archetype: well-intentioned interventions that produce unintended consequences, undermining long-term goals.",
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // SECTION 9: OPERATING SYSTEMS
+  // ═══════════════════════════════════════════════════════════════════════════════
+  operatingSystemsOS: {
+    title: "Operating Systems: Moral Governance",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/OS.png",
+    category: "governance",
+    section: "section9",
+    alt: "Moral Governance",
+    description: "Central operating system with three pillars: Peace, Resilience, and Inclusivity.",
   },
-  tragedyCommons: {
-    title: "Tragedy of the Commons",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/1-Systems%20Thinking%20Banner.png",
-    category: "archetype", section: "section2", alt: "Tragedy of the commons archetype",
-    description: "Tragedy of the Commons archetype: individual actors depleting shared resources, leading to collective detriment.",
+  moralGovernanceDeRisks: {
+    title: "How Moral Governance De-Risks Capital",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/How%20moral%20Governance%20De-Risks%20Capital.png",
+    category: "governance",
+    section: "section9",
+    alt: "De-Risks Capital",
+    description: "Reinforcing feedback loop: Moral Governance → Transparency → Investor Confidence → FDI → Revenue → Governance Capacity.",
   },
-  successSuccessful: {
-    title: "Success to the Successful",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/13.png",
-    category: "archetype", section: "section2", alt: "Success to the successful archetype",
-    description: "Success to the Successful archetype: reinforcing loops that concentrate resources among winners, widening inequality gaps.",
+  regulatoryArchitecture: {
+    title: "Regulatory Architecture of BIRD 2026–2035",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Regulatory%20Architecture.png",
+    category: "governance",
+    section: "section9",
+    alt: "Regulatory Architecture",
+    description: "Five pillars supporting Bangsamoro Organic Law: 2nd BDP & SIPP, BHIDP, BSEMP, RA 11439 & CREATE MORE Act, Pending Forestry Code.",
   },
-  limitsGrowth: {
-    title: "Limits to Growth",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/9LtG.png",
-    category: "archetype", section: "section2", alt: "Limits to growth archetype",
-    description: "Limits to Growth archetype: exponential growth encountering balancing loops that slow or reverse progress.",
+  draftJMC: {
+    title: "Draft Joint Memorandum Circular 2026-01",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Draft%20JMC%202026-01.png",
+    category: "governance",
+    section: "section9",
+    alt: "Draft JMC",
+    description: "Transforms Conservation into Municipal Revenue Streams: Carbon Credits, PES, Eco-Tourism User Fees.",
   },
-  growthUnderinvestment: {
-    title: "Growth and Underinvestment",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/10.png",
-    category: "archetype", section: "section2", alt: "Growth and underinvestment archetype",
-    description: "Growth and Underinvestment archetype: declining performance reducing investment, creating a vicious cycle of deterioration.",
+  fixesThatFail: {
+    title: "Fixes that Fail Archetype",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Fixes%20that%20Fail%20Archetype.png",
+    category: "archetype",
+    section: "section9",
+    alt: "Fixes that Fail",
+    description: "BARMM's reliance on short-term remedies undermines long-term institutional reform.",
   },
   bigManArchetype: {
     title: "The Big Man Archetype",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/11-BM.png",
-    category: "archetype", section: "section2", alt: "Big Man archetype diagram",
-    description: "The Big Man archetype: centralized decision-making patterns in governance and their systemic implications.",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/The%20Big%20Man%20Archetype.png",
+    category: "archetype",
+    section: "section9",
+    alt: "Big Man",
+    description: "Concentrated political power creates self-reinforcing system of instability: R1 (Patronage-Governance), R2 (Exclusion-Conflict), R3 (Resource Depletion).",
   },
-  bigManEscalation: {
-    title: "BigMan and Escalation",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/23.png",
-    category: "archetype", section: "section2", alt: "Big Man escalation pattern",
-    description: "How the Big Man archetype interacts with escalation dynamics, creating competitive loops in political and economic systems.",
+  policyRecommendationsMakers: {
+    title: "Policy Recommendations: Policymakers-Planners-Investors",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Policy%20Recommendations-Policy%20Makers-Planners-Investors.png",
+    category: "governance",
+    section: "section9",
+    alt: "Policy Makers",
+    description: "Synchronized Mandate: Institutional, Fiscal, and Regulatory reforms for collaborative governance.",
   },
-
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // CAUSAL LOOP DIAGRAMS (CLDs)
-  // ═══════════════════════════════════════════════════════════════════════════════
-  cldTrustInvestment: {
-    title: "CLD: Trust-Investment Reinforcing Loop",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/CLD-1.png",
-    category: "cld", section: "section2", alt: "Trust-investment causal loop diagram",
-    description: "Causal loop diagram showing the reinforcing relationship between trust-building and investment attraction in BARMM.",
-  },
-  cldGovernanceConfidence: {
-    title: "CLD: Governance-Investor Confidence",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/CLD-2.png",
-    category: "cld", section: "section2", alt: "Governance confidence causal loop",
-    description: "CLD illustrating how governance reforms feedback into investor confidence and subsequent capital inflows.",
-  },
-  cldInfrastructureGrowth: {
-    title: "CLD: Infrastructure-Economic Growth",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/CLD-3.png",
-    category: "cld", section: "section2", alt: "Infrastructure growth causal loop",
-    description: "Causal loop diagram mapping infrastructure investment to economic growth, employment, and tax revenue feedback loops.",
-  },
-  cldHalalEcosystem: {
-    title: "CLD: Halal Ecosystem Development",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/CLD-4.png",
-    category: "cld", section: "section2", alt: "Halal ecosystem causal loop",
-    description: "CLD showing the interconnected drivers of halal ecosystem development from certification to market access.",
+  policyRecommendationsActivating: {
+    title: "Policy Recommendations: Activating the Framework",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Policy%20recommendations-Institutional-Fiscal-Regulatory.png",
+    category: "governance",
+    section: "section9",
+    alt: "Activating Framework",
+    description: "Three integrated reforms: Institutional (BIF-Net), Fiscal (SIPP & CREATE MORE), Regulatory (BEIE).",
   },
 
   // ═══════════════════════════════════════════════════════════════════════════════
-  // LEVERAGE POINTS
+  // SECTION 10: IEDS & STRATEGIC OPTIONS
   // ═══════════════════════════════════════════════════════════════════════════════
-  meadowsLeverage: {
-    title: "Meadows Hierarchy of Leverage Points",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/public/24.%20Meadows%20Hierarchy%20of%20Leverage%20Points.png",
-    category: "leverage", section: "section8", alt: "Meadows leverage points hierarchy",
-    description: "Donella Meadows' hierarchy of leverage points from parameters to paradigm shifts, applied to BARMM strategic intervention design.",
+  identifyLeveragePoints: {
+    title: "How to Identify Leverage Points",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/How%20to%20Identify%20Leverage%20Points.png",
+    category: "leverage",
+    section: "section10",
+    alt: "Identify Leverage",
+    description: "Three-step process using Donella Meadows' Hierarchy (L1–L12): Diagnostic Synthesis, Mapping the Loops, Tiered Selection.",
   },
-  leverageArchetypes: {
-    title: "Leverage Points in Archetypes",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/22.png",
-    category: "leverage", section: "section8", alt: "Leverage points within archetypes",
-    description: "Mapping strategic leverage points onto identified systems archetypes to design effective interventions.",
+  activatingLeveragePoints: {
+    title: "Activating Leverage Points",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/Activating%20Leverage%20Points.png",
+    category: "leverage",
+    section: "section10",
+    alt: "Activating Leverage",
+    description: "Strategic Leverage Points: L3 (Goals & Operating System), L5 (Rules & Incentives), L6 (Information Flows).",
   },
-  moralGovernanceLeverage: {
-    title: "Moral Governance as Leverage",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/26.png",
-    category: "leverage", section: "section2", alt: "Moral governance as a leverage point",
-    description: "How moral governance functions as a high-leverage intervention point for transforming the BARMM economic ecosystem.",
+  leverageCapacityTraps: {
+    title: "Leverage Points in Capacity Traps",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Leverage%20Points%20for%20Capacity%20Traps.png",
+    category: "leverage",
+    section: "section10",
+    alt: "Capacity Traps",
+    description: "Prescription: Front-Loading the Ecosystem Enablers — L10 (Stock-Flow Structure) to break Limits to Growth.",
   },
-  leveragePointsBanner: {
-    title: "5 Critical Leverage Points",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/25.png",
-    category: "leverage", section: "section8", alt: "Five critical leverage points banner",
-    description: "The five critical leverage points for BIRD 2026-2035: Halal Certification, Infrastructure-Energy, Governance-Confidence, Islamic Finance, and Green Economy.",
+  icebergModel: {
+    title: "Leverage Points in Governance Traps: The Iceberg Model",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Iceberg%20Model%20Paradigm.png",
+    category: "leverage",
+    section: "section10",
+    alt: "Iceberg Model",
+    description: "Systems Thinking Paradigm: Events (Top 10%), Structures (Body 40%), Mental Models (Base 50%).",
   },
-  clpDiagram: {
-    title: "Critical Leverage Points (CLPs) Diagram",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/CLP-Overview.png",
-    category: "leverage", section: "section8", alt: "CLP overview diagram",
-    description: "Complete overview diagram of all 5 Critical Leverage Points with their interconnections and expected transformation outcomes.",
+  collaborativeGovernance: {
+    title: "Architecting Collaborative Governance",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Leverage%20Points%20in%20Governance.png",
+    category: "leverage",
+    section: "section10",
+    alt: "Collaborative Governance",
+    description: "Transition from clashing nodes to synchronized network: L1 (Paradigm), L2 (Mindset), L5 (Rules).",
   },
-
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // ROADMAP, STRATEGY & EXECUTION
-  // ═══════════════════════════════════════════════════════════════════════════════
-  roadmap: {
-    title: "BIRD Investment Roadmap",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/28.png",
-    category: "roadmap", section: "section8", alt: "BIRD strategic roadmap visualization",
-    description: "The complete BIRD 2026-2035 investment roadmap showing phased implementation, milestones, and critical path.",
-  },
-  bangsamoroBIMPEAGA: {
-    title: "Bangsamoro and BIMP-EAGA",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/BARMM%20Connectivity%20%20.png",
-    category: "roadmap", section: "section6", alt: "Bangsamoro BIMP-EAGA integration",
-    description: "Bangsamoro's role and integration strategy within the BIMP-EAGA regional economic cooperation framework.",
-  },
-  bangsamoroUAE: {
-    title: "Bangsamoro and UAE",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/UAE%20&%20GCC.png",
-    category: "roadmap", section: "section6", alt: "Bangsamoro UAE connectivity",
-    description: "Strategic partnership roadmap between Bangsamoro and UAE covering halal trade, Islamic finance, and investment promotion.",
+  archetypesLeveragePoints: {
+    title: "6 Archetypes and Leverage Points",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Archetypes%20&%20Leverage%20Points.png",
+    category: "leverage",
+    section: "section10",
+    alt: "Archetypes Leverage",
+    description: "Mapping strategic leverage points onto identified systems archetypes.",
   },
   strategicOptions: {
-    title: "Strategic Options Portfolio",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/29-Options.png",
-    category: "roadmap", section: "section8", alt: "Strategic options portfolio",
-    description: "Portfolio of strategic options generated through TOWS matrix analysis, prioritized by impact and feasibility.",
+    title: "Four Strategic Options",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/Strategic%20Options.png",
+    category: "roadmap",
+    section: "section10",
+    alt: "Strategic Options",
+    description: "Four Distinct Pathways: HEDS (Halal Economy), GEMS (Green Economy), IFES (Infrastructure-First), IEDS (Integrated Ecosystem).",
   },
-  phases: {
-    title: "BIRD Implementation Phases",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/30-Phases.png",
-    category: "roadmap", section: "section8", alt: "Implementation phases diagram",
-    description: "Three-phase implementation roadmap: Foundation (2026-2028), Acceleration (2029-2031), and Transformation (2032-2035).",
+  strategicOptionsRanking: {
+    title: "Strategic Options Ranking",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/3.%20Strategic%20Options%20Ranking.png",
+    category: "roadmap",
+    section: "section10",
+    alt: "Options Ranking",
+    description: "Comparative evaluation across seven weighted criteria: Economic Impact, Systems Leverage, Identity Alignment, Inclusivity, Sustainability, Feasibility, Risk-Return.",
   },
-  timeline: {
-    title: "BIRD Implementation Timeline",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/31-Timeline.png",
-    category: "roadmap", section: "section8", alt: "Implementation timeline",
-    description: "Detailed implementation timeline with key milestones, decision gates, and review periods across the 10-year horizon.",
+  iedsExecution: {
+    title: "The Execution Engine: IEDS",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/The%20Execution%20Engine%20-IEDS.png",
+    category: "roadmap",
+    section: "section10",
+    alt: "IEDS Execution",
+    description: "Three golden phases: Phase 1 (2026–2028) Activate Enablers, Phase 2 (2029–2032) Scale Transformers, Phase 3 (2033–2035) Consolidate Connectors.",
   },
-  budget: {
-    title: "BIRD Budget Framework",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/32-Budget.png",
-    category: "finance", section: "section8", alt: "Budget framework diagram",
-    description: "Comprehensive budget framework showing funding sources, allocation priorities, and financial sustainability mechanisms.",
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // SECTION 11: METRICS ARCHITECTURE
+  // ═══════════════════════════════════════════════════════════════════════════════
+  metricsArchitecture: {
+    title: "Metrics Architecture",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/9.%20Metrics%20Architecture.png",
+    category: "metrics",
+    section: "section11",
+    alt: "Metrics Architecture",
+    description: "Four-tier measurement framework: Tier 1 (Global Standards), Tier 2 (National Alignment), Tier 3 (Regional Execution), Tier 4 (Local Impact).",
   },
-  ieds: {
-    title: "IEDS: Integrated Economic Development Strategy",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/33-IEDS.png",
-    category: "roadmap", section: "section8", alt: "IEDS strategy diagram",
-    description: "The Integrated Economic Development Strategy (IEDS) sequencing framework for coordinating cross-sectoral initiatives.",
+  driftingGoals: {
+    title: "Drifting Goals Archetype",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/Drifting%20Goals.png",
+    category: "archetype",
+    section: "section11",
+    alt: "Drifting Goals",
+    description: "Illustrates how development ambitions weaken when institutions lower standards instead of addressing root causes.",
   },
-  iedsDiagram: {
-    title: "IEDS Implementation Framework",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/IEDS-Framework.png",
-    category: "roadmap", section: "section8", alt: "IEDS implementation framework",
-    description: "Detailed IEDS implementation framework showing the sequencing logic, dependencies, and integration points across strategic pillars.",
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // SECTION 12: BALANCED SCORECARD
+  // ═══════════════════════════════════════════════════════════════════════════════
+  bscIntangibles: {
+    title: "The Balanced Scorecard: Intangibles to Financial Impact",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/BSC%20Intangibles%20to%20Financial%20Impact.png",
+    category: "framework",
+    section: "section12",
+    alt: "Balanced Scorecard",
+    description: "Four-perspective pyramid: Learning & Growth → Internal Processes → Customer/Stakeholder → Financial Impact (550B GRDP, 20,000+ jobs, <20% poverty).",
   },
-  metrics: {
-    title: "Key Metrics & KPIs Dashboard",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/34-Metrics.png",
-    category: "metrics", section: "section8", alt: "Key metrics and KPIs",
-    description: "Key performance indicators and metrics dashboard for tracking BIRD implementation progress across all strategic pillars.",
+  economicOutcomesBSC: {
+    title: "Economic Outcomes in Balanced Scorecard View",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/18.%20Economic%20Outcomes%20in%20BSC.png",
+    category: "framework",
+    section: "section12",
+    alt: "Economic Outcomes",
+    description: "Four-layer perspectives shaped like a growing tree: Roots (Learning & Growth), Trunk (Internal Process), Branches (Stakeholder), Fruit (Financial).",
   },
-  metricsKPIs: {
-    title: "BIRD KPI Framework",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/KPI-Framework.png",
-    category: "metrics", section: "section8", alt: "BIRD KPI framework",
-    description: "Complete KPI framework with leading and lagging indicators, targets, baselines, and measurement methodologies.",
+  vision2035: {
+    title: "Vision 2035",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/5.%20Vision.png",
+    category: "framework",
+    section: "section12",
+    alt: "Vision 2035",
+    description: "By 2035, Bangsamoro will be recognized as Southeast Asia's leading hub for resilient, ethical, inclusive, and sustainable investments.",
   },
-  infographic: {
-    title: "BIRD at a Glance Infographic",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/35-Infographic.png",
-    category: "framework", section: "general", alt: "BIRD infographic summary",
-    description: "Executive summary infographic capturing the essence of BIRD 2026-2035 for stakeholder communication and public engagement.",
-  },
-  visionExecution: {
-    title: "From Vision to Execution",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/36-Execution.png",
-    category: "framework", section: "section8", alt: "Vision to execution framework",
-    description: "The translation framework from strategic vision through actionable plans to measurable execution and adaptive management.",
-  },
-  decadeAhead: {
-    title: "A Decade Ahead: BIRD 2035 Vision",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/37-Decade.png",
-    category: "framework", section: "section1", alt: "Decade ahead vision",
-    description: "Long-term vision for 2035: what BARMM will look like after a decade of strategic implementation and investment attraction.",
-  },
-  investBanner: {
-    title: "Invest in BARMM Banner",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/38-Invest.png",
-    category: "site", section: "general", alt: "Invest in BARMM banner",
-    description: "Call-to-action banner for attracting investors to BARMM highlighting key value propositions and opportunities.",
-  },
-  chooseBanner: {
-    title: "Choose BARMM Banner",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/39-Choose.png",
-    category: "site", section: "general", alt: "Choose BARMM banner",
-    description: "Promotional banner encouraging stakeholders to choose BARMM as their investment destination in Southeast Asia.",
-  },
-  halalEcosystem: {
-    title: "Halal Ecosystem Map",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Halal-Ecosystem.png",
-    category: "cluster", section: "section4", alt: "Halal ecosystem map",
-    description: "Complete map of the halal ecosystem in BARMM covering certification, production, logistics, and export value chains.",
-  },
-  infrastructureNexus: {
-    title: "Infrastructure-Energy Nexus",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Infrastructure-Nexus.png",
-    category: "cluster", section: "section5", alt: "Infrastructure energy nexus",
-    description: "The infrastructure-energy nexus showing interdependencies between power generation, transport, digital connectivity, and industrial zones.",
-  },
-  islamicFinance: {
-    title: "Islamic Finance Framework",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Islamic-Finance.png",
-    category: "cluster", section: "section7", alt: "Islamic finance framework",
-    description: "Islamic finance framework for BARMM including Shariah-compliant instruments, regulatory architecture, and market development.",
-  },
-  greenEconomy: {
-    title: "Green Economy Roadmap",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Green-Economy.png",
-    category: "cluster", section: "section5", alt: "Green economy roadmap",
-    description: "Green economy roadmap for sustainable development covering renewable energy, carbon markets, and eco-tourism in BARMM.",
-  },
-  investorJourney: {
-    title: "Investor Journey Map",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Investor-Journey.png",
-    category: "framework", section: "general", alt: "Investor journey map",
-    description: "End-to-end investor journey map from awareness and consideration through investment, operation, and expansion in BARMM.",
-  },
-  digitalPlatform: {
-    title: "BIRD Digital Platform Architecture",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Digital-Platform.png",
-    category: "framework", section: "general", alt: "Digital platform architecture",
-    description: "Architecture diagram of the BIRD digital platform showing modules, data flows, integrations, and user interfaces.",
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // SECTION 13: PRIORITY ACTIONS & BUDGET
+  // ═══════════════════════════════════════════════════════════════════════════════
+  totalCapitalDeployment: {
+    title: "Total Capital Deployment Per Phase",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Total%20Capital%20Deployment%20per%20Phase.png",
+    category: "roadmap",
+    section: "section13",
+    alt: "Capital Deployment",
+    description: "Budget/Time Staircase: Phase 1 (2026–2028) ₱15B, Phase 2 (2029–2032) ₱20B, Phase 3 (2033–2035) ₱20B — Total ₱55B.",
   },
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// BIRD SITES — 12 External Reference Sites
+// BIRD SITES — Complete URL Mapping
 // ═══════════════════════════════════════════════════════════════════════════════
-
 export const BIRD_SITES = {
   home: {
     title: "BIRD Home",
@@ -530,70 +610,68 @@ export const BIRD_SITES = {
     url: "https://bird-roadmap.asilvainnovations.com",
     description: "Interactive roadmap visualization with phase details, milestones, progress tracking, and public dashboards.",
   },
-  surveyOrientation: {
-    title: "Validation Survey Orientation",
-    url: "https://bird-survey-orientation.asilvainnovations.com",
-    description: "Survey orientation and guidance portal with methodology explainer, FAQ, and stakeholder preparation resources.",
-  },
-  resources: {
-    title: "Resources Library",
-    url: "https://bird-resources.asilvainnovations.com",
-    description: "Comprehensive BIRD documentation library: reports, presentations, data sets, and multimedia resources.",
-  },
   dashboard: {
     title: "Strategic Dashboard",
     url: "https://bird-dashboard.asilvainnovations.com",
     description: "Public strategic dashboard with real-time KPIs, progress indicators, and transparent performance reporting.",
   },
-  contact: {
-    title: "Contact BOI-MTIT BARMM",
-    url: "https://bird-contact.asilvainnovations.com",
-    description: "Contact page for the Bangsamoro Board of Investments - Ministry of Trade, Investment and Tourism.",
-  },
-  birdApp: {
-    title: "BIRD Strategic Planning App",
-    url: "https://bird-app.asilvainnovations.com",
-    description: "Main BIRD strategic planning application with all modules: SWOT, Systems Thinking, BSC, PAPs, MEL, and AI Assistant.",
-  },
   validationSurvey: {
-    title: "Validation Survey Portal",
+    title: "Validation Survey",
     url: "https://bird-survey.asilvainnovations.com",
     description: "Standalone validation survey portal for stakeholder feedback collection, analysis, and reporting.",
   },
-  boiPortal: {
-    title: "BOI-MTIT BARMM Official",
-    url: "https://boi.barmm.gov.ph",
-    description: "Official Bangsamoro Board of Investments portal for registration, incentives, and investment facilitation.",
+  resources: {
+    title: "Resources",
+    url: "https://bird-resources.asilvainnovations.com",
+    description: "Comprehensive BIRD documentation library: reports, presentations, data sets, and multimedia resources.",
   },
-  barmmGov: {
-    title: "Bangsamoro Government",
-    url: "https://www.barmm.gov.ph",
-    description: "Official website of the Bangsamoro Autonomous Region in Muslim Mindanao government.",
+  surveyDashboard: {
+    title: "Validation Survey Dashboard",
+    url: "https://bird-survey-dashboard.asilvainnovations.com",
+    description: "Real-time survey analytics and response visualization dashboard.",
   },
-  halalCertification: {
-    title: "BARMM Halal Certification",
-    url: "https://halal.barmm.gov.ph",
-    description: "Official halal certification portal for BARMM with application, verification, and registry services.",
+  surveyBriefing: {
+    title: "Survey Briefing",
+    url: "https://bird-survey-orientation.asilvainnovations.com",
+    description: "Survey orientation and guidance portal with methodology explainer, FAQ, and stakeholder preparation resources.",
   },
-  investorPortal: {
-    title: "BARMM Investor Portal",
-    url: "https://invest.barmm.gov.ph",
-    description: "One-stop investor portal for investment promotion, facilitation, aftercare, and grievance handling.",
+  actionPlan: {
+    title: "Action Plan",
+    url: "https://bird-action-plan.asilvainnovations.com",
+    description: "Priority Actions and Programs (PAPs) with detailed implementation timelines and responsible agencies.",
+  },
+  birdApp: {
+    title: "BIRD App",
+    url: "https://bird-app.asilvainnovations.com",
+    description: "Main BIRD strategic planning application with all modules: SWOT, Systems Thinking, BSC, PAPs, MEL, and AI Assistant.",
+  },
+  userManual: {
+    title: "BIRD App User Manual",
+    url: "https://user-manual.asilvainnovations.com",
+    description: "Comprehensive user guide for the BIRD strategic planning application.",
+  },
+  contact: {
+    title: "Contact",
+    url: "https://bird-contact.asilvainnovations.com",
+    description: "Contact page for the Bangsamoro Board of Investments - Ministry of Trade, Investment and Tourism.",
+  },
+  actorsValueMap: {
+    title: "Actors and Value Map",
+    url: "https://bird-actors-value-map.asilvainnovations.com",
+    description: "Interactive map of stakeholders and value chains in the Bangsamoro investment ecosystem.",
   },
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPE EXPORTS
 // ═══════════════════════════════════════════════════════════════════════════════
-
 export type BIRDVideo = typeof BIRD_VIDEOS[keyof typeof BIRD_VIDEOS];
 export type BIRDImage = typeof BIRD_IMAGES[keyof typeof BIRD_IMAGES];
 export type BIRDSite = typeof BIRD_SITES[keyof typeof BIRD_SITES];
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════════
 // HELPER FUNCTIONS
 // ═══════════════════════════════════════════════════════════════════════════════
-
 /** Get all images for a specific section ID */
 export function getImagesForSection(sectionId: string): BIRDImage[] {
   return Object.values(BIRD_IMAGES).filter(img => img.section === sectionId);
@@ -610,7 +688,6 @@ export function getImagesByCategory(category: BIRDImage["category"]): BIRDImage[
 }
 
 // ── Category-specific shortcuts ──────────────────────────────────────────────
-
 export function getArchetypeImages(): BIRDImage[] {
   return Object.values(BIRD_IMAGES).filter(img => img.category === "archetype");
 }
@@ -625,10 +702,6 @@ export function getProvincialImages(): BIRDImage[] {
   );
 }
 
-export function getProvincialOutlookImages(): BIRDImage[] {
-  return Object.values(BIRD_IMAGES).filter(img => img.category === "provincial-outlook");
-}
-
 export function getConnectivityImages(): BIRDImage[] {
   return Object.values(BIRD_IMAGES).filter(img => img.category === "connectivity");
 }
@@ -639,10 +712,6 @@ export function getFrameworkImages(): BIRDImage[] {
 
 export function getSystemsImages(): BIRDImage[] {
   return Object.values(BIRD_IMAGES).filter(img => img.category === "systems");
-}
-
-export function getCLDImages(): BIRDImage[] {
-  return Object.values(BIRD_IMAGES).filter(img => img.category === "cld");
 }
 
 export function getLeverageImages(): BIRDImage[] {
@@ -661,8 +730,11 @@ export function getMetricsImages(): BIRDImage[] {
   return Object.values(BIRD_IMAGES).filter(img => img.category === "metrics");
 }
 
-// ── Search & discovery ───────────────────────────────────────────────────────
+export function getGovernanceImages(): BIRDImage[] {
+  return Object.values(BIRD_IMAGES).filter(img => img.category === "governance");
+}
 
+// ── Search & discovery ───────────────────────────────────────────────────────
 /** Search images by keyword in title, alt, or description */
 export function searchImages(query: string): BIRDImage[] {
   const q = query.toLowerCase();
@@ -690,4 +762,20 @@ export function getAvailableSections(): string[] {
   Object.values(BIRD_IMAGES).forEach(img => sections.add(img.section));
   Object.values(BIRD_VIDEOS).forEach(vid => sections.add(vid.section));
   return Array.from(sections).sort();
+}
+
+// ─── EXTERNAL APP URLS ─────────────────────────────────────────────────────
+/** Canonical URL of the standalone BIRD Validation Survey app. */
+export const VALIDATION_SURVEY_URL = BIRD_SITES.validationSurvey.url;
+
+/** Open an external URL in a new, safe browser tab. */
+export function openExternal(url: string) {
+  if (typeof window !== 'undefined') {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+}
+
+/** Open the standalone Validation Survey in a new tab. */
+export function openValidationSurvey() {
+  openExternal(VALIDATION_SURVEY_URL);
 }
