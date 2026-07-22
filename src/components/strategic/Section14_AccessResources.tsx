@@ -1,400 +1,324 @@
+// src/components/strategic/Section14_AccessResources.tsx
+// BIRD 2026–2035 · Section 14: Resources & Engagements
+// Updated: 2026-07-23 · Strict schema alignment, shadcn/ui components
+
 import React from "react";
+import { Users, Calendar, MessageSquare, FileText, Handshake } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  BookOpen,
-  FileText,
-  Video,
-  Mail,
-  Phone,
-  Calendar,
-  MessageSquare,
-  Heart,
-} from "lucide-react";
+import type { SurveySchemaType } from "@/lib/survey-schema";
 
-/* ------------------------------------------------------------------ */
-/* Data interface                                                      */
-/* ------------------------------------------------------------------ */
-export interface Section14Data {
-  q14_1_engagement_type: string[];
-  q14_2_contact_method: string;
-  q14_3_timing: string;
-  q14_4_role_contribution: string;
-  q14_5_additional_comments: string;
-}
+// ── shadcn/ui imports ────────────────────────────────────────────────────────
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
-/* ------------------------------------------------------------------ */
-/* Props                                                                */
-/* ------------------------------------------------------------------ */
+// ── Type definitions ─────────────────────────────────────────────────────────
+export type Section14Data = Pick<
+  SurveySchemaType,
+  | "q14_1_engagement_type"
+  | "q14_2_contact_method"
+  | "q14_3_timing"
+  | "q14_4_role_contribution"
+  | "q14_5_additional_comments"
+>;
+
 interface Section14Props {
   data: Section14Data;
   onChange: (data: Section14Data) => void;
 }
 
-/* ------------------------------------------------------------------ */
-/* GlassCard helper                                                     */
-/* ------------------------------------------------------------------ */
-const GlassCard: React.FC<{ children: React.ReactNode; className?: string }> = ({
-  children,
-  className,
-}) => (
-  <div
-    className={cn(
-      "rounded-xl border border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm shadow-sm p-6",
-      className
-    )}
-  >
-    {children}
-  </div>
-);
+// ── Design tokens ────────────────────────────────────────────────────────────
+const activeBtnClass = "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90";
+const inactiveBtnClass = "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]";
 
-/* ------------------------------------------------------------------ */
-/* Constants                                                            */
-/* ------------------------------------------------------------------ */
-const RESOURCE_CHAPTERS = [
+// ── Engagement options ───────────────────────────────────────────────────────
+const engagementOptions = [
   {
-    title: "Chapter 1: BARMM at a Crossroads",
-    description: "Economic assessment and strategic imperative for transformation",
-    url: undefined,
+    value: "provincial_workshop",
+    label: "Provincial Validation Workshop",
+    icon: Users,
+    description: "In-person workshop in your province to discuss BIRD priorities and gather local insights",
   },
   {
-    title: "Chapter 2: Context Analysis & BEIE Framework",
-    description: "The Bangsamoro Economic and Investment Ecosystem framework",
-    url: undefined,
+    value: "sector_focus_group",
+    label: "Sector-Specific Focus Group Discussion",
+    icon: MessageSquare,
+    description: "Focused discussion with stakeholders from your industry sector",
   },
   {
-    title: "Chapter 3: SWOT Analysis & Systems Mapping",
-    description: "Comprehensive SWOT with systems archetypes and causal loop diagrams",
-    url: undefined,
+    value: "one_on_one_interview",
+    label: "One-on-One Interview",
+    icon: Handshake,
+    description: "Private interview with BIRD team members for detailed input",
   },
   {
-    title: "Chapter 4: Strategic Options & Roadmap Strategy",
-    description: "TOWS matrix, 7-criteria evaluation, and IEDS selection",
-    url: "#BIRD_RESOURCES.ch4",
+    value: "online_webinar",
+    label: "Online Webinar",
+    icon: Calendar,
+    description: "Virtual session to review BIRD findings and provide feedback",
   },
   {
-    title: "Chapter 5: Metrics & KPI Benchmarking Framework",
-    description: "4-tier calibration architecture with cross-cluster KPIs",
-    url: "#BIRD_RESOURCES.ch5",
+    value: "written_submission",
+    label: "Written Submission",
+    icon: FileText,
+    description: "Submit detailed written feedback on specific BIRD sections",
   },
   {
-    title: "Chapter 6: Balanced Scorecard",
-    description: "4-perspective strategy map with causal linkages",
-    url: "#BIRD_RESOURCES.ch6",
-  },
-  {
-    title: "Chapter 7: Priority Actions & Budget",
-    description: "\u20B1120-160B capital deployment plan across 3 phases",
-    url: undefined,
-  },
-  {
-    title: "Chapter 8: Institutional Architecture",
-    description: "Bangsamoro Investment Command Center and coordination mechanisms",
-    url: undefined,
+    value: "technical_working_group",
+    label: "Technical Working Group Participation",
+    icon: Users,
+    description: "Join specialized working groups on infrastructure, finance, or industry",
   },
 ];
 
-const RESOURCE_VIDEOS = [
-  { title: "BIRD Overview", duration: "~15 min" },
-  { title: "BEIE Framework", duration: "~12 min" },
-  { title: "SWOT & Systems Mapping", duration: "~18 min" },
-  { title: "Strategic Options", duration: "~20 min" },
+// ── Contact method options ───────────────────────────────────────────────────
+const contactMethodOptions = [
+  "Email",
+  "Phone call",
+  "Video conference (Zoom/Teams)",
+  "In-person meeting",
 ];
 
-const ENGAGEMENT_OPTIONS = [
-  "Deep-dive workshop on IEDS implementation",
-  "Provincial consultation in my area",
-  "Sector-specific technical working group",
-  "Investment opportunity briefing",
-  "Policy advocacy coalition",
-  "No further engagement at this time",
-];
-
-const CONTACT_METHODS = [
-  { label: "Email", icon: Mail },
-  { label: "Phone", icon: Phone },
-  { label: "Virtual meeting", icon: Video },
-  { label: "In-person", icon: Calendar },
-];
-
-const TIMING_OPTIONS = [
-  "Within 1 week",
+// ── Timing options ───────────────────────────────────────────────────────────
+const timingOptions = [
   "Within 1 month",
-  "Within 3 months",
-  "No preference",
+  "1-3 months",
+  "3-6 months",
+  "6-12 months",
+  "Anytime",
 ];
 
-const ROLE_CONTRIBUTIONS = [
-  "Technical expertise",
-  "Funding",
-  "Policy advocacy",
-  "Community outreach",
-  "Research",
-  "Monitoring & evaluation",
-  "Other",
-];
-
-/* ------------------------------------------------------------------ */
-/* Component                                                            */
-/* ------------------------------------------------------------------ */
-const Section14_AccessResources: React.FC<Section14Props> = ({ data, onChange }) => {
-  const update = <K extends keyof Section14Data>(field: K, value: Section14Data[K]) =>
+// ═══════════════════════════════════════════════════════════════════════════════
+// MAIN COMPONENT
+// ═══════════════════════════════════════════════════════════════════════════════
+export const Section14_AccessResources: React.FC<Section14Props> = ({ data, onChange }) => {
+  const update = <K extends keyof Section14Data>(field: K, value: Section14Data[K]) => {
     onChange({ ...data, [field]: value });
+  };
+
+  // Toggle multi-select for engagement types
+  const toggleEngagementType = (value: string) => {
+    const current = data.q14_1_engagement_type || [];
+    const updated = current.includes(value)
+      ? current.filter((v) => v !== value)
+      : [...current, value];
+    update("q14_1_engagement_type", updated);
+  };
+
   return (
-    <div className="space-y-8">
-      {/* ── Header ────────────────────────────────────────────── */}
-      <div className="flex items-start gap-4">
-        <div className="p-3 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/30 shrink-0">
-          <BookOpen className="w-6 h-6 text-[#C9A84C]" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold text-[#022c22]">
-            Section 14: Access to Resources &amp; Optional Engagements
-          </h2>
-          <p className="text-sm text-[#065f46] mt-2 leading-relaxed">
-            Explore the complete BIRD resource library and indicate your interest in follow-up
-            engagements. Your participation shapes the Emerging Bangsamoro.
-          </p>
-        </div>
+    <div className="space-y-6">
+      {/* ── Header ──────────────────────────────────────────────────── */}
+      <div className="flex items-center gap-3 mb-4">
+        <Users className="w-6 h-6 text-[#C9A84C]" />
+        <h2 className="text-xl font-bold text-[#022c22]">
+          Section 14: Resources & Engagements
+        </h2>
       </div>
+      <p className="text-sm text-[#065f46] mb-4">
+        Help us understand how you would like to participate in the ongoing development and validation of the BIRD 2026-2035 roadmap. Your engagement preferences will guide our stakeholder outreach strategy.
+      </p>
 
-      {/* ── Block 1: Resource Library ─────────────────────────── */}
-      <GlassCard>
-        <div className="flex items-center gap-3 mb-5">
-          <FileText className="w-5 h-5 text-[#C9A84C]" />
-          <h3 className="text-lg font-semibold text-[#022c22]">Resource Library</h3>
-        </div>
+      {/* ── Context Card ────────────────────────────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardContent className="pt-6">
+          <p className="text-sm text-[#022c22] leading-relaxed">
+            The BIRD 2026-2035 validation process is an ongoing, participatory effort. We value your continued input and want to ensure our engagement activities align with your availability, preferences, and expertise. This section helps us plan meaningful opportunities for collaboration.
+          </p>
+        </CardContent>
+      </Card>
 
-        {/* Chapters */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          {RESOURCE_CHAPTERS.map((chapter) => (
-            <div
-              key={chapter.title}
-              className="rounded-lg border border-[#C9A84C]/20 bg-white p-4 hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-md bg-[#1B4D3E]/10 shrink-0">
-                  <FileText className="w-4 h-4 text-[#1B4D3E]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-[#022c22] leading-snug">
-                    {chapter.title}
-                  </p>
-                  <p className="text-xs text-[#065f46] mt-1 leading-relaxed">
-                    {chapter.description}
-                  </p>
-                  <button
-                    onClick={() => {
-                      if (chapter.url) {
-                        window.open(chapter.url, "_blank");
-                      }
-                    }}
-                    className={cn(
-                      "mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all",
-                      chapter.url
-                        ? "bg-[#1B4D3E] text-white hover:bg-[#022c22] cursor-pointer"
-                        : "bg-[#C9A84C]/10 text-[#C9A84C] cursor-default"
-                    )}
-                  >
-                    <BookOpen className="w-3 h-3" />
-                    {chapter.url ? "View Resource" : "Coming Soon"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Videos */}
-        <div className="mb-2">
-          <div className="flex items-center gap-2 mb-3">
-            <Video className="w-4 h-4 text-[#C9A84C]" />
-            <p className="text-sm font-semibold text-[#022c22]">Video Resources</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {RESOURCE_VIDEOS.map((video) => (
-              <div
-                key={video.title}
-                className="flex items-center gap-3 rounded-lg border border-[#C9A84C]/20 bg-white p-3 hover:shadow-sm transition-shadow"
-              >
-                <div className="p-2 rounded-md bg-[#C9A84C]/10 shrink-0">
-                  <Video className="w-4 h-4 text-[#C9A84C]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#022c22]">{video.title}</p>
-                  <p className="text-xs text-[#065f46]">{video.duration}</p>
-                </div>
+      {/* ── Q14.1: Engagement Type (Multi-select) ───────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2 text-[#022c22]">
+            <Users className="w-5 h-5 text-[#C9A84C]" />
+            Q14.1 What type of engagement are you most interested in?
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-xs text-[#065f46] italic">
+            Select all that apply (you may choose multiple options)
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {engagementOptions.map((option) => {
+              const Icon = option.icon;
+              const isSelected = (data.q14_1_engagement_type || []).includes(option.value);
+              
+              return (
                 <button
-                  className="px-3 py-1.5 rounded-md text-xs font-medium bg-[#C9A84C]/10 text-[#C9A84C] cursor-default shrink-0"
+                  key={option.value}
+                  type="button"
+                  onClick={() => toggleEngagementType(option.value)}
+                  className={cn(
+                    "flex items-start gap-3 p-4 rounded-lg border text-left transition-all",
+                    isSelected
+                      ? "bg-[#1B4D3E]/5 border-[#1B4D3E] shadow-sm"
+                      : "bg-white border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                  )}
                 >
-                  Coming Soon
+                  <div className={cn(
+                    "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0",
+                    isSelected ? "bg-[#1B4D3E] text-white" : "bg-[#C9A84C]/10 text-[#C9A84C]"
+                  )}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={cn(
+                      "text-sm font-semibold mb-1",
+                      isSelected ? "text-[#1B4D3E]" : "text-[#022c22]"
+                    )}>
+                      {option.label}
+                    </p>
+                    <p className="text-xs text-[#065f46] leading-relaxed">
+                      {option.description}
+                    </p>
+                  </div>
+                  {isSelected && (
+                    <div className="w-5 h-5 rounded-full bg-[#1B4D3E] flex items-center justify-center flex-shrink-0">
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  )}
                 </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        </div>
-      </GlassCard>
+          {(data.q14_1_engagement_type || []).length > 0 && (
+            <p className="text-xs text-[#065f46] mt-2">
+              Selected: {(data.q14_1_engagement_type || []).length} option{(data.q14_1_engagement_type || []).length !== 1 ? "s" : ""}
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
-      {/* ── Block 2: Engagement Interest ──────────────────────── */}
-      <GlassCard>
-        <div className="flex items-center gap-3 mb-5">
-          <MessageSquare className="w-5 h-5 text-[#C9A84C]" />
-          <h3 className="text-lg font-semibold text-[#022c22]">Engagement Interest</h3>
-        </div>
-
-        <p className="text-sm font-medium text-[#022c22] mb-4">
-          What type of follow-up engagement interests you?{" "}
-          <span className="text-[#065f46] font-normal">(Select all that apply)</span>
-        </p>
-
-        <div className="space-y-2">
-          {ENGAGEMENT_OPTIONS.map((opt) => (
-            <label
-              key={opt}
-              className={cn(
-                "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all",
-                data.q14_1_engagement_type.includes(opt)
-                  ? "border-[#1B4D3E] bg-[#1B4D3E]/5"
-                  : "border-[#C9A84C]/20 hover:bg-[#C9A84C]/5"
-              )}
-            >
-              <input
-                type="checkbox"
-                checked={data.q14_1_engagement_type.includes(opt)}
-                onChange={(e) => {
-                  const current = data.q14_1_engagement_type;
-                  update(
-                    "q14_1_engagement_type",
-                    e.target.checked
-                      ? [...current, opt]
-                      : current.filter((x) => x !== opt)
-                  );
-                }}
-                className="w-4 h-4 rounded border-[#C9A84C] text-[#1B4D3E] accent-[#1B4D3E] shrink-0"
-              />
-              <span className="text-sm text-[#022c22]">{opt}</span>
-            </label>
-          ))}
-        </div>
-      </GlassCard>
-
-      {/* ── Block 3: Follow-up Preferences ────────────────────── */}
-      <GlassCard>
-        <div className="flex items-center gap-3 mb-5">
-          <Calendar className="w-5 h-5 text-[#C9A84C]" />
-          <h3 className="text-lg font-semibold text-[#022c22]">Follow-up Preferences</h3>
-        </div>
-
-        {/* Contact method */}
-        <div className="mb-6 pb-6 border-b border-[#C9A84C]/20">
-          <p className="text-sm font-medium text-[#022c22] mb-3">
-            Preferred method for follow-up:
+      {/* ── Q14.2: Contact Method (Single-select) ───────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2 text-[#022c22]">
+            <Handshake className="w-5 h-5 text-[#C9A84C]" />
+            Q14.2 What is your preferred method of contact?
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-[#065f46] italic">
+            Select one option
           </p>
-          <div className="grid grid-cols-2 gap-3">
-            {CONTACT_METHODS.map(({ label, icon: Icon }) => (
-              <button
-                key={label}
-                onClick={() => update("q14_2_contact_method", label)}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {contactMethodOptions.map((opt) => (
+              <Button
+                key={opt}
+                type="button"
+                variant="outline"
                 className={cn(
-                  "flex items-center gap-3 p-3 rounded-lg border text-sm text-left transition-all",
-                  data.q14_2_contact_method === label
-                    ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                    : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                  "justify-start h-auto py-3 text-sm text-left",
+                  data.q14_2_contact_method === opt ? activeBtnClass : inactiveBtnClass
                 )}
+                onClick={() => update("q14_2_contact_method", opt)}
               >
-                <Icon className="w-4 h-4 shrink-0" />
-                {label}
-              </button>
+                {opt}
+              </Button>
             ))}
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        {/* Timing */}
-        <div className="mb-6 pb-6 border-b border-[#C9A84C]/20">
-          <p className="text-sm font-medium text-[#022c22] mb-3">Preferred timing:</p>
-          <div className="grid grid-cols-2 gap-3">
-            {TIMING_OPTIONS.map((opt) => (
-              <button
+      {/* ── Q14.3: Timing (Single-select) ───────────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2 text-[#022c22]">
+            <Calendar className="w-5 h-5 text-[#C9A84C]" />
+            Q14.3 When would you be available to participate?
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-[#065f46] italic">
+            Select one option
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {timingOptions.map((opt) => (
+              <Button
                 key={opt}
+                type="button"
+                variant="outline"
+                className={cn(
+                  "justify-start h-auto py-3 text-sm text-left",
+                  data.q14_3_timing === opt ? activeBtnClass : inactiveBtnClass
+                )}
                 onClick={() => update("q14_3_timing", opt)}
-                className={cn(
-                  "p-3 rounded-lg border text-sm text-left transition-all",
-                  data.q14_3_timing === opt
-                    ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                    : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
-                )}
               >
                 {opt}
-              </button>
+              </Button>
             ))}
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        {/* Role contribution */}
-        <div>
-          <p className="text-sm font-medium text-[#022c22] mb-3">
-            How would you like to contribute?
+      {/* ── Q14.4: Role Contribution (Open text) ────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2 text-[#022c22]">
+            <MessageSquare className="w-5 h-5 text-[#C9A84C]" />
+            Q14.4 How would you like to contribute your expertise?
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-[#065f46] italic">
+            Describe your area of expertise and how you can support the BIRD validation process
           </p>
-          <div className="grid grid-cols-2 gap-3">
-            {ROLE_CONTRIBUTIONS.map((opt) => (
-              <button
-                key={opt}
-                onClick={() => update("q14_4_role_contribution", opt)}
-                className={cn(
-                  "p-3 rounded-lg border text-sm text-left transition-all",
-                  data.q14_4_role_contribution === opt
-                    ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                    : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
-                )}
-              >
-                {opt}
-              </button>
-            ))}
+          <Textarea
+            value={data.q14_4_role_contribution || ""}
+            onChange={(e) => update("q14_4_role_contribution", e.target.value)}
+            placeholder="For example: I have 10 years of experience in Islamic finance and can provide insights on Shariah-compliant investment structures..."
+            rows={4}
+            className="bg-white border-[#C9A84C]/30 focus-visible:ring-[#C9A84C] text-[#022c22] placeholder:text-[#065f46]/50"
+          />
+        </CardContent>
+      </Card>
+
+      {/* ── Q14.5: Additional Comments (Open text) ──────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2 text-[#022c22]">
+            <FileText className="w-5 h-5 text-[#C9A84C]" />
+            Q14.5 Additional comments or suggestions
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-[#065f46] italic">
+            Share any other thoughts, questions, or suggestions about the BIRD validation process
+          </p>
+          <Textarea
+            value={data.q14_5_additional_comments || ""}
+            onChange={(e) => update("q14_5_additional_comments", e.target.value)}
+            placeholder="Your feedback helps us improve the validation process..."
+            rows={4}
+            className="bg-white border-[#C9A84C]/30 focus-visible:ring-[#C9A84C] text-[#022c22] placeholder:text-[#065f46]/50"
+          />
+        </CardContent>
+      </Card>
+
+      {/* ── Thank You Message ───────────────────────────────────────── */}
+      <Card className="border-[#1B4D3E]/30 bg-[#1B4D3E]/5 backdrop-blur-sm">
+        <CardContent className="pt-6">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#1B4D3E] flex items-center justify-center flex-shrink-0">
+              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-[#1B4D3E] mb-1">
+                Thank you for your commitment to the BIRD process
+              </p>
+              <p className="text-xs text-[#065f46] leading-relaxed">
+                Your engagement preferences will help us design meaningful opportunities for collaboration. The BIRD team will reach out to you based on your selected preferences and availability. Together, we can build a roadmap that truly reflects the aspirations of the Bangsamoro people.
+              </p>
+            </div>
           </div>
-        </div>
-      </GlassCard>
-
-      {/* ── Block 4: Additional Comments ──────────────────────── */}
-      <GlassCard>
-        <div className="flex items-center gap-3 mb-5">
-          <MessageSquare className="w-5 h-5 text-[#C9A84C]" />
-          <h3 className="text-lg font-semibold text-[#022c22]">Additional Comments</h3>
-        </div>
-
-        <p className="text-sm text-[#022c22] mb-3">
-          We welcome any additional thoughts, recommendations, or questions you may have.
-        </p>
-
-        <textarea
-          value={data.q14_5_additional_comments}
-          onChange={(e) => update("q14_5_additional_comments", e.target.value)}
-          placeholder="Share any additional thoughts, recommendations, or questions..."
-          className="w-full min-h-[120px] p-4 rounded-lg border border-[#C9A84C]/20 text-sm text-[#022c22] placeholder:text-[#94a3b8] focus:outline-none focus:border-[#C9A84C] resize-y"
-        />
-      </GlassCard>
-
-      {/* ── Block 5: Thank You Card ───────────────────────────── */}
-      <div className="rounded-xl border border-[#C9A84C]/30 bg-gradient-to-br from-[#022c22] to-[#1B4D3E] p-8 text-center shadow-lg">
-        <div className="inline-flex items-center justify-center p-4 rounded-full bg-[#C9A84C]/20 mb-5">
-          <Heart className="w-8 h-8 text-[#C9A84C]" />
-        </div>
-
-        <h3 className="text-xl font-bold text-white mb-4">
-          Thank You for Your Contribution
-        </h3>
-
-        <p className="text-sm text-white/80 leading-relaxed max-w-2xl mx-auto">
-          Thank you for your valuable contribution to the Bangsamoro Investment Roadmap
-          2026&ndash;2035. Your insights directly shape the Emerging Bangsamoro — Southeast
-          Asia&apos;s premier ethical and sustainable investment destination. Together, we build
-          dignified prosperity for every Bangsamoro.
-        </p>
-
-        <div className="mt-6 pt-6 border-t border-white/10">
-          <p className="text-xs text-[#C9A84C] tracking-widest uppercase">
-            Bangsamoro Investment Roadmap &middot; 2026&ndash;2035
-          </p>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
