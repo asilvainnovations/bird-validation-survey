@@ -1,6 +1,6 @@
 // src/components/strategic/ContextPanel.tsx
-// BIRD 2026-2035 · Context Reference Panel with Videos, Images & Sites
-// Updated: 2026-07-16 — description support, enhanced categories, tooltips
+// BIRD 2026-2035 · Context Reference Panel with Videos, Images, Sites & AI Assistant
+// Updated: 2026-07-23 — Integrated FloatingAIAssistant for Validation Survey
 
 import React, { useState } from "react";
 import {
@@ -9,17 +9,18 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import {
-  Play, Image as ImageIcon, BookOpen, Globe, Info,
+  Play, Image as ImageIcon, BookOpen, Globe, Info, Sparkles, MessageCircle,
 } from "lucide-react";
 import {
   BIRD_VIDEOS, BIRD_IMAGES, BIRD_SITES,
   getImagesForSection, getVideosForSection,
   type BIRDImage, type BIRDVideo, type BIRDSite,
 } from "@/lib/bird-urls";
+import FloatingAIAssistant from "./FloatingAIAssistant";
 
 // ── Category color map ───────────────────────────────────────────────────────
-
 const CATEGORY_STYLES: Record<string, { bg: string; text: string; border: string }> = {
   framework:    { bg: "bg-[#C9A84C]/20",  text: "text-[#E8C560]",   border: "border-[#C9A84C]/40" },
   systems:      { bg: "bg-emerald-500/20", text: "text-emerald-400", border: "border-emerald-500/40" },
@@ -43,7 +44,6 @@ function getCategoryStyle(category: string) {
 }
 
 // ── Components ───────────────────────────────────────────────────────────────
-
 interface ContextPanelProps {
   sectionId?: string;
   showAll?: boolean;
@@ -54,7 +54,7 @@ interface ContextPanelProps {
 const VideoThumbnail: React.FC<{ video: BIRDVideo; compact?: boolean }> = ({ video, compact }) => {
   const [isOpen, setIsOpen] = useState(false);
   const videoId = video.url.split("/").pop()?.split("?")[0];
-
+  
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -92,7 +92,7 @@ const VideoThumbnail: React.FC<{ video: BIRDVideo; compact?: boolean }> = ({ vid
 const ImageCard: React.FC<{ image: BIRDImage; compact?: boolean }> = ({ image, compact }) => {
   const [isOpen, setIsOpen] = useState(false);
   const catStyle = getCategoryStyle(image.category);
-
+  
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -171,38 +171,52 @@ const SiteLink: React.FC<{ site: BIRDSite }> = ({ site }) => (
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // MAIN COMPONENT
-// ═══════════════════════════════════════════════════════════════════════════════
-
+// ══════════════════════════════════════════════════════════════════════════════
 export const ContextPanel: React.FC<ContextPanelProps> = ({
   sectionId, showAll = false, compact = false,
 }) => {
+  const [aiAssistantOpen, setAiAssistantOpen] = useState(false);
+  
   const sectionVideos = showAll
     ? Object.values(BIRD_VIDEOS)
     : sectionId
-      ? getVideosForSection(sectionId)
-      : [];
+    ? getVideosForSection(sectionId)
+    : [];
+    
   const sectionImages = showAll
     ? Object.values(BIRD_IMAGES)
     : sectionId
-      ? getImagesForSection(sectionId)
-      : [];
+    ? getImagesForSection(sectionId)
+    : [];
+    
   const hasContent = sectionVideos.length > 0 || sectionImages.length > 0;
+  
   if (!hasContent && !showAll) return null;
-
+  
   // Determine default tab
   const defaultTab = sectionVideos.length > 0 ? "videos" : sectionImages.length > 0 ? "images" : "sites";
-
+  
   return (
     <div className={`rounded-xl border border-[#C9A84C]/20 bg-[#011a12]/50 backdrop-blur-sm ${compact ? "p-3" : "p-4"}`}>
       <div className="flex items-center gap-2 mb-3">
         <BookOpen className="w-4 h-4 text-[#C9A84C]" />
-        <h4 className="text-sm font-bold text-[#C9A84C] uppercase tracking-wider">Context &amp; References</h4>
+        <h4 className="text-sm font-bold text-[#C9A84C] uppercase tracking-wider">Context & References</h4>
         {showAll && (
           <Badge variant="outline" className="text-[9px] border-[#C9A84C]/30 text-[#C9A84C]/70 ml-auto">
             {sectionVideos.length + sectionImages.length + Object.keys(BIRD_SITES).length} items
           </Badge>
         )}
+        <Button
+          variant="outline"
+          size="sm"
+          className="ml-auto text-[10px] border-[#C9A84C]/30 text-[#C9A84C] hover:bg-[#C9A84C]/10"
+          onClick={() => setAiAssistantOpen(true)}
+        >
+          <Sparkles className="w-3 h-3 mr-1" />
+          Ask BIRD AI
+        </Button>
       </div>
+      
       <Tabs defaultValue={defaultTab} className="w-full">
         <TabsList className="bg-[#022c22]/60 border border-[#C9A84C]/20 w-full mb-3 flex-wrap h-auto py-1">
           {(sectionVideos.length > 0 || showAll) && (
@@ -219,7 +233,7 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
             <Globe className="w-3 h-3 mr-1" /> Sites ({Object.keys(BIRD_SITES).length})
           </TabsTrigger>
         </TabsList>
-
+        
         {(sectionVideos.length > 0 || showAll) && (
           <TabsContent value="videos">
             <ScrollArea className={compact ? "h-48" : "h-64"}>
@@ -229,7 +243,7 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
             </ScrollArea>
           </TabsContent>
         )}
-
+        
         {(sectionImages.length > 0 || showAll) && (
           <TabsContent value="images">
             <ScrollArea className={compact ? "h-48" : "h-72"}>
@@ -239,7 +253,7 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
             </ScrollArea>
           </TabsContent>
         )}
-
+        
         <TabsContent value="sites">
           <ScrollArea className={compact ? "h-48" : "h-72"}>
             <div className="space-y-2">
@@ -248,6 +262,25 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
           </ScrollArea>
         </TabsContent>
       </Tabs>
+      
+      {/* Floating AI Assistant Dialog */}
+      <Dialog open={aiAssistantOpen} onOpenChange={setAiAssistantOpen}>
+        <DialogContent className="max-w-4xl h-[80vh] bg-[#022c22] border-[#C9A84C]/30 p-0">
+          <DialogHeader className="px-6 py-4 border-b border-[#C9A84C]/20">
+            <DialogTitle className="text-[#C9A84C] font-serif flex items-center gap-2">
+              <Sparkles className="w-5 h-5" />
+              BIRD AI Strategy Assistant
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden">
+            <FloatingAIAssistant 
+              plan={null}
+              activeView={sectionId || "survey"}
+              compact={false}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -255,13 +288,13 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
 // ═══════════════════════════════════════════════════════════════════════════════
 // COMPACT STRIP COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════════
-
 export const ContextStrip: React.FC<{ sectionId: string }> = ({ sectionId }) => {
   const videos = getVideosForSection(sectionId);
   const images = getImagesForSection(sectionId);
   const total = videos.length + images.length;
+  
   if (total === 0) return null;
-
+  
   return (
     <div className="flex items-center gap-2 flex-wrap justify-center">
       {videos.map((v, i) => {
@@ -320,7 +353,7 @@ export const MediaBrowser: React.FC<{ category?: string; title?: string }> = ({ 
   const images = category
     ? Object.values(BIRD_IMAGES).filter(img => img.category === category)
     : Object.values(BIRD_IMAGES);
-
+    
   return (
     <div className="space-y-4">
       {title && <h3 className="text-lg font-bold text-[#C9A84C] font-serif">{title}</h3>}
