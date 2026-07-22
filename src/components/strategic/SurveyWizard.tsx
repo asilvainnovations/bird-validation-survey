@@ -951,6 +951,35 @@ const SurveyWizard: React.FC = () => {
             </button>
           )}
         </div>
+        // In SurveyWizard.tsx handleSubmit function:
+const handleSubmit = async () => {
+  setSubmitting(true);
+  try {
+    // Combine all section states into single payload
+    const payload: Partial<SurveySchemaType> = {
+      // Map s0, s1, s2... s15 to schema fields
+      q0_1_ready: s0.q0_1_ready,
+      q0_2_ecosystem_understanding: s0.q0_2_ecosystem_understanding,
+      // ... all other fields from all sections
+      consent_final: true,
+    };
+
+    // Call the edge function
+    const response = await fetch('https://lydsisparsmvextskevw.supabase.co/functions/v1/survey-submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) throw new Error('Submission failed');
+    
+    toast.success("Survey submitted successfully!");
+  } catch (err) {
+    toast.error("Submission failed. Please try again.");
+  } finally {
+    setSubmitting(false);
+  }
+};
       </div>
     </div>
   );
