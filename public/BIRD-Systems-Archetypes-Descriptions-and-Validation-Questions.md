@@ -3,11 +3,32 @@
 
 ---
 
+## Capacity Traps
+
+---
+
+### 1. Limits to Growth
+
+**Diagram:** https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Limits%20to%20Growth%20Archetype.png
+
+**Description:**
+An investment expands rapidly but eventually hits hard ceilings such as unreliable infrastructure, low literacy, and resource bottlenecks. Without parallel capacity building, growth plateaus.
+
+---
+
+### 2. Growth and Underinvestment
+
+**Diagram:** https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Growth%20and%20Underinvestment.png
+
+**Description:**  Rising demand outpaces institutional capacity (certifiers, staff, infrastructure). Delays and inefficiencies reduce investor confidence, creating a self‑reinforcing cycle of stagnation.
+
+---
+
 ## Governance Traps
 
 ---
 
-### 1. Shifting the Burden — Symptomatic Solutions vs. Structural Reform
+### 3. Shifting the Burden — Symptomatic Solutions vs. Structural Reform
 
 **Diagram:** https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Shifting%20the%20Burden%20Archetype.png
 
@@ -30,7 +51,7 @@ This archetype illustrates how short-term interventions in BARMM often *replace*
 
 ---
 
-### 2. Fixes That Fail — Short-Term Relief Incentives vs. Systemic Capacity Building
+### 4. Fixes That Fail — Short-Term Relief Incentives vs. Systemic Capacity Building
 
 **Diagram:** https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Fixes%20that%20Fail%20Archetype.png
 
@@ -53,11 +74,22 @@ This archetype captures the unintended consequences of relying on quick fixes to
 
 ---
 
+### 5. Drifting Goals
+
+---
+
+**Diagram:** https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/Drifting%20Goals.png
+
+**Description:**
+
+“Drifting Goals” shows how ambitious development targets gradually weaken over time when persistent performance gaps lead institutions to lower their standards instead of solving underlying problems.  It also visualizes how systemic complacency can dilute development objectives, emphasizing the need for consistent monitoring and firm adherence to original targets. The causal loop diagram shows how unmet goals trigger corrective actions, but when results still fall short, pressure builds to redefine targets downward — creating a feedback loop of goal erosion. Instead of fixing systemic issues (like capacity gaps or resource constraints), organizations normalize lower expectations, undermining long‑term accountability. This pattern often appears in areas such as electrification, literacy, or Halal certification, where “realistic” baselines replace original ambitions.
+
+
 ## Resource and Equity Traps
 
 ---
 
-### 3. Success to the Successful — Winners Keep Winning, Regardless of Merit
+### 6. Success to the Successful — Winners Keep Winning, Regardless of Merit
 
 **Diagram:** https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Success%20to%20the%20Successful%20Aarchetype.png
 
@@ -80,7 +112,7 @@ This archetype reveals how **initial advantages create a self-reinforcing cycle 
 
 ---
 
-### 4. Tragedy of the Commons — Resource Over-Exploitation in the Foundations Cluster
+### 7. Tragedy of the Commons — Resource Over-Exploitation in the Foundations Cluster
 
 **Diagram:** https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Tragedy%20of%20the%20Commons%20Archetype.png
 
@@ -107,11 +139,11 @@ This archetype captures the **over-exploitation of shared natural resources** ac
 
 ---
 
-### 5. Cycles of Exclusion and Retaliation — Competitive Spirals and Escalation
+### 8. Escalation
 
 **Diagram:** https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Cycles%20of%20Exclusion%20and%20Retaliation.png
 
-**Introduction Diagram:** https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Instability%20Traps%20Introduction.png
+**Diagram:** https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Instability%20Traps%20Introduction.png
 
 **Description:**
 
@@ -132,7 +164,7 @@ This archetype — also called **"Escalation"** — manifests in both socio-poli
 
 ---
 
-### 6. The "Big Man" Archetype — Concentration of Power and Perpetual Instability
+### 9. The "Big Man" Archetype — Concentration of Power and Perpetual Instability
 
 **Diagram:** https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/The%20Big%20Man%20Archetype.png
 
@@ -161,22 +193,6 @@ Together, these three loops form a **vicious cycle** where political dominance p
 > *Which of the three reinforcing loops (R1: patronage eroding governance, R2: exclusion fueling conflict, or R3: patronage draining development resources) do you see as most active in BARMM today?*
 > * [Open text field]
 
----
-
-## Summary Table — All Systems Archetypes Validation Questions
-
-| # | Archetype | Category | Validation Question Type |
-|---|-----------|----------|-------------------------|
-| 1 | Shifting the Burden | Governance Trap | 4-point accuracy + open follow-up |
-| 2 | Fixes That Fail | Governance Trap | 4-point accuracy + open follow-up |
-| 3 | Success to the Successful | Resource & Equity Trap | 4-point accuracy + open follow-up |
-| 4 | Tragedy of the Commons | Resource & Equity Trap | 4-point accuracy + open follow-up |
-| 5 | Escalation (Cycles of Exclusion & Retaliation) | Instability Trap | 4-point accuracy + open follow-up |
-| 6 | The "Big Man" Archetype | Instability Trap | 4-point accuracy + open follow-up |
-| — | Investment–Development Loop | Reinforcing (R1) | [Previously provided] |
-| — | Governance–Investor Confidence Loop | Reinforcing (R2) | [Previously provided] |
-| — | Limits to Growth | Capacity Trap | [Previously provided] |
-| — | Growth and Underinvestment | Capacity Trap | [Previously provided] |
 
 ---
 
