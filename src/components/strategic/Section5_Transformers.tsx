@@ -2,13 +2,12 @@ import React from "react";
 import { Factory, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// ── Types ───────────────────────────────────────────────────────────
 export interface Section5Data {
-  // Contextual questions
   q5_1_cold_chain: string;
   q5_2_economic_zones: string;
   q5_3_barrier: string;
   q5_4_halal_park: string;
-  // SWOT
   q_s5_halal_cert_impact?: number;
   q_s5_halal_cert_likelihood?: number;
   q_s5_skills_mismatch_impact?: number;
@@ -19,7 +18,6 @@ export interface Section5Data {
   q_s5_uae_corridor_likelihood?: number;
   q_s5_competition_impact?: number;
   q_s5_competition_likelihood?: number;
-  // Archetypes
   q_s5_fixes_fail: string;
   q_s5_fixes_followup: string;
   q_s5_successful: string;
@@ -31,6 +29,7 @@ interface Section5Props {
   onChange: (data: Section5Data) => void;
 }
 
+// ── GlassCard helper ────────────────────────────────────────────────
 const GlassCard: React.FC<{ children: React.ReactNode; className?: string }> = ({
   children,
   className,
@@ -45,6 +44,7 @@ const GlassCard: React.FC<{ children: React.ReactNode; className?: string }> = (
   </div>
 );
 
+// ── Main Component ──────────────────────────────────────────────────
 const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
   const update = <K extends keyof Section5Data>(
     field: K,
