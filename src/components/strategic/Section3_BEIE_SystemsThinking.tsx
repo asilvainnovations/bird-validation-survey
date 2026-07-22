@@ -2,7 +2,7 @@ import React from "react";
 import { Network } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SurveySchemaType } from "@/lib/survey-schema";
-import { BIRD_IMAGES, BIRD_VIDEOS } from "@/lib/bird-ads"; // Note: Ensure this matches your actual bird-urls.ts path
+import { BIRD_IMAGES, BIRD_VIDEOS } from "@/lib/bird-urls";
 
 // ✅ STRICT UI IMPORTS (No custom wrappers)
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
