@@ -6,6 +6,7 @@
 import React from "react";
 import { Sparkles, Play, ArrowRight, BookOpen, BarChart3, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
