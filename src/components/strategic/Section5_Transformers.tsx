@@ -17,12 +17,25 @@ import { Textarea } from "@/components/ui/textarea";
 // ✅ Strict type from single source of truth
 export type Section5Data = Pick<
   SurveySchemaType,
-  | "q05_barrier"
-  | "q05_halal_park"
-  | "q05_s_fixes_fail"
-  | "q05_s_successful"
-  | "q05_s_halal_cert_impact"
-  | "q05_s_halal_cert_likelihood"
+  | "q_s1_halal_legitimacy_impact"
+  | "q_s1_halal_legitimacy_likelihood"
+  | "q_s1_domestic_halal_impact"
+  | "q_s1_domestic_halal_likelihood"
+  | "q_s6_polloc_impact"
+  | "q_s6_polloc_likelihood"
+  | "q_s5_halal_cert_impact"
+  | "q_s5_halal_cert_likelihood"
+  | "q_s5_standards_recognition_impact"
+  | "q_s5_standards_recognition_likelihood"
+  | "q_s5_postharvest_impact"
+  | "q_s5_postharvest_likelihood"
+  | "q_s5_fixes_fail"
+  | "q_s5_fixes_followup"
+  | "q_s5_growth_underinvest"
+  | "q_s5_growth_followup"
+  | "q5_1_halal_sector_rank"
+  | "q5_2_cold_chain"
+  | "q5_3_economic_zones"
 >;
 
 interface Section5Props {
@@ -30,7 +43,7 @@ interface Section5Props {
   onChange: (data: Section5Data) => void;
 }
 
-// ── Design tokens ────────────────────────────────────────────────────────
+// ── Design tokens ───────────────────────────────────────────────────────
 const activeBtn = "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90 hover:text-white";
 const inactiveBtn = "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-emerald-50/50";
 const activeScale = "bg-[#C9A84C] text-white border-[#C9A84C] hover:bg-[#C9A84C]/90";
@@ -49,11 +62,11 @@ export const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange 
       <div className="flex items-center gap-3 mb-4">
         <Factory className="w-6 h-6 text-[#C9A84C]" />
         <h2 className="text-xl font-bold text-[#022c22]">
-          Section 5: Cluster 2 — Transformers
+          Section 5: Cluster 2 — Transformers: Engines of Value Creation
         </h2>
       </div>
       <p className="text-sm text-[#065f46] -mt-2">
-        Engines of Value Creation — converting raw materials into high-value halal products and premium exports.
+        The Transformers cluster converts raw materials into higher-value halal products. This is where cultural authenticity becomes economic advantage.
       </p>
 
       {/* ── 1. Cluster Banner Image ────────────────────────────────── */}
@@ -80,23 +93,23 @@ export const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange 
         </CardContent>
       </Card>
 
-      {/* ── 3. SWOT Scales ─────────────────────────────────────────── */}
+      {/* ── 3. SWOT Scales: Strengths ──────────────────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm shadow-sm">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2 text-[#022c22]">
-            <span className="px-2 py-1 rounded text-xs font-semibold bg-rose-100 text-rose-700">SWOT SCALES</span>
-            Rate Key Transformer Factors
+            <span className="px-2 py-1 rounded text-xs font-semibold bg-emerald-100 text-emerald-700">STRENGTH</span>
+            Foundational Strengths for Transformers Cluster
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-8">
           <p className="text-xs text-[#065f46] italic -mt-4">
-            Impact (1 = very small, 5 = very large) × Likelihood (1 = very unlikely, 5 = very likely)
+            Rate each factor: Impact (1 = very small, 5 = very large) × Likelihood (1 = very unlikely, 5 = very likely)
           </p>
 
-          {/* W3: Weak Halal Certification */}
+          {/* S1: Halal Legitimacy */}
           <div className="space-y-3 pb-6 border-b border-[#C9A84C]/20">
             <p className="text-sm font-medium text-[#022c22]">
-              <strong>W3: Weak Halal Certification System.</strong> BHB lacks resources and international recognition. 45–60 days vs Malaysia&apos;s 15-day benchmark.
+              <strong>S1: Halal Legitimacy & Cultural Credibility.</strong> BARMM is an authentic Muslim-majority region, giving it a unique and trusted position in the global halal market.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
@@ -104,8 +117,8 @@ export const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange 
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((v) => (
                     <Button key={v} type="button" variant="outline" size="icon"
-                      className={cn("w-12 h-12 rounded-lg text-sm font-semibold", data.q05_s_halal_cert_impact === v ? activeScale : inactiveScale)}
-                      onClick={() => update("q05_s_halal_cert_impact", v)}>
+                      className={cn("w-12 h-12 rounded-lg text-sm font-semibold", data.q_s1_halal_legitimacy_impact === v ? activeScale : inactiveScale)}
+                      onClick={() => update("q_s1_halal_legitimacy_impact", v)}>
                       {v}
                     </Button>
                   ))}
@@ -116,8 +129,8 @@ export const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange 
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((v) => (
                     <Button key={v} type="button" variant="outline" size="icon"
-                      className={cn("w-12 h-12 rounded-lg text-sm font-semibold", data.q05_s_halal_cert_likelihood === v ? activeScale : inactiveScale)}
-                      onClick={() => update("q05_s_halal_cert_likelihood", v)}>
+                      className={cn("w-12 h-12 rounded-lg text-sm font-semibold", data.q_s1_halal_legitimacy_likelihood === v ? activeScale : inactiveScale)}
+                      onClick={() => update("q_s1_halal_legitimacy_likelihood", v)}>
                       {v}
                     </Button>
                   ))}
@@ -126,98 +139,70 @@ export const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange 
             </div>
           </div>
 
-          {/* Halal Pipeline Image + Question */}
-          <div className="space-y-4 pb-6 border-b border-[#C9A84C]/20">
-            <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-              <img src={BIRD_IMAGES.farmToMarketPipeline.url} alt={BIRD_IMAGES.farmToMarketPipeline.alt}
-                className="w-full h-auto object-contain" loading="lazy" />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4">
-                <p className="text-xs italic text-white/70">{BIRD_IMAGES.farmToMarketPipeline.title}</p>
-              </div>
-            </div>
-            <p className="text-sm text-[#065f46]">{BIRD_IMAGES.farmToMarketPipeline.description}</p>
-          </div>
-
-          {/* Industrial Zones Image */}
-          <div className="space-y-4">
-            <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-              <img src={BIRD_IMAGES.industrialEconomicZones.url} alt={BIRD_IMAGES.industrialEconomicZones.alt}
-                className="w-full h-auto object-contain" loading="lazy" />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4">
-                <p className="text-xs italic text-white/70">{BIRD_IMAGES.industrialEconomicZones.title}</p>
-              </div>
-            </div>
-            <p className="text-sm text-[#065f46]">{BIRD_IMAGES.industrialEconomicZones.description}</p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* ── 4. Contextual Questions ────────────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-base text-[#022c22]">Key Transformer Questions</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-8">
-          {/* Barrier */}
+          {/* S4: Large Domestic Halal Market */}
           <div className="space-y-3">
-            <Label className="text-sm font-medium text-[#022c22]">
-              What is the single biggest barrier to growing the Transformers cluster?
-            </Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {["Halal certification delays", "Lack of processing facilities", "Weak market linkages",
-                "Skills mismatch", "Competition from Malaysia/Indonesia", "Limited cold chain"].map((opt) => (
-                <Button key={opt} type="button" variant="outline"
-                  className={cn("justify-start h-auto py-3 text-sm text-left", data.q05_barrier === opt ? activeBtn : inactiveBtn)}
-                  onClick={() => update("q05_barrier", opt)}>
-                  {opt}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Halal Park */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium text-[#022c22]">
-              Should BARMM prioritize a dedicated Halal Industrial Park?
-            </Label>
-            <div className="grid grid-cols-1 gap-3">
-              {["Yes — essential for competitiveness", "Yes — but after certification reform",
-                "No — focus on distributed MSMEs", "No — too resource-intensive"].map((opt) => (
-                <Button key={opt} type="button" variant="outline"
-                  className={cn("justify-start h-auto py-3 text-sm text-left", data.q05_halal_park === opt ? activeBtn : inactiveBtn)}
-                  onClick={() => update("q05_halal_park", opt)}>
-                  {opt}
-                </Button>
-              ))}
+            <p className="text-sm font-medium text-[#022c22]">
+              <strong>S4: Large Domestic Halal Market.</strong> With 5.69 million Muslim consumers in BARMM, there is strong built-in local demand for halal products and services.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label className="text-xs text-[#065f46]">Impact (1–5)</Label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((v) => (
+                    <Button key={v} type="button" variant="outline" size="icon"
+                      className={cn("w-12 h-12 rounded-lg text-sm font-semibold", data.q_s1_domestic_halal_impact === v ? activeScale : inactiveScale)}
+                      onClick={() => update("q_s1_domestic_halal_impact", v)}>
+                      {v}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs text-[#065f46]">Likelihood (1–5)</Label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((v) => (
+                    <Button key={v} type="button" variant="outline" size="icon"
+                      className={cn("w-12 h-12 rounded-lg text-sm font-semibold", data.q_s1_domestic_halal_likelihood === v ? activeScale : inactiveScale)}
+                      onClick={() => update("q_s1_domestic_halal_likelihood", v)}>
+                      {v}
+                    </Button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* ── 5. Archetype: Fixes that Fail ──────────────────────────── */}
+      {/* ── 4. The Halal Industry Advantage Image ──────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm shadow-sm">
         <CardContent className="pt-6 space-y-4">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-amber-600" />
-            <h3 className="text-base font-semibold text-[#022c22]">Archetype: Fixes that Fail</h3>
-          </div>
-          {BIRD_IMAGES.fixesThatFail && (
-            <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-              <img src={BIRD_IMAGES.fixesThatFail.url} alt={BIRD_IMAGES.fixesThatFail.alt}
-                className="w-full h-auto object-contain" loading="lazy" />
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Capitalizing%20Cultural%20Advantage%20-%20Halal%20Industry%20Adv.png"
+              alt="The Halal Industry Advantage"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+              <p className="text-xs italic text-white/70">The Halal Industry Advantage: Capitalizing on Cultural Heritage</p>
             </div>
-          )}
+          </div>
           <p className="text-sm text-[#022c22]">
-            Short-term tax incentives and fragmented subsidies create the illusion of progress but erode institutional capacity over time. Each &quot;quick fix&quot; postpones systemic reform.
+            <strong>Three key sectors:</strong> Halal Food & Beverage (coconut-based by-products), Halal Cosmetics (beauty for Muslim consumers), Halal Pharmaceuticals (compliant medicine). The BIMP-EAGA trade corridor connects Bangsamoro to a large regional Muslim population.
           </p>
           <Label className="text-sm font-medium text-[#022c22] block">
-            How accurately does &quot;Fixes that Fail&quot; capture unintended consequences of short-term industrial policy in BARMM?
+            Rank which halal sector offers the greatest growth potential for Bangsamoro&apos;s ASEAN market integration.
           </Label>
-          <div className="grid grid-cols-2 gap-3">
-            {archetypeOptions.map((opt) => (
+          <div className="grid grid-cols-1 gap-3">
+            {["Halal Food & Beverage", "Halal Cosmetics", "Halal Pharmaceuticals"].map((opt, idx) => (
               <Button key={opt} type="button" variant="outline"
-                className={cn("justify-start h-auto py-3 text-sm text-left", data.q05_s_fixes_fail === opt ? activeBtn : inactiveBtn)}
-                onClick={() => update("q05_s_fixes_fail", opt)}>
+                className={cn("justify-start h-auto py-3 text-sm text-left", data.q5_1_halal_sector_rank === opt ? activeBtn : inactiveBtn)}
+                onClick={() => update("q5_1_halal_sector_rank", opt)}>
+                <span className={cn("flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold shrink-0 mr-3",
+                  data.q5_1_halal_sector_rank === opt ? "bg-white/20 text-white" : "bg-[#C9A84C]/10 text-[#C9A84C]")}>
+                  {data.q5_1_halal_sector_rank === opt ? idx + 1 : ""}
+                </span>
                 {opt}
               </Button>
             ))}
@@ -225,34 +210,256 @@ export const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange 
         </CardContent>
       </Card>
 
-      {/* ── 6. Archetype: Success to the Successful ────────────────── */}
+      {/* ── 5. Farm-to-Market Pipeline Image ──────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm shadow-sm">
+        <CardContent className="pt-6 space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Transformers-Farm-to-Market%20Pipeline%20.png"
+              alt="MAFAR Halal Farm-to-Market Pipeline"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+              <p className="text-xs italic text-white/70">Transformers: MAFAR Halal Farm-to-Market Pipeline</p>
+            </div>
+          </div>
+          <p className="text-sm text-[#022c22]">
+            <strong>Four stages:</strong> Input Supply (hatcheries, feed mills), Cold Chain & Logistics (roads, ice plants, cold storage), Processing (halal livestock, poultry, seaweed), Market Linkage (halal pasalubong centers, BIMP-EAGA export).
+          </p>
+          <Label className="text-sm font-medium text-[#022c22] block">
+            Do you think improving cold-chain and logistics will significantly strengthen Bangsamoro&apos;s halal farm-to-market pipeline?
+          </Label>
+          <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+            {["Strongly agree", "Agree", "Neutral", "Disagree", "Strongly disagree"].map((opt) => (
+              <Button key={opt} type="button" variant="outline"
+                className={cn("h-auto py-3 text-sm text-center", data.q5_2_cold_chain === opt ? activeBtn : inactiveBtn)}
+                onClick={() => update("q5_2_cold_chain", opt)}>
+                {opt}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── 6. SWOT Scales: Weaknesses & Threats ─────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2 text-[#022c22]">
+            <span className="px-2 py-1 rounded text-xs font-semibold bg-rose-100 text-rose-700">WEAKNESS / THREAT</span>
+            Barriers to Industrial Transformation
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-8">
+          <p className="text-xs text-[#065f46] italic -mt-4">
+            Rate each factor: Impact (1 = very small, 5 = very large) × Likelihood (1 = very unlikely, 5 = very likely)
+          </p>
+
+          {/* W7: Limited Agro-Processing */}
+          <div className="space-y-3 pb-6 border-b border-[#C9A84C]/20">
+            <p className="text-sm font-medium text-[#022c22]">
+              <strong>W7: Limited Agro-Processing and Cold Chain.</strong> Without proper storage and processing facilities, 20–40% of farm produce is lost after harvest, cutting farmer income.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label className="text-xs text-[#065f46]">Impact (1–5)</Label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((v) => (
+                    <Button key={v} type="button" variant="outline" size="icon"
+                      className={cn("w-12 h-12 rounded-lg text-sm font-semibold", data.q_s5_postharvest_impact === v ? activeScale : inactiveScale)}
+                      onClick={() => update("q_s5_postharvest_impact", v)}>
+                      {v}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs text-[#065f46]">Likelihood (1–5)</Label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((v) => (
+                    <Button key={v} type="button" variant="outline" size="icon"
+                      className={cn("w-12 h-12 rounded-lg text-sm font-semibold", data.q_s5_postharvest_likelihood === v ? activeScale : inactiveScale)}
+                      onClick={() => update("q_s5_postharvest_likelihood", v)}>
+                      {v}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* S6: Polloc Freeport */}
+          <div className="space-y-3 pb-6 border-b border-[#C9A84C]/20">
+            <p className="text-sm font-medium text-[#022c22]">
+              <strong>S6: Polloc Freeport & Economic Zone.</strong> This logistics and trade hub in Maguindanao del Norte serves as a strategic gateway for goods entering and leaving BARMM.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label className="text-xs text-[#065f46]">Impact (1–5)</Label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((v) => (
+                    <Button key={v} type="button" variant="outline" size="icon"
+                      className={cn("w-12 h-12 rounded-lg text-sm font-semibold", data.q_s6_polloc_impact === v ? activeScale : inactiveScale)}
+                      onClick={() => update("q_s6_polloc_impact", v)}>
+                      {v}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs text-[#065f46]">Likelihood (1–5)</Label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((v) => (
+                    <Button key={v} type="button" variant="outline" size="icon"
+                      className={cn("w-12 h-12 rounded-lg text-sm font-semibold", data.q_s6_polloc_likelihood === v ? activeScale : inactiveScale)}
+                      onClick={() => update("q_s6_polloc_likelihood", v)}>
+                      {v}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* W3: Weak Halal Certification */}
+          <div className="space-y-3 pb-6 border-b border-[#C9A84C]/20">
+            <p className="text-sm font-medium text-[#022c22]">
+              <strong>W3: Weak Halal Certification System.</strong> The Bangsamoro Halal Board (BHB) lacks resources and international recognition, making it hard for local producers to export halal goods.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label className="text-xs text-[#065f46]">Impact (1–5)</Label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((v) => (
+                    <Button key={v} type="button" variant="outline" size="icon"
+                      className={cn("w-12 h-12 rounded-lg text-sm font-semibold", data.q_s5_halal_cert_impact === v ? activeScale : inactiveScale)}
+                      onClick={() => update("q_s5_halal_cert_impact", v)}>
+                      {v}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs text-[#065f46]">Likelihood (1–5)</Label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((v) => (
+                    <Button key={v} type="button" variant="outline" size="icon"
+                      className={cn("w-12 h-12 rounded-lg text-sm font-semibold", data.q_s5_halal_cert_likelihood === v ? activeScale : inactiveScale)}
+                      onClick={() => update("q_s5_halal_cert_likelihood", v)}>
+                      {v}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* T3: Standards Recognition Risk */}
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-[#022c22]">
+              <strong>T3: Halal Standards Recognition Risk.</strong> BARMM&apos;s halal certifications are not yet aligned with OIC/SMIIC international standards, which may block export access.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label className="text-xs text-[#065f46]">Impact (1–5)</Label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((v) => (
+                    <Button key={v} type="button" variant="outline" size="icon"
+                      className={cn("w-12 h-12 rounded-lg text-sm font-semibold", data.q_s5_standards_recognition_impact === v ? activeScale : inactiveScale)}
+                      onClick={() => update("q_s5_standards_recognition_impact", v)}>
+                      {v}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs text-[#065f46]">Likelihood (1–5)</Label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((v) => (
+                    <Button key={v} type="button" variant="outline" size="icon"
+                      className={cn("w-12 h-12 rounded-lg text-sm font-semibold", data.q_s5_standards_recognition_likelihood === v ? activeScale : inactiveScale)}
+                      onClick={() => update("q_s5_standards_recognition_likelihood", v)}>
+                      {v}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── 7. Industrial and Economic Zones Image ───────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm shadow-sm">
+        <CardContent className="pt-6 space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Industrial%20and%20Economic%20Zones.png"
+              alt="Industrial and Economic Zones"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+              <p className="text-xs italic text-white/70">The Transformers: Capturing Value Through Industrial and Economic Zones</p>
+            </div>
+          </div>
+          <p className="text-sm text-[#022c22]">
+            <strong>Polloc Freeport & EcoZone</strong> (119-hectare agro-industrial hub in Parang, ADB-funded) and <strong>WOW Matanog Special Economic Zone</strong> (upcoming Bangsamoro Halal Park for halal-compliant manufacturing).
+          </p>
+          <Label className="text-sm font-medium text-[#022c22] block">
+            Will developing economic zones like Polloc Freeport and WOW Matanog significantly boost industrial and halal trade capacity?
+          </Label>
+          <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+            {["Strongly agree", "Agree", "Neutral", "Disagree", "Strongly disagree"].map((opt) => (
+              <Button key={opt} type="button" variant="outline"
+                className={cn("h-auto py-3 text-sm text-center", data.q5_3_economic_zones === opt ? activeBtn : inactiveBtn)}
+                onClick={() => update("q5_3_economic_zones", opt)}>
+                {opt}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── 8. Archetype: Growth and Underinvestment ─────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm shadow-sm">
         <CardContent className="pt-6 space-y-4">
           <div className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-amber-600" />
-            <h3 className="text-base font-semibold text-[#022c22]">Archetype: Success to the Successful</h3>
+            <h3 className="text-base font-semibold text-[#022c22]">Archetype: Growth and Underinvestment</h3>
           </div>
-          {BIRD_IMAGES.successSuccessful && (
-            <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-              <img src={BIRD_IMAGES.successSuccessful.url} alt={BIRD_IMAGES.successSuccessful.alt}
-                className="w-full h-auto object-contain" loading="lazy" />
-            </div>
-          )}
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Growth%20and%20Underinvestment%20(1).png"
+              alt="Growth and Underinvestment Archetype"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
           <p className="text-sm text-[#022c22]">
-            Mainland provinces attract the bulk of resources while island provinces with high potential (e.g., Tawi-Tawi&apos;s 40% national seaweed output) are left behind.
+            Rapid investment expansion can stall when institutional capacity fails to keep pace. As investment increases, facilitation capacity expands, improving processing and approvals. But when capacity hits its ceiling, backlogs and delays erode investor confidence, reducing attractiveness and slowing new investment.
           </p>
           <Label className="text-sm font-medium text-[#022c22] block">
-            How accurately does this reflect the imbalance between mainland and island provinces?
+            How accurately does &quot;Growth and Underinvestment&quot; describe the gap between BARMM&apos;s investment growth and its institutional capacity?
           </Label>
           <div className="grid grid-cols-2 gap-3">
             {archetypeOptions.map((opt) => (
               <Button key={opt} type="button" variant="outline"
-                className={cn("justify-start h-auto py-3 text-sm text-left", data.q05_s_successful === opt ? activeBtn : inactiveBtn)}
-                onClick={() => update("q05_s_successful", opt)}>
+                className={cn("justify-start h-auto py-3 text-sm text-left", data.q_s5_growth_underinvest === opt ? activeBtn : inactiveBtn)}
+                onClick={() => update("q_s5_growth_underinvest", opt)}>
                 {opt}
               </Button>
             ))}
           </div>
+          {(data.q_s5_growth_underinvest === "Very accurately" || data.q_s5_growth_underinvest === "Somewhat accurately") && (
+            <div className="space-y-2 pt-2">
+              <Label className="text-sm font-medium text-[#022c22]">
+                Which capacity constraint is most limiting — halal certification, infrastructure, or skills development?
+              </Label>
+              <Textarea placeholder="Type your response..." rows={3}
+                className="bg-white border-[#C9A84C]/30 focus-visible:ring-[#C9A84C] text-[#022c22]" />
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
