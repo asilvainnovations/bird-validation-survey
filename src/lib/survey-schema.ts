@@ -1,24 +1,18 @@
 // src/lib/survey-schema.ts
 // BIRD 2026–2035 · Validation Survey Zod Schema
 // Single source of truth for all 16 survey sections
+// Updated: 2026-07-23 — Aligned with BEIE Framework and SWOT distribution
 
 import { z } from "zod";
 
 // ── Reusable field validators ───────────────────────────────────────────────
-
-const requiredString = z.string().min(1, "This field is required");
 const optionalString = z.string().optional();
-const requiredNumber = z.number().min(1, "Required").max(5, "Max 5");
-const optionalNumber = z.number().min(1).max(5).optional();
-// 0–5 scale allowing 0 ("unanswered") — pilot mode per survey-lifecycle spec
-const optionalScore = z.number().min(0).max(5).optional();
+const optionalNumber = z.number().min(0).max(5).optional();
 const optionalBoolean = z.boolean().optional();
 const optionalStringArray = z.array(z.string()).default([]);
-const requiredBoolean = z.boolean();
-const requiredArray = <T extends z.ZodTypeAny>(schema: T) => z.array(schema).min(1, "Select at least one option");
+const requiredBoolean = z.boolean({ required_error: "This consent is required" });
 
 // ── IEDS Matrix sub-schema ──────────────────────────────────────────────────
-
 const matrixRowSchema = z.object({
   economic_impact: z.number().min(0).max(10).default(5),
   feasibility: z.number().min(0).max(10).default(5),
@@ -36,377 +30,208 @@ const iedsMatrixSchema = z.object({
   ieds: matrixRowSchema,
 });
 
-// ── Conditional rules type (for UI logic, not validation) ───────────────────
-
-export type ConditionalRules = Record<string, (values: Record<string, unknown>) => boolean>;
-
-export const conditionalRules: ConditionalRules = {
-  // Section 3: Basilan-specific questions
-  showBasilanAlert: (v) => v.demo_province === "basilan",
-  // Section 3: El Niño questions
-  showElNino: (v) => Array.isArray(v.q3_1_priorities) && v.q3_1_priorities.includes("agriculture"),
-  // Section 4: Show commodity impact only if halal selected
-  showCommodityImpact: (v) => v.q4_2_halal_park === "yes",
-};
-
 // ── Main Survey Schema ──────────────────────────────────────────────────────
-
 export const surveySchema = z.object({
-  // ═══ 16-Section Wizard Fields (pilot mode: all optional) ═══
-  demo_position: optionalString,
+  // ═══ Step 0: Welcome & Orientation ══
   q0_1_ready: optionalString,
   q0_2_ecosystem_understanding: optionalString,
-  q0_3_systems_thinking_value: optionalScore,
-  q10_1_ieds_preference: optionalString,
-  q10_2_sequence_a_priority: optionalScore,
-  q10_3_sequence_b_priority: optionalScore,
-  q10_4_sequence_c_priority: optionalScore,
-  q10_5_sequencing_logic: optionalString,
-  q10_6_risk_mitigation: optionalString,
-  q10_7_outcomes_achievable: optionalScore,
-  q11_1_calibration_appropriate: optionalString,
-  q11_2_governance_kpi_importance: optionalScore,
-  q11_3_resilience_kpi_importance: optionalScore,
-  q11_4_inclusivity_kpi_importance: optionalScore,
-  q11_5_peace_kpi_importance: optionalScore,
-  q11_6_cluster_kpi_sufficient: optionalString,
-  q11_7_benchmark_priority: optionalString,
-  q12_10_adaptive_frequency: optionalString,
-  q12_1_learning_growth_alignment: optionalScore,
-  q12_2_internal_process_alignment: optionalScore,
-  q12_3_stakeholder_alignment: optionalScore,
-  q12_4_financial_alignment: optionalScore,
-  q12_5_strongest_pathway: optionalString,
-  q12_6_vision_clarity: optionalScore,
-  q12_7_vision_achievable: optionalScore,
-  q12_8_mission_alignment: optionalScore,
-  q12_9_bsc_useful: optionalScore,
-  q13_1_funding_mix_fair: optionalScore,
-  q13_2_targets_realistic: optionalScore,
-  q13_3_high_risk_concern: optionalScore,
-  q13_4_medium_risk_concern: optionalScore,
-  q13_5_low_risk_concern: optionalScore,
-  q13_6_budget_priority_phase: optionalString,
-  q13_7_budget_priority_cluster: optionalString,
-  q13_8_blended_finance_opinion: optionalString,
-  q14_1_engagement_type: optionalStringArray,
-  q14_2_contact_method: optionalString,
-  q14_3_timing: optionalString,
-  q14_4_role_contribution: optionalString,
-  q14_5_additional_comments: optionalString,
-  q15_1_confirm_accurate: optionalBoolean,
-  q15_2_consent_anonymous_use: optionalBoolean,
-  q15_3_consent_voluntary: optionalBoolean,
-  q15_4_ready_to_submit: optionalBoolean,
-  q1_1_consent_participate: optionalBoolean,
-  q1_2_consent_anonymize: optionalBoolean,
-  q1_3_consent_email_copy: optionalBoolean,
-  q1_4_consent_voluntary: optionalBoolean,
-  q3_1_beie_collaboration: optionalString,
-  q3_2_beie_understanding: optionalString,
-  q3_3_beie_relevance: optionalString,
-  q3_4_cluster_position: optionalString,
-  q4_1_priorities: optionalStringArray,
-  q4_2_maguindanao_logistics: optionalString,
-  q4_3_feasibility: optionalScore,
-  q5_1_cold_chain: optionalString,
-  q5_2_economic_zones: optionalString,
-  q5_3_barrier: optionalString,
-  q5_4_halal_park: optionalString,
-  q6_1_halal_sector_rank: optionalString,
-  q6_2_sequencing_effectiveness: optionalScore,
-  q6_3_begmp_confidence: optionalScore,
-  q6_4_tourism_confidence: optionalScore,
-  q6_5_digital_tourism_rank: optionalStringArray,
-  q6_6_moral_governance_realistic: optionalString,
-  q7_1_connectivity_priority: optionalString,
-  q7_2_integration_challenge: optionalString,
-  q7_3_priority_node: optionalString,
-  q7_4_trapped_value_province: optionalString,
-  q7_5_bridge_impact: optionalString,
-  q7_6_gateway_province: optionalString,
-  q7_7_priority_vector: optionalString,
-  q7_8_uae_feasibility: optionalScore,
-  q7_9_bimpeaga_leverage: optionalScore,
-  q8_1_finance_tier_priority: optionalString,
-  q8_2_roadmap_achievable: optionalScore,
-  q8_3_priority_action: optionalString,
-  q8_4_islamic_authority: optionalString,
-  q9_1_moral_governance_derisk: optionalScore,
-  q9_2_critical_loop: optionalString,
-  q9_3_regulatory_priority: optionalString,
-  q9_4_revenue_channel: optionalString,
-  q9_5_stakeholder_alignment: optionalString,
-  q9_6_reform_priority: optionalString,
-  q_s1_aff_base_impact: optionalScore,
-  q_s1_aff_base_likelihood: optionalScore,
-  q_s1_bimpeaga_impact: optionalScore,
-  q_s1_bimpeaga_likelihood: optionalScore,
-  q_s1_halal_legitimacy_impact: optionalScore,
-  q_s1_halal_legitimacy_likelihood: optionalScore,
-  q_s4_climate_impact: optionalScore,
-  q_s4_climate_likelihood: optionalScore,
-  q_s4_limits_growth: optionalString,
-  q_s4_pestalotiopsis_impact: optionalScore,
-  q_s4_pestalotiopsis_likelihood: optionalScore,
-  q_s4_postharvest_impact: optionalScore,
-  q_s4_postharvest_likelihood: optionalScore,
-  q_s4_poverty_impact: optionalScore,
-  q_s4_poverty_likelihood: optionalScore,
+  q0_3_systems_thinking_value: optionalNumber,
+  q0_4_cld_understanding: optionalNumber,
+  q0_5_feedback_loops_understanding: optionalNumber,
+
+  // ═══ Step 1: Privacy & Consent (ONLY REQUIRED FIELDS IN PILOT MODE) ═══
+  q01_consent_participate: requiredBoolean.describe("Consent to participate"),
+  q01_consent_anonymize: optionalBoolean,
+  q01_consent_email_copy: optionalBoolean,
+
+  // ═══ Step 2: Respondent Profile ═══
+  q02_demo_category: optionalString,
+  q02_demo_province: optionalString,
+  q02_demo_expertise: optionalStringArray,
+  q02_demo_name: optionalString,
+  q02_demo_email: z.string().email("Invalid email format").optional().or(z.literal("")),
+  q02_demo_organization: optionalString,
+
+  // ═══ Step 3: BEIE & Systems Thinking ═══
+  q03_beie_understanding: optionalString,
+  q03_beie_relevance: optionalString,
+  q03_beie_collaboration: optionalString,
+  q03_systems_thinking_value: optionalNumber,
+  q03_systems_reframing_agreement: optionalNumber,
+  // SWOT Strengths (Transformers Cluster)
+  q_s1_halal_legitimacy_impact: optionalNumber,
+  q_s1_halal_legitimacy_likelihood: optionalNumber,
+  q_s4_domestic_halal_impact: optionalNumber,
+  q_s4_domestic_halal_likelihood: optionalNumber,
+  q_s10_cultural_heritage_impact: optionalNumber,
+  q_s10_cultural_heritage_likelihood: optionalNumber,
+  q_s6_polloc_impact: optionalNumber,
+  q_s6_polloc_likelihood: optionalNumber,
+
+  // ═══ Step 4: Cluster 1 — Foundations ═══
+  // SWOT Strengths
+  q_s3_aff_base_impact: optionalNumber,
+  q_s3_aff_base_likelihood: optionalNumber,
+  q_s8_renewable_energy_impact: optionalNumber,
+  q_s8_renewable_energy_likelihood: optionalNumber,
+  q_s11_lake_lanao_impact: optionalNumber,
+  q_s11_lake_lanao_likelihood: optionalNumber,
+  // SWOT Opportunities
+  q_s2_renewable_invest_impact: optionalNumber,
+  q_s2_renewable_invest_likelihood: optionalNumber,
+  q_s7_carbon_markets_impact: optionalNumber,
+  q_s7_carbon_markets_likelihood: optionalNumber,
+  q_s8_pes_impact: optionalNumber,
+  q_s8_pes_likelihood: optionalNumber,
+  // SWOT Threats
+  q_s10_pestalotiopsis_impact: optionalNumber,
+  q_s10_pestalotiopsis_likelihood: optionalNumber,
+  // Archetype: Tragedy of the Commons
   q_s4_tragedy_commons: optionalString,
   q_s4_tragedy_followup: optionalString,
-  q_s5_competition_impact: optionalScore,
-  q_s5_competition_likelihood: optionalScore,
-  q_s5_fixes_fail: optionalString,
-  q_s5_fixes_followup: optionalString,
-  q_s5_global_halal_impact: optionalScore,
-  q_s5_global_halal_likelihood: optionalScore,
-  q_s5_halal_cert_impact: optionalScore,
-  q_s5_halal_cert_likelihood: optionalScore,
-  q_s5_skills_mismatch_impact: optionalScore,
-  q_s5_skills_mismatch_likelihood: optionalScore,
-  q_s5_successful: optionalString,
-  q_s5_successful_followup: optionalString,
-  q_s5_uae_corridor_impact: optionalScore,
-  q_s5_uae_corridor_likelihood: optionalScore,
-  q_s6_cost_overruns_impact: optionalScore,
-  q_s6_cost_overruns_likelihood: optionalScore,
-  q_s6_growth_followup: optionalString,
-  q_s6_growth_underinvest: optionalString,
-  q_s6_infra_deficits_impact: optionalScore,
-  q_s6_infra_deficits_likelihood: optionalScore,
-  q_s6_literacy_impact: optionalScore,
-  q_s6_literacy_likelihood: optionalScore,
-  q_s6_natl_coord_impact: optionalScore,
-  q_s6_natl_coord_likelihood: optionalScore,
-  q_s6_political_transition_impact: optionalScore,
-  q_s6_political_transition_likelihood: optionalScore,
-  q_s6_polloc_impact: optionalScore,
-  q_s6_polloc_likelihood: optionalScore,
-  q_s6_renewable_energy_impact: optionalScore,
-  q_s6_renewable_energy_likelihood: optionalScore,
-  q_s6_renewable_invest_impact: optionalScore,
-  q_s6_renewable_invest_likelihood: optionalScore,
-  q_s6_shifting_burden: optionalString,
-  q_s6_shifting_followup: optionalString,
-  q_s6_skills_mismatch_impact: optionalScore,
-  q_s6_skills_mismatch_likelihood: optionalScore,
-  q_s6_tech_adoption_impact: optionalScore,
-  q_s6_tech_adoption_likelihood: optionalScore,
-  q_s6_tourism_potential_impact: optionalScore,
-  q_s6_tourism_potential_likelihood: optionalScore,
-  q_s6_youth_pop_impact: optionalScore,
-  q_s6_youth_pop_likelihood: optionalScore,
-  q_s7_asean_halal_impact: optionalScore,
-  q_s7_asean_halal_likelihood: optionalScore,
-  q_s7_bimpeaga_integration_impact: optionalScore,
-  q_s7_bimpeaga_integration_likelihood: optionalScore,
-  q_s7_bimpeaga_loc_impact: optionalScore,
-  q_s7_bimpeaga_loc_likelihood: optionalScore,
-  q_s7_domestic_halal_impact: optionalScore,
-  q_s7_domestic_halal_likelihood: optionalScore,
-  q_s7_escalation: optionalString,
-  q_s7_escalation_followup: optionalString,
-  q_s7_fragmented_policy_impact: optionalScore,
-  q_s7_fragmented_policy_likelihood: optionalScore,
-  q_s7_halal_competition_impact: optionalScore,
-  q_s7_halal_competition_likelihood: optionalScore,
-  q_s7_infra_deficits_impact: optionalScore,
-  q_s7_infra_deficits_likelihood: optionalScore,
-  q_s7_islamic_finance_impact: optionalScore,
-  q_s7_islamic_finance_likelihood: optionalScore,
-  q_s7_limits_followup: optionalString,
-  q_s7_limits_growth: optionalString,
-  q_s7_market_linkages_impact: optionalScore,
-  q_s7_market_linkages_likelihood: optionalScore,
-  q_s7_natl_coord_impact: optionalScore,
-  q_s7_natl_coord_likelihood: optionalScore,
-  q_s7_polloc_impact: optionalScore,
-  q_s7_polloc_likelihood: optionalScore,
-  q_s7_price_volatility_impact: optionalScore,
-  q_s7_price_volatility_likelihood: optionalScore,
-  q_s7_security_incidents_impact: optionalScore,
-  q_s7_security_incidents_likelihood: optionalScore,
-  q_s7_tech_adoption_impact: optionalScore,
-  q_s7_tech_adoption_likelihood: optionalScore,
-  q_s7_tourism_potential_impact: optionalScore,
-  q_s7_tourism_potential_likelihood: optionalScore,
-  q_s7_uae_corridor_impact: optionalScore,
-  q_s7_uae_corridor_likelihood: optionalScore,
-  q_s8_asean_halal_impact: optionalScore,
-  q_s8_asean_halal_likelihood: optionalScore,
-  q_s8_big_man: optionalString,
-  q_s8_big_man_followup: optionalString,
-  q_s8_domestic_halal_impact: optionalScore,
-  q_s8_domestic_halal_likelihood: optionalScore,
-  q_s8_financial_penetration_impact: optionalScore,
-  q_s8_financial_penetration_likelihood: optionalScore,
-  q_s8_fragmented_policy_impact: optionalScore,
-  q_s8_fragmented_policy_likelihood: optionalScore,
-  q_s8_global_halal_impact: optionalScore,
-  q_s8_global_halal_likelihood: optionalScore,
-  q_s8_halal_competition_impact: optionalScore,
-  q_s8_halal_competition_likelihood: optionalScore,
-  q_s8_halal_standards_impact: optionalScore,
-  q_s8_halal_standards_likelihood: optionalScore,
-  q_s8_infra_deficits_impact: optionalScore,
-  q_s8_infra_deficits_likelihood: optionalScore,
-  q_s8_islamic_ecosystem_impact: optionalScore,
-  q_s8_islamic_ecosystem_likelihood: optionalScore,
-  q_s8_islamic_finance_fw_impact: optionalScore,
-  q_s8_islamic_finance_fw_likelihood: optionalScore,
-  q_s8_literacy_impact: optionalScore,
-  q_s8_literacy_likelihood: optionalScore,
-  q_s8_peace_dividend_impact: optionalScore,
-  q_s8_peace_dividend_likelihood: optionalScore,
-  q_s8_policy_recognition_impact: optionalScore,
-  q_s8_policy_recognition_likelihood: optionalScore,
-  q_s8_political_transition_impact: optionalScore,
-  q_s8_political_transition_likelihood: optionalScore,
-  q_s8_renewable_invest_impact: optionalScore,
-  q_s8_renewable_invest_likelihood: optionalScore,
-  q_s8_security_incidents_impact: optionalScore,
-  q_s8_security_incidents_likelihood: optionalScore,
-  q_s8_shifting_burden: optionalString,
-  q_s8_shifting_followup: optionalString,
-  q_s8_skills_mismatch_impact: optionalScore,
-  q_s8_skills_mismatch_likelihood: optionalScore,
-  q_s8_uae_corridor_impact: optionalScore,
-  q_s8_uae_corridor_likelihood: optionalScore,
-  q_s8_youth_pop_impact: optionalScore,
-  q_s8_youth_pop_likelihood: optionalScore,
-  q_s9_carbon_markets_impact: optionalScore,
-  q_s9_carbon_markets_likelihood: optionalScore,
-  q_s9_cultural_heritage_impact: optionalScore,
-  q_s9_cultural_heritage_likelihood: optionalScore,
-  q_s9_forestry_code_impact: optionalScore,
-  q_s9_forestry_code_likelihood: optionalScore,
-  q_s9_fragmented_agency_impact: optionalScore,
-  q_s9_fragmented_agency_likelihood: optionalScore,
-  q_s9_fragmented_policy_impact: optionalScore,
-  q_s9_fragmented_policy_likelihood: optionalScore,
-  q_s9_governance_loop: optionalString,
-  q_s9_governance_loop_followup: optionalString,
-  q_s9_investment_loop: optionalString,
-  q_s9_investment_loop_followup: optionalString,
-  q_s9_islamic_finance_impact: optionalScore,
-  q_s9_islamic_finance_likelihood: optionalScore,
-  q_s9_literacy_impact: optionalScore,
-  q_s9_literacy_likelihood: optionalScore,
-  q_s9_peace_dividend_impact: optionalScore,
-  q_s9_peace_dividend_likelihood: optionalScore,
-  q_s9_pes_impact: optionalScore,
-  q_s9_pes_likelihood: optionalScore,
-  q_s9_policy_recognition_impact: optionalScore,
-  q_s9_policy_recognition_likelihood: optionalScore,
-  q_s9_political_transition_impact: optionalScore,
-  q_s9_political_transition_likelihood: optionalScore,
-  q_s9_postconflict_impact: optionalScore,
-  q_s9_postconflict_likelihood: optionalScore,
-  q_s9_security_incidents_impact: optionalScore,
-  q_s9_security_incidents_likelihood: optionalScore,
-  q_s9_underspending_impact: optionalScore,
-  q_s9_underspending_likelihood: optionalScore,
 
-  // ═══ Section 1: BEIE Framework Context ═══
-  q1_1: requiredString.describe("Understanding of BEIE Framework"),
-  q1_2: requiredString.describe("Relevance of BEIE to BARMM"),
+  // ═══ Step 5: Cluster 2 — Transformers ═══
+  // SWOT Weaknesses
+  q_s7_cold_chain_impact: optionalNumber,
+  q_s7_cold_chain_likelihood: optionalNumber,
+  q_s3_halal_cert_impact: optionalNumber,
+  q_s3_halal_cert_likelihood: optionalNumber,
+  q_s3_standards_recognition_impact: optionalNumber,
+  q_s3_standards_recognition_likelihood: optionalNumber,
+  // Archetype: Growth and Underinvestment
+  q_s5_growth_underinvest: optionalString,
+  q_s5_growth_followup: optionalString,
 
-  // ═══ Section 2: Moral Governance Operating System ═══
-  q2_1: requiredNumber.describe("Importance of Moral Governance"),
-  q2_2: requiredNumber.describe("Implementation readiness"),
-  q2_3_archetype: requiredString.describe("Dominant systems archetype"),
-  q2_4_peace: z.array(z.string()).default([]).describe("Peace milestones"),
+  // ═══ Step 6: Cluster 3 — Enablers ═══
+  // SWOT Weaknesses
+  q_s2_poverty_impact: optionalNumber,
+  q_s2_poverty_likelihood: optionalNumber,
+  q_s4_literacy_impact: optionalNumber,
+  q_s4_literacy_likelihood: optionalNumber,
+  q_s8_skills_mismatch_impact: optionalNumber,
+  q_s8_skills_mismatch_likelihood: optionalNumber,
+  // SWOT Strengths
+  q_s5_youth_pop_impact: optionalNumber,
+  q_s5_youth_pop_likelihood: optionalNumber,
+  // Infrastructure sequencing questions
+  q06_infra_sequencing_effectiveness: optionalNumber,
+  q06_digital_confidence: optionalNumber,
+  q06_tourism_confidence: optionalNumber,
+  q06_moral_governance_realistic: optionalString,
+  // Archetype: Limits to Growth
+  q_s6_limits_growth: optionalString,
+  q_s6_limits_followup: optionalString,
 
-  // ═══ Section 3: Cluster 1 — Foundations ═══
-  q3_1_priorities: z.array(z.string()).min(1, "Select at least one priority"),
-  q3_2_feasibility: requiredNumber,
-  q3_el_nino_impact: optionalNumber,
-  q3_el_nino_like: optionalNumber,
-  q3_pestalotiopsis_impact: optionalNumber,
-  q3_pestalotiopsis_like: optionalNumber,
-  q3_postharvest_impact: optionalNumber,
-  q3_postharvest_like: optionalNumber,
-  q3_limits_growth: optionalString,
+  // ═══ Step 7: Cluster 4 — Connectors ═══
+  // SWOT Strengths
+  q_s2_bimpeaga_impact: optionalNumber,
+  q_s2_bimpeaga_likelihood: optionalNumber,
+  q_s7_domestic_halal_impact: optionalNumber,
+  q_s7_domestic_halal_likelihood: optionalNumber,
+  // SWOT Opportunities
+  q_s1_global_halal_impact: optionalNumber,
+  q_s1_global_halal_likelihood: optionalNumber,
+  q_s6_uae_corridor_impact: optionalNumber,
+  q_s6_uae_corridor_likelihood: optionalNumber,
+  // Connectivity questions
+  q07_connectivity_integration: optionalNumber,
+  q07_maritime_revitalization: optionalNumber,
+  q07_geographic_isolation: optionalNumber,
+  // Archetype: Success to the Successful
+  q_s3_success_successful: optionalString,
+  q_s3_success_followup: optionalString,
 
-  // ═══ Section 4: Cluster 2 — Transformers ═══
-  q4_1_barrier: requiredString,
-  q4_2_halal_park: requiredString,
-  q4_3_fixes_fail: requiredString,
-  q4_4_commodity_impact: optionalString,
-  q4_5_heds_ranking: z.array(z.string()).default([]),
+  // ═══ Step 8: Cluster 5 — Financiers ═══
+  // SWOT Strengths
+  q_s9_islamic_finance_impact: optionalNumber,
+  q_s9_islamic_finance_likelihood: optionalNumber,
+  // Archetype: Shifting the Burden
+  q_s1_shifting_burden: optionalString,
+  q_s1_shifting_followup: optionalString,
 
-  // ═══ Section 5: Cluster 3 — Enablers ═══
-  q5_1_infra: requiredNumber,
-  q5_2_sectors: z.array(z.string()).min(1, "Select at least one sector"),
-  q5_3_broadband: requiredNumber,
-  q5_4_literacy: requiredNumber,
-  q5_5_stunting: requiredNumber,
-  q5_6_digital_divide: requiredString,
+  // ═══ Step 9: Operating Systems ═══
+  // SWOT Strengths
+  q_s7_policy_recognition_impact: optionalNumber,
+  q_s7_policy_recognition_likelihood: optionalNumber,
+  q_s12_peace_dividend_impact: optionalNumber,
+  q_s12_peace_dividend_likelihood: optionalNumber,
+  // SWOT Opportunities
+  q_s9_forestry_code_impact: optionalNumber,
+  q_s9_forestry_code_likelihood: optionalNumber,
+  q_s9_cultural_heritage_impact: optionalNumber,
+  q_s9_cultural_heritage_likelihood: optionalNumber,
+  // SWOT Threats
+  q_s9_security_incidents_impact: optionalNumber,
+  q_s9_security_incidents_likelihood: optionalNumber,
+  q_s5_political_transition_impact: optionalNumber,
+  q_s5_political_transition_likelihood: optionalNumber,
+  // Governance questions
+  q09_moral_governance_derisk: optionalNumber,
+  q09_regulatory_architecture: optionalNumber,
+  q09_jmc_revenue: optionalNumber,
+  // Archetype: Fixes that Fail
+  q_s2_fixes_fail: optionalString,
+  q_s2_fixes_followup: optionalString,
+  // Archetype: Big Man
+  q_s6_big_man: optionalString,
+  q_s6_big_man_followup: optionalString,
 
-  // ═══ Section 6: Cluster 4 — Connectors ═══
-  q6_1_bimpeaga: requiredNumber,
-  q6_2_markets: z.array(z.string()).min(1, "Select at least one market"),
-  q6_3_export_target: requiredNumber,
-  q6_4_uae_feasibility: requiredNumber,
-  q6_5_perception: requiredString,
-
-  // ═══ Section 7: Cluster 5 — Financiers ═══
-  q7_1_criticality: requiredNumber,
-  q7_2_instruments: z.array(z.string()).min(1, "Select at least one instrument"),
-  q7_3_inclusion_target: requiredNumber,
-  q7_4_asset_paradox: requiredString,
-  q7_5_block_grant: requiredString,
-
-  // ═══ Section 8: Strategic Options ═══
-  q8_1_strategy: requiredString,
-  q8_2_sequencing: requiredString,
-  q8_3_comments: z.string().default(""),
-
-  // ═══ Section 9: Budget & Targets ═══
-  q9_1_budget: requiredNumber,
-
-  // ═══ Section 10: IEDS Matrix Evaluation ═══
-  q10_1_ambition: requiredNumber,
+  // ═══ Step 10: IEDS & 3-Phase Plan ═══
+  q10_ieds_preference: optionalString,
   q10_matrix: iedsMatrixSchema,
+  q10_sequencing_logic: optionalString,
+  q10_leverage_points: optionalNumber,
+  q10_ieds_execution: optionalNumber,
 
-  // ═══ Section 11: Provincial Equity ═══
-  q11_1_affirmative: requiredString,
-  q11_2_mechanisms: z.array(z.string()).default([]),
+  // ══ Step 11: Metrics Architecture & KPIs ═══
+  q11_calibration_appropriate: optionalString,
+  q11_governance_kpi_importance: optionalNumber,
+  q11_resilience_kpi_importance: optionalNumber,
+  q11_inclusivity_kpi_importance: optionalNumber,
+  q11_peace_kpi_importance: optionalNumber,
+  q11_cluster_kpi_sufficient: optionalString,
+  q11_benchmark_priority: optionalString,
+  // Archetype: Drifting Goals
+  q_s11_drifting_goals: optionalString,
+  q_s11_drifting_followup: optionalString,
 
-  // ═══ Section 12: Climate Resilience ═══
-  q12_1_green_priority: requiredNumber,
-  q12_2_adaptation: z.array(z.string()).min(1, "Select at least one adaptation measure"),
+  // ═══ Step 12: Balanced Scorecard ═══
+  q12_learning_growth_alignment: optionalNumber,
+  q12_internal_process_alignment: optionalNumber,
+  q12_stakeholder_alignment: optionalNumber,
+  q12_financial_alignment: optionalNumber,
+  q12_strongest_pathway: optionalString,
+  q12_vision_clarity: optionalNumber,
+  q12_vision_achievable: optionalNumber,
+  q12_mission_alignment: optionalNumber,
+  q12_bsc_useful: optionalNumber,
+  q12_adaptive_frequency: optionalString,
 
-  // ═══ Section 13: Policy & Governance ═══
-  q13_1_legislation: z.array(z.string()).min(1, "Select at least one legislation priority"),
-  q13_2_bicc: requiredNumber,
+  // ═══ Step 13: Priority Actions & Budget ═══
+  q13_funding_mix_fair: optionalNumber,
+  q13_targets_realistic: optionalNumber,
+  q13_high_risk_concern: optionalNumber,
+  q13_medium_risk_concern: optionalNumber,
+  q13_low_risk_concern: optionalNumber,
+  q13_budget_priority_phase: optionalString,
+  q13_budget_priority_cluster: optionalString,
+  q13_blended_finance_opinion: optionalString,
 
-  // ═══ Section 14: Demographics ═══
-  demo_category: requiredString,
-  demo_province: requiredString,
-  demo_expertise: z.array(z.string()).min(1, "Select at least one area of expertise"),
-  demo_name: requiredString,
-  demo_email: z.string().email("Valid email required"),
-  demo_organization: optionalString,
+  // ═══ Step 14: Resources & Engagement ═══
+  q14_engagement_type: optionalStringArray,
+  q14_contact_method: optionalString,
+  q14_timing: optionalString,
+  q14_role_contribution: optionalString,
+  q14_additional_comments: optionalString,
 
-  // ═══ Province-specific conditional fields ═══
-  basilan_peace_questions: z.string().optional(),
-  maguindanao_halal_questions: z.string().optional(),
-  tawitawi_seaweed_questions: z.string().optional(),
-  lanao_lake_questions: z.string().optional(),
-
-  // ═══ Section 15: Final Consent ═══
+  // ═══ Step 15: Review & Submission ═══
+  q15_confirm_accurate: optionalBoolean,
+  q15_consent_anonymous_use: optionalBoolean,
+  q15_consent_voluntary: optionalBoolean,
+  q15_ready_to_submit: optionalBoolean,
   consent_final: z.literal(true, {
-    errorMap: () => ({ message: "You must consent to submit" }),
+    errorMap: () => ({ message: "You must confirm accuracy and consent to submit" }),
   }),
-
-  // ═══ Section 16: C.A.R.E. Validation ═══
-  care_context: requiredNumber,
-  care_action: requiredNumber,
-  care_realtime: requiredNumber,
-  care_evidence: requiredNumber,
-  care_overall: requiredNumber,
 });
 
 export type SurveySchemaType = z.infer<typeof surveySchema>;
