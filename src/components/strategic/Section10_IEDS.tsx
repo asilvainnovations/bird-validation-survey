@@ -1,6 +1,7 @@
 import React from "react";
-import { Rocket, CheckCircle2 } from "lucide-react";
+import { Rocket, CheckCircle2, AlertTriangle, TrendingUp, Users, Leaf, Building2, Globe, Zap, Wifi, BarChart3, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BIRD_IMAGES, BIRD_VIDEOS } from "@/lib/bird-urls";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -44,7 +45,7 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
     { code: "HEDS", name: "Halal Economy Dominance Strategy", score: "7.61/10", grdp: "₱150–200B" },
     { code: "GEMS", name: "Green Economy Monetization Strategy", score: "7.16/10", grdp: "₱80–120B" },
     { code: "IFES", name: "Infrastructure-First Enabling Strategy", score: "7.48/10", grdp: "₱200–280B" },
-    { code: "IEDS", name: "Integrated Ecosystem Development Strategy", score: "8.93/10", grdp: "₱550B+", highlight: true },
+    { code: "IEDS", name: "Integrated Ecosystem Development Strategy", score: "8.93/10", grdp: "550B+", highlight: true },
   ];
 
   return (
@@ -237,7 +238,7 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
         </CardContent>
       </Card>
 
-      {/* ═══════════════════════════════════════════ ICEBERG MODEL */}
+      {/* ══════════════════════════════════════════ ICEBERG MODEL */}
       <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base text-[#022c22]">
@@ -287,7 +288,7 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
         </CardContent>
       </Card>
 
-      {/* ═══════════════════════════════════════════ COLLABORATIVE GOVERNANCE */}
+      {/* ══════════════════════════════════════════ COLLABORATIVE GOVERNANCE */}
       <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base text-[#022c22]">
@@ -582,7 +583,7 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
         </CardContent>
       </Card>
 
-      {/* ═══════════════════════════════════════════ SEQUENCING LOGIC */}
+      {/* ══════════════════════════════════════════ SEQUENCING LOGIC */}
       <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base text-[#022c22]">
@@ -656,8 +657,7 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
         </CardHeader>
         <CardContent>
           <Label className="text-sm font-medium text-[#022c22] mb-3 block">
-            {/* FIXED: Escaped the '<' character to prevent JSX parsing errors */}
-            How achievable are the IEDS 2035 targets (₱550B+ GRDP, &lt;20% poverty, 100% electrification)?
+            How achievable are the IEDS 2035 targets (₱550B+ GRDP, <20% poverty, 100% electrification)?
           </Label>
           <div className="flex gap-2">
             {[1, 2, 3, 4, 5].map((v) => (
