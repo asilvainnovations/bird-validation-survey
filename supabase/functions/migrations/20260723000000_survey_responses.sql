@@ -1,96 +1,100 @@
--- ============================================================================
--- BIRD 2026-2035 Validation Survey Database Schema
--- Target: Supabase PostgreSQL
--- Compliance: DPA 2012 (Philippines) - PII isolation and strict RLS
--- ============================================================================
+-- supabase/migrations/20260723000000_survey_responses.sql
+-- BIRD Validation Survey Database Schema
+-- Updated: 2026-07-23 · Aligned with SurveyWizard.tsx and survey-schema.ts
 
--- 1. Create the main survey_responses table
--- We use a hybrid approach: explicit columns for high-frequency filtering/indexing,
--- and a JSONB column for the flexible 150+ field survey payload.
-CREATE TABLE IF NOT EXISTS public.survey_responses (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    created_at timestamptz DEFAULT now() NOT NULL,
-    updated_at timestamptz DEFAULT now() NOT NULL,
-    
-    -- Core filtering fields (extracted for fast indexing)
-    demo_province text,
-    demo_category text,
-    consent_final boolean DEFAULT false,
-    
-    -- Full payload storage (matches SurveySchemaType from survey-schema.ts)
-    response_data jsonb DEFAULT '{}'::jsonb NOT NULL,
-    
-    -- Metadata
-    submission_source text DEFAULT 'web' -- e.g., 'web', 'mobile', 'kiosk'
+-- 1. Create the main responses table
+create table if not exists public.survey_responses (
+  id uuid default gen_random_uuid() primary key,
+  
+  -- Top-level indexed columns for fast dashboard filtering
+  demo_province text,
+  demo_category text,
+  
+  -- Consent and metadata
+  consent_final boolean default true not null,
+  submission_source text default 'web' not null,
+  
+  -- Full payload storage (260+ fields)
+  response_data jsonb not null,
+  
+  -- Audit timestamps
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- 2. Create Indexes for Performance
--- Optimizes dashboard filtering and MEL reporting
-CREATE INDEX IF NOT EXISTS idx_survey_responses_province ON public.survey_responses(demo_province);
-CREATE INDEX IF NOT EXISTS idx_survey_responses_category ON public.survey_responses(demo_category);
-CREATE INDEX IF NOT EXISTS idx_survey_responses_created_at ON public.survey_responses(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_survey_responses_consent ON public.survey_responses(consent_final) WHERE consent_final = true;
+-- 2. Add indexes for common dashboard queries
+create index if not exists idx_survey_responses_province on public.survey_responses(demo_province);
+create index if not exists idx_survey_responses_category on public.survey_responses(demo_category);
+create index if not exists idx_survey_responses_created_at on public.survey_responses(created_at desc);
+create index if not exists idx_survey_responses_consent on public.survey_responses(consent_final) where consent_final = true;
 
--- 3. Row-Level Security (RLS)
--- DPA 2012 Compliance: Ensure data is protected at the database level
-ALTER TABLE public.survey_responses ENABLE ROW LEVEL SECURITY;
+-- 3. Enable Row Level Security (RLS)
+alter table public.survey_responses enable row level security;
 
--- Policy 1: Allow anyone (including anonymous users) to INSERT a response
--- This is required for the public-facing survey to work without login
-CREATE POLICY "Allow public insert for survey responses" 
-ON public.survey_responses 
-FOR INSERT 
-WITH CHECK (true);
+-- 4. Allow anonymous public submissions (Frontend Edge Function uses anon key)
+create policy "Allow anonymous public submissions"
+on public.survey_responses 
+for insert 
+to anon
+with check (true);
 
--- Policy 2: Allow authenticated users (admins/MEL team) to READ responses
--- Prevents public scraping of survey data
-CREATE POLICY "Allow authenticated read for survey responses" 
-ON public.survey_responses 
-FOR SELECT 
-USING (auth.role() = 'authenticated' OR auth.role() = 'service_role');
+-- 5. Allow Service Role to read all data (Used by Analytics/MEL Dashboard & Admin)
+create policy "Service role can read all responses"
+on public.survey_responses 
+for select 
+to service_role
+using (true);
 
--- Policy 3: Allow service_role (Edge Functions) to UPDATE/DELETE if needed for moderation
-CREATE POLICY "Allow service role full access" 
-ON public.survey_responses 
-FOR ALL 
-USING (auth.role() = 'service_role') 
-WITH CHECK (auth.role() = 'service_role');
+-- 6. Allow Service Role to update responses (For admin corrections if needed)
+create policy "Service role can update responses"
+on public.survey_responses 
+for update 
+to service_role
+using (true);
 
--- 4. Create PII-Stripped View for MEL Dashboard
--- This view explicitly excludes sensitive fields (name, email, organization) 
--- to ensure safe querying by dashboard applications or BI tools.
-CREATE OR REPLACE VIEW public.survey_response_stats AS
-SELECT 
-    id,
-    created_at,
-    demo_province,
-    demo_category,
-    submission_source,
-    
-    -- Extract key metrics directly from the JSONB payload for easy dashboard querying
-    (response_data->>'q0_3_systems_thinking_value')::numeric AS systems_thinking_value,
-    (response_data->>'q10_1_ieds_preference')::text AS ieds_preference,
-    (response_data->>'q12_6_vision_clarity')::numeric AS vision_clarity_score,
-    (response_data->>'q13_2_targets_realistic')::numeric AS targets_realistic_score,
-    
-    -- Example: Extract a specific SWOT score if needed for aggregation
-    (response_data->>'q_s1_halal_legitimacy_impact')::numeric AS s1_halal_impact,
-    (response_data->>'q_s1_halal_legitimacy_likelihood')::numeric AS s1_halal_likelihood
-    
-    -- NOTE: demo_name, demo_email, and demo_organization are intentionally OMITTED
-FROM public.survey_responses
-WHERE consent_final = true;
+-- 7. Create a PII-stripped view for the public live analytics dashboard
+-- This view safely exposes non-sensitive segmentation data and key metrics
+create or replace view public.survey_response_stats as
+select
+  id,
+  demo_province,
+  demo_category,
+  submission_source,
+  created_at,
+  
+  -- Extract key non-PII segmentation fields
+  response_data->'demo_expertise' as demo_expertise,
+  response_data->>'demo_position' as demo_position,
+  
+  -- Extract consent status (aligned with survey-schema.ts: q1_1_consent_participate)
+  (response_data->>'q1_1_consent_participate')::boolean as consented_participate,
+  (response_data->>'q1_2_consent_anonymize')::boolean as consented_anonymize,
+  
+  -- Extract strategic matrices for dashboard visualization
+  response_data->'q10_matrix' as ieds_matrix,
+  
+  -- Extract computed BIRD scores (if appended by Edge Function or frontend)
+  (response_data->>'bird_score_strength_ri')::numeric as score_strength_ri,
+  (response_data->>'bird_score_opportunity_ri')::numeric as score_opportunity_ri,
+  (response_data->>'bird_score_weakness_risk')::numeric as score_weakness_risk,
+  (response_data->>'bird_score_threat_vi')::numeric as score_threat_vi
 
--- 5. Secure the View
--- Ensure the view inherits the same RLS restrictions as the base table
-ALTER VIEW public.survey_response_stats SET (security_invoker = on);
+from public.survey_responses
+where consent_final = true;
 
--- 6. Add Helpful Comments for Future Developers
-COMMENT ON TABLE public.survey_responses IS 'Stores all BIRD 2026-2035 Validation Survey submissions. Full payload is in response_data (jsonb).';
-COMMENT ON COLUMN public.survey_responses.response_data IS 'JSONB object matching the Zod SurveySchemaType. Contains all 16 sections of the survey.';
-COMMENT ON VIEW public.survey_response_stats IS 'PII-stripped view of survey responses for safe use in the MEL Dashboard and analytics.';
+-- 8. Grant read access to the public view for anon users (Live Dashboard)
+grant select on public.survey_response_stats to anon;
 
--- ============================================================================
--- Execution Complete. 
--- Next Step: Verify in Supabase Table Editor and test Edge Function submission.
--- ============================================================================
+-- 9. Add a trigger to automatically update the `updated_at` column
+create or replace function public.handle_updated_at()
+returns trigger as $$
+begin
+  new.updated_at = timezone('utc'::text, now());
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger on_survey_response_updated
+  before update on public.survey_responses
+  for each row
+  execute function public.handle_updated_at();
