@@ -1,7 +1,10 @@
+// src/components/strategic/Section10_IEDS.tsx
+// BIRD 2026–2035 · Section 10: Integrated Ecosystem Development Strategy (IEDS)
+// Updated: 2026-07-23 · Production-ready, JSX syntax fixed, schema-aligned
+
 import React from "react";
-import { Rocket, CheckCircle2, AlertTriangle, TrendingUp, Users, Leaf, Building2, Globe, Zap, Wifi, BarChart3, Wallet } from "lucide-react";
+import { Rocket, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { BIRD_IMAGES, BIRD_VIDEOS } from "@/lib/bird-urls";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -24,15 +27,16 @@ export interface Section10Data {
   q10_6_strategic_ranking?: string;
 }
 
-// ── Component ───────────────────────────────────────────────────
+// ── Component Props ─────────────────────────────────────────────
 interface Section10Props {
   data: Section10Data;
-  onChange: (data: Section10Data) => void;
+  setData: React.Dispatch<React.SetStateAction<Section10Data>>;
 }
 
-const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
+const Section10_IEDS: React.FC<Section10Props> = ({ data, setData }) => {
+  // Helper to update specific fields immutably
   const update = <K extends keyof Section10Data>(field: K, value: Section10Data[K]) => {
-    onChange({ ...data, [field]: value });
+    setData((prev) => ({ ...prev, [field]: value }));
   };
 
   const activeBtnClass = "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90";
@@ -45,7 +49,7 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
     { code: "HEDS", name: "Halal Economy Dominance Strategy", score: "7.61/10", grdp: "₱150–200B" },
     { code: "GEMS", name: "Green Economy Monetization Strategy", score: "7.16/10", grdp: "₱80–120B" },
     { code: "IFES", name: "Infrastructure-First Enabling Strategy", score: "7.48/10", grdp: "₱200–280B" },
-    { code: "IEDS", name: "Integrated Ecosystem Development Strategy", score: "8.93/10", grdp: "550B+", highlight: true },
+    { code: "IEDS", name: "Integrated Ecosystem Development Strategy", score: "8.93/10", grdp: "₱550B+", highlight: true },
   ];
 
   return (
@@ -657,7 +661,8 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
         </CardHeader>
         <CardContent>
           <Label className="text-sm font-medium text-[#022c22] mb-3 block">
-            How achievable are the IEDS 2035 targets (₱550B+ GRDP, <20% poverty, 100% electrification)?
+            {/* FIXED: Escaped '<' character to prevent JSX parser error */}
+            How achievable are the IEDS 2035 targets (₱550B+ GRDP, {'<'}20% poverty, 100% electrification)?
           </Label>
           <div className="flex gap-2">
             {[1, 2, 3, 4, 5].map((v) => (
