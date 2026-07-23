@@ -4,7 +4,7 @@
 
 import React, { useState, useCallback } from "react";
 import { submitSurvey } from "@/lib/api";
-import { type SurveySchemaType } from "@/lib/survey-schema";
+import { surveySchema, type SurveySchemaType } from "@/lib/survey-schema";
 import { Toaster, toast } from "sonner";
 
 // ─── SECTION COMPONENTS & TYPES ──────────────────────────────────────────────
@@ -542,33 +542,27 @@ const SurveyWizard: React.FC = () => {
 
   // ── Submission (Integrated with Edge Function via @/lib/api) ──
   const handleSubmit = async () => {
-    if (!s15.q15_1_confirm_accurate) {
-      toast.error("Please confirm your responses are accurate before submitting.");
-      return;
-    }
-
     setSubmitting(true);
     try {
       const payload: Partial<SurveySchemaType> = {
         // Step 0
         q0_1_ready: s0.ready_to_begin,
-        q0_2_ecosystem_understanding: s0.ecosystem_understanding, // Corrected schema typo mapping
+        q0_2_ecosystem_understanding: s0.ecosystem_understanding,
         q0_3_systems_thinking_value: s0.systems_thinking_value,
         
-        // Step 1 (Aligned with survey-schema.ts: q1_1_... format)
-        q1_1_consent_participate: s1.consent_participate,
-        q1_2_consent_anonymize: s1.consent_anonymize,
-        q1_3_consent_email_copy: s1.consent_email_copy,
+        // Step 1
+        q01_consent_participate: s1.consent_participate,
+        q01_consent_anonymize: s1.consent_anonymize,
+        q01_consent_email_copy: s1.consent_email_copy,
         q1_4_consent_voluntary: s1.consent_voluntary,
         
-        // Step 2 (Aligned with survey-schema.ts: demo_* format)
-        demo_position: s2.demo_position,
-        demo_category: s2.demo_category,
-        demo_province: s2.demo_province,
-        demo_expertise: s2.demo_expertise,
-        demo_name: s2.demo_name,
-        demo_email: s2.demo_email,
-        demo_organization: s2.demo_organization,
+        // Step 2
+        q02_demo_category: s2.demo_category,
+        q02_demo_province: s2.demo_province,
+        q02_demo_expertise: s2.demo_expertise,
+        q02_demo_name: s2.demo_name,
+        q02_demo_email: s2.demo_email,
+        q02_demo_organization: s2.demo_organization,
         
         // Step 3
         q3_1_beie_collaboration: s3.q3_1_beie_collaboration,
@@ -847,8 +841,8 @@ const SurveyWizard: React.FC = () => {
         q_s9_governance_loop_followup: s9.q_s9_governance_loop_followup,
       };
 
-      // Calls the Edge Function via centralized api.ts wrapper
-      await submitSurvey(payload as SurveySchemaType); 
+      // This calls the Edge Function via your centralized api.ts wrapper
+      await submitSurvey(payload as any); 
       toast.success("Survey submitted successfully! Your input shapes the Emerging Bangsamoro.");
     } catch (err) {
       toast.error("Submission failed. Please try again or contact support.");
@@ -861,22 +855,22 @@ const SurveyWizard: React.FC = () => {
   // ── Step Rendering ──
   const renderStep = () => {
     switch (step) {
-      case 0: return <Section0_Orientation data={s0} setData={setS0} />;
-      case 1: return <Section1_Privacy data={s1} setData={setS1} />;
-      case 2: return <Section2_Demographics data={s2} setData={setS2} />;
-      case 3: return <Section3_BEIE_SystemsThinking data={s3} setData={setS3} />;
-      case 4: return <Section4_Foundations data={s4} setData={setS4} />;
-      case 5: return <Section5_Transformers data={s5} setData={setS5} />;
-      case 6: return <Section6_Enablers data={s6} setData={setS6} />;
-      case 7: return <Section7_Connectors data={s7} setData={setS7} />;
-      case 8: return <Section8_Financiers data={s8} setData={setS8} />;
-      case 9: return <Section9_OperatingSystems data={s9} setData={setS9} />;
-      case 10: return <Section10_IEDS data={s10} setData={setS10} />;
-      case 11: return <Section11_Metrics data={s11} setData={setS11} />;
-      case 12: return <Section12_BalancedScorecard data={s12} setData={setS12} />;
-      case 13: return <Section13_PriorityActions data={s13} setData={setS13} />;
-      case 14: return <Section14_AccessResources data={s14} setData={setS14} />;
-      case 15: return <Section15_Submission data={s15} setData={setS15} />;
+      case 0: return <Section0_Orientation data={s0} onChange={setS0} />;
+      case 1: return <Section1_Privacy data={s1} onChange={setS1} />;
+      case 2: return <Section2_Demographics data={s2} onChange={setS2} />;
+      case 3: return <Section3_BEIE_SystemsThinking data={s3} onChange={setS3} />;
+      case 4: return <Section4_Foundations data={s4} onChange={setS4} />;
+      case 5: return <Section5_Transformers data={s5} onChange={setS5} />;
+      case 6: return <Section6_Enablers data={s6} onChange={setS6} />;
+      case 7: return <Section7_Connectors data={s7} onChange={setS7} />;
+      case 8: return <Section8_Financiers data={s8} onChange={setS8} />;
+      case 9: return <Section9_OperatingSystems data={s9} onChange={setS9} />;
+      case 10: return <Section10_IEDS data={s10} onChange={setS10} />;
+      case 11: return <Section11_Metrics data={s11} onChange={setS11} />;
+      case 12: return <Section12_BalancedScorecard data={s12} onChange={setS12} />;
+      case 13: return <Section13_PriorityActions data={s13} onChange={setS13} />;
+      case 14: return <Section14_AccessResources data={s14} onChange={setS14} />;
+      case 15: return <Section15_Submission data={s15} onChange={setS15} />;
       default: return null;
     }
   };
