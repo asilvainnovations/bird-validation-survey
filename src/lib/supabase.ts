@@ -34,6 +34,7 @@ export const EDGE_FUNCTIONS = {
   STRATEGIC_PLANNER_SYNC: `${EDGE_BASE}/strategic-planner-sync`,
   EMAIL_NOTIFICATIONS:    `${EDGE_BASE}/email-notifications`,
   CRM_DISPATCHER:         `${EDGE_BASE}/crm-dispatcher`,
+  SUBMIT_SURVEY:          `${EDGE_BASE}/submit-survey`,
 } as const;
 
 // ── Branding Assets (CDN) ─────────────────────────────────────────────────────
