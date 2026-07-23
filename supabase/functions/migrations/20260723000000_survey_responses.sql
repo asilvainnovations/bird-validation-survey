@@ -1,6 +1,6 @@
 -- supabase/migrations/20260723000000_survey_responses.sql
 -- BIRD Validation Survey Database Schema
--- Updated: 2026-07-23 · Aligned with SurveyWizard.tsx and survey-schema.ts
+-- Updated: 2026-07-23 · Fully idempotent, aligned with SurveyWizard.tsx and survey-schema.ts
 
 -- 1. Create the main responses table
 create table if not exists public.survey_responses (
@@ -32,6 +32,7 @@ create index if not exists idx_survey_responses_consent on public.survey_respons
 alter table public.survey_responses enable row level security;
 
 -- 4. Allow anonymous public submissions (Frontend Edge Function uses anon key)
+drop policy if exists "Allow anonymous public submissions" on public.survey_responses;
 create policy "Allow anonymous public submissions"
 on public.survey_responses 
 for insert 
@@ -39,6 +40,7 @@ to anon
 with check (true);
 
 -- 5. Allow Service Role to read all data (Used by Analytics/MEL Dashboard & Admin)
+drop policy if exists "Service role can read all responses" on public.survey_responses;
 create policy "Service role can read all responses"
 on public.survey_responses 
 for select 
@@ -46,15 +48,20 @@ to service_role
 using (true);
 
 -- 6. Allow Service Role to update responses (For admin corrections if needed)
+drop policy if exists "Service role can update responses" on public.survey_responses;
 create policy "Service role can update responses"
 on public.survey_responses 
 for update 
 to service_role
 using (true);
 
--- 7. Create a PII-stripped view for the public live analytics dashboard
+-- 7. Drop existing view to prevent column order/name mismatch errors during replacement
+-- (This does NOT delete any data from the underlying survey_responses table)
+drop view if exists public.survey_response_stats cascade;
+
+-- 8. Create a PII-stripped view for the public live analytics dashboard
 -- This view safely exposes non-sensitive segmentation data and key metrics
-create or replace view public.survey_response_stats as
+create view public.survey_response_stats as
 select
   id,
   demo_province,
@@ -82,11 +89,14 @@ select
 from public.survey_responses
 where consent_final = true;
 
--- 8. Grant read access to the public view for anon users (Live Dashboard)
+-- 9. Grant read access to the public view for anon users (Live Dashboard)
 grant select on public.survey_response_stats to anon;
 
--- 9. Add a trigger to automatically update the `updated_at` column
-create or replace function public.handle_updated_at()
+-- 10. Add a trigger to automatically update the `updated_at` column
+drop trigger if exists on_survey_response_updated on public.survey_responses;
+drop function if exists public.handle_updated_at() cascade;
+
+create function public.handle_updated_at()
 returns trigger as $$
 begin
   new.updated_at = timezone('utc'::text, now());
