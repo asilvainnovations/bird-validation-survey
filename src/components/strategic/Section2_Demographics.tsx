@@ -1,5 +1,10 @@
+// src/components/strategic/Section2_Demographics.tsx
+// BIRD 2026–2035 · Section 2: Respondent Profile
+// Updated: 2026-07-23 · Production-ready, GlassCard discarded, schema-aligned
+
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   User,
   MapPin,
@@ -25,7 +30,7 @@ export interface Section2Data {
 
 interface Section2Props {
   data: Section2Data;
-  onChange: (data: Section2Data) => void;
+  setData: React.Dispatch<React.SetStateAction<Section2Data>>;
 }
 
 // Expanded to include non-BARMM stakeholders as per Survey Guide segmentation needs
@@ -71,23 +76,10 @@ const EXPERTISE_AREAS = [
   "Education, Health & Human Capital",
 ];
 
-const GlassCard: React.FC<{ children: React.ReactNode; className?: string }> = ({
-  children,
-  className,
-}) => (
-  <div
-    className={cn(
-      "rounded-xl border border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm shadow-sm p-6",
-      className
-    )}
-  >
-    {children}
-  </div>
-);
-
-const Section2_Demographics: React.FC<Section2Props> = ({ data, onChange }) => {
-  const update = <K extends keyof Section2Data>(field: K, value: Section2Data[K]) =>
-    onChange({ ...data, [field]: value });
+const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
+  const update = <K extends keyof Section2Data>(field: K, value: Section2Data[K]) => {
+    setData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const toggle = (field: keyof Section2Data, val: string) => {
     const arr = (data[field] as string[]) || [];
@@ -119,13 +111,14 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, onChange }) => {
       </div>
 
       {/* Personal Information Card */}
-      <GlassCard>
-        <div className="flex items-center gap-2 mb-5">
-          <User className="w-5 h-5 text-[#C9A84C]" />
-          <h3 className="text-base font-semibold text-[#022c22]">Personal Information</h3>
-        </div>
-
-        <div className="space-y-5">
+      <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
+            <User className="w-5 h-5 text-[#C9A84C]" />
+            Personal Information
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-5">
           {/* Q2.1 Full Name */}
           <div>
             <label className="block text-sm font-medium text-[#022c22] mb-1.5">
@@ -196,99 +189,104 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, onChange }) => {
               />
             </div>
           </div>
-        </div>
-      </GlassCard>
+        </CardContent>
+      </Card>
 
       {/* Location Card */}
-      <GlassCard>
-        <div className="flex items-center gap-2 mb-5">
-          <MapPin className="w-5 h-5 text-[#C9A84C]" />
-          <h3 className="text-base font-semibold text-[#022c22]">Primary Location</h3>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-[#022c22] mb-1.5">
-            Province / Region of Engagement <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setProvinceOpen(!provinceOpen)}
-              className={cn(
-                inputClass,
-                "flex items-center justify-between text-left pr-4",
-                !data.demo_province && "text-[#64748b]"
-              )}
-            >
-              <span className={data.demo_province ? "text-[#022c22]" : "text-[#64748b]"}>
-                {data.demo_province || "Select your province or region"}
-              </span>
-              <ChevronDown
-                className={cn(
-                  "w-4 h-4 text-[#64748b] transition-transform duration-200",
-                  provinceOpen && "rotate-180"
-                )}
-              />
-            </button>
-            
-            {/* Dropdown Menu */}
-            {provinceOpen && (
-              <div className="absolute z-20 w-full mt-1 bg-white border border-[#C9A84C]/30 rounded-lg shadow-xl max-h-64 overflow-y-auto">
-                {PROVINCES.map((province) => (
-                  <button
-                    key={province}
-                    type="button"
-                    onClick={() => {
-                      if (province === "Other (please specify)") {
-                        setShowCustomProvince(true);
-                        update("demo_province", "");
-                      } else {
-                        setShowCustomProvince(false);
-                        update("demo_province", province);
-                      }
-                      setProvinceOpen(false);
-                    }}
-                    className={cn(
-                      "w-full px-4 py-2.5 text-sm text-left transition-colors hover:bg-[#ecfdf5]",
-                      data.demo_province === province && !showCustomProvince
-                        ? "bg-[#ecfdf5] text-[#1B4D3E] font-semibold"
-                        : "text-[#022c22]"
-                    )}
-                  >
-                    {province}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Conditional "Other" Input */}
-          {showCustomProvince && (
-            <div className="mt-3 animate-in fade-in slide-in-from-top-2 duration-200">
+      <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-[#C9A84C]" />
+            Primary Location
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div>
               <label className="block text-sm font-medium text-[#022c22] mb-1.5">
-                Please specify your location:
+                Province / Region of Engagement <span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                placeholder="e.g., Davao City, Cebu, International Organization HQ"
-                value={data.demo_province}
-                onChange={(e) => update("demo_province", e.target.value)}
-                className={inputClass}
-                autoFocus
-              />
-            </div>
-          )}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setProvinceOpen(!provinceOpen)}
+                  className={cn(
+                    inputClass,
+                    "flex items-center justify-between text-left pr-4",
+                    !data.demo_province && "text-[#64748b]"
+                  )}
+                >
+                  <span className={data.demo_province ? "text-[#022c22]" : "text-[#64748b]"}>
+                    {data.demo_province || "Select your province or region"}
+                  </span>
+                  <ChevronDown
+                    className={cn(
+                      "w-4 h-4 text-[#64748b] transition-transform duration-200",
+                      provinceOpen && "rotate-180"
+                    )}
+                  />
+                </button>
+                
+                {/* Dropdown Menu */}
+                {provinceOpen && (
+                  <div className="absolute z-20 w-full mt-1 bg-white border border-[#C9A84C]/30 rounded-lg shadow-xl max-h-64 overflow-y-auto">
+                    {PROVINCES.map((province) => (
+                      <button
+                        key={province}
+                        type="button"
+                        onClick={() => {
+                          if (province === "Other (please specify)") {
+                            setShowCustomProvince(true);
+                            update("demo_province", "");
+                          } else {
+                            setShowCustomProvince(false);
+                            update("demo_province", province);
+                          }
+                          setProvinceOpen(false);
+                        }}
+                        className={cn(
+                          "w-full px-4 py-2.5 text-sm text-left transition-colors hover:bg-[#ecfdf5]",
+                          data.demo_province === province && !showCustomProvince
+                            ? "bg-[#ecfdf5] text-[#1B4D3E] font-semibold"
+                            : "text-[#022c22]"
+                        )}
+                      >
+                        {province}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-          <p className="text-xs text-[#065f46] mt-2 flex items-start gap-1.5">
-            <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
-            <span>
-              <strong>Why this matters:</strong> Your geographic affiliation helps us identify 
-              region-specific investment priorities and ensures equitable representation across 
-              BARMM's 5 provinces, the SGA, Cotabato City, and our external development partners.
-            </span>
-          </p>
-        </div>
-      </GlassCard>
+              {/* Conditional "Other" Input */}
+              {showCustomProvince && (
+                <div className="mt-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <label className="block text-sm font-medium text-[#022c22] mb-1.5">
+                    Please specify your location:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g., Davao City, Cebu, International Organization HQ"
+                    value={data.demo_province}
+                    onChange={(e) => update("demo_province", e.target.value)}
+                    className={inputClass}
+                    autoFocus
+                  />
+                </div>
+              )}
+
+              <p className="text-xs text-[#065f46] mt-2 flex items-start gap-1.5">
+                <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+                <span>
+                  <strong>Why this matters:</strong> Your geographic affiliation helps us identify 
+                  region-specific investment priorities and ensures equitable representation across 
+                  BARMM's 5 provinces, the SGA, Cotabato City, and our external development partners.
+                </span>
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Contextual Image: Provincial Endowments */}
       <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
@@ -311,105 +309,109 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, onChange }) => {
       </div>
 
       {/* Stakeholder Category Card */}
-      <GlassCard>
-        <div className="flex items-center gap-2 mb-4">
-          <GraduationCap className="w-5 h-5 text-[#C9A84C]" />
-          <h3 className="text-base font-semibold text-[#022c22]">
+      <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
+            <GraduationCap className="w-5 h-5 text-[#C9A84C]" />
             Which category best describes your role? <span className="text-red-500">*</span>
-          </h3>
-        </div>
-        <p className="text-xs text-[#065f46] mb-4 italic">
-          This helps us segment responses and ensure all stakeholder voices are accurately represented in the consensus mapping.
-        </p>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-xs text-[#065f46] mb-4 italic">
+            This helps us segment responses and ensure all stakeholder voices are accurately represented in the consensus mapping.
+          </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => update("demo_category", cat)}
-              className={cn(
-                "p-3.5 rounded-lg border text-sm text-left transition-all duration-200 flex items-start gap-3",
-                data.demo_category === cat
-                  ? "bg-[#1B4D3E] text-white border-[#1B4D3E] shadow-md"
-                  : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30"
-              )}
-            >
-              <div
-                className={cn(
-                  "w-4 h-4 rounded-full border flex-shrink-0 mt-0.5 transition-all",
-                  data.demo_category === cat
-                    ? "bg-[#C9A84C] border-[#C9A84C]"
-                    : "border-[#C9A84C]/50 bg-white"
-                )}
-              >
-                {data.demo_category === cat && (
-                  <div className="w-2 h-2 bg-[#022c22] rounded-full mx-auto mt-0.5" />
-                )}
-              </div>
-              <span className="leading-tight">{cat}</span>
-            </button>
-          ))}
-        </div>
-      </GlassCard>
-
-      {/* Areas of Expertise Card */}
-      <GlassCard>
-        <div className="flex items-center gap-2 mb-4">
-          <CheckSquare className="w-5 h-5 text-[#C9A84C]" />
-          <h3 className="text-base font-semibold text-[#022c22]">
-            Select Your Areas of Expertise
-          </h3>
-        </div>
-        <p className="text-xs text-[#065f46] mb-4 italic">
-          Select all that apply. This contextualizes your responses within the Bangsamoro Economic and Investment Ecosystem (BEIE) framework.
-        </p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {EXPERTISE_AREAS.map((area) => {
-            const isSelected = data.demo_expertise.includes(area);
-            return (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {CATEGORIES.map((cat) => (
               <button
-                key={area}
+                key={cat}
                 type="button"
-                onClick={() => toggle("demo_expertise", area)}
+                onClick={() => update("demo_category", cat)}
                 className={cn(
                   "p-3.5 rounded-lg border text-sm text-left transition-all duration-200 flex items-start gap-3",
-                  isSelected
+                  data.demo_category === cat
                     ? "bg-[#1B4D3E] text-white border-[#1B4D3E] shadow-md"
                     : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30"
                 )}
               >
                 <div
                   className={cn(
-                    "w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 mt-0.5 transition-all",
-                    isSelected
+                    "w-4 h-4 rounded-full border flex-shrink-0 mt-0.5 transition-all",
+                    data.demo_category === cat
                       ? "bg-[#C9A84C] border-[#C9A84C]"
                       : "border-[#C9A84C]/50 bg-white"
                   )}
                 >
-                  {isSelected && (
-                    <svg
-                      className="w-3 h-3 text-[#022c22]"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={3}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                  {data.demo_category === cat && (
+                    <div className="w-2 h-2 bg-[#022c22] rounded-full mx-auto mt-0.5" />
                   )}
                 </div>
-                <span className="leading-tight">{area}</span>
+                <span className="leading-tight">{cat}</span>
               </button>
-            );
-          })}
-        </div>
-      </GlassCard>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Areas of Expertise Card */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
+            <CheckSquare className="w-5 h-5 text-[#C9A84C]" />
+            Select Your Areas of Expertise
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-xs text-[#065f46] mb-4 italic">
+            Select all that apply. This contextualizes your responses within the Bangsamoro Economic and Investment Ecosystem (BEIE) framework.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {EXPERTISE_AREAS.map((area) => {
+              const isSelected = data.demo_expertise.includes(area);
+              return (
+                <button
+                  key={area}
+                  type="button"
+                  onClick={() => toggle("demo_expertise", area)}
+                  className={cn(
+                    "p-3.5 rounded-lg border text-sm text-left transition-all duration-200 flex items-start gap-3",
+                    isSelected
+                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E] shadow-md"
+                      : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30"
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 mt-0.5 transition-all",
+                      isSelected
+                        ? "bg-[#C9A84C] border-[#C9A84C]"
+                        : "border-[#C9A84C]/50 bg-white"
+                    )}
+                  >
+                    {isSelected && (
+                      <svg
+                        className="w-3 h-3 text-[#022c22]"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={3}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <span className="leading-tight">{area}</span>
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Privacy Assurance Footer */}
       <div className="flex items-start gap-3 p-4 bg-[#ecfdf5]/40 border border-[#C9A84C]/20 rounded-lg">
