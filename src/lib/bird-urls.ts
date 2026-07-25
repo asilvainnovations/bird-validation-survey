@@ -14,7 +14,7 @@ export const BIRD_VIDEOS = {
   systemsThinking: {
     title: "Systems Thinking: Moving from Checklists to Interconnected Investment Ecosystem",
     url: "https://youtu.be/VBAHk0WYz_c",
-    duration: "~10 min",
+    duration: "~4 min",
     section: "section0",
     description: "Discover how the Bangsamoro Investment Roadmap (BIRD 2026–2035) turns fragmented efforts into a unified engine of growth. This video unpacks: Systems Thinking — shifting from checklists to interconnected strategies; Feedback Loops — cycles that amplify progress and stabilize change; Causal Loop Diagrams — visuals that expose traps and leverage points; and Leverage Strategies — small shifts sparking big gains in governance, infrastructure, and equity.",
   },
