@@ -94,7 +94,7 @@ export const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({ data, o
         <CardContent className="space-y-4">
           <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg aspect-video">
             <iframe
-              src={BIRD_VIDEOS.strategicOptions.url.replace("youtu.be/", "youtube.com/embed/")} 
+              src={BIRD_VIDEOS.beieFramework.url.replace("youtu.be/", "youtube.com/embed/")} 
               title="BEIE Framework"
               className="w-full h-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
