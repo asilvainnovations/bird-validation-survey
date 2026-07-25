@@ -91,6 +91,19 @@ const App: React.FC = () => (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark" storageKey="bird-survey-theme">
         <AppProvider>
+          {/* Toaster moved HERE — outside BrowserRouter, inside ThemeProvider */}
+          <Toaster
+            position="top-right"
+            richColors
+            closeButton
+            toastOptions={{
+              style: {
+                background: '#011a12',
+                border: '1px solid rgba(201,168,76,0.2)',
+                color: '#ecfdf5',
+              },
+            }}
+          />
           <BrowserRouter>
             <Suspense fallback={<AppLoadingFallback />}>
               <Routes>
@@ -100,18 +113,6 @@ const App: React.FC = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
-            <Toaster
-              position="top-right"
-              richColors
-              closeButton
-              toastOptions={{
-                style: {
-                  background: '#011a12',
-                  border: '1px solid rgba(201,168,76,0.2)',
-                  color: '#ecfdf5',
-                },
-              }}
-            />
           </BrowserRouter>
         </AppProvider>
       </ThemeProvider>
