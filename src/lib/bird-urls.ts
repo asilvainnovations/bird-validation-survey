@@ -54,8 +54,8 @@ export const BIRD_IMAGES = {
     alt: "Anatomy of Causal Loop Diagram",
     description: "A Causal Loop Diagram (CLD) has interconnected elements: Variables — factors that change over time; Links — arrows showing influence; Polarity — marked as 's' for same-direction and 'o' for opposite-direction effects.",
   },
-  anatomySystemTraps: {
-    title: "Anatomy of Systems Traps",
+  feedbackLoops: {
+    title: "Feedback Loops and Leverage Points",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/6-Anatomy%20of%20Systems%20Traps.png",
     category: "systems",
     section: "section0",
