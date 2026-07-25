@@ -48,7 +48,7 @@ export const BIRD_IMAGES = {
   },
   anatomyCLD: {
     title: "Anatomy of Causal Loop Diagram",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/3-Anatomy%20of%20CLD.png",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Anatomy%20of%20CLD.png",
     category: "systems",
     section: "section0",
     alt: "Anatomy of Causal Loop Diagram",
@@ -56,7 +56,7 @@ export const BIRD_IMAGES = {
   },
   feedbackLoops: {
     title: "Feedback Loops and Leverage Points",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/6-Anatomy%20of%20Systems%20Traps.png",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Feedback%20Loops%20and%20Leverage%20Points.png",
     category: "systems",
     section: "section0",
     alt: "Feedback Loops and Leverage Points",
