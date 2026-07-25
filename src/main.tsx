@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import * as Sentry from "@sentry/react";
 import App from "./App";
 import "./index.css";
+import { ThemeProvider } from "@/components/theme-provider";
 
 // Sentry is only initialized if a DSN is provided via env, so the build and
 // runtime work fine whether or not Sentry is configured for this deployment.
@@ -17,7 +18,9 @@ if (sentryDsn) {
 }
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+    <React.StrictMode>
+      <ThemeProvider defaultTheme="dark" storageKey="bird-theme">
+        <App />
+      </ThemeProvider>
+    </React.StrictMode>
+  );
