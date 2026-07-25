@@ -183,10 +183,10 @@ const Section1_Privacy: React.FC<Section1Props> = ({ data, onChange }) => {
         <p className="text-sm text-[#065f46]">
           Questions about data privacy? Contact us at{" "}
           <a
-            href="mailto:bird@barmm.gov.ph"
+            href="mailto:bird2035@asilvainnovations.com"
             className="text-[#C9A84C] hover:underline font-medium"
           >
-            bird@barmm.gov.ph
+            bird2035@asilvainnovations.com
           </a>{" "}
           or the BOI-MTIT BARMM office.
         </p>
