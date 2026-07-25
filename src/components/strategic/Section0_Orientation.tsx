@@ -1,9 +1,9 @@
 // src/components/strategic/Section0_Orientation.tsx
 // BIRD 2026–2035 · Section 0: Welcome & Orientation
-// Updated: 2026-07-23 — Aligned with survey-schema.ts types, GlassCard removed
+// Updated: 2026-07-23 — Added interactive systems thinking quiz with CLD and feedback loop images
 
-import React from "react";
-import { Sparkles, Play, ArrowRight, BookOpen, BarChart3, Users } from "lucide-react";
+import React, { useState } from "react";
+import { Sparkles, Play, ArrowRight, BookOpen, BarChart3, Users, CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,11 +24,67 @@ interface Section0Props {
 }
 
 const Section0_Orientation: React.FC<Section0Props> = ({ data, setData }) => {
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
+  const [showQuizResults, setShowQuizResults] = useState(false);
+
   const update = <K extends keyof Section0Data>(
     field: K,
     value: Section0Data[K]
   ) => {
     setData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleQuizAnswer = (questionId: number, answer: string) => {
+    setQuizAnswers(prev => ({ ...prev, [questionId]: answer }));
+  };
+
+  const quizQuestions = [
+    {
+      id: 1,
+      question: "In a Causal Loop Diagram, what does the 's' polarity marker indicate?",
+      options: [
+        "Same-direction relationship (both variables move together)",
+        "Opposite-direction relationship (variables move in opposite directions)",
+        "Static relationship (no change over time)",
+        "Secondary relationship (minor impact)"
+      ],
+      correct: 0,
+      explanation: "The 's' (same) marker indicates that when one variable increases, the other also increases, or when one decreases, the other also decreases."
+    },
+    {
+      id: 2,
+      question: "What is a Reinforcing Loop (R) in systems thinking?",
+      options: [
+        "A loop that stabilizes the system",
+        "A loop that amplifies change in the same direction",
+        "A loop that has no impact on the system",
+        "A loop that only affects external factors"
+      ],
+      correct: 1,
+      explanation: "A Reinforcing Loop (R) amplifies change — growth leads to more growth, or decline leads to more decline, creating exponential patterns."
+    },
+    {
+      id: 3,
+      question: "Which leverage point is considered MOST transformative according to Meadows' hierarchy?",
+      options: [
+        "Changing parameters (numbers, subsidies)",
+        "Adjusting feedback loops",
+        "Transforming the paradigm or mindset",
+        "Adding buffers or stocks"
+      ],
+      correct: 2,
+      explanation: "Transforming the paradigm (L1) is the highest leverage point — changing the fundamental mindset from which the system emerges."
+    }
+  ];
+
+  const calculateQuizScore = () => {
+    let correct = 0;
+    quizQuestions.forEach(q => {
+      if (quizAnswers[q.id] === q.options[q.correct]) {
+        correct++;
+      }
+    });
+    return correct;
   };
 
   return (
@@ -166,7 +222,164 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, setData }) => {
         </CardContent>
       </Card>
 
-      {/* ── 4. Quick-Start Questions ──────────────────────────────── */}
+      {/* ── 4. Systems Thinking Learning Module ──────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-[#C9A84C]" />
+            Understanding Systems Thinking Tools
+          </CardTitle>
+          <p className="text-xs text-[#065f46] italic pt-1">
+            Interactive learning: Study the diagrams below, then test your understanding.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Image 1: Anatomy of Causal Loop Diagram */}
+          <div className="space-y-3">
+            <h4 className="text-sm font-semibold text-[#022c22]">1. Anatomy of Causal Loop Diagrams (CLDs)</h4>
+            <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg">
+              <img
+                src={BIRD_IMAGES.anatomyCLD.url}
+                alt={BIRD_IMAGES.anatomyCLD.alt}
+                className="w-full h-auto object-contain"
+                loading="lazy"
+              />
+            </div>
+            <p className="text-sm text-[#065f46]">
+              <strong>Key Elements:</strong> Variables (factors that change over time), Links (arrows showing influence), 
+              Polarity marked as <strong>'s'</strong> for same-direction effects and <strong>'o'</strong> for opposite-direction effects.
+            </p>
+          </div>
+
+          {/* Image 2: Feedback Loops and Leverage Points */}
+          <div className="space-y-3">
+            <h4 className="text-sm font-semibold text-[#022c22]">2. Feedback Loops & Leverage Points</h4>
+            <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg">
+              <img
+                src={BIRD_IMAGES.feedbackLoops.url}
+                alt={BIRD_IMAGES.feedbackLoops.alt}
+                className="w-full h-auto object-contain"
+                loading="lazy"
+              />
+            </div>
+            <p className="text-sm text-[#065f46]">
+              <strong>Two Types of Loops:</strong> Reinforcing (R) loops amplify change; Balancing (B) loops stabilize systems.
+              <strong> Leverage Hierarchy:</strong> Transformative (L1–L2), Systemic (L5–L6), and Incremental (L10) intervention points.
+            </p>
+          </div>
+
+          {/* Interactive Quiz */}
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            <h4 className="text-sm font-semibold text-[#022c22] mb-4 flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-[#C9A84C]" />
+              Quick Knowledge Check
+            </h4>
+            <p className="text-xs text-[#065f46] mb-4">
+              Test your understanding of systems thinking concepts. Select the best answer for each question.
+            </p>
+
+            <div className="space-y-6">
+              {quizQuestions.map((q, index) => (
+                <div key={q.id} className="space-y-3">
+                  <p className="text-sm font-medium text-[#022c22]">
+                    {index + 1}. {q.question}
+                  </p>
+                  <RadioGroup
+                    value={quizAnswers[q.id]}
+                    onValueChange={(val) => handleQuizAnswer(q.id, val)}
+                    className="grid grid-cols-1 gap-2"
+                  >
+                    {q.options.map((opt, optIndex) => {
+                      const isSelected = quizAnswers[q.id] === opt;
+                      const isCorrect = optIndex === q.correct;
+                      const showResult = showQuizResults && isSelected;
+                      
+                      return (
+                        <div key={opt}>
+                          <RadioGroupItem 
+                            value={opt} 
+                            id={`q${q.id}-opt${optIndex}`} 
+                            className="peer sr-only" 
+                          />
+                          <Label
+                            htmlFor={`q${q.id}-opt${optIndex}`}
+                            className={cn(
+                              "flex items-center justify-between p-3 rounded-lg border text-sm text-left transition-all cursor-pointer",
+                              showResult
+                                ? isCorrect
+                                  ? "bg-emerald-50 border-emerald-500 text-emerald-800"
+                                  : "bg-red-50 border-red-500 text-red-800"
+                                : isSelected
+                                ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
+                                : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                            )}
+                          >
+                            <span className="flex-1">{opt}</span>
+                            {showResult && (
+                              isCorrect 
+                                ? <CheckCircle2 className="w-4 h-4 text-emerald-600 ml-2" />
+                                : <XCircle className="w-4 h-4 text-red-600 ml-2" />
+                            )}
+                          </Label>
+                        </div>
+                      );
+                    })}
+                  </RadioGroup>
+                  {showQuizResults && quizAnswers[q.id] && (
+                    <p className="text-xs text-[#065f46] mt-2 pl-3 border-l-2 border-[#C9A84C]/30">
+                      <strong>Explanation:</strong> {q.explanation}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <Button
+                type="button"
+                onClick={() => setShowQuizResults(true)}
+                className={cn(
+                  "bg-[#1B4D3E] hover:bg-[#1B4D3E]/90 text-white",
+                  Object.keys(quizAnswers).length < quizQuestions.length && "opacity-50 cursor-not-allowed"
+                )}
+                disabled={Object.keys(quizAnswers).length < quizQuestions.length}
+              >
+                Check Answers
+              </Button>
+              {showQuizResults && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setQuizAnswers({});
+                    setShowQuizResults(false);
+                  }}
+                  className="border-[#C9A84C]/30 text-[#022c22] hover:border-[#C9A84C]"
+                >
+                  Retake Quiz
+                </Button>
+              )}
+            </div>
+
+            {showQuizResults && (
+              <div className="mt-4 p-4 rounded-lg bg-[#C9A84C]/10 border border-[#C9A84C]/30">
+                <p className="text-sm font-semibold text-[#022c22]">
+                  Your Score: {calculateQuizScore()} / {quizQuestions.length}
+                </p>
+                <p className="text-xs text-[#065f46] mt-1">
+                  {calculateQuizScore() === quizQuestions.length 
+                    ? "Excellent! You have a strong understanding of systems thinking."
+                    : calculateQuizScore() >= 2
+                    ? "Good job! Review the explanations to strengthen your understanding."
+                    : "Keep learning! Review the diagrams and try again."}
+                </p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── 5. Quick-Start Questions ──────────────────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
