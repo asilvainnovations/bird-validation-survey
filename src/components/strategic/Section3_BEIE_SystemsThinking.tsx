@@ -1,27 +1,39 @@
 import React from "react";
+import { Network } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { SurveySchemaType } from "@/lib/survey-schema";
+import { BIRD_IMAGES, BIRD_VIDEOS } from "@/lib/bird-urls";
+
+// ✅ STRICT UI IMPORTS (No custom wrappers)
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Network, BookOpen, Target, AlertTriangle } from "lucide-react";
-import { BIRD_IMAGES } from "@/lib/bird-urls";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export interface Section3Data {
-  q3_1_beie_collaboration: string;
-  q3_2_beie_understanding: string;
-  q3_3_beie_relevance: string;
-  q3_4_cluster_position: string;
-}
+// ✅ TYPE SAFETY: Extract EXACT keys from the master schema
+export type Section3Data = Pick<
+  SurveySchemaType,
+  | "q3_1_beie_collaboration"
+  | "q3_2_beie_understanding"
+  | "q3_3_beie_relevance"
+  | "q3_4_cluster_position"
+  | "q_s1_halal_legitimacy_impact"
+  | "q_s1_halal_legitimacy_likelihood"
+  | "q_s1_bimpeaga_impact"
+  | "q_s1_bimpeaga_likelihood"
+  | "q_s1_aff_base_impact"
+  | "q_s1_aff_base_likelihood"
+>;
 
 interface Section3Props {
   data: Section3Data;
-  setData: React.Dispatch<React.SetStateAction<Section3Data>>;
+  onChange: (data: Section3Data) => void;
 }
 
-const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({ data, setData }) => {
+export const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({ data, onChange }) => {
   const update = <K extends keyof Section3Data>(field: K, value: Section3Data[K]) => {
-    setData((prev) => ({ ...prev, [field]: value }));
+    onChange({ ...data, [field]: value });
   };
 
   const understandingOptions = [
@@ -34,195 +46,220 @@ const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({ data, setData 
   const relevanceOptions = ["Highly relevant", "Moderately relevant", "Somewhat relevant", "Not relevant"];
   const clusterOptions = ["Foundations", "Transformers", "Enablers", "Connectors", "Financiers", "Multiple clusters", "Observer / External partner"];
 
+  const strengthFactors = [
+    {
+      label: "Halal Legitimacy & Cultural Credibility",
+      description: "BARMM's authentic Muslim-majority identity provides unmatched credibility for halal branding and global market access.",
+      impactField: "q_s1_halal_legitimacy_impact" as keyof Section3Data,
+      likelihoodField: "q_s1_halal_legitimacy_likelihood" as keyof Section3Data,
+    },
+    {
+      label: "Strategic BIMP-EAGA Location",
+      description: "BARMM is close to Sabah and ASEAN trade routes, making it a natural gateway for regional trade.",
+      impactField: "q_s1_bimpeaga_impact" as keyof Section3Data,
+      likelihoodField: "q_s1_bimpeaga_likelihood" as keyof Section3Data,
+    },
+    {
+      label: "Strong Agriculture, Fisheries, Forestry Base",
+      description: "Strong resources in rubber, coconut, seaweed, fisheries, halal farm products, and rice.",
+      impactField: "q_s1_aff_base_impact" as keyof Section3Data,
+      likelihoodField: "q_s1_aff_base_likelihood" as keyof Section3Data,
+    },
+  ];
+
   const activeBtnClass = "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90";
-  const inactiveBtnClass = "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10";
+  const inactiveBtnClass = "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]";
+  const activeScaleClass = "bg-[#C9A84C] text-white border-[#C9A84C] hover:bg-[#C9A84C]/90";
+  const inactiveScaleClass = "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]";
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-start gap-4">
-        <div className="p-3 rounded-xl bg-[#022c22] text-[#C9A84C] shadow-md shrink-0">
-          <Network className="w-8 h-8" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold text-[#022c22] dark:text-[#ecfdf5]">
-            Section 3: Systems Thinking & BEIE Framework
-          </h2>
-          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 mt-1 max-w-3xl">
-            The IEDS requires a synchronized, cross-cluster monitoring framework that measures not just sectoral outputs 
-            but ecosystem health. This section validates the conceptual foundations and archetype understanding.
-          </p>
-        </div>
+      <div className="flex items-center gap-3 mb-4">
+        <Network className="w-6 h-6 text-[#C9A84C]" />
+        <h2 className="text-xl font-bold text-[#022c22]">Section 3: Systems Thinking & BEIE Framework</h2>
       </div>
+      <p className="text-sm text-[#065f46] mb-4">
+        Before evaluating specific clusters, let's establish the conceptual foundation. The BEIE framework shifts from siloed sector planning to an interconnected ecosystem approach.
+      </p>
 
-      {/* Anatomy of Causal Loop Diagram */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+      {/* 1. Video Card */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-[#C9A84C]" />
-            Anatomy of Causal Loop Diagrams (CLDs)
+          <CardTitle className="text-base flex items-center justify-between text-[#022c22]">
+            The Bangsamoro Economic and Investment Ecosystem (BEIE) Framework
+            <span className="px-2 py-1 rounded text-xs font-semibold bg-[#C9A84C]/10 text-[#C9A84C]">~4 mins</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
-            <img
-              src={BIRD_IMAGES.anatomyCLD?.url || "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/3-Anatomy%20of%20CLD.png"}
-              alt="Anatomy of Causal Loop Diagram"
-              className="w-full h-auto max-h-[500px] object-contain transition-transform group-hover:scale-[1.02]"
-              loading="lazy"
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg aspect-video">
+            <iframe
+              src={BIRD_VIDEOS.beieFramework.url.replace("youtu.be/", "youtube.com/embed/")} 
+              title="BEIE Framework"
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
             />
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
-              <p className="text-xs italic text-white/70">
-                Variables, Links, and Polarity in Systems Mapping
-              </p>
-            </div>
           </div>
-          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
-            A Causal Loop Diagram (CLD) has interconnected elements: <strong>Variables</strong> (factors that change over time), 
-            <strong> Links</strong> (arrows showing influence), and <strong>Polarity</strong> (marked as 's' for same-direction 
-            and 'o' for opposite-direction effects).
+          <p className="text-sm text-[#065f46]">
+            Don’t just read about the framework—see it in action. Watch now to understand how these drivers of change will shape the future of Bangsamoro’s economy and investment landscape.
           </p>
         </CardContent>
       </Card>
 
-      {/* Feedback Loops and Leverage Points */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
-            <Target className="w-5 h-5 text-[#C9A84C]" />
-            Feedback Loops & Leverage Points
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      {/* 2. Operating Systems Image */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardContent className="pt-6 space-y-4">
+          <h3 className="text-base font-semibold text-[#022c22]">The Operating System: Moral Governance at the Core</h3>
           <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
             <img
-              src={BIRD_IMAGES.feedbackLoops?.url || "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/6-Anatomy%20of%20Systems%20Traps.png"}
-              alt="Feedback Loops and Leverage Points"
+              src={BIRD_IMAGES.operatingSystems.url}
+              alt={BIRD_IMAGES.operatingSystems.alt}
               className="w-full h-auto max-h-[500px] object-contain transition-transform group-hover:scale-[1.02]"
               loading="lazy"
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
-              <p className="text-xs italic text-white/70">
-                Reinforcing (R) and Balancing (B) Loops with Meadows' Leverage Hierarchy
-              </p>
+              <p className="text-xs italic text-white/70">Moral Governance: The Operating System of the Bangsamoro Economy</p>
             </div>
           </div>
-          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
-            <strong>Two Types of Loops:</strong> Reinforcing (R) loops amplify change; Balancing (B) loops stabilize systems.
-            <strong> Leverage Hierarchy:</strong> Transformative (L1–L2), Systemic (L5–L6), and Incremental (L10) intervention points.
+          <p className="text-sm text-[#065f46]">
+            At the core of the Bangsamoro Economic and Investment Ecosystem is <strong>Moral Governance</strong>—ensuring justice, transparency, accountability, and Islamic ethics (khalifa stewardship). Surrounding it are three foundational pillars that serve as the operating system determining whether all other clusters function effectively, equitably, and sustainably.
           </p>
         </CardContent>
       </Card>
 
-      {/* BEIE Validation Questions */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-[#C9A84C]" />
-            Framework Validation & Archetype Assessment
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Q3.1: Understanding */}
+      {/* 3. BEIE Validation Questions */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardContent className="pt-6 space-y-6">
+          {/* Q3.1 */}
           <div className="space-y-3">
-            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
-              How well do you understand the BEIE ecosystem approach compared to traditional sector-based planning?
+            <Label className="text-base font-semibold text-[#022c22]">
+              Q3.1 How can stakeholders across government, business, and civil society work together to make the BEIE ecosystem approach more actionable in real investment planning?
             </Label>
-            <RadioGroup
-              value={data.q3_2_beie_understanding}
-              onValueChange={(val) => update("q3_2_beie_understanding", val)}
-              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
-            >
+            <Textarea
+              value={data.q3_1_beie_collaboration || ""}
+              onChange={(e) => update("q3_1_beie_collaboration", e.target.value)}
+              placeholder="Write your answer in one to two sentences..."
+              rows={3}
+              className="bg-white border-[#C9A84C]/30 focus-visible:ring-[#C9A84C] text-[#022c22] placeholder:text-[#065f46]/50"
+            />
+          </div>
+
+          {/* Q3.2 */}
+          <div className="space-y-3">
+            <Label className="text-base font-semibold text-[#022c22]">
+              Q3.2 How well do you understand the BEIE ecosystem approach compared to traditional sector-based planning?
+            </Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {understandingOptions.map((opt) => (
-                <div key={opt}>
-                  <RadioGroupItem value={opt} id={`understand-${opt}`} className="peer sr-only" />
-                  <Label
-                    htmlFor={`understand-${opt}`}
-                    className={cn(
-                      "flex items-center justify-center p-3 rounded-lg border text-sm text-left transition-all cursor-pointer h-full",
-                      data.q3_2_beie_understanding === opt ? activeBtnClass : inactiveBtnClass
-                    )}
-                  >
-                    {opt}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </div>
-
-          {/* Q3.2: Relevance */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
-              How relevant is the BEIE framework to real-world investment planning in your province or organization?
-            </Label>
-            <RadioGroup
-              value={data.q3_3_beie_relevance}
-              onValueChange={(val) => update("q3_3_beie_relevance", val)}
-              className="grid grid-cols-2 gap-3"
-            >
-              {relevanceOptions.map((opt) => (
-                <div key={opt}>
-                  <RadioGroupItem value={opt} id={`relevance-${opt}`} className="peer sr-only" />
-                  <Label
-                    htmlFor={`relevance-${opt}`}
-                    className={cn(
-                      "flex items-center justify-center p-3 rounded-lg border text-sm text-left transition-all cursor-pointer h-full",
-                      data.q3_3_beie_relevance === opt ? activeBtnClass : inactiveBtnClass
-                    )}
-                  >
-                    {opt}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </div>
-
-          {/* Q3.3: Cluster Position */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
-              Where does your organization belong in the economic and investment ecosystem?
-            </Label>
-            <RadioGroup
-              value={data.q3_4_cluster_position}
-              onValueChange={(val) => update("q3_4_cluster_position", val)}
-              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
-            >
-              {clusterOptions.map((opt) => (
-                <div key={opt}>
-                  <RadioGroupItem value={opt} id={`cluster-${opt}`} className="peer sr-only" />
-                  <Label
-                    htmlFor={`cluster-${opt}`}
-                    className={cn(
-                      "flex items-center justify-center p-3 rounded-lg border text-sm text-left transition-all cursor-pointer h-full",
-                      data.q3_4_cluster_position === opt ? activeBtnClass : inactiveBtnClass
-                    )}
-                  >
-                    {opt}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </div>
-
-          {/* Q3.4: Archetype Validation */}
-          <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20">
-            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
-              How accurately does the "Limits to Growth" archetype describe the barriers facing BARMM's development?
-            </Label>
-            <div className="grid grid-cols-2 gap-3">
-              {["Very accurately", "Somewhat accurately", "Needs revision", "Not accurate"].map((opt) => (
                 <Button
                   key={opt}
                   type="button"
                   variant="outline"
-                  className={cn("justify-start h-auto py-3 text-sm text-left", data.q3_1_beie_collaboration === opt ? activeBtnClass : inactiveBtnClass)}
-                  onClick={() => update("q3_1_beie_collaboration", opt)}
+                  className={cn("justify-start h-auto py-3 text-sm text-left", data.q3_2_beie_understanding === opt ? activeBtnClass : inactiveBtnClass)}
+                  onClick={() => update("q3_2_beie_understanding", opt)}
+                >
+                  {opt}
+                </Button>
+                ))}
+            </div>
+          </div>
+
+          {/* Q3.3 */}
+          <div className="space-y-3">
+            <Label className="text-base font-semibold text-[#022c22]">
+              Q3.3 How relevant is the BEIE framework to real-world investment planning in your province or organization?
+            </Label>
+            <div className="grid grid-cols-2 gap-3">
+              {relevanceOptions.map((opt) => (
+                <Button
+                  key={opt}
+                  type="button"
+                  variant="outline"
+                  className={cn("justify-start h-auto py-3 text-sm text-left", data.q3_3_beie_relevance === opt ? activeBtnClass : inactiveBtnClass)}
+                  onClick={() => update("q3_3_beie_relevance", opt)}
                 >
                   {opt}
                 </Button>
               ))}
             </div>
           </div>
+
+          {/* Q3.4 */}
+          <div className="space-y-3">
+            <Label className="text-base font-semibold text-[#022c22]">
+              Q3.4 Where does your organization belong in the economic and investment ecosystem?
+            </Label>
+            <Select value={data.q3_4_cluster_position} onValueChange={(val) => update("q3_4_cluster_position", val)}>
+              <SelectTrigger className="bg-white border-[#C9A84C]/30 focus:ring-[#C9A84C] text-[#022c22]">
+                <SelectValue placeholder="Select your cluster position..." />
+              </SelectTrigger>
+              <SelectContent>
+                {clusterOptions.map((opt) => (
+                  <SelectItem key={opt} value={opt} className="text-[#022c22] focus:bg-[#1B4D3E] focus:text-white">
+                    {opt}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 4. SWOT Scale: Key Strengths */}
+      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+        <CardContent className="pt-6 space-y-6">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="px-2 py-1 rounded text-xs font-semibold bg-emerald-100 text-emerald-700">STRENGTH</span>
+            <h3 className="text-base font-semibold text-[#022c22]">Foundational Strengths of BARMM</h3>
+          </div>
+          <p className="text-xs text-[#065f46] italic mb-4">
+            Rate each factor: Impact (1 = very small effect, 5 = very large effect) × Likelihood (1 = very unlikely, 5 = very likely)
+          </p>
+          
+          {strengthFactors.map((factor, idx) => (
+            <div key={factor.label} className={cn("space-y-3", idx < strengthFactors.length - 1 && "pb-6 border-b border-[#C9A84C]/20")}>
+              <p className="text-sm font-medium text-[#022c22]">
+                <strong>S{idx + 1}: {factor.label}.</strong> {factor.description}
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <p className="text-xs text-[#065f46]">Impact (1–5)</p>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map((v) => (
+                      <Button
+                        key={v}
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className={cn("w-12 h-12 rounded-lg text-sm font-semibold", data[factor.impactField] === v ? activeScaleClass : inactiveScaleClass)}
+                        onClick={() => update(factor.impactField, v)}
+                      >
+                        {v}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs text-[#065f46]">Likelihood (1–5)</p>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map((v) => (
+                      <Button
+                        key={v}
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className={cn("w-12 h-12 rounded-lg text-sm font-semibold", data[factor.likelihoodField] === v ? activeScaleClass : inactiveScaleClass)}
+                        onClick={() => update(factor.likelihoodField, v)}
+                      >
+                        {v}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </CardContent>
       </Card>
     </div>

@@ -1,19 +1,12 @@
 import React from "react";
-import { Shield, FileText, ExternalLink, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { BIRD_SITES } from "@/lib/bird-urls";
+import { Shield, Check, ExternalLink } from "lucide-react";
 
-// ── Types ────────────────────────────────────────────────────────────────────
 export interface Section1Data {
-  q1_1_consent_participate: boolean;
-  q1_2_consent_anonymize: boolean;
-  q1_3_consent_email_copy: boolean;
-  q1_4_consent_voluntary: boolean;
+  consent_participate: boolean;
+  consent_anonymize: boolean;
+  consent_email_copy: boolean;
+  consent_voluntary: boolean;
 }
 
 interface Section1Props {
@@ -21,161 +14,183 @@ interface Section1Props {
   onChange: (data: Section1Data) => void;
 }
 
-// ── Component ────────────────────────────────────────────────────────────────
-export const Section1_Privacy: React.FC<Section1Props> = ({ data, onChange }) => {
-  const update = <K extends keyof Section1Data>(field: K, value: Section1Data[K]) => {
+const Section1_Privacy: React.FC<Section1Props> = ({ data, onChange }) => {
+  const update = <K extends keyof Section1Data>(field: K, value: Section1Data[K]) =>
     onChange({ ...data, [field]: value });
-  };
 
-  // Fallback URLs if not explicitly defined in BIRD_SITES
-  const privacyUrl = BIRD_SITES.privacyPolicy?.url || "https://asilvainnovations.github.io/BIRD-2026-2035/public/privacy-policy.html";
-  const cookieUrl = BIRD_SITES.cookiePolicy?.url || "https://asilvainnovations.github.io/BIRD-2026-2035/public/cookie-policy.html";
-
-  const consentItems = [
+  const consentItems: {
+    field: keyof Section1Data;
+    label: string;
+    question: string;
+  }[] = [
     {
-      field: "q1_1_consent_participate" as keyof Section1Data,
-      label: "I consent to participate in the BIRD 2026-2035 Validation Survey.",
-      description: "Your responses will be used to shape the Bangsamoro Investment Roadmap.",
+      field: "consent_participate",
+      label: "Q1.1",
+      question: "I consent to participate in this validation survey.",
     },
     {
-      field: "q1_2_consent_anonymize" as keyof Section1Data,
-      label: "I understand my responses will be anonymized in public reports.",
-      description: "No individual responses will be publicly attributed to you.",
+      field: "consent_anonymize",
+      label: "Q1.2",
+      question:
+        "I understand my responses will be anonymized in public reports.",
     },
     {
-      field: "q1_3_consent_email_copy" as keyof Section1Data,
-      label: "I agree to receive a copy of my submission via email (if provided).",
-      description: "Your email will only be used to send your response summary.",
+      field: "consent_email_copy",
+      label: "Q1.3",
+      question: "I agree to receive a copy of my submission via email.",
     },
     {
-      field: "q1_4_consent_voluntary" as keyof Section1Data,
-      label: "I confirm my participation is entirely voluntary.",
-      description: "I may withdraw my consent at any time by contacting the BIRD team.",
+      field: "consent_voluntary",
+      label: "Q1.4",
+      question:
+        "I confirm I am responding voluntarily and may withdraw at any time.",
     },
   ];
 
   return (
-    <div className="space-y-8">
-      {/* ── Section Header ─────────────────────────────────────────────── */}
+    <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <Shield className="w-6 h-6 text-[#C9A84C]" />
         <h2 className="text-xl font-bold text-[#022c22]">
           Section 1: Privacy, Consent & Confidentiality
         </h2>
       </div>
-      <p className="text-sm text-[#065f46] mb-4 -mt-5">
-        Your data is protected under the Data Privacy Act of 2012 (RA 10173)
+      <p className="text-sm text-[#065f46] mb-4">
+        Your responses are protected under the Data Privacy Act of 2012 (RA
+        10173). This section explains how your data is collected, used, and
+        safeguarded.
       </p>
 
-      {/* ── 1. Privacy Notice Card ─────────────────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
-            <FileText className="w-5 h-5 text-[#C9A84C]" />
-            Data Privacy Notice
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-[#022c22] leading-relaxed">
-            The Bangsamoro Investment Roadmap Development (BIRD) 2026-2035 validation survey is conducted by the 
-            <strong> Board of Investments - Ministry of Trade, Investments and Tourism (BOI-MTIT BARMM)</strong>. 
-            Your personal data is collected solely for the purpose of validating the BIRD strategic framework and 
-            ensuring diverse stakeholder representation.
+      {/* 1. Privacy Notice Card */}
+      <div className="rounded-xl border border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm shadow-sm p-6">
+        <h3 className="text-base font-semibold text-[#022c22] mb-4">
+          Data Privacy Notice
+        </h3>
+        <div className="space-y-4">
+          <p className="text-sm text-[#065f46]">
+            The Bangsamoro Investment Roadmap Development (BIRD) 2026-2035
+            validation survey is conducted by the Bangsamoro Board of
+            Investments - Ministry of Trade, Investment and Tourism (BOI-MTIT).
           </p>
-
-          <div className="bg-emerald-50/60 border border-[#C9A84C]/20 rounded-lg p-4">
-            <h4 className="text-sm font-semibold text-[#022c22] mb-3 flex items-center gap-2">
-              <Shield className="w-4 h-4 text-[#1B4D3E]" />
+          <p className="text-sm text-[#065f46]">
+            Your personal data is collected solely for the purpose of validating
+            the BIRD strategic framework and ensuring diverse stakeholder
+            representation.
+          </p>
+          <div>
+            <p className="text-sm font-medium text-[#022c22] mb-2">
               Safeguards in place:
-            </h4>
+            </p>
             <ul className="space-y-2">
               {[
-                "All responses are anonymized in aggregate reporting and public dashboards.",
-                "Individual responses are never shared with third parties or used for commercial purposes.",
-                "Your email (if provided) is used only to send a copy of your submission.",
-                "Data is stored securely on encrypted servers with strict access controls.",
-                "You may request data deletion at any time by contacting bird-team@asilvainnovations.com.",
+                "All responses are anonymized in aggregate reporting",
+                "Individual responses are never shared publicly or with third parties",
+                "Your email is used only to send a copy of your submission",
+                "Data is stored securely on encrypted servers with access controls",
+                "You may request data deletion at any time by contacting bird@barmm.gov.ph",
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-[#065f46]">
-                  <CheckCircle2 className="w-4 h-4 text-[#1B4D3E] mt-0.5 flex-shrink-0" />
+                  <Check className="w-4 h-4 text-[#C9A84C] mt-0.5 flex-shrink-0" />
                   <span>{item}</span>
                 </li>
               ))}
             </ul>
           </div>
+        </div>
+      </div>
 
-          <div className="flex flex-wrap gap-3 pt-2">
-            <Button variant="outline" size="sm" asChild className="border-[#C9A84C]/30 text-[#022c22] hover:border-[#C9A84C]">
-              <a href={privacyUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="w-4 h-4 mr-2 text-[#C9A84C]" />
-                Read Full Privacy Policy
-              </a>
-            </Button>
-            <Button variant="outline" size="sm" asChild className="border-[#C9A84C]/30 text-[#022c22] hover:border-[#C9A84C]">
-              <a href={cookieUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="w-4 h-4 mr-2 text-[#C9A84C]" />
-                Read Cookie Policy
-              </a>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* ── 2. Consent Checkboxes ──────────────────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
-            <Shield className="w-5 h-5 text-[#C9A84C]" />
-            Consent Declaration
-          </CardTitle>
-          <p className="text-xs text-[#065f46] italic pt-1">
-            Please check each box below to confirm your understanding and consent before proceeding.
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {consentItems.map(({ field, label, description }) => (
-            <div
-              key={field}
-              className={cn(
-                "flex items-start space-x-3 p-4 rounded-lg border transition-all",
-                data[field]
-                  ? "bg-emerald-50/60 border-[#C9A84C]/40"
-                  : "bg-white border-[#C9A84C]/20 hover:border-[#C9A84C]/40"
-              )}
-            >
-              <Checkbox
-                id={field}
-                checked={data[field]}
-                onCheckedChange={(checked) => update(field, !!checked)}
-                className="mt-1"
-              />
-              <div className="flex-1">
-                <Label
-                  htmlFor={field}
-                  className="text-sm font-medium text-[#022c22] cursor-pointer leading-relaxed"
+      {/* 2. Consent Checkboxes */}
+      <div className="rounded-xl border border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm shadow-sm p-6">
+        <h3 className="text-base font-semibold text-[#022c22] mb-4">
+          Consent Declaration
+        </h3>
+        <p className="text-sm text-[#065f46] mb-4">
+          Please check each box below to confirm your understanding and consent
+          before proceeding with the survey.
+        </p>
+        <div className="space-y-3">
+          {consentItems.map(({ field, label, question }) => {
+            const checked = data[field];
+            return (
+              <button
+                key={field}
+                onClick={() => update(field, !checked)}
+                className={cn(
+                  "w-full flex items-start gap-3 p-4 rounded-lg border text-left transition-all",
+                  checked
+                    ? "bg-[#C9A84C]/10 border-[#C9A84C]"
+                    : "bg-white border-[#C9A84C]/30 hover:border-[#C9A84C]/60"
+                )}
+              >
+                <div
+                  className={cn(
+                    "w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all",
+                    checked
+                      ? "bg-[#C9A84C] border-[#C9A84C]"
+                      : "border-[#C9A84C]/40"
+                  )}
                 >
-                  {label}
-                </Label>
-                <p className="text-xs text-[#065f46] mt-1">{description}</p>
-              </div>
-              {data[field] && (
-                <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 shrink-0">
-                  Confirmed
-                </Badge>
-              )}
-            </div>
-          ))}
+                  {checked && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                </div>
+                <div className="flex-1">
+                  <span className="text-xs font-semibold text-[#C9A84C] uppercase tracking-wide">
+                    {label}
+                  </span>
+                  <p
+                    className={cn(
+                      "text-sm mt-0.5",
+                      checked ? "text-[#022c22]" : "text-[#065f46]"
+                    )}
+                  >
+                    {question}
+                  </p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
-          {/* Info Note */}
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50/60 border border-amber-200 mt-4">
-            <Info className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-amber-800">
-              <strong>Note:</strong> All four consent declarations must be confirmed to proceed with the survey. 
-              Your participation is entirely voluntary, and you may withdraw at any time.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      {/* 3. Policy Links Card */}
+      <div className="rounded-xl border border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm shadow-sm p-6">
+        <h3 className="text-base font-semibold text-[#022c22] mb-4">
+          Policies & Contact
+        </h3>
+        <p className="text-sm text-[#065f46] mb-4">
+          For full details, please review our policies:
+        </p>
+        <div className="flex flex-wrap gap-3 mb-6">
+          <a
+            href="https://asilvainnovations.github.io/BIRD-2026-2035/public/privacy-policy.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-[#022c22]/5 hover:bg-[#C9A84C]/10 border border-[#C9A84C]/20 text-[#022c22] text-sm px-4 py-3 rounded-lg inline-flex items-center gap-2 transition-all"
+          >
+            <ExternalLink className="w-4 h-4 text-[#C9A84C]" />
+            Privacy Policy
+          </a>
+          <a
+            href="https://asilvainnovations.github.io/BIRD-2026-2035/public/cookies-policy.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-[#022c22]/5 hover:bg-[#C9A84C]/10 border border-[#C9A84C]/20 text-[#022c22] text-sm px-4 py-3 rounded-lg inline-flex items-center gap-2 transition-all"
+          >
+            <ExternalLink className="w-4 h-4 text-[#C9A84C]" />
+            Cookies Policy
+          </a>
+        </div>
+        <p className="text-sm text-[#065f46]">
+          Questions about data privacy? Contact us at{" "}
+          <a
+            href="mailto:bird2035@asilvainnovations.com"
+            className="text-[#C9A84C] hover:underline font-medium"
+          >
+            bird2035@asilvainnovations.com
+          </a>{" "}
+          or the BOI-MTIT BARMM office.
+        </p>
+      </div>
     </div>
   );
 };

@@ -1,13 +1,10 @@
+// src/components/strategic/Section2_Demographics.tsx
+// BIRD 2026–2035 · Section 2: Respondent Profile
+// Updated: 2026-07-23 · Production-ready, GlassCard discarded, schema-aligned
+
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   User,
   MapPin,
@@ -16,10 +13,10 @@ import {
   Briefcase,
   GraduationCap,
   CheckSquare,
+  ChevronDown,
   ShieldCheck,
   Info,
 } from "lucide-react";
-import { BIRD_IMAGES } from "@/lib/bird-urls";
 
 export interface Section2Data {
   demo_name: string;
@@ -36,6 +33,7 @@ interface Section2Props {
   setData: React.Dispatch<React.SetStateAction<Section2Data>>;
 }
 
+// Expanded to include non-BARMM stakeholders as per Survey Guide segmentation needs
 const PROVINCES = [
   "Lanao del Sur",
   "Maguindanao del Norte",
@@ -52,6 +50,7 @@ const PROVINCES = [
   "Other (please specify)",
 ];
 
+// Expanded to capture the full multi-stakeholder ecosystem
 const CATEGORIES = [
   "Bangsamoro Government Official",
   "Local Government Unit (LGU) Official",
@@ -65,6 +64,7 @@ const CATEGORIES = [
   "Other (please specify)",
 ];
 
+// Aligned with the 5 BEIE Clusters and Cross-Cutting Operating Systems
 const EXPERTISE_AREAS = [
   "Agriculture, Fisheries & Forestry (Foundations)",
   "Halal Economy & Manufacturing (Transformers)",
@@ -89,10 +89,11 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
     );
   };
 
+  const [provinceOpen, setProvinceOpen] = useState(false);
   const [showCustomProvince, setShowCustomProvince] = useState(false);
 
   const inputClass =
-    "w-full px-4 py-3 rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] text-sm placeholder:text-[#64748b] focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C]/30 transition-all";
+    "w-full px-4 py-3 rounded-lg border border-[#C9A84C]/30 bg-white text-[#022c22] text-sm placeholder:text-[#64748b] focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C]/30 transition-all";
 
   return (
     <div className="space-y-8">
@@ -100,27 +101,27 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
       <div className="space-y-3">
         <div className="flex items-center gap-3">
           <User className="w-6 h-6 text-[#C9A84C]" />
-          <h2 className="text-xl font-bold text-[#022c22] dark:text-[#ecfdf5]">Section 2: Your Profile</h2>
+          <h2 className="text-xl font-bold text-[#022c22]">Section 2: Your Profile</h2>
         </div>
-        <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed max-w-3xl">
-          This helps us understand whose voice this is, ensuring the BIRD 2026-2035 roadmap
-          reflects a true multi-stakeholder consensus. Your email is used <strong>only</strong> to send
+        <p className="text-sm text-[#065f46] leading-relaxed max-w-3xl">
+          This helps us understand whose voice this is, ensuring the BIRD 2026-2035 roadmap 
+          reflects a true multi-stakeholder consensus. Your email is used <strong>only</strong> to send 
           you a copy of your submission and is protected under the Data Privacy Act of 2012 (RA 10173).
         </p>
       </div>
 
       {/* Personal Information Card */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+      <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
+          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
             <User className="w-5 h-5 text-[#C9A84C]" />
             Personal Information
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
-          {/* Full Name */}
+          {/* Q2.1 Full Name */}
           <div>
-            <label className="block text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-1.5">
+            <label className="block text-sm font-medium text-[#022c22] mb-1.5">
               Full Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -133,9 +134,9 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
             />
           </div>
 
-          {/* Email Address */}
+          {/* Q2.2 Email Address */}
           <div>
-            <label className="block text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-1.5">
+            <label className="block text-sm font-medium text-[#022c22] mb-1.5">
               Email Address <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -149,15 +150,15 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
                 required
               />
             </div>
-            <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mt-1.5 flex items-start gap-1.5">
+            <p className="text-xs text-[#065f46] mt-1.5 flex items-start gap-1.5">
               <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
               A valid email is needed to send you a copy of your submission. It will never be published or shared publicly.
             </p>
           </div>
 
-          {/* Organization */}
+          {/* Q2.3 Organization */}
           <div>
-            <label className="block text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-1.5">
+            <label className="block text-sm font-medium text-[#022c22] mb-1.5">
               Organization / Institution / Agency
             </label>
             <div className="relative">
@@ -172,9 +173,9 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
             </div>
           </div>
 
-          {/* Position */}
+          {/* Q2.4 Position */}
           <div>
-            <label className="block text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-1.5">
+            <label className="block text-sm font-medium text-[#022c22] mb-1.5">
               Position / Designation
             </label>
             <div className="relative">
@@ -192,9 +193,9 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
       </Card>
 
       {/* Location Card */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+      <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
+          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
             <MapPin className="w-5 h-5 text-[#C9A84C]" />
             Primary Location
           </CardTitle>
@@ -202,36 +203,65 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
         <CardContent>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-1.5">
+              <label className="block text-sm font-medium text-[#022c22] mb-1.5">
                 Province / Region of Engagement <span className="text-red-500">*</span>
               </label>
-              <Select
-                value={data.demo_province}
-                onValueChange={(value) => {
-                  if (value === "Other (please specify)") {
-                    setShowCustomProvince(true);
-                    update("demo_province", "");
-                  } else {
-                    setShowCustomProvince(false);
-                    update("demo_province", value);
-                  }
-                }}
-              >
-                <SelectTrigger className={cn(inputClass, !data.demo_province && !showCustomProvince && "text-[#64748b]")}>
-                  <SelectValue placeholder="Select your province or region" />
-                </SelectTrigger>
-                <SelectContent className="z-50 max-h-64">
-                  {PROVINCES.map((province) => (
-                    <SelectItem key={province} value={province}>
-                      {province}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setProvinceOpen(!provinceOpen)}
+                  className={cn(
+                    inputClass,
+                    "flex items-center justify-between text-left pr-4",
+                    !data.demo_province && "text-[#64748b]"
+                  )}
+                >
+                  <span className={data.demo_province ? "text-[#022c22]" : "text-[#64748b]"}>
+                    {data.demo_province || "Select your province or region"}
+                  </span>
+                  <ChevronDown
+                    className={cn(
+                      "w-4 h-4 text-[#64748b] transition-transform duration-200",
+                      provinceOpen && "rotate-180"
+                    )}
+                  />
+                </button>
+                
+                {/* Dropdown Menu */}
+                {provinceOpen && (
+                  <div className="absolute z-20 w-full mt-1 bg-white border border-[#C9A84C]/30 rounded-lg shadow-xl max-h-64 overflow-y-auto">
+                    {PROVINCES.map((province) => (
+                      <button
+                        key={province}
+                        type="button"
+                        onClick={() => {
+                          if (province === "Other (please specify)") {
+                            setShowCustomProvince(true);
+                            update("demo_province", "");
+                          } else {
+                            setShowCustomProvince(false);
+                            update("demo_province", province);
+                          }
+                          setProvinceOpen(false);
+                        }}
+                        className={cn(
+                          "w-full px-4 py-2.5 text-sm text-left transition-colors hover:bg-[#ecfdf5]",
+                          data.demo_province === province && !showCustomProvince
+                            ? "bg-[#ecfdf5] text-[#1B4D3E] font-semibold"
+                            : "text-[#022c22]"
+                        )}
+                      >
+                        {province}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
+              {/* Conditional "Other" Input */}
               {showCustomProvince && (
                 <div className="mt-3 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <label className="block text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-1.5">
+                  <label className="block text-sm font-medium text-[#022c22] mb-1.5">
                     Please specify your location:
                   </label>
                   <input
@@ -245,7 +275,7 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
                 </div>
               )}
 
-              <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mt-2 flex items-start gap-1.5">
+              <p className="text-xs text-[#065f46] mt-2 flex items-start gap-1.5">
                 <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
                 <span>
                   <strong>Why this matters:</strong> Your geographic affiliation helps us identify 
@@ -261,12 +291,12 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
       {/* Contextual Image: Provincial Endowments */}
       <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
         <img
-          src={BIRD_IMAGES.provincialEndowments?.url || "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/13.%20Provincial%20Endowments-Mainlands.png"}
+          src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/13.%20Provincial%20Endowments-Mainlands.png"
           alt="BARMM Provincial Endowments and Geographic Context"
           className="w-full h-auto max-h-[350px] object-cover transition-transform duration-500 group-hover:scale-[1.02]"
           loading="lazy"
         />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5">
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#022c22]/95 via-[#022c22]/60 to-transparent p-5">
           <h4 className="text-[#C9A84C] font-semibold text-sm mb-1 flex items-center gap-2">
             <MapPin className="w-4 h-4" />
             BARMM's Diverse Economic Geography
@@ -279,17 +309,18 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
       </div>
 
       {/* Stakeholder Category Card */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+      <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
+          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
             <GraduationCap className="w-5 h-5 text-[#C9A84C]" />
             Which category best describes your role? <span className="text-red-500">*</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mb-4 italic">
+          <p className="text-xs text-[#065f46] mb-4 italic">
             This helps us segment responses and ensure all stakeholder voices are accurately represented in the consensus mapping.
           </p>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {CATEGORIES.map((cat) => (
               <button
@@ -300,7 +331,7 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
                   "p-3.5 rounded-lg border text-sm text-left transition-all duration-200 flex items-start gap-3",
                   data.demo_category === cat
                     ? "bg-[#1B4D3E] text-white border-[#1B4D3E] shadow-md"
-                    : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10"
+                    : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30"
                 )}
               >
                 <div
@@ -308,7 +339,7 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
                     "w-4 h-4 rounded-full border flex-shrink-0 mt-0.5 transition-all",
                     data.demo_category === cat
                       ? "bg-[#C9A84C] border-[#C9A84C]"
-                      : "border-[#C9A84C]/50 bg-white dark:bg-[#022c22]"
+                      : "border-[#C9A84C]/50 bg-white"
                   )}
                 >
                   {data.demo_category === cat && (
@@ -323,17 +354,18 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
       </Card>
 
       {/* Areas of Expertise Card */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+      <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
+          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
             <CheckSquare className="w-5 h-5 text-[#C9A84C]" />
             Select Your Areas of Expertise
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mb-4 italic">
+          <p className="text-xs text-[#065f46] mb-4 italic">
             Select all that apply. This contextualizes your responses within the Bangsamoro Economic and Investment Ecosystem (BEIE) framework.
           </p>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {EXPERTISE_AREAS.map((area) => {
               const isSelected = data.demo_expertise.includes(area);
@@ -346,7 +378,7 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
                     "p-3.5 rounded-lg border text-sm text-left transition-all duration-200 flex items-start gap-3",
                     isSelected
                       ? "bg-[#1B4D3E] text-white border-[#1B4D3E] shadow-md"
-                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10"
+                      : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30"
                   )}
                 >
                   <div
@@ -354,7 +386,7 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
                       "w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 mt-0.5 transition-all",
                       isSelected
                         ? "bg-[#C9A84C] border-[#C9A84C]"
-                        : "border-[#C9A84C]/50 bg-white dark:bg-[#022c22]"
+                        : "border-[#C9A84C]/50 bg-white"
                     )}
                   >
                     {isSelected && (
@@ -382,10 +414,10 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
       </Card>
 
       {/* Privacy Assurance Footer */}
-      <div className="flex items-start gap-3 p-4 bg-[#ecfdf5]/40 dark:bg-[#C9A84C]/10 border border-[#C9A84C]/20 rounded-lg">
-        <ShieldCheck className="w-5 h-5 text-[#1B4D3E] dark:text-[#C9A84C] flex-shrink-0 mt-0.5" />
-        <div className="text-xs text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
-          <strong className="text-[#1B4D3E] dark:text-[#C9A84C]">Data Privacy Assurance:</strong> In compliance with the 
+      <div className="flex items-start gap-3 p-4 bg-[#ecfdf5]/40 border border-[#C9A84C]/20 rounded-lg">
+        <ShieldCheck className="w-5 h-5 text-[#1B4D3E] flex-shrink-0 mt-0.5" />
+        <div className="text-xs text-[#065f46] leading-relaxed">
+          <strong className="text-[#1B4D3E]">Data Privacy Assurance:</strong> In compliance with the 
           Data Privacy Act of 2012 (RA 10173), all personal data collected is processed solely for the 
           purpose of the BIRD 2026-2035 Validation Survey. Aggregated data will be used for public 
           reporting, but no individual response will ever be publicly attributed to you without explicit consent.
