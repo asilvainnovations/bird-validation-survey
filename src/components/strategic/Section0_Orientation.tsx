@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { Sparkles, Play, ArrowRight, BookOpen, BarChart3, Users, CheckCircle2, XCircle } from "lucide-react";
+import {
+  Sparkles,
+  Play,
+  ArrowRight,
+  BookOpen,
+  BarChart3,
+  Users,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +22,9 @@ export interface Section0Data {
   q0_1_ready: string;
   q0_2_ecosystem_understanding: string;
   q0_3_systems_thinking_value?: number;
+  q0_4_cld_understanding?: number;
+  q0_5_feedback_loops_understanding?: number;
+  q0_6_leverage_points_understanding?: number;
 }
 
 interface Section0Props {
@@ -21,12 +33,18 @@ interface Section0Props {
 }
 
 // ── Component ────────────────────────────────────────────────────────────────
-export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
+export const Section0_Orientation: React.FC<Section0Props> = ({
+  data,
+  onChange,
+}) => {
   // Local state for the interactive quiz (not part of the main survey schema)
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
   const [showQuizResults, setShowQuizResults] = useState(false);
 
-  const update = <K extends keyof Section0Data>(field: K, value: Section0Data[K]) => {
+  const update = <K extends keyof Section0Data>(
+    field: K,
+    value: Section0Data[K]
+  ) => {
     onChange({ ...data, [field]: value });
   };
 
@@ -37,7 +55,8 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
   const quizQuestions = [
     {
       id: 1,
-      question: "In a Causal Loop Diagram, what does the 's' polarity marker indicate?",
+      question:
+        "In a Causal Loop Diagram, what does the 's' polarity marker indicate?",
       options: [
         "Same-direction relationship (both variables move together)",
         "Opposite-direction relationship (variables move in opposite directions)",
@@ -45,7 +64,8 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
         "Secondary relationship (minor impact)",
       ],
       correct: 0,
-      explanation: "The 's' (same) marker indicates that when one variable increases, the other also increases, or when one decreases, the other also decreases.",
+      explanation:
+        "The 's' (same) marker indicates that when one variable increases, the other also increases, or when one decreases, the other also decreases.",
     },
     {
       id: 2,
@@ -57,11 +77,13 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
         "A loop that only affects external factors",
       ],
       correct: 1,
-      explanation: "A Reinforcing Loop (R) amplifies change — growth leads to more growth, or decline leads to more decline, creating exponential patterns.",
+      explanation:
+        "A Reinforcing Loop (R) amplifies change — growth leads to more growth, or decline leads to more decline, creating exponential patterns.",
     },
     {
       id: 3,
-      question: "Which leverage point is considered MOST transformative according to Meadows' hierarchy?",
+      question:
+        "Which leverage point is considered MOST transformative according to Meadows' hierarchy?",
       options: [
         "Changing parameters (numbers, subsidies)",
         "Adjusting feedback loops",
@@ -69,7 +91,8 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
         "Adding buffers or stocks",
       ],
       correct: 2,
-      explanation: "Transforming the paradigm (L1) is the highest leverage point — changing the fundamental mindset from which the system emerges.",
+      explanation:
+        "Transforming the paradigm (L1) is the highest leverage point — changing the fundamental mindset from which the system emerges.",
     },
   ];
 
@@ -83,16 +106,23 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
     return correct;
   };
 
+  const activeBtnClass =
+    "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90";
+  const inactiveBtnClass =
+    "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10";
+
+  const scaleLabels = ["Not at all", "Slightly", "Moderately", "Very well", "Completely"];
+
   return (
     <div className="space-y-8">
       {/* ── Section Header ─────────────────────────────────────────────── */}
       <div className="flex items-center gap-3 mb-4">
         <Sparkles className="w-6 h-6 text-[#C9A84C]" />
-        <h2 className="text-xl font-bold text-[#022c22]">
+        <h2 className="text-xl font-bold text-[#022c22] dark:text-[#ecfdf5]">
           Section 0: Welcome & Orientation
         </h2>
       </div>
-      <p className="text-sm text-[#065f46] mb-4 -mt-5">
+      <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 mb-4 -mt-5">
         Your voice shapes the future of the Bangsamoro Autonomous Region
       </p>
 
@@ -112,26 +142,26 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
       </div>
 
       {/* ── 2. Welcome Card ────────────────────────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-lg font-bold text-[#022c22]">
+          <CardTitle className="text-lg font-bold text-[#022c22] dark:text-[#ecfdf5]">
             Welcome to the BIRD 2026–2035 Validation Survey
           </CardTitle>
-          <p className="text-sm text-[#065f46]">
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
             Your voice shapes the future of the Bangsamoro Autonomous Region
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-[#022c22] leading-relaxed">
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90 leading-relaxed">
             The{" "}
-            <strong>
+            <strong className="text-[#1B4D3E] dark:text-[#C9A84C]">
               Bangsamoro Investment Roadmap Development (BIRD) 2026–2035
             </strong>{" "}
             is a living strategic framework built on systems thinking — the
             discipline of seeing wholes rather than parts, patterns of change
             rather than static snapshots.
           </p>
-          <p className="text-sm text-[#022c22] leading-relaxed">
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90 leading-relaxed">
             This survey invites you to examine the{" "}
             <strong>interconnected ecosystem</strong> of governance,
             infrastructure, enterprise, connectivity, and finance that determines
@@ -140,56 +170,71 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
 
           {/* Feature grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-            <div className="rounded-lg border border-[#C9A84C]/20 bg-emerald-50/60 p-4 text-center">
-              <BarChart3 className="w-6 h-6 text-[#1B4D3E] mx-auto mb-2" />
-              <p className="text-sm font-semibold text-[#022c22] mb-1">Data-Driven</p>
-              <p className="text-xs text-[#065f46] leading-relaxed">
-                Every response feeds into real-time analytics shaping policy and investment priorities
+            <div className="rounded-lg border border-[#C9A84C]/20 bg-emerald-50/60 dark:bg-[#1B4D3E]/20 p-4 text-center">
+              <BarChart3 className="w-6 h-6 text-[#1B4D3E] dark:text-[#C9A84C] mx-auto mb-2" />
+              <p className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5] mb-1">
+                Data-Driven
+              </p>
+              <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
+                Every response feeds into real-time analytics shaping policy and
+                investment priorities
               </p>
             </div>
-            <div className="rounded-lg border border-[#C9A84C]/20 bg-emerald-50/60 p-4 text-center">
-              <Users className="w-6 h-6 text-[#1B4D3E] mx-auto mb-2" />
-              <p className="text-sm font-semibold text-[#022c22] mb-1">Inclusive</p>
-              <p className="text-xs text-[#065f46] leading-relaxed">
-                Designed for government, business, academe, civil society, and development partners
+            <div className="rounded-lg border border-[#C9A84C]/20 bg-emerald-50/60 dark:bg-[#1B4D3E]/20 p-4 text-center">
+              <Users className="w-6 h-6 text-[#1B4D3E] dark:text-[#C9A84C] mx-auto mb-2" />
+              <p className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5] mb-1">
+                Inclusive
+              </p>
+              <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
+                Designed for government, business, academe, civil society, and
+                development partners
               </p>
             </div>
-            <div className="rounded-lg border border-[#C9A84C]/20 bg-emerald-50/60 p-4 text-center">
-              <BookOpen className="w-6 h-6 text-[#1B4D3E] mx-auto mb-2" />
-              <p className="text-sm font-semibold text-[#022c22] mb-1">Systems-Based</p>
-              <p className="text-xs text-[#065f46] leading-relaxed">
-                Moving beyond checklists to understand feedback loops, archetypes, and leverage points
+            <div className="rounded-lg border border-[#C9A84C]/20 bg-emerald-50/60 dark:bg-[#1B4D3E]/20 p-4 text-center">
+              <BookOpen className="w-6 h-6 text-[#1B4D3E] dark:text-[#C9A84C] mx-auto mb-2" />
+              <p className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5] mb-1">
+                Systems-Based
+              </p>
+              <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
+                Moving beyond checklists to understand feedback loops,
+                archetypes, and leverage points
               </p>
             </div>
           </div>
 
           {/* Closing statement */}
           <div className="pt-2">
-            <p className="text-sm text-[#022c22] leading-relaxed mb-3">
+            <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90 leading-relaxed mb-3">
               Your participation answers:{" "}
-              <em>
-                How do we turn fragmented efforts into a unified engine of inclusive growth?
+              <em className="text-[#1B4D3E] dark:text-[#C9A84C]">
+                How do we turn fragmented efforts into a unified engine of
+                inclusive growth?
               </em>
             </p>
-            <p className="text-xs text-[#065f46] italic">
-              The survey has 16 sections (0–15). Most use 1–5 scales. All fields optional except final consent. Takes ~20–30 minutes.
+            <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 italic">
+              The survey has 16 sections (0–15). Most use 1–5 scales. All fields
+              optional except final consent. Takes ~20–30 minutes.
             </p>
           </div>
         </CardContent>
       </Card>
 
       {/* ── 3. Video Card ──────────────────────────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
             <Play className="w-5 h-5 text-[#C9A84C]" />
-            Systems Thinking: Moving from Checklists to Interconnected Investment Ecosystem
+            Systems Thinking: Moving from Checklists to Interconnected
+            Investment Ecosystem
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg aspect-video">
             <iframe
-              src={BIRD_VIDEOS.systemsThinking.url.replace("youtu.be/", "youtube.com/embed/")}
+              src={BIRD_VIDEOS.systemsThinking.url.replace(
+                "youtu.be/",
+                "youtube.com/embed/"
+              )}
               title={BIRD_VIDEOS.systemsThinking.title}
               className="w-full h-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -197,32 +242,38 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
             />
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="bg-amber-100 text-amber-800 hover:bg-amber-100">
+            <Badge
+              variant="secondary"
+              className="bg-amber-100 text-amber-800 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-300"
+            >
               <Play className="w-3 h-3 mr-1" />
               {BIRD_VIDEOS.systemsThinking.duration}
             </Badge>
           </div>
-          <p className="text-sm text-[#065f46] leading-relaxed">
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
             {BIRD_VIDEOS.systemsThinking.description}
           </p>
         </CardContent>
       </Card>
 
       {/* ── 4. Systems Thinking Learning Module ────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-[#C9A84C]" />
             Understanding Systems Thinking Tools
           </CardTitle>
-          <p className="text-xs text-[#065f46] italic pt-1">
-            Interactive learning: Study the diagrams below, then test your understanding.
+          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 italic pt-1">
+            Interactive learning: Study the diagrams below, then test your
+            understanding.
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Image 1: Anatomy of Causal Loop Diagram */}
           <div className="space-y-3">
-            <h4 className="text-sm font-semibold text-[#022c22]">1. Anatomy of Causal Loop Diagrams (CLDs)</h4>
+            <h4 className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+              1. Anatomy of Causal Loop Diagrams (CLDs)
+            </h4>
             <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg">
               <img
                 src={BIRD_IMAGES.anatomyCLD.url}
@@ -231,15 +282,19 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
                 loading="lazy"
               />
             </div>
-            <p className="text-sm text-[#065f46]">
-              <strong>Key Elements:</strong> Variables (factors that change over time), Links (arrows showing influence), 
-              Polarity marked as <strong>'s'</strong> for same-direction effects and <strong>'o'</strong> for opposite-direction effects.
+            <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+              <strong>Key Elements:</strong> Variables (factors that change over
+              time), Links (arrows showing influence), Polarity marked as{" "}
+              <strong>&apos;s&apos;</strong> for same-direction effects and{" "}
+              <strong>&apos;o&apos;</strong> for opposite-direction effects.
             </p>
           </div>
 
           {/* Image 2: Feedback Loops and Leverage Points */}
           <div className="space-y-3">
-            <h4 className="text-sm font-semibold text-[#022c22]">2. Feedback Loops & Leverage Points</h4>
+            <h4 className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+              2. Feedback Loops & Leverage Points
+            </h4>
             <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg">
               <img
                 src={BIRD_IMAGES.feedbackLoops.url}
@@ -248,25 +303,28 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
                 loading="lazy"
               />
             </div>
-            <p className="text-sm text-[#065f46]">
-              <strong>Two Types of Loops:</strong> Reinforcing (R) loops amplify change; Balancing (B) loops stabilize systems.
-              <strong> Leverage Hierarchy:</strong> Transformative (L1–L2), Systemic (L5–L6), and Incremental (L10) intervention points.
+            <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+              <strong>Two Types of Loops:</strong> Reinforcing (R) loops amplify
+              change; Balancing (B) loops stabilize systems.
+              <strong> Leverage Hierarchy:</strong> Transformative (L1–L2),
+              Systemic (L5–L6), and Incremental (L10) intervention points.
             </p>
           </div>
 
           {/* Interactive Quiz */}
           <div className="pt-4 border-t border-[#C9A84C]/20">
-            <h4 className="text-sm font-semibold text-[#022c22] mb-4 flex items-center gap-2">
+            <h4 className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5] mb-4 flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-[#C9A84C]" />
               Quick Knowledge Check
             </h4>
-            <p className="text-xs text-[#065f46] mb-4">
-              Test your understanding of systems thinking concepts. Select the best answer for each question.
+            <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mb-4">
+              Test your understanding of systems thinking concepts. Select the
+              best answer for each question.
             </p>
             <div className="space-y-6">
               {quizQuestions.map((q, index) => (
                 <div key={q.id} className="space-y-3">
-                  <p className="text-sm font-medium text-[#022c22]">
+                  <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
                     {index + 1}. {q.question}
                   </p>
                   <RadioGroup
@@ -279,11 +337,14 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
                       const isCorrect = optIndex === q.correct;
                       const showResult = showQuizResults && isSelected;
                       return (
-                        <div key={opt} className="flex items-center space-x-2">
-                          <RadioGroupItem 
-                            value={opt} 
-                            id={`q${q.id}-opt${optIndex}`} 
-                            className="peer sr-only" 
+                        <div
+                          key={opt}
+                          className="flex items-center space-x-2"
+                        >
+                          <RadioGroupItem
+                            value={opt}
+                            id={`q${q.id}-opt${optIndex}`}
+                            className="peer sr-only"
                           />
                           <Label
                             htmlFor={`q${q.id}-opt${optIndex}`}
@@ -291,26 +352,27 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
                               "flex items-center justify-between p-3 rounded-lg border text-sm text-left transition-all cursor-pointer w-full",
                               showResult
                                 ? isCorrect
-                                  ? "bg-emerald-50 border-emerald-500 text-emerald-800"
-                                  : "bg-red-50 border-red-500 text-red-800"
+                                  ? "bg-emerald-50 dark:bg-emerald-900/30 border-emerald-500 text-emerald-800 dark:text-emerald-300"
+                                  : "bg-red-50 dark:bg-red-900/30 border-red-500 text-red-800 dark:text-red-300"
                                 : isSelected
                                 ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                                : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                                : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
                             )}
                           >
                             <span className="flex-1">{opt}</span>
-                            {showResult && (
-                              isCorrect 
-                                ? <CheckCircle2 className="w-4 h-4 text-emerald-600 ml-2" />
-                                : <XCircle className="w-4 h-4 text-red-600 ml-2" />
-                            )}
+                            {showResult &&
+                              (isCorrect ? (
+                                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 ml-2" />
+                              ) : (
+                                <XCircle className="w-4 h-4 text-red-600 dark:text-red-400 ml-2" />
+                              ))}
                           </Label>
                         </div>
                       );
                     })}
                   </RadioGroup>
                   {showQuizResults && quizAnswers[q.id] && (
-                    <p className="text-xs text-[#065f46] mt-2 pl-3 border-l-2 border-[#C9A84C]/30">
+                    <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/70 mt-2 pl-3 border-l-2 border-[#C9A84C]/30">
                       <strong>Explanation:</strong> {q.explanation}
                     </p>
                   )}
@@ -323,7 +385,8 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
                 onClick={() => setShowQuizResults(true)}
                 className={cn(
                   "bg-[#1B4D3E] hover:bg-[#1B4D3E]/90 text-white",
-                  Object.keys(quizAnswers).length < quizQuestions.length && "opacity-50 cursor-not-allowed"
+                  Object.keys(quizAnswers).length < quizQuestions.length &&
+                    "opacity-50 cursor-not-allowed"
                 )}
                 disabled={Object.keys(quizAnswers).length < quizQuestions.length}
               >
@@ -337,7 +400,7 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
                     setQuizAnswers({});
                     setShowQuizResults(false);
                   }}
-                  className="border-[#C9A84C]/30 text-[#022c22] hover:border-[#C9A84C]"
+                  className="border-[#C9A84C]/30 text-[#022c22] dark:text-[#ecfdf5] hover:border-[#C9A84C] dark:hover:bg-[#C9A84C]/10"
                 >
                   Retake Quiz
                 </Button>
@@ -345,11 +408,11 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
             </div>
             {showQuizResults && (
               <div className="mt-4 p-4 rounded-lg bg-[#C9A84C]/10 border border-[#C9A84C]/30">
-                <p className="text-sm font-semibold text-[#022c22]">
+                <p className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5]">
                   Your Score: {calculateQuizScore()} / {quizQuestions.length}
                 </p>
-                <p className="text-xs text-[#065f46] mt-1">
-                  {calculateQuizScore() === quizQuestions.length 
+                <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/70 mt-1">
+                  {calculateQuizScore() === quizQuestions.length
                     ? "Excellent! You have a strong understanding of systems thinking."
                     : calculateQuizScore() >= 2
                     ? "Good job! Review the explanations to strengthen your understanding."
@@ -362,37 +425,48 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
       </Card>
 
       {/* ── 5. Quick-Start Questions ───────────────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
             <ArrowRight className="w-5 h-5 text-[#C9A84C]" />
             Quick-Start Questions
           </CardTitle>
-          <p className="text-xs text-[#065f46] italic pt-1">
-            Let&apos;s get started — a few quick questions to orient your thinking.
+          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 italic pt-1">
+            Let&apos;s get started — a few quick questions to orient your
+            thinking.
           </p>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-8">
           {/* Q0.1: Readiness */}
           <div className="pb-6 border-b border-[#C9A84C]/20">
-            <Label className="text-sm font-medium text-[#022c22] mb-3 block">
-              How ready do you feel to contribute to shaping BARMM&apos;s investment future?
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How ready do you feel to contribute to shaping BARMM&apos;s
+              investment future?
             </Label>
             <RadioGroup
               value={data.q0_1_ready}
               onValueChange={(val) => update("q0_1_ready", val)}
               className="grid grid-cols-1 sm:grid-cols-2 gap-3"
             >
-              {["Very ready", "Somewhat ready", "Curious but unsure", "Just exploring"].map((opt) => (
+              {[
+                "Very ready",
+                "Somewhat ready",
+                "Curious but unsure",
+                "Just exploring",
+              ].map((opt) => (
                 <div key={opt} className="flex items-center space-x-2">
-                  <RadioGroupItem value={opt} id={`ready-${opt}`} className="peer sr-only" />
+                  <RadioGroupItem
+                    value={opt}
+                    id={`ready-${opt}`}
+                    className="peer sr-only"
+                  />
                   <Label
                     htmlFor={`ready-${opt}`}
                     className={cn(
                       "flex items-center justify-center p-3 rounded-lg border text-sm text-left transition-all cursor-pointer w-full",
                       data.q0_1_ready === opt
-                        ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                        : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                        ? activeBtnClass
+                        : inactiveBtnClass
                     )}
                   >
                     {opt}
@@ -404,8 +478,9 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
 
           {/* Q0.2: Ecosystem Understanding */}
           <div className="pb-6 border-b border-[#C9A84C]/20">
-            <Label className="text-sm font-medium text-[#022c22] mb-3 block">
-              How would you describe your understanding of an &quot;investment ecosystem&quot; versus traditional sector-based planning?
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How would you describe your understanding of an &quot;investment
+              ecosystem&quot; versus traditional sector-based planning?
             </Label>
             <RadioGroup
               value={data.q0_2_ecosystem_understanding}
@@ -419,14 +494,18 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
                 "I'm not familiar with either",
               ].map((opt) => (
                 <div key={opt} className="flex items-center space-x-2">
-                  <RadioGroupItem value={opt} id={`understand-${opt}`} className="peer sr-only" />
+                  <RadioGroupItem
+                    value={opt}
+                    id={`understand-${opt}`}
+                    className="peer sr-only"
+                  />
                   <Label
                     htmlFor={`understand-${opt}`}
                     className={cn(
                       "flex items-center justify-center p-3 rounded-lg border text-sm text-left transition-all cursor-pointer w-full",
                       data.q0_2_ecosystem_understanding === opt
-                        ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                        : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                        ? activeBtnClass
+                        : inactiveBtnClass
                     )}
                   >
                     {opt}
@@ -437,10 +516,13 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
           </div>
 
           {/* Q0.3: Systems Thinking Value */}
-          <div>
-            <Label className="text-sm font-medium text-[#022c22] mb-3 block">
-              After watching the video, how valuable is systems thinking for BARMM investment planning?
-              <span className="text-xs text-[#065f46] block mt-1 font-normal">(1 = not valuable, 5 = extremely valuable)</span>
+          <div className="pb-6 border-b border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              After watching the video, how valuable is systems thinking for
+              BARMM investment planning?
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 block mt-1 font-normal">
+                (1 = not valuable, 5 = extremely valuable)
+              </span>
             </Label>
             <div className="flex gap-2 flex-wrap">
               {[1, 2, 3, 4, 5].map((v) => (
@@ -453,7 +535,7 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
                     "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
                     data.q0_3_systems_thinking_value === v
                       ? "bg-[#C9A84C] text-white border-[#C9A84C]"
-                      : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
                   )}
                   onClick={() => update("q0_3_systems_thinking_value", v)}
                 >
@@ -462,8 +544,127 @@ export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }
               ))}
             </div>
             <div className="flex justify-between mt-2 max-w-[272px]">
-              <span className="text-xs text-[#065f46]">Not valuable</span>
-              <span className="text-xs text-[#065f46]">Extremely valuable</span>
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
+                Not valuable
+              </span>
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
+                Extremely valuable
+              </span>
+            </div>
+          </div>
+
+          {/* Q0.4: CLD Understanding */}
+          <div className="pb-6 border-b border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How well do you understand Causal Loop Diagrams (CLDs) after
+              reviewing the materials above?
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 block mt-1 font-normal">
+                (1 = not at all, 5 = completely)
+              </span>
+            </Label>
+            <div className="flex gap-2 flex-wrap">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
+                    data.q0_4_cld_understanding === v
+                      ? "bg-[#C9A84C] text-white border-[#C9A84C]"
+                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                  )}
+                  onClick={() => update("q0_4_cld_understanding", v)}
+                >
+                  {v}
+                </Button>
+              ))}
+            </div>
+            <div className="flex justify-between mt-2 max-w-[272px]">
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
+                {scaleLabels[0]}
+              </span>
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
+                {scaleLabels[4]}
+              </span>
+            </div>
+          </div>
+
+          {/* Q0.5: Feedback Loops Understanding */}
+          <div className="pb-6 border-b border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How well do you understand the difference between Reinforcing (R)
+              and Balancing (B) feedback loops?
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 block mt-1 font-normal">
+                (1 = not at all, 5 = completely)
+              </span>
+            </Label>
+            <div className="flex gap-2 flex-wrap">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
+                    data.q0_5_feedback_loops_understanding === v
+                      ? "bg-[#C9A84C] text-white border-[#C9A84C]"
+                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                  )}
+                  onClick={() => update("q0_5_feedback_loops_understanding", v)}
+                >
+                  {v}
+                </Button>
+              ))}
+            </div>
+            <div className="flex justify-between mt-2 max-w-[272px]">
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
+                {scaleLabels[0]}
+              </span>
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
+                {scaleLabels[4]}
+              </span>
+            </div>
+          </div>
+
+          {/* Q0.6: Leverage Points Understanding */}
+          <div>
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How well do you understand the concept of &quot;leverage
+              points&quot; — small interventions that produce large systemic
+              change?
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 block mt-1 font-normal">
+                (1 = not at all, 5 = completely)
+              </span>
+            </Label>
+            <div className="flex gap-2 flex-wrap">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
+                    data.q0_6_leverage_points_understanding === v
+                      ? "bg-[#C9A84C] text-white border-[#C9A84C]"
+                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                  )}
+                  onClick={() => update("q0_6_leverage_points_understanding", v)}
+                >
+                  {v}
+                </Button>
+              ))}
+            </div>
+            <div className="flex justify-between mt-2 max-w-[272px]">
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
+                {scaleLabels[0]}
+              </span>
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
+                {scaleLabels[4]}
+              </span>
             </div>
           </div>
         </CardContent>
