@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AppProvider } from "@/contexts/AppContext";
 import { Toaster } from "sonner";
+import AppLayout from "@/components/AppLayout";
 
 // ─── LAZY LOADED PAGE COMPONENTS ────────────────────────────────────────────
 const Index = lazy(() => import("@/pages/Index"));
@@ -13,18 +14,17 @@ const NotFound = lazy(() => import("@/pages/NotFound"));
 const AppLoadingFallback = React.memo(() => (
   <div className="min-h-screen bg-[#011a12] flex flex-col items-center justify-center p-6">
     <div className="relative mb-6">
-      <div className="w-20 h-20 rounded-full overflow-hidden ring-2 ring-[#C9A84C] shadow-2xl border border-white/20 animate-pulse">
-        <img
-          src="https://gqznkyczlkskbgpoqkqf.supabase.co/storage/v1/object/public/bird-images/MTIT%20Logo.png"
-          alt="BIRD 2026-2035"
-          className="w-full h-full object-cover"
-          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-        />
+      <div className="w-20 h-20 rounded-full overflow-hidden ring-2 ring-[#C9A84C] shadow-2xl border border-white/20 animate-pulse bg-[#022c22] flex items-center justify-center">
+        <span className="text-[#C9A84C] font-serif font-bold text-lg">BIRD</span>
       </div>
       <div className="absolute -bottom-2 -right-2 w-8 h-8 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
     </div>
-    <h2 className="text-[#ecfdf5] font-bold text-xl mb-2">Loading BIRD Validation Survey</h2>
-    <p className="text-[#64748b] text-sm">Preparing the stakeholder validation instrument…</p>
+    <h2 className="text-[#ecfdf5] font-bold text-xl mb-2">
+      Loading BIRD Validation Survey
+    </h2>
+    <p className="text-[#64748b] text-sm">
+      Preparing the stakeholder validation instrument…
+    </p>
   </div>
 ));
 
@@ -102,26 +102,44 @@ const App: React.FC = () => (
             }}
           />
           <BrowserRouter>
-            <Suspense fallback={<AppLoadingFallback />}>
-              <Routes>
-                {/* Core SPA routes */}
-                <Route path="/" element={<Index />} />
-                <Route path="/validation-survey" element={<Index />} />
+            <AppLayout>
+              <Suspense fallback={<AppLoadingFallback />}>
+                <Routes>
+                  {/* Core SPA routes */}
+                  <Route path="/" element={<Index />} />
+                  <Route path="/validation-survey" element={<Index />} />
 
-                {/* Redirects: old static HTML pages → SPA equivalent */}
-                <Route path="/survey-dashboard" element={<Navigate to="/" replace />} />
-                <Route path="/survey-dashboard.html" element={<Navigate to="/" replace />} />
-                <Route path="/survey-orientation" element={<Navigate to="/" replace />} />
-                <Route path="/survey-orientation.html" element={<Navigate to="/" replace />} />
+                  {/* Redirects: old static HTML pages → SPA equivalent */}
+                  <Route
+                    path="/survey-dashboard"
+                    element={<Navigate to="/" replace />}
+                  />
+                  <Route
+                    path="/survey-dashboard.html"
+                    element={<Navigate to="/" replace />}
+                  />
+                  <Route
+                    path="/survey-orientation"
+                    element={<Navigate to="/" replace />}
+                  />
+                  <Route
+                    path="/survey-orientation.html"
+                    element={<Navigate to="/" replace />}
+                  />
+                  <Route
+                    path="/validation-survey.html"
+                    element={<Navigate to="/" replace />}
+                  />
 
-                {/* Static reference pages (served as-is from public/) */}
-                {/* These are NOT React routes — the static host serves the HTML directly. */}
-                {/* user-manual.html, resources.html, privacy-policy.html, cookie-policy.html */}
+                  {/* Static reference pages (served as-is from public/) */}
+                  {/* user-manual.html, resources.html, privacy-policy.html, cookie-policy.html */}
+                  {/* These are NOT React routes — the static host serves the HTML directly. */}
 
-                {/* Catch-all */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
+                  {/* Catch-all */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </AppLayout>
           </BrowserRouter>
         </AppProvider>
       </ThemeProvider>
