@@ -68,27 +68,36 @@ export const surveySchema = z.object({
   q_s6_polloc_impact: optionalNumber,
   q_s6_polloc_likelihood: optionalNumber,
 
-  // ═══ Step 4: Cluster 1 — Foundations ═══
-  // SWOT Strengths
-  q_s3_aff_base_impact: optionalNumber,
-  q_s3_aff_base_likelihood: optionalNumber,
-  q_s8_renewable_energy_impact: optionalNumber,
-  q_s8_renewable_energy_likelihood: optionalNumber,
-  q_s11_lake_lanao_impact: optionalNumber,
-  q_s11_lake_lanao_likelihood: optionalNumber,
-  // SWOT Opportunities
-  q_s2_renewable_invest_impact: optionalNumber,
-  q_s2_renewable_invest_likelihood: optionalNumber,
-  q_s7_carbon_markets_impact: optionalNumber,
-  q_s7_carbon_markets_likelihood: optionalNumber,
-  q_s8_pes_impact: optionalNumber,
-  q_s8_pes_likelihood: optionalNumber,
-  // SWOT Threats
-  q_s10_pestalotiopsis_impact: optionalNumber,
-  q_s10_pestalotiopsis_likelihood: optionalNumber,
-  // Archetype: Tragedy of the Commons
-  q_s4_tragedy_commons: optionalString,
-  q_s4_tragedy_followup: optionalString,
+    // ── Section 4: Cluster 1 — Foundations ──
+  const [s4, setS4] = useState<Section4Data>({
+    q_s4_aff_base_impact: undefined,
+    q_s4_aff_base_likelihood: undefined,
+    q_s4_renewable_energy_impact: undefined,
+    q_s4_renewable_energy_likelihood: undefined,
+    q_s4_lake_lanao_impact: undefined,
+    q_s4_lake_lanao_likelihood: undefined,
+    q_s4_renewable_invest_impact: undefined,
+    q_s4_renewable_invest_likelihood: undefined,
+    q_s4_carbon_markets_impact: undefined,
+    q_s4_carbon_markets_likelihood: undefined,
+    q_s4_pes_impact: undefined,
+    q_s4_pes_likelihood: undefined,
+    q_s4_forestry_code_impact: undefined,
+    q_s4_forestry_code_likelihood: undefined,
+    q_s4_land_tenure_impact: undefined,
+    q_s4_land_tenure_likelihood: undefined,
+    q_s4_pestalotiopsis_impact: undefined,
+    q_s4_pestalotiopsis_likelihood: undefined,
+    q_s4_climate_impact: undefined,
+    q_s4_climate_likelihood: undefined,
+    q_s4_postharvest_impact: undefined,
+    q_s4_postharvest_likelihood: undefined,
+    q_s4_poverty_impact: undefined,
+    q_s4_poverty_likelihood: undefined,
+    q_s4_tragedy_commons: "",
+    q_s4_tragedy_followup: "",
+    q_s4_limits_growth: "",
+  });
 
   // ═══ Step 5: Cluster 2 — Transformers ═══
   // SWOT Weaknesses
