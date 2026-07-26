@@ -1,21 +1,16 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // BIRD 2026–2035 · Supabase Client & Edge Function Service Layer
-// Primary Supabase project: lydsisparsmvextskevw.supabase.co
-// Edge functions hosted on: lydsisparsmvextskevw.supabase.co
+// Primary Supabase project: cacimkjpkxflrtgspiay.supabase.co
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
+import { ENV, EDGE_FUNCTIONS, BRAND_ASSETS, EXTERNAL_URLS } from "@/lib/env";
 
-// ── Primary Supabase project (auth + data) ────────────────────────────────────
-// Values sourced from VITE_ env vars; hard-coded fallbacks for runtime resilience
-const supabaseUrl =
-  (import.meta.env.VITE_SUPABASE_URL as string) ||
-  'https://lydsisparsmvextskevw.supabase.co';
+// Re-export env constants so existing imports don't break immediately
+export { EDGE_FUNCTIONS, BRAND_ASSETS, EXTERNAL_URLS };
 
-const supabaseKey =
-  (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZHNpc3BhcnNtdmV4dHNrZXZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NzIxNzEsImV4cCI6MjA5NzU0ODE3MX0.VM8BPXPLw7wGYCcUvwlTGeP4qB-M02Nq3x';
-
-export const supabase = createClient(supabaseUrl, supabaseKey, {
+// ── Primary Supabase client (auth + data) ────────────────────────────────────
+export const supabase = createClient(ENV.VITE_SUPABASE_URL, ENV.VITE_SUPABASE_ANON_KEY, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -23,126 +18,81 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
   },
 });
 
-// ── Edge Function Endpoints ───────────────────────────────────────────────────
-// NOTE: Edge functions are deployed on a separate Supabase project.
-//       Use direct fetch() for these endpoints rather than supabase.functions.invoke()
-//       when calling from the primary project's client.
-const EDGE_BASE = 'https://lydsisparsmvextskevw.supabase.co/functions/v1';
+// ── Admin client (elevated operations — NEVER ship to browser in production) ─
+// This is guarded behind a build check; in production, service-key ops
+// should only happen inside Edge Functions.
+export function createAdminClient() {
+  if (!ENV.VITE_SUPABASE_SERVICE_KEY) {
+    throw new Error(
+      "[Supabase] VITE_SUPABASE_SERVICE_KEY is required for admin operations. " +
+        "If you are in a browser context, use Edge Functions instead."
+    );
+  }
+  return createClient(ENV.VITE_SUPABASE_URL, ENV.VITE_SUPABASE_SERVICE_KEY, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
 
-export const EDGE_FUNCTIONS = {
-  AI_STRATEGY_ASSISTANT: `${EDGE_BASE}/ai-strategy-assistant`,
-  STRATEGIC_PLANNER_SYNC: `${EDGE_BASE}/strategic-planner-sync`,
-  EMAIL_NOTIFICATIONS:    `${EDGE_BASE}/email-notifications`,
-  CRM_DISPATCHER:         `${EDGE_BASE}/crm-dispatcher`,
-  SUBMIT_SURVEY:          `${EDGE_BASE}/submit-survey`,
-} as const;
+// ── Typed Headers Helper ────────────────────────────────────────────────────
+/**
+ * Returns standard headers for Edge Function fetch() calls.
+ * Includes the anon key as Authorization bearer for Supabase auth context.
+ */
+export function getEdgeFunctionHeaders(): Record<string, string> {
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${ENV.VITE_SUPABASE_ANON_KEY}`,
+    "apikey": ENV.VITE_SUPABASE_ANON_KEY,
+  };
+}
 
-// ── Branding Assets (CDN) ─────────────────────────────────────────────────────
-export const BRAND_ASSETS = {
-  LOGO_URL: import.meta.env.VITE_BRAND_LOGO_URL || 'https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/MTIT%20Logo.png',
-  AI_AVATAR_URL: import.meta.env.VITE_AI_STRATEGIST_AVATAR_URL || 'https://appimize.app/assets/apps/user_1097/images/2c7d825bf937_232_1097.png',
-  BANNER_URL: import.meta.env.VITE_BANNER_INVESTMENT_URL || 'https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/1.Banner.png',
-} as const;
+// ── Edge Function Invokers ──────────────────────────────────────────────────
+/**
+ * Generic typed fetch wrapper for Edge Functions.
+ * Handles JSON serialization, error parsing, and timeout.
+ */
+export async function invokeEdgeFunction<T = unknown>(
+  endpoint: string,
+  payload: Record<string, unknown>,
+  options: { timeoutMs?: number; retries?: number } = {}
+): Promise<T> {
+  const { timeoutMs = 30000, retries = 1 } = options;
 
-// ── External URLs ──────────────────────────────────────────────────────────────
-export const EXTERNAL_URLS = {
-  PWA:          import.meta.env.VITE_PWA_EXTERNAL_URL      || 'https://bangsamoro-investment-roadmap.asilvainnovations.com',
-  USER_MANUAL:  import.meta.env.VITE_USER_MANUAL_URL       || 'https://bird-user-manual.asilvainnovations.com',
-  DEV_DOCS:     import.meta.env.VITE_DEVELOPER_DOCS_URL    || 'https://asilvainnovations.github.io/strat-planner-pwa/developer-doc.html',
-} as const;
+  const attempt = async (): Promise<T> => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-// ── Typed Headers Helper ──────────────────────────────────────────────────────
-export const getAuthHeaders = (token: string): HeadersInit => ({
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${token}`,
-});
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: getEdgeFunctionHeaders(),
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
 
-// ── EDGE FUNCTION SERVICE CALLS ───────────────────────────────────────────────
+      if (!response.ok) {
+        const text = await response.text().catch(() => "Unknown error");
+        throw new Error(`Edge Function ${response.status}: ${text}`);
+      }
 
-/** GET: Fetch the user's full strategic planner state from the sync edge function */
-export async function fetchPlannerState(token: string): Promise<any | null> {
-  try {
-    const res = await fetch(EDGE_FUNCTIONS.STRATEGIC_PLANNER_SYNC, {
-      method: 'GET',
-      headers: getAuthHeaders(token),
-    });
-    if (!res.ok) {
-      if (res.status === 404) return { plans: [], currentPlanId: null };
-      throw new Error(`Sync fetch failed: ${res.statusText}`);
+      return (await response.json()) as T;
+    } catch (err) {
+      clearTimeout(timer);
+      throw err;
     }
-    return res.json();
-  } catch (err) {
-    console.error('[supabase] fetchPlannerState error:', err);
-    return null;
-  }
-}
+  };
 
-/** POST: Save the full planner state (plans array + currentPlanId) */
-export async function saveFullState(
-  plans: any[],
-  currentPlanId: string | null,
-  token: string,
-): Promise<boolean> {
-  try {
-    const res = await fetch(EDGE_FUNCTIONS.STRATEGIC_PLANNER_SYNC, {
-      method: 'POST',
-      headers: getAuthHeaders(token),
-      body: JSON.stringify({ plans, currentPlanId }),
-    });
-    if (!res.ok) throw new Error(`Sync save failed: ${res.statusText}`);
-    return true;
-  } catch (err) {
-    console.error('[supabase] saveFullState error:', err);
-    return false;
+  let lastError: Error | undefined;
+  for (let i = 0; i <= retries; i++) {
+    try {
+      return await attempt();
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      if (i < retries) {
+        await new Promise((r) => setTimeout(r, 1000 * (i + 1))); // exponential-ish backoff
+      }
+    }
   }
-}
-
-/** POST: Save a single plan (incremental update) */
-export async function saveSinglePlan(plan: any, token: string): Promise<boolean> {
-  try {
-    const res = await fetch(EDGE_FUNCTIONS.STRATEGIC_PLANNER_SYNC, {
-      method: 'POST',
-      headers: getAuthHeaders(token),
-      body: JSON.stringify({ plan }),
-    });
-    if (!res.ok) throw new Error(`Plan save failed: ${res.statusText}`);
-    return true;
-  } catch (err) {
-    console.error('[supabase] saveSinglePlan error:', err);
-    return false;
-  }
-}
-
-/** DELETE: Soft-delete (archive) a plan */
-export async function archivePlan(planId: string, token: string): Promise<boolean> {
-  try {
-    const res = await fetch(`${EDGE_FUNCTIONS.STRATEGIC_PLANNER_SYNC}?plan_id=${planId}`, {
-      method: 'DELETE',
-      headers: getAuthHeaders(token),
-    });
-    if (!res.ok) throw new Error(`Archive failed: ${res.statusText}`);
-    return true;
-  } catch (err) {
-    console.error('[supabase] archivePlan error:', err);
-    return false;
-  }
-}
-
-/** POST: Send welcome or notification email */
-export async function triggerEmailNotification(
-  type: 'welcome' | 'share' | 'kpi_alert' | 'weekly_digest',
-  userId: string,
-  metadata?: Record<string, unknown>,
-): Promise<boolean> {
-  try {
-    const res = await fetch(EDGE_FUNCTIONS.EMAIL_NOTIFICATIONS, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, user_id: userId, ...metadata }),
-    });
-    return res.ok;
-  } catch (err) {
-    console.error('[supabase] triggerEmailNotification error:', err);
-    return false;
-  }
+  throw lastError;
 }
