@@ -104,42 +104,39 @@ const SurveyWizard: React.FC = () => {
 
   // ── Section 4: Cluster 1 — Foundations ──
   const [s4, setS4] = useState<Section4Data>({
-    q4_1_priorities: [],
-    q4_2_maguindanao_logistics: "",
-    q4_3_feasibility: undefined,
-    q_s4_climate_impact: undefined,
-    q_s4_climate_likelihood: undefined,
-    q_s4_pestalotiopsis_impact: undefined,
-    q_s4_pestalotiopsis_likelihood: undefined,
-    q_s4_postharvest_impact: undefined,
-    q_s4_postharvest_likelihood: undefined,
-    q_s4_poverty_impact: undefined,
-    q_s4_poverty_likelihood: undefined,
-    q_s4_tragedy_commons: "",
-    q_s4_tragedy_followup: "",
-    q_s4_limits_growth: "",
+    q4_1_foundations_banner_understanding: undefined,
+    q4_2_tragedy_commons_accuracy: "",
+    q4_3_tragedy_followup: "",
+    q4_4_climate_impact: undefined,
+    q4_5_climate_likelihood: undefined,
+    q4_6_pestalotiopsis_impact: undefined,
+    q4_7_pestalotiopsis_likelihood: undefined,
+    q4_8_postharvest_impact: undefined,
+    q4_9_postharvest_likelihood: undefined,
+    q4_10_poverty_impact: undefined,
+    q4_11_poverty_likelihood: undefined,
+    q4_12_limits_growth_accuracy: "",
+    q4_13_limits_followup: "",
   });
 
   // ── Section 5: Cluster 2 — Transformers ──
   const [s5, setS5] = useState<Section5Data>({
-    q5_1_cold_chain: "",
-    q5_2_economic_zones: "",
-    q5_3_barrier: "",
-    q5_4_halal_park: "",
-    q_s5_halal_cert_impact: undefined,
-    q_s5_halal_cert_likelihood: undefined,
-    q_s5_skills_mismatch_impact: undefined,
-    q_s5_skills_mismatch_likelihood: undefined,
-    q_s5_global_halal_impact: undefined,
-    q_s5_global_halal_likelihood: undefined,
-    q_s5_uae_corridor_impact: undefined,
-    q_s5_uae_corridor_likelihood: undefined,
-    q_s5_competition_impact: undefined,
-    q_s5_competition_likelihood: undefined,
-    q_s5_fixes_fail: "",
-    q_s5_fixes_followup: "",
-    q_s5_successful: "",
-    q_s5_successful_followup: "",
+    q5_1_transformers_banner_understanding: undefined,
+    q5_2_halal_advantage_understanding: undefined,
+    q5_3_farm_to_market_understanding: undefined,
+    q5_4_economic_zones_understanding: undefined,
+    q5_5_growth_underinvestment_accuracy: "",
+    q5_6_growth_underinvestment_followup: "",
+    q5_7_halal_cert_impact: undefined,
+    q5_8_halal_cert_likelihood: undefined,
+    q5_9_skills_mismatch_impact: undefined,
+    q5_10_skills_mismatch_likelihood: undefined,
+    q5_11_global_halal_impact: undefined,
+    q5_12_global_halal_likelihood: undefined,
+    q5_13_uae_corridor_impact: undefined,
+    q5_14_uae_corridor_likelihood: undefined,
+    q5_15_competition_impact: undefined,
+    q5_16_competition_likelihood: undefined,
   });
 
   // ── Section 6: Cluster 3 — Enablers ──
@@ -464,15 +461,15 @@ const SurveyWizard: React.FC = () => {
     if (s3.q_s1_aff_base_impact && s3.q_s1_aff_base_likelihood) scores.s1_aff_ri = calculateStrengthRI(s3.q_s1_aff_base_impact, s3.q_s1_aff_base_likelihood);
 
     // Section 4: Threats & Weaknesses
-    if (s4.q_s4_climate_impact && s4.q_s4_climate_likelihood) scores.s4_climate_vi = calculateThreatVI(s4.q_s4_climate_impact, s4.q_s4_climate_likelihood);
-    if (s4.q_s4_pestalotiopsis_impact && s4.q_s4_pestalotiopsis_likelihood) scores.s4_pestalotiopsis_vi = calculateThreatVI(s4.q_s4_pestalotiopsis_impact, s4.q_s4_pestalotiopsis_likelihood);
-    if (s4.q_s4_postharvest_impact && s4.q_s4_postharvest_likelihood) scores.s4_postharvest_risk = calculateWeaknessRisk(s4.q_s4_postharvest_impact, s4.q_s4_postharvest_likelihood);
-    if (s4.q_s4_poverty_impact && s4.q_s4_poverty_likelihood) scores.s4_poverty_risk = calculateWeaknessRisk(s4.q_s4_poverty_impact, s4.q_s4_poverty_likelihood);
+    if (s4.q4_4_climate_impact && s4.q4_5_climate_likelihood) scores.s4_climate_vi = calculateThreatVI(s4.q4_4_climate_impact, s4.q4_5_climate_likelihood);
+    if (s4.q4_6_pestalotiopsis_impact && s4.q4_7_pestalotiopsis_likelihood) scores.s4_pestalotiopsis_vi = calculateThreatVI(s4.q4_6_pestalotiopsis_impact, s4.q4_7_pestalotiopsis_likelihood);
+    if (s4.q4_8_postharvest_impact && s4.q4_9_postharvest_likelihood) scores.s4_postharvest_risk = calculateWeaknessRisk(s4.q4_8_postharvest_impact, s4.q4_9_postharvest_likelihood);
+    if (s4.q4_10_poverty_impact && s4.q4_11_poverty_likelihood) scores.s4_poverty_risk = calculateWeaknessRisk(s4.q4_10_poverty_impact, s4.q4_11_poverty_likelihood);
 
     // Section 5: Mixed (W, O, T)
-    if (s5.q_s5_halal_cert_impact && s5.q_s5_halal_cert_likelihood) scores.s5_halal_risk = calculateWeaknessRisk(s5.q_s5_halal_cert_impact, s5.q_s5_halal_cert_likelihood);
-    if (s5.q_s5_global_halal_impact && s5.q_s5_global_halal_likelihood) scores.s5_global_ri = calculateOpportunityRI(s5.q_s5_global_halal_impact, s5.q_s5_global_halal_likelihood);
-    if (s5.q_s5_competition_impact && s5.q_s5_competition_likelihood) scores.s5_competition_vi = calculateThreatVI(s5.q_s5_competition_impact, s5.q_s5_competition_likelihood);
+    if (s5.q5_7_halal_cert_impact && s5.q5_8_halal_cert_likelihood) scores.s5_halal_risk = calculateWeaknessRisk(s5.q5_7_halal_cert_impact, s5.q5_8_halal_cert_likelihood);
+    if (s5.q5_11_global_halal_impact && s5.q5_12_global_halal_likelihood) scores.s5_global_ri = calculateOpportunityRI(s5.q5_11_global_halal_impact, s5.q5_12_global_halal_likelihood);
+    if (s5.q5_15_competition_impact && s5.q5_16_competition_likelihood) scores.s5_competition_vi = calculateThreatVI(s5.q5_15_competition_impact, s5.q5_16_competition_likelihood);
 
     // Section 6: Enablers (S, W, O, T)
     if (s6.q_s6_youth_pop_impact && s6.q_s6_youth_pop_likelihood) scores.s6_youth_ri = calculateStrengthRI(s6.q_s6_youth_pop_impact, s6.q_s6_youth_pop_likelihood);
@@ -572,40 +569,37 @@ const SurveyWizard: React.FC = () => {
         q_s1_aff_base_likelihood: s3.q_s1_aff_base_likelihood,
 
         // Step 4
-        q4_1_priorities: s4.q4_1_priorities,
-        q4_2_maguindanao_logistics: s4.q4_2_maguindanao_logistics || undefined,
-        q4_3_feasibility: s4.q4_3_feasibility,
-        q_s4_climate_impact: s4.q_s4_climate_impact,
-        q_s4_climate_likelihood: s4.q_s4_climate_likelihood,
-        q_s4_pestalotiopsis_impact: s4.q_s4_pestalotiopsis_impact,
-        q_s4_pestalotiopsis_likelihood: s4.q_s4_pestalotiopsis_likelihood,
-        q_s4_postharvest_impact: s4.q_s4_postharvest_impact,
-        q_s4_postharvest_likelihood: s4.q_s4_postharvest_likelihood,
-        q_s4_poverty_impact: s4.q_s4_poverty_impact,
-        q_s4_poverty_likelihood: s4.q_s4_poverty_likelihood,
-        q_s4_tragedy_commons: s4.q_s4_tragedy_commons || undefined,
-        q_s4_tragedy_followup: s4.q_s4_tragedy_followup || undefined,
-        q_s4_limits_growth: s4.q_s4_limits_growth || undefined,
+        q4_1_foundations_banner_understanding: s4.q4_1_foundations_banner_understanding,
+        q4_2_tragedy_commons_accuracy: s4.q4_2_tragedy_commons_accuracy || undefined,
+        q4_3_tragedy_followup: s4.q4_3_tragedy_followup || undefined,
+        q4_4_climate_impact: s4.q4_4_climate_impact,
+        q4_5_climate_likelihood: s4.q4_5_climate_likelihood,
+        q4_6_pestalotiopsis_impact: s4.q4_6_pestalotiopsis_impact,
+        q4_7_pestalotiopsis_likelihood: s4.q4_7_pestalotiopsis_likelihood,
+        q4_8_postharvest_impact: s4.q4_8_postharvest_impact,
+        q4_9_postharvest_likelihood: s4.q4_9_postharvest_likelihood,
+        q4_10_poverty_impact: s4.q4_10_poverty_impact,
+        q4_11_poverty_likelihood: s4.q4_11_poverty_likelihood,
+        q4_12_limits_growth_accuracy: s4.q4_12_limits_growth_accuracy || undefined,
+        q4_13_limits_followup: s4.q4_13_limits_followup || undefined,
 
         // Step 5
-        q5_1_cold_chain: s5.q5_1_cold_chain || undefined,
-        q5_2_economic_zones: s5.q5_2_economic_zones || undefined,
-        q5_3_barrier: s5.q5_3_barrier || undefined,
-        q5_4_halal_park: s5.q5_4_halal_park || undefined,
-        q_s5_halal_cert_impact: s5.q_s5_halal_cert_impact,
-        q_s5_halal_cert_likelihood: s5.q_s5_halal_cert_likelihood,
-        q_s5_skills_mismatch_impact: s5.q_s5_skills_mismatch_impact,
-        q_s5_skills_mismatch_likelihood: s5.q_s5_skills_mismatch_likelihood,
-        q_s5_global_halal_impact: s5.q_s5_global_halal_impact,
-        q_s5_global_halal_likelihood: s5.q_s5_global_halal_likelihood,
-        q_s5_uae_corridor_impact: s5.q_s5_uae_corridor_impact,
-        q_s5_uae_corridor_likelihood: s5.q_s5_uae_corridor_likelihood,
-        q_s5_competition_impact: s5.q_s5_competition_impact,
-        q_s5_competition_likelihood: s5.q_s5_competition_likelihood,
-        q_s5_fixes_fail: s5.q_s5_fixes_fail || undefined,
-        q_s5_fixes_followup: s5.q_s5_fixes_followup || undefined,
-        q_s5_successful: s5.q_s5_successful || undefined,
-        q_s5_successful_followup: s5.q_s5_successful_followup || undefined,
+        q5_1_transformers_banner_understanding: s5.q5_1_transformers_banner_understanding,
+        q5_2_halal_advantage_understanding: s5.q5_2_halal_advantage_understanding,
+        q5_3_farm_to_market_understanding: s5.q5_3_farm_to_market_understanding,
+        q5_4_economic_zones_understanding: s5.q5_4_economic_zones_understanding,
+        q5_5_growth_underinvestment_accuracy: s5.q5_5_growth_underinvestment_accuracy || undefined,
+        q5_6_growth_underinvestment_followup: s5.q5_6_growth_underinvestment_followup || undefined,
+        q5_7_halal_cert_impact: s5.q5_7_halal_cert_impact,
+        q5_8_halal_cert_likelihood: s5.q5_8_halal_cert_likelihood,
+        q5_9_skills_mismatch_impact: s5.q5_9_skills_mismatch_impact,
+        q5_10_skills_mismatch_likelihood: s5.q5_10_skills_mismatch_likelihood,
+        q5_11_global_halal_impact: s5.q5_11_global_halal_impact,
+        q5_12_global_halal_likelihood: s5.q5_12_global_halal_likelihood,
+        q5_13_uae_corridor_impact: s5.q5_13_uae_corridor_impact,
+        q5_14_uae_corridor_likelihood: s5.q5_14_uae_corridor_likelihood,
+        q5_15_competition_impact: s5.q5_15_competition_impact,
+        q5_16_competition_likelihood: s5.q5_16_competition_likelihood,
 
         // Step 6
         q6_1_halal_sector_rank: s6.q6_1_halal_sector_rank || undefined,
