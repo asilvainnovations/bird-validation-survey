@@ -1,20 +1,11 @@
-// src/lib/bird-urls.ts
-// BIRD 2026–2035 · Centralized URL Registry
-// Videos, Images, and Site Pages for Context, Reference, Visualizations & Interactions
-// Updated: 2026-07-23 — Complete URL mapping per user specifications
-
+// ═══════════════════════════════════════════════════════════════════════════════
+// VIDEOS
+// ═══════════════════════════════════════════════════════════════════════════════
 export const BIRD_VIDEOS = {
-  overview: {
-    title: "Bangsamoro Investment Roadmap 2026‑2035 | Southeast Asia's Hub for Ethical & Sustainable Growth",
-    url: "https://youtu.be/UCi2dVUmSbE",
-    duration: "~7 min",
-    section: "general",
-    description: "Discover how the Bangsamoro Investment Roadmap (BIRD) 2026‑2035 positions BARMM as Southeast Asia's hub for resilient, ethical, and sustainable investments — highlighting its growth momentum, the risks ahead, and the frameworks driving transformation.",
-  },
   systemsThinking: {
     title: "Systems Thinking: Moving from Checklists to Interconnected Investment Ecosystem",
-    url: "https://youtu.be/VBAHk0WYz_c",
-    duration: "~4 min",
+    url: "https://youtu.be/VBAHk0WYz_c?si=sbA9QhA4M791C1ET",
+    duration: "~10 min",
     section: "section0",
     description: "Discover how the Bangsamoro Investment Roadmap (BIRD 2026–2035) turns fragmented efforts into a unified engine of growth. This video unpacks: Systems Thinking — shifting from checklists to interconnected strategies; Feedback Loops — cycles that amplify progress and stabilize change; Causal Loop Diagrams — visuals that expose traps and leverage points; and Leverage Strategies — small shifts sparking big gains in governance, infrastructure, and equity.",
   },
@@ -32,12 +23,23 @@ export const BIRD_VIDEOS = {
     section: "section10",
     description: "Discover the strategic choices shaping Bangsamoro's Investment Roadmap 2026–2035. This video shows how well-crafted strategies and priorities can fuel inclusive growth, sustainability, and regional competitiveness in BARMM.",
   },
+  overview: {
+    title: "Bangsamoro Investment Roadmap 2026‑2035 | Southeast Asia's Hub for Ethical & Sustainable Growth",
+    url: "https://youtu.be/UCi2dVUmSbE",
+    duration: "~7 min",
+    section: "section12",
+    description: "Discover how the Bangsamoro Investment Roadmap (BIRD) 2026‑2035 positions BARMM as Southeast Asia's hub for resilient, ethical, and sustainable investments — highlighting its growth momentum, the risks ahead, and the frameworks driving transformation.",
+  },
 } as const;
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// IMAGES
+// ═══════════════════════════════════════════════════════════════════════════════
 export const BIRD_IMAGES = {
-  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // ═════════════════════════════════════════════════════════════════════════════
   // SECTION 0: VALIDATION SURVEY & ORIENTATION
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════
   validationSurveyBanner: {
     title: "BIRD Validation Survey 2026-2035",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Validation%20Survey%20Banner.png",
@@ -48,7 +50,7 @@ export const BIRD_IMAGES = {
   },
   anatomyCLD: {
     title: "Anatomy of Causal Loop Diagram",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Anatomy%20of%20CLD.png",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/3-Anatomy%20of%20CLD.png",
     category: "systems",
     section: "section0",
     alt: "Anatomy of Causal Loop Diagram",
@@ -56,16 +58,16 @@ export const BIRD_IMAGES = {
   },
   feedbackLoops: {
     title: "Feedback Loops and Leverage Points",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Feedback%20Loops%20and%20Leverage%20Points.png",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/6-Anatomy%20of%20Systems%20Traps.png",
     category: "systems",
     section: "section0",
     alt: "Feedback Loops and Leverage Points",
     description: "Visual explanation of feedback loops (Reinforcing and Balancing) and Meadows' Leverage Hierarchy showing Transformative (L1–L2), Systemic (L5–L6), and Incremental (L10) leverage points.",
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════
   // SECTION 3: BEIE FRAMEWORK & SYSTEMS THINKING
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════
   systemsBasedReframing: {
     title: "Why the Need for Systems-Based Reframing",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Why%20the%20need%20for%20Systems-Based%20reframing.png",
@@ -123,9 +125,9 @@ export const BIRD_IMAGES = {
     description: "Two interconnected reinforcing loops (R1: Investment-Development, R2: Governance-Investor Confidence) that drive sustained development.",
   },
 
-    // ═══════════════════════════════════════════════════════════════════════════════
-  // SECTION 4: CLUSTER 1 - FOUNDATIONS
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════
+  // SECTION 4: CLUSTER 1 — FOUNDATIONS
+  // ═════════════════════════════════════════════════════════════════════════════
   cluster1Foundations: {
     title: "Cluster 1: Foundations",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Cluster%201-Foundations.png",
@@ -143,19 +145,19 @@ export const BIRD_IMAGES = {
     description: "Warning of how uncoordinated exploitation of shared natural resources leads to systemic collapse across BARMM's Foundations cluster.",
   },
 
-  // ══════════════════════════════════════════════════════════════════════════════
-  // SECTION 5: CLUSTER 2 - TRANSFORMERS
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════
+  // SECTION 5: CLUSTER 2 — TRANSFORMERS
+  // ═════════════════════════════════════════════════════════════════════════════
   cluster2Transformers: {
     title: "Cluster 2: Transformers",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Cluster%202%20_%20Transformers.png",
     category: "cluster",
     section: "section5",
     alt: "Transformers Cluster",
-    description: "Engines of Value Creation: Raw Material → High-Value Processing → Premium Export targeting the ASEAN Halal market.",
+    description: "Engines of Value Creation — converting raw materials into high-value halal products and premium exports.",
   },
   halalIndustryAdvantage: {
-    title: "The Halal Industry Advantage: Capitalizing Cultural Advantage",
+    title: "The Halal Industry Advantage: Capitalizing on Cultural Heritage",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Capitalizing%20Cultural%20Advantage%20-%20Halal%20Industry%20Adv.png",
     category: "cluster",
     section: "section5",
@@ -187,9 +189,9 @@ export const BIRD_IMAGES = {
     description: "Illustrates how rapid investment expansion stalls when institutional capacity fails to keep pace.",
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // SECTION 6: CLUSTER 3 - ENABLERS
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════
+  // SECTION 6: CLUSTER 3 — ENABLERS
+  // ═════════════════════════════════════════════════════════════════════════════
   cluster3Enablers: {
     title: "Cluster 3: Enablers",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Cluster%203%20Enablers.png",
@@ -199,7 +201,7 @@ export const BIRD_IMAGES = {
     description: "Constructing the Support Architecture: Digital Connectivity, Physical Infrastructure, Education & Skills, Health & Social Protection.",
   },
   skillsEducationGap: {
-    title: "Skills and Education Gap",
+    title: "Skills and Education Gap Analysis",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Skills%20and%20Education%20Gap.png",
     category: "cluster",
     section: "section6",
@@ -215,7 +217,7 @@ export const BIRD_IMAGES = {
     description: "Sequential stages: Energy Priming → Physical Mobility → Logistics Integrity → Industrial Scaling.",
   },
   digitalTransformation: {
-    title: "Digital Transformation Master Plan",
+    title: "Digital Transformation Master Plan (BEGMP)",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Digital%20Transformation%20Master%20Plan.png",
     category: "cluster",
     section: "section6",
@@ -255,9 +257,9 @@ export const BIRD_IMAGES = {
     description: "Illustrates how rapid investment expansion slows when structural ceilings are reached.",
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // SECTION 7: CLUSTER 4 - CONNECTORS
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════
+  // SECTION 7: CLUSTER 4 — CONNECTORS
+  // ═════════════════════════════════════════════════════════════════════════════
   cluster4Connectors: {
     title: "Cluster 4: Connectors",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Cluster%204_%20Connectors.png",
@@ -267,12 +269,12 @@ export const BIRD_IMAGES = {
     description: "Linking Local Value to Global Demand: BIMP-EAGA Corridor and UAE & GCC trade routes.",
   },
   connectivityCapital: {
-    title: "The Connectivity Capital",
+    title: "The Connectivity Capital Matrix",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/The%20Connectivity%20Capital%20.png",
     category: "connectivity",
     section: "section7",
     alt: "Connectivity Capital",
-    description: "Categorizing the Investment Pipeline: Physical Pipelines, Digital Backbones, Market-Access Assets.",
+    description: "Three pillars: Physical Pipelines, Digital Backbones, Market-Access Assets.",
   },
   integratingZones: {
     title: "Critical Test: Integrating Zones & Scaling Capital",
@@ -283,55 +285,55 @@ export const BIRD_IMAGES = {
     description: "Visualizes challenge of linking physical connectivity with ethical financing.",
   },
   provincialSpecializedNode: {
-    title: "Layer 1: Provincial Specialized Node and Equity - One Bangsamoro",
+    title: "Layer 1: Provincial Specialized Nodes — One Bangsamoro",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Layer%201%20-%20Provincial%20-%20Geopolitical%20Specialized%20Nodes.png",
     category: "provincial",
     section: "section7",
     alt: "Provincial Nodes",
-    description: "Geopolitical Specialized Nodes: Mainland Nodes (Maguindanao, Lanao, SGA) and Archipelagic Hubs (Basilan, Tawi-Tawi).",
+    description: "Geopolitical Specialized Nodes: Mainland Nodes and Archipelagic Hubs forming a connected network.",
   },
   trappedValue: {
-    title: "The Trapped Value",
+    title: "The Trapped Value: Geographic Reality",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/The%20Trapped%20Value.png",
     category: "provincial",
     section: "section7",
     alt: "Trapped Value",
-    description: "Geographic Reality: We Cannot Export Value We Cannot Move — farm-to-market roads and ports must precede agro-industrial scale-up.",
+    description: "We Cannot Export Value We Cannot Move — limited connectivity traps economic potential.",
   },
   revitalizingMaritime: {
     title: "Revitalizing the Maritime Trade",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Revitalizing%20the%20Maritime%20Trade.png",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Revitalizing%20the%20Maritime%20Trade.png",
     category: "connectivity",
     section: "section7",
     alt: "Maritime Trade",
-    description: "Mapping maritime trade flows and proposed port and logistics upgrades to unlock regional exports.",
+    description: "Infographic mapping maritime trade flows and proposed port and logistics upgrades to unlock regional exports.",
   },
   shatteringIsolation: {
-    title: "Shattering Geographic Isolation",
+    title: "The Archipelagic Bridge: Shattering Geographic Isolation",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Shattering%20Geographical%20Isolation.png",
     category: "connectivity",
     section: "section7",
     alt: "Archipelagic Bridge",
-    description: "Strategic infrastructure: Zamboanga-Basilan Interconnection (₱6.67B), Basilan-Zamboanga Bridge (31km), Bongao Bridge (541m).",
+    description: "Strategic infrastructure: ZBIP (₱6.67B), Basilan-Zamboanga Bridge (31km), Bongao Bridge (541m).",
   },
   basilanTawiTawi: {
-    title: "Basilan and Tawi-Tawi",
+    title: "Basilan and Tawi-Tawi: Provincial Endowments & Strategic Leverages",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Basilan%20and%20tawi-Tawi.png",
     category: "provincial",
     section: "section7",
     alt: "Island Provinces",
-    description: "Provincial Endowments & Strategic Leverages: Basilan (Logistics Gateway) and Tawi-Tawi (Maritime & Eco-Tourism Hub).",
+    description: "Basilan (Archipelagic Catalyst) and Tawi-Tawi (Maritime & Eco-Tourism Hub) endowments and leverages.",
   },
   globalIntegration: {
-    title: "Global Integration Vectors",
+    title: "Layer 3: Global Integration Vectors",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Global%20Integration%20Vectors.png",
     category: "connectivity",
     section: "section7",
     alt: "Global Integration",
-    description: "Layer 3: BIMP-EAGA Corridor (3% ASEAN halal market) and UAE & GCC Corridor ($2.3T global halal market).",
+    description: "BIMP-EAGA Corridor (3% ASEAN halal market) and UAE & GCC Corridor ($2.3T global halal market).",
   },
   uaeGccConnectivity: {
-    title: "BARMM Strategic Connectivity vis-à-vis UAE & GCC",
+    title: "BARMM Connectivity vis-à-vis UAE & GCC",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/UAE%20&%20GCC.png",
     category: "connectivity",
     section: "section7",
@@ -343,7 +345,7 @@ export const BIRD_IMAGES = {
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/BARMM%20Connectivity-BIMP-EAGA.png",
     category: "connectivity",
     section: "section7",
-    alt: "BIMP-EAGA",
+    alt: "BIMP-EAGA Map",
     description: "Links provincial hubs to BIMP-EAGA Corridor and UAE & GCC Route.",
   },
   successSuccessful: {
@@ -355,9 +357,9 @@ export const BIRD_IMAGES = {
     description: "Illustrates how initial advantages reinforce uneven development between mainland and island provinces.",
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // SECTION 8: CLUSTER 5 - FINANCIERS
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════
+  // SECTION 8: CLUSTER 5 — FINANCIERS
+  // ═════════════════════════════════════════════════════════════════════════════
   cluster5Financiers: {
     title: "Cluster 5: Financiers",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/38.%20Cluster%205_%20Financiers.png",
@@ -367,19 +369,19 @@ export const BIRD_IMAGES = {
     description: "Powering the Bloodstream of the Economy: Islamic finance through ethical and faith-aligned capital mechanisms.",
   },
   financiersCapitalBloodstream: {
-    title: "The Capital Bloodstream",
+    title: "The Capital Bloodstream: Scaling Shariah-Compliant Finance",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Financiers.png",
     category: "cluster",
     section: "section8",
     alt: "Capital Bloodstream",
-    description: "Scaling Shariah-Compliant Finance: Macro-Capital (Islamic Banking & Sukuk), Risk Mitigation (Takaful), Micro-Access (Islamic Microfinance & Waqf).",
+    description: "Three-tier pyramid: Macro-Capital (Islamic Banking & Sukuk), Risk Mitigation (Takaful), Micro-Access (Islamic Microfinance & Waqf).",
   },
   islamicFinanceRoadmap: {
     title: "Islamic Finance Roadmap (2024–2028)",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Islamic%20Finance%20Roadmap.png",
     category: "cluster",
     section: "section8",
-    alt: "Islamic Finance",
+    alt: "Islamic Finance Roadmap",
     description: "Six progressive layers from Strengthen Islamic Banking Foundation to Develop Human Capital.",
   },
   shiftingBurden: {
@@ -391,17 +393,9 @@ export const BIRD_IMAGES = {
     description: "BARMM's reliance on conventional banking instead of fully investing in Islamic finance institutions.",
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════
   // SECTION 9: OPERATING SYSTEMS
-  // ═══════════════════════════════════════════════════════════════════════════════
-  operatingSystemsOS: {
-    title: "Operating Systems: Moral Governance",
-    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/OS.png",
-    category: "governance",
-    section: "section9",
-    alt: "Moral Governance",
-    description: "Central operating system with three pillars: Peace, Resilience, and Inclusivity.",
-  },
+  // ═════════════════════════════════════════════════════════════════════════════
   moralGovernanceDeRisks: {
     title: "How Moral Governance De-Risks Capital",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/How%20moral%20Governance%20De-Risks%20Capital.png",
@@ -459,9 +453,9 @@ export const BIRD_IMAGES = {
     description: "Three integrated reforms: Institutional (BIF-Net), Fiscal (SIPP & CREATE MORE), Regulatory (BEIE).",
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════
   // SECTION 10: IEDS & STRATEGIC OPTIONS
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════
   identifyLeveragePoints: {
     title: "How to Identify Leverage Points",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/How%20to%20Identify%20Leverage%20Points.png",
@@ -471,7 +465,7 @@ export const BIRD_IMAGES = {
     description: "Three-step process using Donella Meadows' Hierarchy (L1–L12): Diagnostic Synthesis, Mapping the Loops, Tiered Selection.",
   },
   activatingLeveragePoints: {
-    title: "Activating Leverage Points",
+    title: "Activating Strategic Leverage Points",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/Activating%20Leverage%20Points.png",
     category: "leverage",
     section: "section10",
@@ -479,7 +473,7 @@ export const BIRD_IMAGES = {
     description: "Strategic Leverage Points: L3 (Goals & Operating System), L5 (Rules & Incentives), L6 (Information Flows).",
   },
   leverageCapacityTraps: {
-    title: "Leverage Points in Capacity Traps",
+    title: "Leverage Points for Capacity Traps",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Leverage%20Points%20for%20Capacity%20Traps.png",
     category: "leverage",
     section: "section10",
@@ -487,12 +481,12 @@ export const BIRD_IMAGES = {
     description: "Prescription: Front-Loading the Ecosystem Enablers — L10 (Stock-Flow Structure) to break Limits to Growth.",
   },
   icebergModel: {
-    title: "Leverage Points in Governance Traps: The Iceberg Model",
+    title: "The Iceberg Model: Systems Thinking Paradigm",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Iceberg%20Model%20Paradigm.png",
     category: "leverage",
     section: "section10",
     alt: "Iceberg Model",
-    description: "Systems Thinking Paradigm: Events (Top 10%), Structures (Body 40%), Mental Models (Base 50%).",
+    description: "Events (Top 10%), Structures (Body 40%), Mental Models (Base 50%) — going below the waterline.",
   },
   collaborativeGovernance: {
     title: "Architecting Collaborative Governance",
@@ -500,7 +494,7 @@ export const BIRD_IMAGES = {
     category: "leverage",
     section: "section10",
     alt: "Collaborative Governance",
-    description: "Transition from clashing nodes to synchronized network: L1 (Paradigm), L2 (Mindset), L5 (Rules).",
+    description: "Transition from disconnected nodes to synchronized network: L1 (Paradigm), L2 (Mindset), L5 (Rules).",
   },
   archetypesLeveragePoints: {
     title: "6 Archetypes and Leverage Points",
@@ -519,12 +513,12 @@ export const BIRD_IMAGES = {
     description: "Four Distinct Pathways: HEDS (Halal Economy), GEMS (Green Economy), IFES (Infrastructure-First), IEDS (Integrated Ecosystem).",
   },
   strategicOptionsRanking: {
-    title: "Strategic Options Ranking",
+    title: "Strategic Options Ranking and Scoring Matrix",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/3.%20Strategic%20Options%20Ranking.png",
     category: "roadmap",
     section: "section10",
     alt: "Options Ranking",
-    description: "Comparative evaluation across seven weighted criteria: Economic Impact, Systems Leverage, Identity Alignment, Inclusivity, Sustainability, Feasibility, Risk-Return.",
+    description: "Comparative evaluation across seven weighted criteria showing IEDS achieves highest balanced performance (8.93/10).",
   },
   iedsExecution: {
     title: "The Execution Engine: IEDS",
@@ -535,9 +529,9 @@ export const BIRD_IMAGES = {
     description: "Three golden phases: Phase 1 (2026–2028) Activate Enablers, Phase 2 (2029–2032) Scale Transformers, Phase 3 (2033–2035) Consolidate Connectors.",
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════
   // SECTION 11: METRICS ARCHITECTURE
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════
   metricsArchitecture: {
     title: "Metrics Architecture",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/9.%20Metrics%20Architecture.png",
@@ -555,16 +549,16 @@ export const BIRD_IMAGES = {
     description: "Illustrates how development ambitions weaken when institutions lower standards instead of addressing root causes.",
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════
   // SECTION 12: BALANCED SCORECARD
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════
   bscIntangibles: {
     title: "The Balanced Scorecard: Intangibles to Financial Impact",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/BSC%20Intangibles%20to%20Financial%20Impact.png",
     category: "framework",
     section: "section12",
     alt: "Balanced Scorecard",
-    description: "Four-perspective pyramid: Learning & Growth → Internal Processes → Customer/Stakeholder → Financial Impact (550B GRDP, 20,000+ jobs, <20% poverty).",
+    description: "Four-perspective pyramid: Learning & Growth → Internal Processes → Customer/Stakeholder → Financial Impact (₱550B GRDP, 20,000+ jobs, <20% poverty).",
   },
   economicOutcomesBSC: {
     title: "Economic Outcomes in Balanced Scorecard View",
@@ -572,7 +566,7 @@ export const BIRD_IMAGES = {
     category: "framework",
     section: "section12",
     alt: "Economic Outcomes",
-    description: "Four-layer perspectives shaped like a growing tree: Roots (Learning & Growth), Trunk (Internal Process), Branches (Stakeholder), Fruit (Financial).",
+    description: "Four-layer tree: Roots (Learning & Growth), Trunk (Internal Process), Branches (Stakeholder), Fruit (Financial).",
   },
   vision2035: {
     title: "Vision 2035",
@@ -583,9 +577,9 @@ export const BIRD_IMAGES = {
     description: "By 2035, Bangsamoro will be recognized as Southeast Asia's leading hub for resilient, ethical, inclusive, and sustainable investments.",
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════
   // SECTION 13: PRIORITY ACTIONS & BUDGET
-  // ═══════════════════════════════════════════════════════════════════════════════
+  // ═════════════════════════════════════════════════════════════════════════════
   totalCapitalDeployment: {
     title: "Total Capital Deployment Per Phase",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Total%20Capital%20Deployment%20per%20Phase.png",
@@ -594,10 +588,54 @@ export const BIRD_IMAGES = {
     alt: "Capital Deployment",
     description: "Budget/Time Staircase: Phase 1 (2026–2028) ₱15B, Phase 2 (2029–2032) ₱20B, Phase 3 (2033–2035) ₱20B — Total ₱55B.",
   },
+
+  // ═════════════════════════════════════════════════════════════════════════════
+  // BRANDING & GENERAL ASSETS
+  // ═════════════════════════════════════════════════════════════════════════════
+  mtitLogo: {
+    title: "MTIT Logo",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/MTIT%20Logo.png",
+    category: "branding",
+    section: "general",
+    alt: "Ministry of Trade, Investments and Tourism Logo",
+    description: "Official logo of the Ministry of Trade, Investments and Tourism (MTIT), BARMM.",
+  },
+  asilvaLogo: {
+    title: "ASilva Innovations Logo",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/ASilva%20Innovations%20Logo.png",
+    category: "branding",
+    section: "general",
+    alt: "ASilva Innovations Logo",
+    description: "Developer logo for ASilva Innovations.",
+  },
+  infographicRoadmap: {
+    title: "Investment Roadmap 2026-2035 Infographic",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/Infographic-Roadmap.png",
+    category: "branding",
+    section: "general",
+    alt: "Investment Roadmap Infographic",
+    description: "Visual infographic summarizing the BIRD 2026-2035 Investment Roadmap.",
+  },
+  chooseBangsamoro: {
+    title: "Choose Bangsamoro",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Choose%20Bangsamoro.png",
+    category: "branding",
+    section: "general",
+    alt: "Choose Bangsamoro",
+    description: "Promotional image encouraging investment in Bangsamoro.",
+  },
+  investInBangsamoro: {
+    title: "Invest in Bangsamoro",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Invest%20in%20Bangsamoro.png",
+    category: "branding",
+    section: "general",
+    alt: "Invest in Bangsamoro",
+    description: "Promotional image for Bangsamoro investment opportunities.",
+  },
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// BIRD SITES — Complete URL Mapping
+// BIRD SITES
 // ═══════════════════════════════════════════════════════════════════════════════
 export const BIRD_SITES = {
   home: {
@@ -617,7 +655,7 @@ export const BIRD_SITES = {
   },
   validationSurvey: {
     title: "Validation Survey",
-    url: "https://bird-survey.asilvainnovations.com",
+    url: "https://bird-validation-survey.bolt.host",
     description: "Standalone validation survey portal for stakeholder feedback collection, analysis, and reporting.",
   },
   resources: {
@@ -642,7 +680,7 @@ export const BIRD_SITES = {
   },
   birdApp: {
     title: "BIRD App",
-    url: "https://bird-app.asilvainnovations.com",
+    url: "https://bird-app.bolt.host",
     description: "Main BIRD strategic planning application with all modules: SWOT, Systems Thinking, BSC, PAPs, MEL, and AI Assistant.",
   },
   userManual: {
@@ -669,9 +707,10 @@ export type BIRDVideo = typeof BIRD_VIDEOS[keyof typeof BIRD_VIDEOS];
 export type BIRDImage = typeof BIRD_IMAGES[keyof typeof BIRD_IMAGES];
 export type BIRDSite = typeof BIRD_SITES[keyof typeof BIRD_SITES];
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
 // HELPER FUNCTIONS
 // ═══════════════════════════════════════════════════════════════════════════════
+
 /** Get all images for a specific section ID */
 export function getImagesForSection(sectionId: string): BIRDImage[] {
   return Object.values(BIRD_IMAGES).filter(img => img.section === sectionId);
@@ -697,9 +736,7 @@ export function getClusterImages(): BIRDImage[] {
 }
 
 export function getProvincialImages(): BIRDImage[] {
-  return Object.values(BIRD_IMAGES).filter(img =>
-    img.category === "provincial" || img.category === "provincial-outlook"
-  );
+  return Object.values(BIRD_IMAGES).filter(img => img.category === "provincial");
 }
 
 export function getConnectivityImages(): BIRDImage[] {
@@ -734,6 +771,10 @@ export function getGovernanceImages(): BIRDImage[] {
   return Object.values(BIRD_IMAGES).filter(img => img.category === "governance");
 }
 
+export function getBrandingImages(): BIRDImage[] {
+  return Object.values(BIRD_IMAGES).filter(img => img.category === "branding");
+}
+
 // ── Search & discovery ───────────────────────────────────────────────────────
 /** Search images by keyword in title, alt, or description */
 export function searchImages(query: string): BIRDImage[] {
@@ -742,7 +783,7 @@ export function searchImages(query: string): BIRDImage[] {
     img =>
       img.title.toLowerCase().includes(q) ||
       img.alt.toLowerCase().includes(q) ||
-      (img as BIRDImage & { description?: string }).description?.toLowerCase().includes(q)
+      img.description.toLowerCase().includes(q)
   );
 }
 
