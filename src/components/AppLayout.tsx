@@ -1,7 +1,3 @@
-// src/components/AppLayout.tsx
-// BIRD 2026–2035 · Validation Survey Shell
-// Updated: Integrated Theme Toggle, AuthModal, and useAuth hook
-
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { StratLogo } from '@/components/branding/Logo';
@@ -10,6 +6,9 @@ import { AuthModal } from '@/components/auth/AuthModal';
 import { useTheme } from '@/components/theme-provider';
 import { Toggle } from '@/components/ui/toggle';
 import { Loader2, LogIn, LogOut, Menu, X, Sun, Moon } from 'lucide-react';
+
+// ─── SURVEY CORE ────────────────────────────────────────────────────────────
+import SurveyWizard from './strategic/SurveyWizard';
 
 // ─── STATIC COMPANION PAGES (served from /public) ───────────────────────────
 const NAV_LINKS = [
