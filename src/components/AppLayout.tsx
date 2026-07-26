@@ -1,41 +1,71 @@
-// src/components/AppLayout.tsx
-// BIRD 2026–2035 · Validation Survey Shell
-// Updated: Integrated Theme Toggle, AuthModal, and useAuth hook
-
-import React, { useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { StratLogo } from '@/components/branding/Logo';
-import { PlatformBadge } from '@/components/branding/PlatformBadge';
-import { AuthModal } from '@/components/auth/AuthModal';
-import { useTheme } from '@/components/theme-provider';
-import { Toggle } from '@/components/ui/toggle';
-import { Loader2, LogIn, LogOut, Menu, X, Sun, Moon } from 'lucide-react';
+import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { StratLogo } from "@/components/branding/Logo";
+import { PlatformBadge } from "@/components/branding/PlatformBadge";
+import { AuthModal } from "@/components/auth/AuthModal";
+import { useTheme } from "@/components/theme-provider";
+import { Toggle } from "@/components/ui/toggle";
+import { ContextPanel } from "@/components/strategic/ContextPanel";
+import { Button } from "@/components/ui/button";
+import {
+  Loader2,
+  LogIn,
+  LogOut,
+  Menu,
+  X,
+  Sun,
+  Moon,
+  BookOpen,
+  PanelRightClose,
+  PanelRightOpen,
+} from "lucide-react";
 
 // ─── STATIC COMPANION PAGES (served from /public) ───────────────────────────
 const NAV_LINKS = [
-  { label: 'Orientation', href: '/survey-orientation.html' },
-  { label: 'Live Dashboard', href: '/survey-dashboard.html' },
-  { label: 'Resources', href: '/resources.html' },
-  { label: 'Privacy', href: '/privacy-policy.html' },
+  { label: "Orientation", href: "/survey-orientation.html" },
+  { label: "Live Dashboard", href: "/survey-dashboard.html" },
+  { label: "Resources", href: "/resources.html" },
+  { label: "Privacy", href: "/privacy-policy.html" },
 ] as const;
 
 // ─── MAIN LAYOUT ────────────────────────────────────────────────────────────
 const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const { user, profile, isAuthenticated, isLoading: authLoading, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
-  
+  const location = useLocation();
+
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [contextPanelOpen, setContextPanelOpen] = useState(false);
+
+  // Derive section ID from pathname for ContextPanel context-awareness
+  const sectionId = React.useMemo(() => {
+    const path = location.pathname;
+    if (path.includes("section0") || path === "/" || path === "/validation-survey") return "section0";
+    if (path.includes("section3")) return "section3";
+    if (path.includes("section4")) return "section4";
+    if (path.includes("section5")) return "section5";
+    if (path.includes("section6")) return "section6";
+    if (path.includes("section7")) return "section7";
+    if (path.includes("section8")) return "section8";
+    if (path.includes("section9")) return "section9";
+    if (path.includes("section10")) return "section10";
+    if (path.includes("section11")) return "section11";
+    if (path.includes("section12")) return "section12";
+    if (path.includes("section13")) return "section13";
+    return undefined;
+  }, [location.pathname]);
 
   const userDisplayInfo = React.useMemo(() => {
-    const email = user?.email || '';
-    const name = profile?.full_name || email.split('@')[0] || 'Respondent';
+    const email = user?.email || "";
+    const name = profile?.full_name || email.split("@")[0] || "Respondent";
     const initials = (profile?.full_name || email)
       .split(/[\s@]+/)
       .filter(Boolean)
       .slice(0, 2)
       .map((p) => p[0]?.toUpperCase())
-      .join('') || 'R';
+      .join("") || "R";
     return { name, email, initials };
   }, [user, profile]);
 
@@ -53,8 +83,12 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
           </div>
           <div className="absolute -bottom-2 -right-2 w-8 h-8 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
         </div>
-        <h2 className="text-[#ecfdf5] font-bold text-xl mb-2">Loading BIRD Validation Survey</h2>
-        <p className="text-[#ecfdf5]/50 text-sm">Preparing the stakeholder validation instrument…</p>
+        <h2 className="text-[#ecfdf5] font-bold text-xl mb-2">
+          Loading BIRD Validation Survey
+        </h2>
+        <p className="text-[#ecfdf5]/50 text-sm">
+          Preparing the stakeholder validation instrument…
+        </p>
       </div>
     );
   }
@@ -64,7 +98,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
       {/* ── Header ── */}
       <header className="sticky top-0 z-40 border-b border-[#C9A84C]/15 bg-[#022c22]/85 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
-          
           {/* Logo */}
           <a href="/" className="flex items-center gap-3 min-w-0">
             <StratLogo size="sm" variant="icon" />
@@ -95,20 +128,40 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
             <div className="h-6 w-px bg-[#C9A84C]/20" />
 
             <div className="flex items-center gap-2">
+              {/* Context Panel Toggle */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setContextPanelOpen((v) => !v)}
+                className="text-[#ecfdf5]/60 hover:text-[#C9A84C] hover:bg-white/5 text-xs"
+                aria-label="Toggle context panel"
+              >
+                {contextPanelOpen ? (
+                  <PanelRightOpen className="w-4 h-4" />
+                ) : (
+                  <PanelRightClose className="w-4 h-4" />
+                )}
+                <span className="ml-1 hidden lg:inline">Context</span>
+              </Button>
+
               {/* Theme Toggle */}
               <Toggle
-                pressed={theme === 'dark'}
-                onPressedChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                pressed={theme === "dark"}
+                onPressedChange={() =>
+                  setTheme(theme === "dark" ? "light" : "dark")
+                }
                 className="text-[#ecfdf5]/60 hover:text-[#C9A84C] hover:bg-white/5 data-[state=on]:text-[#C9A84C] data-[state=on]:bg-[#C9A84C]/10"
                 aria-label="Toggle theme"
               >
-                {theme === 'dark' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+                {theme === "dark" ? (
+                  <Moon className="w-4 h-4" />
+                ) : (
+                  <Sun className="w-4 h-4" />
+                )}
               </Toggle>
 
               {/* Auth State */}
-              {authLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin text-[#C9A84C]" />
-              ) : isAuthenticated ? (
+              {isAuthenticated ? (
                 <div className="flex items-center gap-2">
                   <div className="flex flex-col items-end mr-1">
                     <span className="text-xs font-medium text-[#ecfdf5] truncate max-w-[120px]">
@@ -139,20 +192,39 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
 
           {/* Mobile Menu Toggle */}
           <div className="flex md:hidden items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setContextPanelOpen((v) => !v)}
+              className="text-[#ecfdf5]/60 hover:text-[#C9A84C]"
+              aria-label="Toggle context panel"
+            >
+              <BookOpen className="w-4 h-4" />
+            </Button>
             <Toggle
-              pressed={theme === 'dark'}
-              onPressedChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              pressed={theme === "dark"}
+              onPressedChange={() =>
+                setTheme(theme === "dark" ? "light" : "dark")
+              }
               className="text-[#ecfdf5]/60 hover:text-[#C9A84C] hover:bg-white/5 data-[state=on]:text-[#C9A84C] data-[state=on]:bg-[#C9A84C]/10"
               aria-label="Toggle theme"
             >
-              {theme === 'dark' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+              {theme === "dark" ? (
+                <Moon className="w-4 h-4" />
+              ) : (
+                <Sun className="w-4 h-4" />
+              )}
             </Toggle>
             <button
               onClick={() => setMobileNavOpen((v) => !v)}
               className="p-2 rounded-lg text-[#ecfdf5]/70 hover:bg-white/5 transition-colors"
               aria-label="Toggle navigation"
             >
-              {mobileNavOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              {mobileNavOpen ? (
+                <X className="w-4 h-4" />
+              ) : (
+                <Menu className="w-4 h-4" />
+              )}
             </button>
           </div>
         </div>
@@ -173,14 +245,20 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
             <div className="border-t border-white/5 mt-2 pt-2">
               {isAuthenticated ? (
                 <button
-                  onClick={() => { handleSignOut(); setMobileNavOpen(false); }}
+                  onClick={() => {
+                    handleSignOut();
+                    setMobileNavOpen(false);
+                  }}
                   className="w-full flex items-center gap-2 px-2 py-2.5 text-sm text-rose-400 hover:bg-white/5 transition-colors"
                 >
                   <LogOut className="w-4 h-4" /> Sign Out ({userDisplayInfo.name})
                 </button>
               ) : (
                 <button
-                  onClick={() => { setShowAuthModal(true); setMobileNavOpen(false); }}
+                  onClick={() => {
+                    setShowAuthModal(true);
+                    setMobileNavOpen(false);
+                  }}
                   className="w-full flex items-center gap-2 px-2 py-2.5 text-sm text-[#C9A84C] hover:bg-white/5 transition-colors"
                 >
                   <LogIn className="w-4 h-4" /> Sign In
@@ -191,21 +269,78 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
         )}
       </header>
 
-      {/* ── Main Content ── */}
-      <main className="flex-1">
-        {children}
-      </main>
+      {/* ── Main Content with optional Context Panel ── */}
+      <div className="flex-1 flex relative">
+        <main className="flex-1 min-w-0">{children}</main>
+
+        {/* Context Panel Sidebar (desktop) */}
+        {contextPanelOpen && (
+          <aside className="hidden lg:block w-80 xl:w-96 border-l border-[#C9A84C]/15 bg-[#011a12]/90 backdrop-blur-md overflow-y-auto">
+            <div className="p-4 sticky top-0">
+              <ContextPanel
+                sectionId={sectionId}
+                showAll={!sectionId}
+                compact={false}
+              />
+            </div>
+          </aside>
+        )}
+
+        {/* Context Panel Drawer (mobile) */}
+        {contextPanelOpen && (
+          <div className="lg:hidden fixed inset-0 z-50 flex">
+            <div
+              className="flex-1 bg-black/50 backdrop-blur-sm"
+              onClick={() => setContextPanelOpen(false)}
+            />
+            <div className="w-80 bg-[#011a12] border-l border-[#C9A84C]/15 overflow-y-auto">
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-bold text-[#C9A84C]">Context & References</h3>
+                  <button
+                    onClick={() => setContextPanelOpen(false)}
+                    className="p-1 rounded hover:bg-white/5"
+                  >
+                    <X className="w-4 h-4 text-[#ecfdf5]/60" />
+                  </button>
+                </div>
+                <ContextPanel
+                  sectionId={sectionId}
+                  showAll={!sectionId}
+                  compact={true}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* ── Footer ── */}
       <footer className="border-t border-white/5 bg-[#011a12]">
         <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#ecfdf5]/40">
           <p>
-            © {new Date().getFullYear()} BOI-MTIT, BARMM · BIRD 2026–2035 Validation Survey · Developed by ASilva Innovations
+            © {new Date().getFullYear()} BOI-MTIT, BARMM · BIRD 2026–2035
+            Validation Survey · Developed by ASilva Innovations
           </p>
           <div className="flex items-center gap-4">
-            <a href="/privacy-policy.html" className="hover:text-[#E8C560] transition-colors">Privacy Policy</a>
-            <a href="/cookie-policy.html" className="hover:text-[#E8C560] transition-colors">Cookie Policy</a>
-            <a href="mailto:boi@bangsamoro.gov.ph" className="hover:text-[#E8C560] transition-colors">Contact</a>
+            <a
+              href="/privacy-policy.html"
+              className="hover:text-[#E8C560] transition-colors"
+            >
+              Privacy Policy
+            </a>
+            <a
+              href="/cookie-policy.html"
+              className="hover:text-[#E8C560] transition-colors"
+            >
+              Cookie Policy
+            </a>
+            <a
+              href="mailto:boi@bangsamoro.gov.ph"
+              className="hover:text-[#E8C560] transition-colors"
+            >
+              Contact
+            </a>
           </div>
         </div>
       </footer>
@@ -214,9 +349,9 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
       <PlatformBadge />
 
       {/* ── Auth Modal ── */}
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
       />
     </div>
   );
