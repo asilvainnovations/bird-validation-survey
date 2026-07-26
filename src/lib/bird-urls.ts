@@ -123,7 +123,7 @@ export const BIRD_IMAGES = {
     description: "Two interconnected reinforcing loops (R1: Investment-Development, R2: Governance-Investor Confidence) that drive sustained development.",
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════════════════════════
   // SECTION 4: CLUSTER 1 - FOUNDATIONS
   // ═══════════════════════════════════════════════════════════════════════════════
   cluster1Foundations: {
