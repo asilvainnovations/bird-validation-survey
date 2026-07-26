@@ -1,10 +1,13 @@
-// src/components/strategic/Section2_Demographics.tsx
-// BIRD 2026–2035 · Section 2: Respondent Profile
-// Updated: 2026-07-23 · Production-ready, GlassCard discarded, schema-aligned
-
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   User,
   MapPin,
@@ -13,7 +16,6 @@ import {
   Briefcase,
   GraduationCap,
   CheckSquare,
-  ChevronDown,
   ShieldCheck,
   Info,
 } from "lucide-react";
@@ -89,7 +91,6 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
     );
   };
 
-  const [provinceOpen, setProvinceOpen] = useState(false);
   const [showCustomProvince, setShowCustomProvince] = useState(false);
 
   const inputClass =
@@ -206,57 +207,31 @@ const Section2_Demographics: React.FC<Section2Props> = ({ data, setData }) => {
               <label className="block text-sm font-medium text-[#022c22] mb-1.5">
                 Province / Region of Engagement <span className="text-red-500">*</span>
               </label>
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setProvinceOpen(!provinceOpen)}
-                  className={cn(
-                    inputClass,
-                    "flex items-center justify-between text-left pr-4",
-                    !data.demo_province && "text-[#64748b]"
-                  )}
-                >
-                  <span className={data.demo_province ? "text-[#022c22]" : "text-[#64748b]"}>
-                    {data.demo_province || "Select your province or region"}
-                  </span>
-                  <ChevronDown
-                    className={cn(
-                      "w-4 h-4 text-[#64748b] transition-transform duration-200",
-                      provinceOpen && "rotate-180"
-                    )}
-                  />
-                </button>
-                
-                {/* Dropdown Menu */}
-                {provinceOpen && (
-                  <div className="absolute z-20 w-full mt-1 bg-white border border-[#C9A84C]/30 rounded-lg shadow-xl max-h-64 overflow-y-auto">
-                    {PROVINCES.map((province) => (
-                      <button
-                        key={province}
-                        type="button"
-                        onClick={() => {
-                          if (province === "Other (please specify)") {
-                            setShowCustomProvince(true);
-                            update("demo_province", "");
-                          } else {
-                            setShowCustomProvince(false);
-                            update("demo_province", province);
-                          }
-                          setProvinceOpen(false);
-                        }}
-                        className={cn(
-                          "w-full px-4 py-2.5 text-sm text-left transition-colors hover:bg-[#ecfdf5]",
-                          data.demo_province === province && !showCustomProvince
-                            ? "bg-[#ecfdf5] text-[#1B4D3E] font-semibold"
-                            : "text-[#022c22]"
-                        )}
-                      >
-                        {province}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              
+              {/* Shadcn Select Component (Fixes clipping/scrolling issues) */}
+              <Select
+                value={data.demo_province}
+                onValueChange={(value) => {
+                  if (value === "Other (please specify)") {
+                    setShowCustomProvince(true);
+                    update("demo_province", ""); // Clear value so user can type
+                  } else {
+                    setShowCustomProvince(false);
+                    update("demo_province", value);
+                  }
+                }}
+              >
+                <SelectTrigger className={cn(inputClass, !data.demo_province && !showCustomProvince && "text-[#64748b]")}>
+                  <SelectValue placeholder="Select your province or region" />
+                </SelectTrigger>
+                <SelectContent className="z-50 max-h-64">
+                  {PROVINCES.map((province) => (
+                    <SelectItem key={province} value={province}>
+                      {province}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
               {/* Conditional "Other" Input */}
               {showCustomProvince && (
