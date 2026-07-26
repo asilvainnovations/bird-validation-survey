@@ -1,28 +1,24 @@
 {
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "outputDirectory": "dist",
-  "framework": "vite",
+  "rewrites": [
+    { "source": "/survey-dashboard", "destination": "/index.html" },
+    { "source": "/survey-dashboard.html", "destination": "/index.html" },
+    { "source": "/survey-orientation", "destination": "/index.html" },
+    { "source": "/survey-orientation.html", "destination": "/index.html" },
+    { "source": "/validation-survey", "destination": "/index.html" },
+    { "source": "/validation-survey.html", "destination": "/index.html" },
+    { "source": "/user-manual", "destination": "/user-manual.html" },
+    { "source": "/resources", "destination": "/resources.html" },
+    { "source": "/privacy-policy", "destination": "/privacy-policy.html" },
+    { "source": "/cookie-policy", "destination": "/cookie-policy.html" },
+    { "source": "/((?!api|_next|static|.*\..*).*)", "destination": "/index.html" }
+  ],
   "headers": [
     {
-      "source": "/assets/(.*)",
+      "source": "/service-worker.js",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-      ]
-    },
-    {
-      "source": "/validation-survey.html",
-      "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https://lydsisparsmvextskevw.supabase.co https://rgvteytgkugdqdodedxq.databasepad.com; connect-src 'self' https://lydsisparsmvextskevw.supabase.co; frame-src https://www.youtube.com; manifest-src 'self';"
-        },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" },
+        { "key": "Service-Worker-Allowed", "value": "/" }
       ]
     }
-  ],
-  "rewrites": [
-    { "source": "/((?!api/|.*\\..*).*)", "destination": "/index.html" }
   ]
 }
