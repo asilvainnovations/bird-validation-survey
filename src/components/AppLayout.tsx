@@ -8,9 +8,8 @@ import { StratLogo } from '@/components/branding/Logo';
 import { PlatformBadge } from '@/components/branding/PlatformBadge';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { useTheme } from '@/components/theme-provider';
-import { IconSun, IconMoon } from '@/components/ui/icons';
 import { Toggle } from '@/components/ui/toggle';
-import { Loader2, LogIn, LogOut, Menu, X } from 'lucide-react';
+import { Loader2, LogIn, LogOut, Menu, X, Sun, Moon } from 'lucide-react';
 
 // ─── STATIC COMPANION PAGES (served from /public) ───────────────────────────
 const NAV_LINKS = [
@@ -21,7 +20,7 @@ const NAV_LINKS = [
 ] as const;
 
 // ─── MAIN LAYOUT ────────────────────────────────────────────────────────────
-const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const { user, profile, isAuthenticated, isLoading: authLoading, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   
@@ -43,6 +42,22 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const handleSignOut = async () => {
     await signOut();
   };
+
+  // ── Full-screen loader while auth session initializes ──
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#011a12] flex flex-col items-center justify-center p-6">
+        <div className="relative mb-6">
+          <div className="w-20 h-20 rounded-full overflow-hidden ring-2 ring-[#C9A84C] shadow-2xl border border-white/20 animate-pulse">
+            <StratLogo size="lg" variant="icon" />
+          </div>
+          <div className="absolute -bottom-2 -right-2 w-8 h-8 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
+        </div>
+        <h2 className="text-[#ecfdf5] font-bold text-xl mb-2">Loading BIRD Validation Survey</h2>
+        <p className="text-[#ecfdf5]/50 text-sm">Preparing the stakeholder validation instrument…</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#011a12] text-[#ecfdf5] flex flex-col">
@@ -87,7 +102,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 className="text-[#ecfdf5]/60 hover:text-[#C9A84C] hover:bg-white/5 data-[state=on]:text-[#C9A84C] data-[state=on]:bg-[#C9A84C]/10"
                 aria-label="Toggle theme"
               >
-                {theme === 'dark' ? <IconMoon className="w-4 h-4" /> : <IconSun className="w-4 h-4" />}
+                {theme === 'dark' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
               </Toggle>
 
               {/* Auth State */}
@@ -130,7 +145,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               className="text-[#ecfdf5]/60 hover:text-[#C9A84C] hover:bg-white/5 data-[state=on]:text-[#C9A84C] data-[state=on]:bg-[#C9A84C]/10"
               aria-label="Toggle theme"
             >
-              {theme === 'dark' ? <IconMoon className="w-4 h-4" /> : <IconSun className="w-4 h-4" />}
+              {theme === 'dark' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
             </Toggle>
             <button
               onClick={() => setMobileNavOpen((v) => !v)}
