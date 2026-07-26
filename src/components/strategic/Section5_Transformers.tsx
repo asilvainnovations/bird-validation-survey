@@ -19,6 +19,7 @@ import {
   Link2,
   Award,
   Package,
+  Users,
 } from "lucide-react";
 import { BIRD_IMAGES } from "@/lib/bird-urls";
 import {
@@ -27,22 +28,14 @@ import {
   calculateThreatVI,
 } from "@/lib/formulas";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TYPES — Aligned with SWOT_Scale_Questions.md & CLDs_Systems_Archetypes_Questions.md
-// ─────────────────────────────────────────────────────────────────────────────
-
+// ── Types ────────────────────────────────────────────────────────────────────
 export interface Section5Data {
-  // Understanding validation
   q5_1_transformers_banner_understanding?: number;
   q5_2_halal_advantage_understanding?: number;
   q5_3_farm_to_market_understanding?: number;
   q5_4_economic_zones_understanding?: number;
-
-  // Archetype: Growth and Underinvestment
   q5_5_growth_underinvestment_accuracy?: string;
   q5_6_growth_underinvestment_followup?: string;
-
-  // ── Strengths ──
   q5_s1_halal_legitimacy_impact?: number;
   q5_s1_halal_legitimacy_likelihood?: number;
   q5_s2_domestic_demand_impact?: number;
@@ -51,16 +44,12 @@ export interface Section5Data {
   q5_s3_polloc_freeport_likelihood?: number;
   q5_s4_cultural_heritage_impact?: number;
   q5_s4_cultural_heritage_likelihood?: number;
-
-  // ── Weaknesses ──
   q5_w1_halal_cert_impact?: number;
   q5_w1_halal_cert_likelihood?: number;
   q5_w2_cold_chain_impact?: number;
   q5_w2_cold_chain_likelihood?: number;
   q5_w3_market_linkages_impact?: number;
   q5_w3_market_linkages_likelihood?: number;
-
-  // ── Threats ──
   q5_t1_standards_recognition_impact?: number;
   q5_t1_standards_recognition_likelihood?: number;
 }
@@ -70,10 +59,7 @@ interface Section5Props {
   onChange: (data: Section5Data) => void;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// REUSABLE SCALE SELECTOR
-// ─────────────────────────────────────────────────────────────────────────────
-
+// ── Reusable Scale Selector ──────────────────────────────────────────────────
 const ScaleSelector: React.FC<{
   value?: number;
   onSelect: (v: number) => void;
@@ -99,17 +85,14 @@ const ScaleSelector: React.FC<{
         </Button>
       ))}
     </div>
-    <div className="flex justify-between text-[10px] text-[#64748b] dark:text-[#ecfdf5]/50 px-1">
+    <div className="flex justify-between text-[10px] text-[#64748b] dark:text-[#ecfdf5]/50 px-1 max-w-[260px]">
       <span>{labels[0]}</span>
       <span>{labels[1]}</span>
     </div>
   </div>
 );
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SWOT FACTOR CARD
-// ─────────────────────────────────────────────────────────────────────────────
-
+// ── SWOT Factor Card ───────────────────────────────────────────────────────
 interface SwotFactorProps {
   icon: React.ReactNode;
   label: string;
@@ -205,10 +188,7 @@ const SwotFactor: React.FC<SwotFactorProps> = ({
   );
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MAIN COMPONENT
-// ─────────────────────────────────────────────────────────────────────────────
-
+// ── Main Component ───────────────────────────────────────────────────────────
 const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
   const update = <K extends keyof Section5Data>(
     field: K,
@@ -220,7 +200,7 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
   const activeBtn =
     "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90 dark:bg-[#C9A84C] dark:text-[#022c22] dark:border-[#C9A84C]";
   const inactiveBtn =
-    "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C] dark:bg-[#022c22]/50 dark:text-[#ecfdf5] dark:border-[#C9A84C]/30";
+    "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10";
 
   const understandingQuestions = [
     {
@@ -237,7 +217,7 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
     },
     {
       field: "q5_4_economic_zones_understanding" as keyof Section5Data,
-      label: "How well do you understand the role of Polloc Freeport and WOW Matanog SEZ in industrial scaling?",
+      label: "How well do you understand the role of Pollock Freeport and WOW Matanog SEZ in industrial scaling?",
     },
   ];
 
@@ -247,33 +227,33 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
 
   return (
     <div className="space-y-8">
-      {/* ── Header ── */}
+      {/* Header */}
       <div className="flex items-center gap-3 mb-2">
         <Factory className="w-6 h-6 text-[#C9A84C]" />
         <h2 className="text-xl font-bold text-[#022c22] dark:text-[#ecfdf5]">
           Section 5: Cluster 2 — Transformers
         </h2>
       </div>
-      <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 mb-4 -mt-2">
+      <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 -mt-5 mb-2">
         Engines of Value Creation — converting raw materials into higher-value halal products and premium exports
       </p>
 
-      {/* ── 1. Banner Image ── */}
+      {/* Banner Image */}
       <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
         <img
-          src={BIRD_IMAGES.cluster2Transformers.url}
-          alt={BIRD_IMAGES.cluster2Transformers.alt}
+          src={BIRD_IMAGES.cluster2Transformers?.url || BIRD_IMAGES.validationSurveyBanner?.url}
+          alt={BIRD_IMAGES.cluster2Transformers?.alt || "Transformers Cluster"}
           className="w-full h-auto max-h-[420px] object-contain transition-transform group-hover:scale-[1.02]"
           loading="lazy"
         />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-5">
-          <p className="text-xs text-white/90 italic">
-            {BIRD_IMAGES.cluster2Transformers.title}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5">
+          <p className="text-xs italic text-white/70">
+            {BIRD_IMAGES.cluster2Transformers?.title || "Cluster 2: Transformers"}
           </p>
         </div>
       </div>
 
-      {/* ── 2. Understanding Questions ── */}
+      {/* Understanding Questions */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
@@ -287,7 +267,7 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
               className={cn(
                 "space-y-3",
                 idx < understandingQuestions.length - 1 &&
-                  "pb-6 border-b border-[#C9A84C]/20 dark:border-[#C9A84C]/10"
+                  "pb-6 border-b border-[#C9A84C]/20"
               )}
             >
               <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
@@ -297,7 +277,7 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
                 </span>
               </Label>
               <ScaleSelector
-                value={data[q.field]}
+                value={data[q.field] as number | undefined}
                 onSelect={(v) => update(q.field, v)}
                 labels={["Not at all", "Completely"]}
               />
@@ -306,19 +286,19 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
         </CardContent>
       </Card>
 
-      {/* ── 3. Halal Industry Advantage ── */}
+      {/* Halal Industry Advantage */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardContent className="pt-6 space-y-4">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
             <img
-              src={BIRD_IMAGES.halalIndustryAdvantage.url}
-              alt={BIRD_IMAGES.halalIndustryAdvantage.alt}
+              src={BIRD_IMAGES.halalIndustryAdvantage?.url || ""}
+              alt={BIRD_IMAGES.halalIndustryAdvantage?.alt || "Halal Industry Advantage"}
               className="w-full h-auto object-contain"
               loading="lazy"
             />
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5">
               <p className="text-xs italic text-white/70">
-                {BIRD_IMAGES.halalIndustryAdvantage.title}
+                {BIRD_IMAGES.halalIndustryAdvantage?.title || "Halal Industry Advantage"}
               </p>
             </div>
           </div>
@@ -330,19 +310,19 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
         </CardContent>
       </Card>
 
-      {/* ── 4. Farm-to-Market Pipeline ── */}
+      {/* Farm-to-Market Pipeline */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardContent className="pt-6 space-y-4">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
             <img
-              src={BIRD_IMAGES.farmToMarketPipeline.url}
-              alt={BIRD_IMAGES.farmToMarketPipeline.alt}
+              src={BIRD_IMAGES.farmToMarketPipeline?.url || ""}
+              alt={BIRD_IMAGES.farmToMarketPipeline?.alt || "Farm-to-Market Pipeline"}
               className="w-full h-auto object-contain"
               loading="lazy"
             />
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5">
               <p className="text-xs italic text-white/70">
-                {BIRD_IMAGES.farmToMarketPipeline.title}
+                {BIRD_IMAGES.farmToMarketPipeline?.title || "Farm-to-Market Pipeline"}
               </p>
             </div>
           </div>
@@ -354,7 +334,7 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
         </CardContent>
       </Card>
 
-      {/* ── 5. SWOT Assessment ── */}
+      {/* SWOT Assessment */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
@@ -362,7 +342,7 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
             Risk & Resilience Assessment — Transformers Cluster
           </CardTitle>
           <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 pt-1">
-            Rate each factor&apos;s <strong>Impact</strong> (severity if realized) and{" "}
+            Rate each factor's <strong>Impact</strong> (severity if realized) and{" "}
             <strong>Likelihood</strong> (probability of occurrence) on a 1–5 scale.
           </p>
         </CardHeader>
@@ -400,7 +380,7 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
               />
               <SwotFactor
                 icon={<Landmark className="w-4 h-4" />}
-                label="Polloc Freeport & Economic Zone"
+                label="Pollock Freeport & Economic Zone"
                 code="S3"
                 description="Strategic logistics hub and trade gateway in Maguindanao del Norte."
                 impact={data.q5_s3_polloc_freeport_impact}
@@ -424,7 +404,7 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
           </div>
 
           {/* Weaknesses */}
-          <div className="pt-6 border-t border-[#C9A84C]/10 dark:border-[#C9A84C]/10">
+          <div className="pt-6 border-t border-[#C9A84C]/10">
             <div className="flex items-center gap-2 mb-4">
               <TrendingDown className="w-4 h-4 text-rose-600 dark:text-rose-400" />
               <h3 className="text-sm font-bold text-rose-800 dark:text-rose-300 uppercase tracking-wider">
@@ -469,7 +449,7 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
           </div>
 
           {/* Threats */}
-          <div className="pt-6 border-t border-[#C9A84C]/10 dark:border-[#C9A84C]/10">
+          <div className="pt-6 border-t border-[#C9A84C]/10">
             <div className="flex items-center gap-2 mb-4">
               <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400" />
               <h3 className="text-sm font-bold text-red-800 dark:text-red-300 uppercase tracking-wider">
@@ -491,30 +471,30 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
         </CardContent>
       </Card>
 
-      {/* ── 6. Industrial & Economic Zones ── */}
+      {/* Industrial & Economic Zones */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardContent className="pt-6 space-y-4">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
             <img
-              src={BIRD_IMAGES.industrialEconomicZones.url}
-              alt={BIRD_IMAGES.industrialEconomicZones.alt}
+              src={BIRD_IMAGES.industrialEconomicZones?.url || ""}
+              alt={BIRD_IMAGES.industrialEconomicZones?.alt || "Industrial & Economic Zones"}
               className="w-full h-auto object-contain"
               loading="lazy"
             />
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5">
               <p className="text-xs italic text-white/70">
-                {BIRD_IMAGES.industrialEconomicZones.title}
+                {BIRD_IMAGES.industrialEconomicZones?.title || "Industrial & Economic Zones"}
               </p>
             </div>
           </div>
           <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
-            <strong>Polloc Freeport & EcoZone</strong> (119-hectare agro-industrial hub in Parang, ADB-funded) and{" "}
+            <strong>Pollock Freeport & EcoZone</strong> (119-hectare agro-industrial hub in Parang, ADB-funded) and{" "}
             <strong>WOW Matanog Special Economic Zone</strong> (upcoming Bangsamoro Halal Park).
           </p>
         </CardContent>
       </Card>
 
-      {/* ── 7. Archetype: Growth and Underinvestment ── */}
+      {/* Archetype: Growth and Underinvestment */}
       <Card className="border-2 border-amber-500/40 bg-amber-50/30 dark:bg-amber-900/10 dark:border-amber-500/30 backdrop-blur-sm">
         <CardContent className="pt-6 space-y-4">
           <div className="flex items-center gap-2 mb-2">
@@ -526,27 +506,27 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
 
           <div className="bg-amber-100/50 dark:bg-amber-900/20 border-l-4 border-amber-600 dark:border-amber-400 p-4 rounded-r-lg">
             <p className="text-sm text-amber-900 dark:text-amber-200 font-medium mb-2">
-              ⚠️ Capacity Gap Warning
+              ⚠ Capacity Gap Warning
             </p>
             <p className="text-sm text-amber-800 dark:text-amber-300/80 leading-relaxed">
-              &quot;Growth and Underinvestment&quot; illustrates how rapid investment expansion stalls when
+              "Growth and Underinvestment" illustrates how rapid investment expansion stalls when
               institutional capacity fails to keep pace. As investment increases, facilitation capacity
               (certifiers, staff, infrastructure) expands — but when it hits its ceiling, processing slows,
               creating backlogs that erode investor confidence and dampen growth.
             </p>
           </div>
 
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 mb-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg">
             <img
-              src={BIRD_IMAGES.growthUnderinvestment.url}
-              alt={BIRD_IMAGES.growthUnderinvestment.alt}
+              src={BIRD_IMAGES.growthUnderinvestment?.url || ""}
+              alt={BIRD_IMAGES.growthUnderinvestment?.alt || "Growth and Underinvestment Archetype"}
               className="w-full h-auto object-contain"
               loading="lazy"
             />
           </div>
 
           <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
-            How accurately does &quot;Growth and Underinvestment&quot; describe the gap between BARMM&apos;s
+            How accurately does "Growth and Underinvestment" describe the gap between BARMM's
             investment growth and its institutional capacity?
           </Label>
           <div className="grid grid-cols-2 gap-3 mb-4">
@@ -567,7 +547,7 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
           </div>
 
           {growthAgree && (
-            <div className="mt-4 pt-4 border-t border-[#C9A84C]/20 dark:border-[#C9A84C]/10 space-y-3">
+            <div className="mt-4 pt-4 border-t border-[#C9A84C]/20 space-y-3">
               <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
                 Which capacity constraint most affects your sector?
               </Label>
@@ -597,7 +577,7 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
         </CardContent>
       </Card>
 
-      {/* ── 8. Live Score Summary ── */}
+      {/* Live Score Summary */}
       {(data.q5_s1_halal_legitimacy_impact || data.q5_w1_halal_cert_impact || data.q5_t1_standards_recognition_impact) && (
         <Card className="border-[#C9A84C]/30 bg-gradient-to-r from-[#022c22]/5 to-[#C9A84C]/5 dark:from-[#022c22]/20 dark:to-[#C9A84C]/10">
           <CardContent className="pt-5 pb-5">
@@ -611,7 +591,7 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
               {[
                 { label: "S1 Halal Legitimacy", i: data.q5_s1_halal_legitimacy_impact, l: data.q5_s1_halal_legitimacy_likelihood, cat: "strength" },
                 { label: "S2 Domestic Demand", i: data.q5_s2_domestic_demand_impact, l: data.q5_s2_domestic_demand_likelihood, cat: "strength" },
-                { label: "S3 Polloc Freeport", i: data.q5_s3_polloc_freeport_impact, l: data.q5_s3_polloc_freeport_likelihood, cat: "strength" },
+                { label: "S3 Pollock Freeport", i: data.q5_s3_polloc_freeport_impact, l: data.q5_s3_polloc_freeport_likelihood, cat: "strength" },
                 { label: "S4 Cultural Heritage", i: data.q5_s4_cultural_heritage_impact, l: data.q5_s4_cultural_heritage_likelihood, cat: "strength" },
                 { label: "W1 Halal Cert", i: data.q5_w1_halal_cert_impact, l: data.q5_w1_halal_cert_likelihood, cat: "weakness" },
                 { label: "W2 Cold Chain", i: data.q5_w2_cold_chain_impact, l: data.q5_w2_cold_chain_likelihood, cat: "weakness" },
