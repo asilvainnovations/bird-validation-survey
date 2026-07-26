@@ -1,14 +1,20 @@
+// src/App.tsx
+// BIRD 2026–2035 · Root Application Component
+// Updated: 2026-07-27 · Standardized path aliases, no relative deep paths
+
 import React, { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ThemeProvider } from "@/components/theme-provider";
-import { AppProvider } from "@/contexts/AppContext";
+import { ThemeProvider } from "@components/theme-provider";
+import { AppProvider } from "@contexts/AppContext";
 import { Toaster } from "sonner";
-import AppLayout from "@/components/AppLayout";
+import AppLayout from "@components/AppLayout";
 
 // ─── LAZY LOADED PAGE COMPONENTS ────────────────────────────────────────────
-const Index = lazy(() => import("@/pages/Index"));
-const NotFound = lazy(() => import("@/pages/NotFound"));
+// All page-level components are lazy-loaded to keep the initial bundle small.
+// The survey wizard itself is the heaviest component; it loads on demand.
+const Index = lazy(() => import("@pages/Index"));
+const NotFound = lazy(() => import("@pages/NotFound"));
 
 // ─── LOADING FALLBACK ───────────────────────────────────────────────────────
 const AppLoadingFallback = React.memo(() => (
@@ -59,6 +65,7 @@ class ErrorBoundary extends React.Component<
               {this.state.error?.message || "An unexpected error occurred."}
             </p>
             <button
+              type="button"
               onClick={() => window.location.reload()}
               className="px-4 py-2 rounded-lg bg-[#C9A84C] text-[#011a12] font-semibold text-sm hover:bg-[#C9A84C]/90 transition-all"
             >
@@ -101,46 +108,25 @@ const App: React.FC = () => (
               },
             }}
           />
-          <BrowserRouter>
-            <AppLayout>
-              <Suspense fallback={<AppLoadingFallback />}>
-                <Routes>
-                  {/* Core SPA routes */}
-                  <Route path="/" element={<Index />} />
-                  <Route path="/validation-survey" element={<Index />} />
+          <AppLayout>
+            <Suspense fallback={<AppLoadingFallback />}>
+              <Routes>
+                {/* Core SPA routes */}
+                <Route path="/" element={<Index />} />
+                <Route path="/validation-survey" element={<Index />} />
 
-                  {/* Redirects: old static HTML pages → SPA equivalent */}
-                  <Route
-                    path="/survey-dashboard"
-                    element={<Navigate to="/" replace />}
-                  />
-                  <Route
-                    path="/survey-dashboard.html"
-                    element={<Navigate to="/" replace />}
-                  />
-                  <Route
-                    path="/survey-orientation"
-                    element={<Navigate to="/" replace />}
-                  />
-                  <Route
-                    path="/survey-orientation.html"
-                    element={<Navigate to="/" replace />}
-                  />
-                  <Route
-                    path="/validation-survey.html"
-                    element={<Navigate to="/" replace />}
-                  />
+                {/* Redirects: old static HTML pages → SPA equivalent */}
+                <Route path="/survey-dashboard" element={<Navigate to="/" replace />} />
+                <Route path="/survey-dashboard.html" element={<Navigate to="/" replace />} />
+                <Route path="/survey-orientation" element={<Navigate to="/" replace />} />
+                <Route path="/survey-orientation.html" element={<Navigate to="/" replace />} />
+                <Route path="/validation-survey.html" element={<Navigate to="/" replace />} />
 
-                  {/* Static reference pages (served as-is from public/) */}
-                  {/* user-manual.html, resources.html, privacy-policy.html, cookie-policy.html */}
-                  {/* These are NOT React routes — the static host serves the HTML directly. */}
-
-                  {/* Catch-all */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-            </AppLayout>
-          </BrowserRouter>
+                {/* Catch-all */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </AppLayout>
         </AppProvider>
       </ThemeProvider>
     </QueryClientProvider>
