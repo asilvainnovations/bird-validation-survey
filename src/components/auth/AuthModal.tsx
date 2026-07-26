@@ -160,11 +160,15 @@ export function AuthModal({ isOpen, onClose, defaultView = 'login' }: AuthModalP
             disabled={loading}
             className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-[#C9A84C] text-[#022c22] font-bold hover:bg-[#E8C560] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? (
-              <span className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
-            ) : (
-              <>
-                {view === 'login' ? 'Sign In' : view === 'signup' ? 'Create Account' : 'Send Reset Link'}
+           {loading ? (
+  <span className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
+) : (
+  view === 'login'
+    ? 'Sign In'
+    : view === 'signup'
+    ? 'Create Account'
+    : 'Send Reset Link'
+)}
                 <ArrowRight size={16} />
               </>
             )}
