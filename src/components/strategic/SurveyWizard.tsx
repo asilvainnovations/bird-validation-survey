@@ -872,7 +872,8 @@ const SurveyWizard: React.FC = () => {
       <Toaster position="top-right" richColors />
 
       {/* ── Progress Bar ── */}
-      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#C9A84C]/20">
+      {/* FIX: changed sticky top-0 z-50 → sticky top-16 z-30 so it sits below AppLayout's h-16 header */}
+      <div className="sticky top-16 z-30 bg-white/80 backdrop-blur-md border-b border-[#C9A84C]/20">
         <div className="max-w-5xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
@@ -931,7 +932,7 @@ const SurveyWizard: React.FC = () => {
       </main>
 
       {/* ── Navigation Footer ── */}
-      <div className="sticky bottom-0 z-50 bg-white/90 backdrop-blur-md border-t border-[#C9A84C]/20">
+      <div className="sticky bottom-0 z-40 bg-white/90 backdrop-blur-md border-t border-[#C9A84C]/20">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <button 
             onClick={goPrev} 
