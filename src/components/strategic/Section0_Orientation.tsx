@@ -1,7 +1,3 @@
-// src/components/strategic/Section0_Orientation.tsx
-// BIRD 2026–2035 · Section 0: Welcome & Orientation
-// Updated: 2026-07-23 — Fixed prop name to match SurveyWizard (onChange instead of setData)
-
 import React, { useState } from "react";
 import { Sparkles, Play, ArrowRight, BookOpen, BarChart3, Users, CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -9,9 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Badge } from "@/components/ui/badge";
 import { BIRD_IMAGES, BIRD_VIDEOS } from "@/lib/bird-urls";
 
-// ✅ Explicit Type Definition to avoid Pick issues with schema typos
+// ── Types ────────────────────────────────────────────────────────────────────
 export interface Section0Data {
   q0_1_ready: string;
   q0_2_ecosystem_understanding: string;
@@ -20,22 +17,21 @@ export interface Section0Data {
 
 interface Section0Props {
   data: Section0Data;
-  onChange: (data: Section0Data) => void; // ✅ FIXED: Changed from setData to onChange
+  onChange: (data: Section0Data) => void;
 }
 
-const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
+// ── Component ────────────────────────────────────────────────────────────────
+export const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
+  // Local state for the interactive quiz (not part of the main survey schema)
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
   const [showQuizResults, setShowQuizResults] = useState(false);
 
-  const update = <K extends keyof Section0Data>(
-    field: K,
-    value: Section0Data[K]
-  ) => {
-    onChange({ ...data, [field]: value }); // ✅ FIXED: Use onChange
+  const update = <K extends keyof Section0Data>(field: K, value: Section0Data[K]) => {
+    onChange({ ...data, [field]: value });
   };
 
   const handleQuizAnswer = (questionId: number, answer: string) => {
-    setQuizAnswers(prev => ({ ...prev, [questionId]: answer }));
+    setQuizAnswers((prev) => ({ ...prev, [questionId]: answer }));
   };
 
   const quizQuestions = [
@@ -46,10 +42,10 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
         "Same-direction relationship (both variables move together)",
         "Opposite-direction relationship (variables move in opposite directions)",
         "Static relationship (no change over time)",
-        "Secondary relationship (minor impact)"
+        "Secondary relationship (minor impact)",
       ],
       correct: 0,
-      explanation: "The 's' (same) marker indicates that when one variable increases, the other also increases, or when one decreases, the other also decreases."
+      explanation: "The 's' (same) marker indicates that when one variable increases, the other also increases, or when one decreases, the other also decreases.",
     },
     {
       id: 2,
@@ -58,10 +54,10 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
         "A loop that stabilizes the system",
         "A loop that amplifies change in the same direction",
         "A loop that has no impact on the system",
-        "A loop that only affects external factors"
+        "A loop that only affects external factors",
       ],
       correct: 1,
-      explanation: "A Reinforcing Loop (R) amplifies change — growth leads to more growth, or decline leads to more decline, creating exponential patterns."
+      explanation: "A Reinforcing Loop (R) amplifies change — growth leads to more growth, or decline leads to more decline, creating exponential patterns.",
     },
     {
       id: 3,
@@ -70,16 +66,16 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
         "Changing parameters (numbers, subsidies)",
         "Adjusting feedback loops",
         "Transforming the paradigm or mindset",
-        "Adding buffers or stocks"
+        "Adding buffers or stocks",
       ],
       correct: 2,
-      explanation: "Transforming the paradigm (L1) is the highest leverage point — changing the fundamental mindset from which the system emerges."
-    }
+      explanation: "Transforming the paradigm (L1) is the highest leverage point — changing the fundamental mindset from which the system emerges.",
+    },
   ];
 
   const calculateQuizScore = () => {
     let correct = 0;
-    quizQuestions.forEach(q => {
+    quizQuestions.forEach((q) => {
       if (quizAnswers[q.id] === q.options[q.correct]) {
         correct++;
       }
@@ -89,7 +85,7 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
 
   return (
     <div className="space-y-8">
-      {/* ── Section Header ─────────────────────────────────────────── */}
+      {/* ── Section Header ─────────────────────────────────────────────── */}
       <div className="flex items-center gap-3 mb-4">
         <Sparkles className="w-6 h-6 text-[#C9A84C]" />
         <h2 className="text-xl font-bold text-[#022c22]">
@@ -100,7 +96,7 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
         Your voice shapes the future of the Bangsamoro Autonomous Region
       </p>
 
-      {/* ─ 1. Hero Banner Image ──────────────────────────────────── */}
+      {/* ── 1. Hero Banner Image ───────────────────────────────────────── */}
       <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
         <img
           src={BIRD_IMAGES.validationSurveyBanner.url}
@@ -115,7 +111,7 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
         </div>
       </div>
 
-      {/* ── 2. Welcome Card ───────────────────────────────────────── */}
+      {/* ── 2. Welcome Card ────────────────────────────────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-lg font-bold text-[#022c22]">
@@ -146,32 +142,23 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
             <div className="rounded-lg border border-[#C9A84C]/20 bg-emerald-50/60 p-4 text-center">
               <BarChart3 className="w-6 h-6 text-[#1B4D3E] mx-auto mb-2" />
-              <p className="text-sm font-semibold text-[#022c22] mb-1">
-                Data-Driven
-              </p>
+              <p className="text-sm font-semibold text-[#022c22] mb-1">Data-Driven</p>
               <p className="text-xs text-[#065f46] leading-relaxed">
-                Every response feeds into real-time analytics shaping policy and
-                investment priorities
+                Every response feeds into real-time analytics shaping policy and investment priorities
               </p>
             </div>
             <div className="rounded-lg border border-[#C9A84C]/20 bg-emerald-50/60 p-4 text-center">
               <Users className="w-6 h-6 text-[#1B4D3E] mx-auto mb-2" />
-              <p className="text-sm font-semibold text-[#022c22] mb-1">
-                Inclusive
-              </p>
+              <p className="text-sm font-semibold text-[#022c22] mb-1">Inclusive</p>
               <p className="text-xs text-[#065f46] leading-relaxed">
-                Designed for government, business, academe, civil society, and
-                development partners
+                Designed for government, business, academe, civil society, and development partners
               </p>
             </div>
             <div className="rounded-lg border border-[#C9A84C]/20 bg-emerald-50/60 p-4 text-center">
               <BookOpen className="w-6 h-6 text-[#1B4D3E] mx-auto mb-2" />
-              <p className="text-sm font-semibold text-[#022c22] mb-1">
-                Systems-Based
-              </p>
+              <p className="text-sm font-semibold text-[#022c22] mb-1">Systems-Based</p>
               <p className="text-xs text-[#065f46] leading-relaxed">
-                Moving beyond checklists to understand feedback loops, archetypes,
-                and leverage points
+                Moving beyond checklists to understand feedback loops, archetypes, and leverage points
               </p>
             </div>
           </div>
@@ -181,8 +168,7 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
             <p className="text-sm text-[#022c22] leading-relaxed mb-3">
               Your participation answers:{" "}
               <em>
-                How do we turn fragmented efforts into a unified engine of inclusive
-                growth?
+                How do we turn fragmented efforts into a unified engine of inclusive growth?
               </em>
             </p>
             <p className="text-xs text-[#065f46] italic">
@@ -192,7 +178,7 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
         </CardContent>
       </Card>
 
-      {/* ── 3. Video Card ─────────────────────────────────────────── */}
+      {/* ── 3. Video Card ──────────────────────────────────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
@@ -211,10 +197,10 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+            <Badge variant="secondary" className="bg-amber-100 text-amber-800 hover:bg-amber-100">
               <Play className="w-3 h-3 mr-1" />
               {BIRD_VIDEOS.systemsThinking.duration}
-            </span>
+            </Badge>
           </div>
           <p className="text-sm text-[#065f46] leading-relaxed">
             {BIRD_VIDEOS.systemsThinking.description}
@@ -222,7 +208,7 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
         </CardContent>
       </Card>
 
-      {/* ── 4. Systems Thinking Learning Module ──────────────────── */}
+      {/* ── 4. Systems Thinking Learning Module ────────────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
@@ -277,7 +263,6 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
             <p className="text-xs text-[#065f46] mb-4">
               Test your understanding of systems thinking concepts. Select the best answer for each question.
             </p>
-
             <div className="space-y-6">
               {quizQuestions.map((q, index) => (
                 <div key={q.id} className="space-y-3">
@@ -293,9 +278,8 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
                       const isSelected = quizAnswers[q.id] === opt;
                       const isCorrect = optIndex === q.correct;
                       const showResult = showQuizResults && isSelected;
-                      
                       return (
-                        <div key={opt}>
+                        <div key={opt} className="flex items-center space-x-2">
                           <RadioGroupItem 
                             value={opt} 
                             id={`q${q.id}-opt${optIndex}`} 
@@ -304,7 +288,7 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
                           <Label
                             htmlFor={`q${q.id}-opt${optIndex}`}
                             className={cn(
-                              "flex items-center justify-between p-3 rounded-lg border text-sm text-left transition-all cursor-pointer",
+                              "flex items-center justify-between p-3 rounded-lg border text-sm text-left transition-all cursor-pointer w-full",
                               showResult
                                 ? isCorrect
                                   ? "bg-emerald-50 border-emerald-500 text-emerald-800"
@@ -333,7 +317,6 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
                 </div>
               ))}
             </div>
-
             <div className="flex gap-3 mt-6">
               <Button
                 type="button"
@@ -360,7 +343,6 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
                 </Button>
               )}
             </div>
-
             {showQuizResults && (
               <div className="mt-4 p-4 rounded-lg bg-[#C9A84C]/10 border border-[#C9A84C]/30">
                 <p className="text-sm font-semibold text-[#022c22]">
@@ -379,7 +361,7 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
         </CardContent>
       </Card>
 
-      {/* ── 5. Quick-Start Questions ──────────────────────────────── */}
+      {/* ── 5. Quick-Start Questions ───────────────────────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
@@ -402,12 +384,12 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
               className="grid grid-cols-1 sm:grid-cols-2 gap-3"
             >
               {["Very ready", "Somewhat ready", "Curious but unsure", "Just exploring"].map((opt) => (
-                <div key={opt}>
+                <div key={opt} className="flex items-center space-x-2">
                   <RadioGroupItem value={opt} id={`ready-${opt}`} className="peer sr-only" />
                   <Label
                     htmlFor={`ready-${opt}`}
                     className={cn(
-                      "flex items-center justify-center p-3 rounded-lg border text-sm text-left transition-all cursor-pointer h-full",
+                      "flex items-center justify-center p-3 rounded-lg border text-sm text-left transition-all cursor-pointer w-full",
                       data.q0_1_ready === opt
                         ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
                         : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
@@ -436,12 +418,12 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
                 "I mainly know sector-based",
                 "I'm not familiar with either",
               ].map((opt) => (
-                <div key={opt}>
+                <div key={opt} className="flex items-center space-x-2">
                   <RadioGroupItem value={opt} id={`understand-${opt}`} className="peer sr-only" />
                   <Label
                     htmlFor={`understand-${opt}`}
                     className={cn(
-                      "flex items-center justify-center p-3 rounded-lg border text-sm text-left transition-all cursor-pointer h-full",
+                      "flex items-center justify-center p-3 rounded-lg border text-sm text-left transition-all cursor-pointer w-full",
                       data.q0_2_ecosystem_understanding === opt
                         ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
                         : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
