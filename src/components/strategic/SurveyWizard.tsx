@@ -1,14 +1,7 @@
-// src/components/strategic/SurveyWizard.tsx
-// BIRD 2026–2035 · 16-Step Validation Survey Wizard
-// Updated: 2026-07-23 · Production-ready, fully typed, schema-aligned, Edge Function integrated
-
 import React, { useState, useCallback } from "react";
 import { submitSurvey } from "@/lib/api";
 import { surveySchema, type SurveySchemaType } from "@/lib/survey-schema";
 import { Toaster, toast } from "sonner";
-import FloatingAIAssistant from "./FloatingAIAssistant";
-import { triggerEmailNotification } from "@/lib/supabase";
-import { useAuth } from "@/hooks/useAuth";
 
 // ─── SECTION COMPONENTS & TYPES ──────────────────────────────────────────────
 import Section0_Orientation, { type Section0Data } from "./Section0_Orientation";
@@ -60,7 +53,6 @@ const STEP_LABELS = [
 // MAIN WIZARD COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════════
 const SurveyWizard: React.FC = () => {
-  const { user } = useAuth();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [birdScores, setBirdScores] = useState<Record<string, number>>({});
@@ -107,26 +99,13 @@ const SurveyWizard: React.FC = () => {
 
   // ── Section 4: Cluster 1 — Foundations ──
   const [s4, setS4] = useState<Section4Data>({
-    q_s4_aff_base_impact: undefined,
-    q_s4_aff_base_likelihood: undefined,
-    q_s4_renewable_energy_impact: undefined,
-    q_s4_renewable_energy_likelihood: undefined,
-    q_s4_lake_lanao_impact: undefined,
-    q_s4_lake_lanao_likelihood: undefined,
-    q_s4_renewable_invest_impact: undefined,
-    q_s4_renewable_invest_likelihood: undefined,
-    q_s4_carbon_markets_impact: undefined,
-    q_s4_carbon_markets_likelihood: undefined,
-    q_s4_pes_impact: undefined,
-    q_s4_pes_likelihood: undefined,
-    q_s4_forestry_code_impact: undefined,
-    q_s4_forestry_code_likelihood: undefined,
-    q_s4_land_tenure_impact: undefined,
-    q_s4_land_tenure_likelihood: undefined,
-    q_s4_pestalotiopsis_impact: undefined,
-    q_s4_pestalotiopsis_likelihood: undefined,
+    q4_1_priorities: [],
+    q4_2_maguindanao_logistics: "",
+    q4_3_feasibility: undefined,
     q_s4_climate_impact: undefined,
     q_s4_climate_likelihood: undefined,
+    q_s4_pestalotiopsis_impact: undefined,
+    q_s4_pestalotiopsis_likelihood: undefined,
     q_s4_postharvest_impact: undefined,
     q_s4_postharvest_likelihood: undefined,
     q_s4_poverty_impact: undefined,
@@ -160,6 +139,12 @@ const SurveyWizard: React.FC = () => {
 
   // ── Section 6: Cluster 3 — Enablers ──
   const [s6, setS6] = useState<Section6Data>({
+    q6_1_halal_sector_rank: "",
+    q6_2_sequencing_effectiveness: undefined,
+    q6_3_begmp_confidence: undefined,
+    q6_4_tourism_confidence: undefined,
+    q6_5_digital_tourism_rank: [],
+    q6_6_moral_governance_realistic: "",
     q_s6_youth_pop_impact: undefined,
     q_s6_youth_pop_likelihood: undefined,
     q_s6_renewable_energy_impact: undefined,
@@ -188,16 +173,19 @@ const SurveyWizard: React.FC = () => {
     q_s6_shifting_followup: "",
     q_s6_growth_underinvest: "",
     q_s6_growth_followup: "",
-    q6_1_halal_sector_rank: "",
-    q6_2_sequencing_effectiveness: undefined,
-    q6_3_begmp_confidence: undefined,
-    q6_4_tourism_confidence: undefined,
-    q6_5_digital_tourism_rank: [],
-    q6_6_moral_governance_realistic: "",
   });
 
   // ── Section 7: Cluster 4 — Connectors ──
   const [s7, setS7] = useState<Section7Data>({
+    q7_1_connectivity_priority: "",
+    q7_2_integration_challenge: "",
+    q7_3_priority_node: "",
+    q7_4_trapped_value_province: "",
+    q7_5_bridge_impact: "",
+    q7_6_gateway_province: "",
+    q7_7_priority_vector: "",
+    q7_8_uae_feasibility: undefined,
+    q7_9_bimpeaga_leverage: undefined,
     q_s7_bimpeaga_loc_impact: undefined,
     q_s7_bimpeaga_loc_likelihood: undefined,
     q_s7_domestic_halal_impact: undefined,
@@ -234,19 +222,14 @@ const SurveyWizard: React.FC = () => {
     q_s7_escalation_followup: "",
     q_s7_limits_growth: "",
     q_s7_limits_followup: "",
-    q7_1_connectivity_priority: "",
-    q7_2_integration_challenge: "",
-    q7_3_priority_node: "",
-    q7_4_trapped_value_province: "",
-    q7_5_bridge_impact: "",
-    q7_6_gateway_province: "",
-    q7_7_priority_vector: "",
-    q7_8_uae_feasibility: undefined,
-    q7_9_bimpeaga_leverage: undefined,
   });
 
   // ── Section 8: Cluster 5 — Financiers ──
   const [s8, setS8] = useState<Section8Data>({
+    q8_1_finance_tier_priority: "",
+    q8_2_roadmap_achievable: undefined,
+    q8_3_priority_action: "",
+    q8_4_islamic_authority: "",
     q_s8_domestic_halal_impact: undefined,
     q_s8_domestic_halal_likelihood: undefined,
     q_s8_youth_pop_impact: undefined,
@@ -289,14 +272,16 @@ const SurveyWizard: React.FC = () => {
     q_s8_big_man_followup: "",
     q_s8_shifting_burden: "",
     q_s8_shifting_followup: "",
-    q8_1_finance_tier_priority: "",
-    q8_2_roadmap_achievable: undefined,
-    q8_3_priority_action: "",
-    q8_4_islamic_authority: "",
   });
 
-  // ── Section 9: Operating Systems — Moral Governance ──
+  // ── Section 9: Operating Systems ──
   const [s9, setS9] = useState<Section9Data>({
+    q9_1_moral_governance_derisk: undefined,
+    q9_2_critical_loop: "",
+    q9_3_regulatory_priority: "",
+    q9_4_revenue_channel: "",
+    q9_5_stakeholder_alignment: "",
+    q9_6_reform_priority: "",
     q_s9_policy_recognition_impact: undefined,
     q_s9_policy_recognition_likelihood: undefined,
     q_s9_islamic_finance_impact: undefined,
@@ -329,12 +314,6 @@ const SurveyWizard: React.FC = () => {
     q_s9_investment_loop_followup: "",
     q_s9_governance_loop: "",
     q_s9_governance_loop_followup: "",
-    q9_1_moral_governance_derisk: undefined,
-    q9_2_critical_loop: "",
-    q9_3_regulatory_priority: "",
-    q9_4_revenue_channel: "",
-    q9_5_stakeholder_alignment: "",
-    q9_6_reform_priority: "",
   });
 
   // ── Section 10: IEDS & Three-Phase Implementation ──
@@ -411,134 +390,58 @@ const SurveyWizard: React.FC = () => {
   // ── BIRD Score Computation (real-time) ──
   const computeBIRDScores = useCallback(() => {
     const scores: Record<string, number> = {};
-
+    
     // Section 3: Strengths
-    if (s3.q_s1_halal_legitimacy_impact && s3.q_s1_halal_legitimacy_likelihood) {
-      scores.s1_halal_ri = calculateStrengthRI(s3.q_s1_halal_legitimacy_impact, s3.q_s1_halal_legitimacy_likelihood);
-    }
-    if (s3.q_s1_bimpeaga_impact && s3.q_s1_bimpeaga_likelihood) {
-      scores.s1_bimpeaga_ri = calculateStrengthRI(s3.q_s1_bimpeaga_impact, s3.q_s1_bimpeaga_likelihood);
-    }
-    if (s3.q_s1_aff_base_impact && s3.q_s1_aff_base_likelihood) {
-      scores.s1_aff_ri = calculateStrengthRI(s3.q_s1_aff_base_impact, s3.q_s1_aff_base_likelihood);
-    }
+    if (s3.q_s1_halal_legitimacy_impact && s3.q_s1_halal_legitimacy_likelihood) scores.s1_halal_ri = calculateStrengthRI(s3.q_s1_halal_legitimacy_impact, s3.q_s1_halal_legitimacy_likelihood);
+    if (s3.q_s1_bimpeaga_impact && s3.q_s1_bimpeaga_likelihood) scores.s1_bimpeaga_ri = calculateStrengthRI(s3.q_s1_bimpeaga_impact, s3.q_s1_bimpeaga_likelihood);
+    if (s3.q_s1_aff_base_impact && s3.q_s1_aff_base_likelihood) scores.s1_aff_ri = calculateStrengthRI(s3.q_s1_aff_base_impact, s3.q_s1_aff_base_likelihood);
 
     // Section 4: Threats & Weaknesses
-    if (s4.q_s4_climate_impact && s4.q_s4_climate_likelihood) {
-      scores.s4_climate_vi = calculateThreatVI(s4.q_s4_climate_impact, s4.q_s4_climate_likelihood);
-    }
-    if (s4.q_s4_pestalotiopsis_impact && s4.q_s4_pestalotiopsis_likelihood) {
-      scores.s4_pestalotiopsis_vi = calculateThreatVI(s4.q_s4_pestalotiopsis_impact, s4.q_s4_pestalotiopsis_likelihood);
-    }
-    if (s4.q_s4_postharvest_impact && s4.q_s4_postharvest_likelihood) {
-      scores.s4_postharvest_risk = calculateWeaknessRisk(s4.q_s4_postharvest_impact, s4.q_s4_postharvest_likelihood);
-    }
-    if (s4.q_s4_poverty_impact && s4.q_s4_poverty_likelihood) {
-      scores.s4_poverty_risk = calculateWeaknessRisk(s4.q_s4_poverty_impact, s4.q_s4_poverty_likelihood);
-    }
+    if (s4.q_s4_climate_impact && s4.q_s4_climate_likelihood) scores.s4_climate_vi = calculateThreatVI(s4.q_s4_climate_impact, s4.q_s4_climate_likelihood);
+    if (s4.q_s4_pestalotiopsis_impact && s4.q_s4_pestalotiopsis_likelihood) scores.s4_pestalotiopsis_vi = calculateThreatVI(s4.q_s4_pestalotiopsis_impact, s4.q_s4_pestalotiopsis_likelihood);
+    if (s4.q_s4_postharvest_impact && s4.q_s4_postharvest_likelihood) scores.s4_postharvest_risk = calculateWeaknessRisk(s4.q_s4_postharvest_impact, s4.q_s4_postharvest_likelihood);
+    if (s4.q_s4_poverty_impact && s4.q_s4_poverty_likelihood) scores.s4_poverty_risk = calculateWeaknessRisk(s4.q_s4_poverty_impact, s4.q_s4_poverty_likelihood);
 
     // Section 5: Mixed (W, O, T)
-    if (s5.q_s5_halal_cert_impact && s5.q_s5_halal_cert_likelihood) {
-      scores.s5_halal_risk = calculateWeaknessRisk(s5.q_s5_halal_cert_impact, s5.q_s5_halal_cert_likelihood);
-    }
-    if (s5.q_s5_global_halal_impact && s5.q_s5_global_halal_likelihood) {
-      scores.s5_global_ri = calculateOpportunityRI(s5.q_s5_global_halal_impact, s5.q_s5_global_halal_likelihood);
-    }
-    if (s5.q_s5_competition_impact && s5.q_s5_competition_likelihood) {
-      scores.s5_competition_vi = calculateThreatVI(s5.q_s5_competition_impact, s5.q_s5_competition_likelihood);
-    }
+    if (s5.q_s5_halal_cert_impact && s5.q_s5_halal_cert_likelihood) scores.s5_halal_risk = calculateWeaknessRisk(s5.q_s5_halal_cert_impact, s5.q_s5_halal_cert_likelihood);
+    if (s5.q_s5_global_halal_impact && s5.q_s5_global_halal_likelihood) scores.s5_global_ri = calculateOpportunityRI(s5.q_s5_global_halal_impact, s5.q_s5_global_halal_likelihood);
+    if (s5.q_s5_competition_impact && s5.q_s5_competition_likelihood) scores.s5_competition_vi = calculateThreatVI(s5.q_s5_competition_impact, s5.q_s5_competition_likelihood);
 
     // Section 6: Enablers (S, W, O, T)
-    if (s6.q_s6_youth_pop_impact && s6.q_s6_youth_pop_likelihood) {
-      scores.s6_youth_ri = calculateStrengthRI(s6.q_s6_youth_pop_impact, s6.q_s6_youth_pop_likelihood);
-    }
-    if (s6.q_s6_renewable_energy_impact && s6.q_s6_renewable_energy_likelihood) {
-      scores.s6_renewable_ri = calculateStrengthRI(s6.q_s6_renewable_energy_impact, s6.q_s6_renewable_energy_likelihood);
-    }
-    if (s6.q_s6_infra_deficits_impact && s6.q_s6_infra_deficits_likelihood) {
-      scores.s6_infra_risk = calculateWeaknessRisk(s6.q_s6_infra_deficits_impact, s6.q_s6_infra_deficits_likelihood);
-    }
-    if (s6.q_s6_literacy_impact && s6.q_s6_literacy_likelihood) {
-      scores.s6_literacy_risk = calculateWeaknessRisk(s6.q_s6_literacy_impact, s6.q_s6_literacy_likelihood);
-    }
-    if (s6.q_s6_renewable_invest_impact && s6.q_s6_renewable_invest_likelihood) {
-      scores.s6_renewableO_ri = calculateOpportunityRI(s6.q_s6_renewable_invest_impact, s6.q_s6_renewable_invest_likelihood);
-    }
-    if (s6.q_s6_political_transition_impact && s6.q_s6_political_transition_likelihood) {
-      scores.s6_political_vi = calculateThreatVI(s6.q_s6_political_transition_impact, s6.q_s6_political_transition_likelihood);
-    }
+    if (s6.q_s6_youth_pop_impact && s6.q_s6_youth_pop_likelihood) scores.s6_youth_ri = calculateStrengthRI(s6.q_s6_youth_pop_impact, s6.q_s6_youth_pop_likelihood);
+    if (s6.q_s6_renewable_energy_impact && s6.q_s6_renewable_energy_likelihood) scores.s6_renewable_ri = calculateStrengthRI(s6.q_s6_renewable_energy_impact, s6.q_s6_renewable_energy_likelihood);
+    if (s6.q_s6_infra_deficits_impact && s6.q_s6_infra_deficits_likelihood) scores.s6_infra_risk = calculateWeaknessRisk(s6.q_s6_infra_deficits_impact, s6.q_s6_infra_deficits_likelihood);
+    if (s6.q_s6_literacy_impact && s6.q_s6_literacy_likelihood) scores.s6_literacy_risk = calculateWeaknessRisk(s6.q_s6_literacy_impact, s6.q_s6_literacy_likelihood);
+    if (s6.q_s6_renewable_invest_impact && s6.q_s6_renewable_invest_likelihood) scores.s6_renewableO_ri = calculateOpportunityRI(s6.q_s6_renewable_invest_impact, s6.q_s6_renewable_invest_likelihood);
+    if (s6.q_s6_political_transition_impact && s6.q_s6_political_transition_likelihood) scores.s6_political_vi = calculateThreatVI(s6.q_s6_political_transition_impact, s6.q_s6_political_transition_likelihood);
 
     // Section 7: Connectors (S, W, O, T)
-    if (s7.q_s7_bimpeaga_loc_impact && s7.q_s7_bimpeaga_loc_likelihood) {
-      scores.s7_bimpeaga_ri = calculateStrengthRI(s7.q_s7_bimpeaga_loc_impact, s7.q_s7_bimpeaga_loc_likelihood);
-    }
-    if (s7.q_s7_domestic_halal_impact && s7.q_s7_domestic_halal_likelihood) {
-      scores.s7_domestic_ri = calculateStrengthRI(s7.q_s7_domestic_halal_impact, s7.q_s7_domestic_halal_likelihood);
-    }
-    if (s7.q_s7_infra_deficits_impact && s7.q_s7_infra_deficits_likelihood) {
-      scores.s7_infra_risk = calculateWeaknessRisk(s7.q_s7_infra_deficits_impact, s7.q_s7_infra_deficits_likelihood);
-    }
-    if (s7.q_s7_market_linkages_impact && s7.q_s7_market_linkages_likelihood) {
-      scores.s7_linkages_risk = calculateWeaknessRisk(s7.q_s7_market_linkages_impact, s7.q_s7_market_linkages_likelihood);
-    }
-    if (s7.q_s7_asean_halal_impact && s7.q_s7_asean_halal_likelihood) {
-      scores.s7_asean_ri = calculateOpportunityRI(s7.q_s7_asean_halal_impact, s7.q_s7_asean_halal_likelihood);
-    }
-    if (s7.q_s7_uae_corridor_impact && s7.q_s7_uae_corridor_likelihood) {
-      scores.s7_uae_ri = calculateOpportunityRI(s7.q_s7_uae_corridor_impact, s7.q_s7_uae_corridor_likelihood);
-    }
-    if (s7.q_s7_halal_competition_impact && s7.q_s7_halal_competition_likelihood) {
-      scores.s7_competition_vi = calculateThreatVI(s7.q_s7_halal_competition_impact, s7.q_s7_halal_competition_likelihood);
-    }
+    if (s7.q_s7_bimpeaga_loc_impact && s7.q_s7_bimpeaga_loc_likelihood) scores.s7_bimpeaga_ri = calculateStrengthRI(s7.q_s7_bimpeaga_loc_impact, s7.q_s7_bimpeaga_loc_likelihood);
+    if (s7.q_s7_domestic_halal_impact && s7.q_s7_domestic_halal_likelihood) scores.s7_domestic_ri = calculateStrengthRI(s7.q_s7_domestic_halal_impact, s7.q_s7_domestic_halal_likelihood);
+    if (s7.q_s7_infra_deficits_impact && s7.q_s7_infra_deficits_likelihood) scores.s7_infra_risk = calculateWeaknessRisk(s7.q_s7_infra_deficits_impact, s7.q_s7_infra_deficits_likelihood);
+    if (s7.q_s7_market_linkages_impact && s7.q_s7_market_linkages_likelihood) scores.s7_linkages_risk = calculateWeaknessRisk(s7.q_s7_market_linkages_impact, s7.q_s7_market_linkages_likelihood);
+    if (s7.q_s7_asean_halal_impact && s7.q_s7_asean_halal_likelihood) scores.s7_asean_ri = calculateOpportunityRI(s7.q_s7_asean_halal_impact, s7.q_s7_asean_halal_likelihood);
+    if (s7.q_s7_uae_corridor_impact && s7.q_s7_uae_corridor_likelihood) scores.s7_uae_ri = calculateOpportunityRI(s7.q_s7_uae_corridor_impact, s7.q_s7_uae_corridor_likelihood);
+    if (s7.q_s7_halal_competition_impact && s7.q_s7_halal_competition_likelihood) scores.s7_competition_vi = calculateThreatVI(s7.q_s7_halal_competition_impact, s7.q_s7_halal_competition_likelihood);
 
     // Section 8: Financiers (S, W, O, T)
-    if (s8.q_s8_islamic_finance_fw_impact && s8.q_s8_islamic_finance_fw_likelihood) {
-      scores.s8_islamic_ri = calculateStrengthRI(s8.q_s8_islamic_finance_fw_impact, s8.q_s8_islamic_finance_fw_likelihood);
-    }
-    if (s8.q_s8_peace_dividend_impact && s8.q_s8_peace_dividend_likelihood) {
-      scores.s8_peace_ri = calculateStrengthRI(s8.q_s8_peace_dividend_impact, s8.q_s8_peace_dividend_likelihood);
-    }
-    if (s8.q_s8_financial_penetration_impact && s8.q_s8_financial_penetration_likelihood) {
-      scores.s8_penetration_risk = calculateWeaknessRisk(s8.q_s8_financial_penetration_impact, s8.q_s8_financial_penetration_likelihood);
-    }
-    if (s8.q_s8_literacy_impact && s8.q_s8_literacy_likelihood) {
-      scores.s8_literacy_risk = calculateWeaknessRisk(s8.q_s8_literacy_impact, s8.q_s8_literacy_likelihood);
-    }
-    if (s8.q_s8_islamic_ecosystem_impact && s8.q_s8_islamic_ecosystem_likelihood) {
-      scores.s8_ecosystem_ri = calculateOpportunityRI(s8.q_s8_islamic_ecosystem_impact, s8.q_s8_islamic_ecosystem_likelihood);
-    }
-    if (s8.q_s8_uae_corridor_impact && s8.q_s8_uae_corridor_likelihood) {
-      scores.s8_uae_ri = calculateOpportunityRI(s8.q_s8_uae_corridor_impact, s8.q_s8_uae_corridor_likelihood);
-    }
-    if (s8.q_s8_halal_standards_impact && s8.q_s8_halal_standards_likelihood) {
-      scores.s8_standards_vi = calculateThreatVI(s8.q_s8_halal_standards_impact, s8.q_s8_halal_standards_likelihood);
-    }
+    if (s8.q_s8_islamic_finance_fw_impact && s8.q_s8_islamic_finance_fw_likelihood) scores.s8_islamic_ri = calculateStrengthRI(s8.q_s8_islamic_finance_fw_impact, s8.q_s8_islamic_finance_fw_likelihood);
+    if (s8.q_s8_peace_dividend_impact && s8.q_s8_peace_dividend_likelihood) scores.s8_peace_ri = calculateStrengthRI(s8.q_s8_peace_dividend_impact, s8.q_s8_peace_dividend_likelihood);
+    if (s8.q_s8_financial_penetration_impact && s8.q_s8_financial_penetration_likelihood) scores.s8_penetration_risk = calculateWeaknessRisk(s8.q_s8_financial_penetration_impact, s8.q_s8_financial_penetration_likelihood);
+    if (s8.q_s8_literacy_impact && s8.q_s8_literacy_likelihood) scores.s8_literacy_risk = calculateWeaknessRisk(s8.q_s8_literacy_impact, s8.q_s8_literacy_likelihood);
+    if (s8.q_s8_islamic_ecosystem_impact && s8.q_s8_islamic_ecosystem_likelihood) scores.s8_ecosystem_ri = calculateOpportunityRI(s8.q_s8_islamic_ecosystem_impact, s8.q_s8_islamic_ecosystem_likelihood);
+    if (s8.q_s8_uae_corridor_impact && s8.q_s8_uae_corridor_likelihood) scores.s8_uae_ri = calculateOpportunityRI(s8.q_s8_uae_corridor_impact, s8.q_s8_uae_corridor_likelihood);
+    if (s8.q_s8_halal_standards_impact && s8.q_s8_halal_standards_likelihood) scores.s8_standards_vi = calculateThreatVI(s8.q_s8_halal_standards_impact, s8.q_s8_halal_standards_likelihood);
 
     // Section 9: Operating Systems (S, W, O, T)
-    if (s9.q_s9_policy_recognition_impact && s9.q_s9_policy_recognition_likelihood) {
-      scores.s9_policy_ri = calculateStrengthRI(s9.q_s9_policy_recognition_impact, s9.q_s9_policy_recognition_likelihood);
-    }
-    if (s9.q_s9_peace_dividend_impact && s9.q_s9_peace_dividend_likelihood) {
-      scores.s9_peace_ri = calculateStrengthRI(s9.q_s9_peace_dividend_impact, s9.q_s9_peace_dividend_likelihood);
-    }
-    if (s9.q_s9_literacy_impact && s9.q_s9_literacy_likelihood) {
-      scores.s9_literacy_risk = calculateWeaknessRisk(s9.q_s9_literacy_impact, s9.q_s9_literacy_likelihood);
-    }
-    if (s9.q_s9_underspending_impact && s9.q_s9_underspending_likelihood) {
-      scores.s9_underspend_risk = calculateWeaknessRisk(s9.q_s9_underspending_impact, s9.q_s9_underspending_likelihood);
-    }
-    if (s9.q_s9_carbon_markets_impact && s9.q_s9_carbon_markets_likelihood) {
-      scores.s9_carbon_ri = calculateOpportunityRI(s9.q_s9_carbon_markets_impact, s9.q_s9_carbon_markets_likelihood);
-    }
-    if (s9.q_s9_postconflict_impact && s9.q_s9_postconflict_likelihood) {
-      scores.s9_recon_ri = calculateOpportunityRI(s9.q_s9_postconflict_impact, s9.q_s9_postconflict_likelihood);
-    }
-    if (s9.q_s9_security_incidents_impact && s9.q_s9_security_incidents_likelihood) {
-      scores.s9_security_vi = calculateThreatVI(s9.q_s9_security_incidents_impact, s9.q_s9_security_incidents_likelihood);
-    }
-    if (s9.q_s9_political_transition_impact && s9.q_s9_political_transition_likelihood) {
-      scores.s9_political_vi = calculateThreatVI(s9.q_s9_political_transition_impact, s9.q_s9_political_transition_likelihood);
-    }
+    if (s9.q_s9_policy_recognition_impact && s9.q_s9_policy_recognition_likelihood) scores.s9_policy_ri = calculateStrengthRI(s9.q_s9_policy_recognition_impact, s9.q_s9_policy_recognition_likelihood);
+    if (s9.q_s9_peace_dividend_impact && s9.q_s9_peace_dividend_likelihood) scores.s9_peace_ri = calculateStrengthRI(s9.q_s9_peace_dividend_impact, s9.q_s9_peace_dividend_likelihood);
+    if (s9.q_s9_literacy_impact && s9.q_s9_literacy_likelihood) scores.s9_literacy_risk = calculateWeaknessRisk(s9.q_s9_literacy_impact, s9.q_s9_literacy_likelihood);
+    if (s9.q_s9_underspending_impact && s9.q_s9_underspending_likelihood) scores.s9_underspend_risk = calculateWeaknessRisk(s9.q_s9_underspending_impact, s9.q_s9_underspending_likelihood);
+    if (s9.q_s9_carbon_markets_impact && s9.q_s9_carbon_markets_likelihood) scores.s9_carbon_ri = calculateOpportunityRI(s9.q_s9_carbon_markets_impact, s9.q_s9_carbon_markets_likelihood);
+    if (s9.q_s9_postconflict_impact && s9.q_s9_postconflict_likelihood) scores.s9_recon_ri = calculateOpportunityRI(s9.q_s9_postconflict_impact, s9.q_s9_postconflict_likelihood);
+    if (s9.q_s9_security_incidents_impact && s9.q_s9_security_incidents_likelihood) scores.s9_security_vi = calculateThreatVI(s9.q_s9_security_incidents_impact, s9.q_s9_security_incidents_likelihood);
+    if (s9.q_s9_political_transition_impact && s9.q_s9_political_transition_likelihood) scores.s9_political_vi = calculateThreatVI(s9.q_s9_political_transition_impact, s9.q_s9_political_transition_likelihood);
 
     setBirdScores(scores);
   }, [s3, s4, s5, s6, s7, s8, s9]);
@@ -557,142 +460,47 @@ const SurveyWizard: React.FC = () => {
 
   const totalSteps = STEP_LABELS.length; // 16 steps (0–15)
 
-  // ── Submission (Integrated with Edge Function via @/lib/api) ──
+  // ── Submission (Exhaustive Payload Mapping) ──
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
       const payload: Partial<SurveySchemaType> = {
         // Step 0
-        q0_1_ready: s0.ready_to_begin,
-        q0_2_ecosystem_understanding: s0.ecosystem_understanding,
-        q0_3_systems_thinking_value: s0.systems_thinking_value,
+        q0_1_ready: s0.ready_to_begin || undefined,
+        q0_2_ecosystem_understanding: s0.ecosystem_understanding || undefined,
+        q0_3_systems_thinking_value: s0.systems_thinking_value || undefined,
         
         // Step 1
-        q01_consent_participate: s1.consent_participate,
-        q01_consent_anonymize: s1.consent_anonymize,
-        q01_consent_email_copy: s1.consent_email_copy,
+        q1_1_consent_participate: s1.consent_participate,
+        q1_2_consent_anonymize: s1.consent_anonymize,
+        q1_3_consent_email_copy: s1.consent_email_copy,
         q1_4_consent_voluntary: s1.consent_voluntary,
         
         // Step 2
-        q02_demo_category: s2.demo_category,
-        q02_demo_province: s2.demo_province,
-        q02_demo_expertise: s2.demo_expertise,
-        q02_demo_name: s2.demo_name,
-        q02_demo_email: s2.demo_email,
-        q02_demo_organization: s2.demo_organization,
+        demo_name: s2.demo_name || undefined,
+        demo_email: s2.demo_email || undefined,
+        demo_organization: s2.demo_organization || undefined,
+        demo_position: s2.demo_position || undefined,
+        demo_province: s2.demo_province || undefined,
+        demo_category: s2.demo_category || undefined,
+        demo_expertise: s2.demo_expertise,
         
         // Step 3
-        q3_1_beie_collaboration: s3.q3_1_beie_collaboration,
-        q3_2_beie_understanding: s3.q3_2_beie_understanding,
-        q3_3_beie_relevance: s3.q3_3_beie_relevance,
-        q3_4_cluster_position: s3.q3_4_cluster_position,
-        
-        // Step 4
-        q4_1_priorities: s4.q4_1_priorities,
-        q4_2_maguindanao_logistics: s4.q4_2_maguindanao_logistics,
-        q4_3_feasibility: s4.q4_3_feasibility,
-        
-        // Step 5
-        q5_1_cold_chain: s5.q5_1_cold_chain,
-        q5_2_economic_zones: s5.q5_2_economic_zones,
-        q5_3_barrier: s5.q5_3_barrier,
-        q5_4_halal_park: s5.q5_4_halal_park,
-        
-        // Step 6
-        q6_1_halal_sector_rank: s6.q6_1_halal_sector_rank,
-        q6_2_sequencing_effectiveness: s6.q6_2_sequencing_effectiveness,
-        q6_3_begmp_confidence: s6.q6_3_begmp_confidence,
-        q6_4_tourism_confidence: s6.q6_4_tourism_confidence,
-        q6_5_digital_tourism_rank: s6.q6_5_digital_tourism_rank,
-        q6_6_moral_governance_realistic: s6.q6_6_moral_governance_realistic,
-        
-        // Step 7
-        q7_1_connectivity_priority: s7.q7_1_connectivity_priority,
-        q7_2_integration_challenge: s7.q7_2_integration_challenge,
-        q7_3_priority_node: s7.q7_3_priority_node,
-        q7_4_trapped_value_province: s7.q7_4_trapped_value_province,
-        q7_5_bridge_impact: s7.q7_5_bridge_impact,
-        q7_6_gateway_province: s7.q7_6_gateway_province,
-        q7_7_priority_vector: s7.q7_7_priority_vector,
-        q7_8_uae_feasibility: s7.q7_8_uae_feasibility,
-        q7_9_bimpeaga_leverage: s7.q7_9_bimpeaga_leverage,
-        
-        // Step 8
-        q8_1_finance_tier_priority: s8.q8_1_finance_tier_priority,
-        q8_2_roadmap_achievable: s8.q8_2_roadmap_achievable,
-        q8_3_priority_action: s8.q8_3_priority_action,
-        q8_4_islamic_authority: s8.q8_4_islamic_authority,
-        
-        // Step 9
-        q9_1_moral_governance_derisk: s9.q9_1_moral_governance_derisk,
-        q9_2_critical_loop: s9.q9_2_critical_loop,
-        q9_3_regulatory_priority: s9.q9_3_regulatory_priority,
-        q9_4_revenue_channel: s9.q9_4_revenue_channel,
-        q9_5_stakeholder_alignment: s9.q9_5_stakeholder_alignment,
-        q9_6_reform_priority: s9.q9_6_reform_priority,
-        
-        // Step 10
-        q10_1_ieds_preference: s10.q10_1_ieds_preference,
-        q10_2_sequence_a_priority: s10.q10_2_sequence_a_priority,
-        q10_3_sequence_b_priority: s10.q10_3_sequence_b_priority,
-        q10_4_sequence_c_priority: s10.q10_4_sequence_c_priority,
-        q10_5_sequencing_logic: s10.q10_5_sequencing_logic,
-        q10_6_risk_mitigation: s10.q10_6_risk_mitigation,
-        q10_7_outcomes_achievable: s10.q10_7_outcomes_achievable,
-        q10_matrix: s10.q10_matrix,
-        
-        // Step 11
-        q11_1_calibration_appropriate: s11.q11_1_calibration_appropriate,
-        q11_2_governance_kpi_importance: s11.q11_2_governance_kpi_importance,
-        q11_3_resilience_kpi_importance: s11.q11_3_resilience_kpi_importance,
-        q11_4_inclusivity_kpi_importance: s11.q11_4_inclusivity_kpi_importance,
-        q11_5_peace_kpi_importance: s11.q11_5_peace_kpi_importance,
-        q11_6_cluster_kpi_sufficient: s11.q11_6_cluster_kpi_sufficient,
-        q11_7_benchmark_priority: s11.q11_7_benchmark_priority,
-        
-        // Step 12
-        q12_1_learning_growth_alignment: s12.q12_1_learning_growth_alignment,
-        q12_2_internal_process_alignment: s12.q12_2_internal_process_alignment,
-        q12_3_stakeholder_alignment: s12.q12_3_stakeholder_alignment,
-        q12_4_financial_alignment: s12.q12_4_financial_alignment,
-        q12_5_strongest_pathway: s12.q12_5_strongest_pathway,
-        q12_6_vision_clarity: s12.q12_6_vision_clarity,
-        q12_7_vision_achievable: s12.q12_7_vision_achievable,
-        q12_8_mission_alignment: s12.q12_8_mission_alignment,
-        q12_9_bsc_useful: s12.q12_9_bsc_useful,
-        q12_10_adaptive_frequency: s12.q12_10_adaptive_frequency,
-        
-        // Step 13
-        q13_1_funding_mix_fair: s13.q13_1_funding_mix_fair,
-        q13_2_targets_realistic: s13.q13_2_targets_realistic,
-        q13_3_high_risk_concern: s13.q13_3_high_risk_concern,
-        q13_4_medium_risk_concern: s13.q13_4_medium_risk_concern,
-        q13_5_low_risk_concern: s13.q13_5_low_risk_concern,
-        q13_6_budget_priority_phase: s13.q13_6_budget_priority_phase,
-        q13_7_budget_priority_cluster: s13.q13_7_budget_priority_cluster,
-        q13_8_blended_finance_opinion: s13.q13_8_blended_finance_opinion,
-        
-        // Step 14
-        q14_1_engagement_type: s14.q14_1_engagement_type,
-        q14_2_contact_method: s14.q14_2_contact_method,
-        q14_3_timing: s14.q14_3_timing,
-        q14_4_role_contribution: s14.q14_4_role_contribution,
-        q14_5_additional_comments: s14.q14_5_additional_comments,
-        
-        // Step 15
-        q15_1_confirm_accurate: s15.q15_1_confirm_accurate,
-        q15_2_consent_anonymous_use: s15.q15_2_consent_anonymous_use,
-        q15_3_consent_voluntary: s15.q15_3_consent_voluntary,
-        q15_4_ready_to_submit: s15.q15_4_ready_to_submit,
-        consent_final: true,
-
-        // ── Explicit SWOT Field Mapping (to satisfy strict Zod schema) ──
+        q3_1_beie_collaboration: s3.q3_1_beie_collaboration || undefined,
+        q3_2_beie_understanding: s3.q3_2_beie_understanding || undefined,
+        q3_3_beie_relevance: s3.q3_3_beie_relevance || undefined,
+        q3_4_cluster_position: s3.q3_4_cluster_position || undefined,
         q_s1_halal_legitimacy_impact: s3.q_s1_halal_legitimacy_impact,
         q_s1_halal_legitimacy_likelihood: s3.q_s1_halal_legitimacy_likelihood,
         q_s1_bimpeaga_impact: s3.q_s1_bimpeaga_impact,
         q_s1_bimpeaga_likelihood: s3.q_s1_bimpeaga_likelihood,
         q_s1_aff_base_impact: s3.q_s1_aff_base_impact,
         q_s1_aff_base_likelihood: s3.q_s1_aff_base_likelihood,
+        
+        // Step 4
+        q4_1_priorities: s4.q4_1_priorities,
+        q4_2_maguindanao_logistics: s4.q4_2_maguindanao_logistics || undefined,
+        q4_3_feasibility: s4.q4_3_feasibility,
         q_s4_climate_impact: s4.q_s4_climate_impact,
         q_s4_climate_likelihood: s4.q_s4_climate_likelihood,
         q_s4_pestalotiopsis_impact: s4.q_s4_pestalotiopsis_impact,
@@ -701,9 +509,15 @@ const SurveyWizard: React.FC = () => {
         q_s4_postharvest_likelihood: s4.q_s4_postharvest_likelihood,
         q_s4_poverty_impact: s4.q_s4_poverty_impact,
         q_s4_poverty_likelihood: s4.q_s4_poverty_likelihood,
-        q_s4_tragedy_commons: s4.q_s4_tragedy_commons,
-        q_s4_tragedy_followup: s4.q_s4_tragedy_followup,
-        q_s4_limits_growth: s4.q_s4_limits_growth,
+        q_s4_tragedy_commons: s4.q_s4_tragedy_commons || undefined,
+        q_s4_tragedy_followup: s4.q_s4_tragedy_followup || undefined,
+        q_s4_limits_growth: s4.q_s4_limits_growth || undefined,
+        
+        // Step 5
+        q5_1_cold_chain: s5.q5_1_cold_chain || undefined,
+        q5_2_economic_zones: s5.q5_2_economic_zones || undefined,
+        q5_3_barrier: s5.q5_3_barrier || undefined,
+        q5_4_halal_park: s5.q5_4_halal_park || undefined,
         q_s5_halal_cert_impact: s5.q_s5_halal_cert_impact,
         q_s5_halal_cert_likelihood: s5.q_s5_halal_cert_likelihood,
         q_s5_skills_mismatch_impact: s5.q_s5_skills_mismatch_impact,
@@ -714,10 +528,18 @@ const SurveyWizard: React.FC = () => {
         q_s5_uae_corridor_likelihood: s5.q_s5_uae_corridor_likelihood,
         q_s5_competition_impact: s5.q_s5_competition_impact,
         q_s5_competition_likelihood: s5.q_s5_competition_likelihood,
-        q_s5_fixes_fail: s5.q_s5_fixes_fail,
-        q_s5_fixes_followup: s5.q_s5_fixes_followup,
-        q_s5_successful: s5.q_s5_successful,
-        q_s5_successful_followup: s5.q_s5_successful_followup,
+        q_s5_fixes_fail: s5.q_s5_fixes_fail || undefined,
+        q_s5_fixes_followup: s5.q_s5_fixes_followup || undefined,
+        q_s5_successful: s5.q_s5_successful || undefined,
+        q_s5_successful_followup: s5.q_s5_successful_followup || undefined,
+        
+        // Step 6
+        q6_1_halal_sector_rank: s6.q6_1_halal_sector_rank || undefined,
+        q6_2_sequencing_effectiveness: s6.q6_2_sequencing_effectiveness,
+        q6_3_begmp_confidence: s6.q6_3_begmp_confidence,
+        q6_4_tourism_confidence: s6.q6_4_tourism_confidence,
+        q6_5_digital_tourism_rank: s6.q6_5_digital_tourism_rank,
+        q6_6_moral_governance_realistic: s6.q6_6_moral_governance_realistic || undefined,
         q_s6_youth_pop_impact: s6.q_s6_youth_pop_impact,
         q_s6_youth_pop_likelihood: s6.q_s6_youth_pop_likelihood,
         q_s6_renewable_energy_impact: s6.q_s6_renewable_energy_impact,
@@ -742,10 +564,21 @@ const SurveyWizard: React.FC = () => {
         q_s6_cost_overruns_likelihood: s6.q_s6_cost_overruns_likelihood,
         q_s6_natl_coord_impact: s6.q_s6_natl_coord_impact,
         q_s6_natl_coord_likelihood: s6.q_s6_natl_coord_likelihood,
-        q_s6_shifting_burden: s6.q_s6_shifting_burden,
-        q_s6_shifting_followup: s6.q_s6_shifting_followup,
-        q_s6_growth_underinvest: s6.q_s6_growth_underinvest,
-        q_s6_growth_followup: s6.q_s6_growth_followup,
+        q_s6_shifting_burden: s6.q_s6_shifting_burden || undefined,
+        q_s6_shifting_followup: s6.q_s6_shifting_followup || undefined,
+        q_s6_growth_underinvest: s6.q_s6_growth_underinvest || undefined,
+        q_s6_growth_followup: s6.q_s6_growth_followup || undefined,
+        
+        // Step 7
+        q7_1_connectivity_priority: s7.q7_1_connectivity_priority || undefined,
+        q7_2_integration_challenge: s7.q7_2_integration_challenge || undefined,
+        q7_3_priority_node: s7.q7_3_priority_node || undefined,
+        q7_4_trapped_value_province: s7.q7_4_trapped_value_province || undefined,
+        q7_5_bridge_impact: s7.q7_5_bridge_impact || undefined,
+        q7_6_gateway_province: s7.q7_6_gateway_province || undefined,
+        q7_7_priority_vector: s7.q7_7_priority_vector || undefined,
+        q7_8_uae_feasibility: s7.q7_8_uae_feasibility,
+        q7_9_bimpeaga_leverage: s7.q7_9_bimpeaga_leverage,
         q_s7_bimpeaga_loc_impact: s7.q_s7_bimpeaga_loc_impact,
         q_s7_bimpeaga_loc_likelihood: s7.q_s7_bimpeaga_loc_likelihood,
         q_s7_domestic_halal_impact: s7.q_s7_domestic_halal_impact,
@@ -778,10 +611,16 @@ const SurveyWizard: React.FC = () => {
         q_s7_price_volatility_likelihood: s7.q_s7_price_volatility_likelihood,
         q_s7_natl_coord_impact: s7.q_s7_natl_coord_impact,
         q_s7_natl_coord_likelihood: s7.q_s7_natl_coord_likelihood,
-        q_s7_escalation: s7.q_s7_escalation,
-        q_s7_escalation_followup: s7.q_s7_escalation_followup,
-        q_s7_limits_growth: s7.q_s7_limits_growth,
-        q_s7_limits_followup: s7.q_s7_limits_followup,
+        q_s7_escalation: s7.q_s7_escalation || undefined,
+        q_s7_escalation_followup: s7.q_s7_escalation_followup || undefined,
+        q_s7_limits_growth: s7.q_s7_limits_growth || undefined,
+        q_s7_limits_followup: s7.q_s7_limits_followup || undefined,
+        
+        // Step 8
+        q8_1_finance_tier_priority: s8.q8_1_finance_tier_priority || undefined,
+        q8_2_roadmap_achievable: s8.q8_2_roadmap_achievable,
+        q8_3_priority_action: s8.q8_3_priority_action || undefined,
+        q8_4_islamic_authority: s8.q8_4_islamic_authority || undefined,
         q_s8_domestic_halal_impact: s8.q_s8_domestic_halal_impact,
         q_s8_domestic_halal_likelihood: s8.q_s8_domestic_halal_likelihood,
         q_s8_youth_pop_impact: s8.q_s8_youth_pop_impact,
@@ -820,10 +659,18 @@ const SurveyWizard: React.FC = () => {
         q_s8_security_incidents_likelihood: s8.q_s8_security_incidents_likelihood,
         q_s8_political_transition_impact: s8.q_s8_political_transition_impact,
         q_s8_political_transition_likelihood: s8.q_s8_political_transition_likelihood,
-        q_s8_big_man: s8.q_s8_big_man,
-        q_s8_big_man_followup: s8.q_s8_big_man_followup,
-        q_s8_shifting_burden: s8.q_s8_shifting_burden,
-        q_s8_shifting_followup: s8.q_s8_shifting_followup,
+        q_s8_big_man: s8.q_s8_big_man || undefined,
+        q_s8_big_man_followup: s8.q_s8_big_man_followup || undefined,
+        q_s8_shifting_burden: s8.q_s8_shifting_burden || undefined,
+        q_s8_shifting_followup: s8.q_s8_shifting_followup || undefined,
+        
+        // Step 9
+        q9_1_moral_governance_derisk: s9.q9_1_moral_governance_derisk,
+        q9_2_critical_loop: s9.q9_2_critical_loop || undefined,
+        q9_3_regulatory_priority: s9.q9_3_regulatory_priority || undefined,
+        q9_4_revenue_channel: s9.q9_4_revenue_channel || undefined,
+        q9_5_stakeholder_alignment: s9.q9_5_stakeholder_alignment || undefined,
+        q9_6_reform_priority: s9.q9_6_reform_priority || undefined,
         q_s9_policy_recognition_impact: s9.q_s9_policy_recognition_impact,
         q_s9_policy_recognition_likelihood: s9.q_s9_policy_recognition_likelihood,
         q_s9_islamic_finance_impact: s9.q_s9_islamic_finance_impact,
@@ -852,22 +699,71 @@ const SurveyWizard: React.FC = () => {
         q_s9_political_transition_likelihood: s9.q_s9_political_transition_likelihood,
         q_s9_fragmented_agency_impact: s9.q_s9_fragmented_agency_impact,
         q_s9_fragmented_agency_likelihood: s9.q_s9_fragmented_agency_likelihood,
-        q_s9_investment_loop: s9.q_s9_investment_loop,
-        q_s9_investment_loop_followup: s9.q_s9_investment_loop_followup,
-        q_s9_governance_loop: s9.q_s9_governance_loop,
-        q_s9_governance_loop_followup: s9.q_s9_governance_loop_followup,
+        q_s9_investment_loop: s9.q_s9_investment_loop || undefined,
+        q_s9_investment_loop_followup: s9.q_s9_investment_loop_followup || undefined,
+        q_s9_governance_loop: s9.q_s9_governance_loop || undefined,
+        q_s9_governance_loop_followup: s9.q_s9_governance_loop_followup || undefined,
+        
+        // Step 10
+        q10_1_ieds_preference: s10.q10_1_ieds_preference || undefined,
+        q10_2_sequence_a_priority: s10.q10_2_sequence_a_priority,
+        q10_3_sequence_b_priority: s10.q10_3_sequence_b_priority,
+        q10_4_sequence_c_priority: s10.q10_4_sequence_c_priority,
+        q10_5_sequencing_logic: s10.q10_5_sequencing_logic || undefined,
+        q10_6_risk_mitigation: s10.q10_6_risk_mitigation || undefined,
+        q10_7_outcomes_achievable: s10.q10_7_outcomes_achievable,
+        q10_matrix: s10.q10_matrix,
+        
+        // Step 11
+        q11_1_calibration_appropriate: s11.q11_1_calibration_appropriate || undefined,
+        q11_2_governance_kpi_importance: s11.q11_2_governance_kpi_importance,
+        q11_3_resilience_kpi_importance: s11.q11_3_resilience_kpi_importance,
+        q11_4_inclusivity_kpi_importance: s11.q11_4_inclusivity_kpi_importance,
+        q11_5_peace_kpi_importance: s11.q11_5_peace_kpi_importance,
+        q11_6_cluster_kpi_sufficient: s11.q11_6_cluster_kpi_sufficient || undefined,
+        q11_7_benchmark_priority: s11.q11_7_benchmark_priority || undefined,
+        
+        // Step 12
+        q12_1_learning_growth_alignment: s12.q12_1_learning_growth_alignment,
+        q12_2_internal_process_alignment: s12.q12_2_internal_process_alignment,
+        q12_3_stakeholder_alignment: s12.q12_3_stakeholder_alignment,
+        q12_4_financial_alignment: s12.q12_4_financial_alignment,
+        q12_5_strongest_pathway: s12.q12_5_strongest_pathway || undefined,
+        q12_6_vision_clarity: s12.q12_6_vision_clarity,
+        q12_7_vision_achievable: s12.q12_7_vision_achievable,
+        q12_8_mission_alignment: s12.q12_8_mission_alignment,
+        q12_9_bsc_useful: s12.q12_9_bsc_useful,
+        q12_10_adaptive_frequency: s12.q12_10_adaptive_frequency || undefined,
+        
+        // Step 13
+        q13_1_funding_mix_fair: s13.q13_1_funding_mix_fair,
+        q13_2_targets_realistic: s13.q13_2_targets_realistic,
+        q13_3_high_risk_concern: s13.q13_3_high_risk_concern,
+        q13_4_medium_risk_concern: s13.q13_4_medium_risk_concern,
+        q13_5_low_risk_concern: s13.q13_5_low_risk_concern,
+        q13_6_budget_priority_phase: s13.q13_6_budget_priority_phase || undefined,
+        q13_7_budget_priority_cluster: s13.q13_7_budget_priority_cluster || undefined,
+        q13_8_blended_finance_opinion: s13.q13_8_blended_finance_opinion || undefined,
+        
+        // Step 14
+        q14_1_engagement_type: s14.q14_1_engagement_type,
+        q14_2_contact_method: s14.q14_2_contact_method || undefined,
+        q14_3_timing: s14.q14_3_timing || undefined,
+        q14_4_role_contribution: s14.q14_4_role_contribution || undefined,
+        q14_5_additional_comments: s14.q14_5_additional_comments || undefined,
+        
+        // Step 15
+        q15_1_confirm_accurate: s15.q15_1_confirm_accurate,
+        q15_2_consent_anonymous_use: s15.q15_2_consent_anonymous_use,
+        q15_3_consent_voluntary: s15.q15_3_consent_voluntary,
+        q15_4_ready_to_submit: s15.q15_4_ready_to_submit,
+        
+        // Final Consent
+        consent_final: true,
       };
 
-      // This calls the Edge Function via your centralized api.ts wrapper
-      await submitSurvey(payload as any);
+      await submitSurvey(payload);
       toast.success("Survey submitted successfully! Your input shapes the Emerging Bangsamoro.");
-
-      // Send confirmation email if user is signed in (best-effort, non-blocking)
-      if (user?.id) {
-        triggerEmailNotification('welcome', user.id, {
-          full_name: user.email?.split('@')[0] ?? 'Strategic Partner',
-        }).catch(() => {});
-      }
     } catch (err) {
       toast.error("Submission failed. Please try again or contact support.");
       console.error("Survey submission error:", err);
@@ -1002,9 +898,6 @@ const SurveyWizard: React.FC = () => {
           )}
         </div>
       </div>
-
-      {/* Floating AI Strategy Assistant */}
-      <FloatingAIAssistant />
     </div>
   );
 };
