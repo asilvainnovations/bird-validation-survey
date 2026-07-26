@@ -1,7 +1,3 @@
-// src/components/strategic/Section14_AccessResources.tsx
-// BIRD 2026–2035 · Section 14: Access to Resources & Optional Engagements
-// Updated: 2026-07-23 · Production-ready, GlassCard discarded, schema-aligned
-
 import React from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,9 +12,7 @@ import {
   Heart,
 } from "lucide-react";
 
-/* ------------------------------------------------------------------ */
-/* Data interface                                                       */
-/* ------------------------------------------------------------------ */
+// ── Types ────────────────────────────────────────────────────────────────────
 export interface Section14Data {
   q14_1_engagement_type: string[];
   q14_2_contact_method: string;
@@ -27,22 +21,17 @@ export interface Section14Data {
   q14_5_additional_comments: string;
 }
 
-/* ------------------------------------------------------------------ */
-/* Props                                                                */
-/* ------------------------------------------------------------------ */
 interface Section14Props {
   data: Section14Data;
-  setData: React.Dispatch<React.SetStateAction<Section14Data>>;
+  onChange: (data: Section14Data) => void;
 }
 
-/* ------------------------------------------------------------------ */
-/* Constants                                                            */
-/* ------------------------------------------------------------------ */
+// ── Constants ──────────────────────────────────────────────────────────────
 const RESOURCE_CHAPTERS = [
   {
     title: "Chapter 1: BARMM at a Crossroads",
     description: "Economic assessment and strategic imperative for transformation",
-    url: undefined,
+    url: undefined as string | undefined,
   },
   {
     title: "Chapter 2: Context Analysis & BEIE Framework",
@@ -121,16 +110,25 @@ const ROLE_CONTRIBUTIONS = [
   "Other",
 ];
 
-/* ------------------------------------------------------------------ */
-/* Component                                                            */
-/* ------------------------------------------------------------------ */
-const Section14_AccessResources: React.FC<Section14Props> = ({ data, setData }) => {
-  const update = <K extends keyof Section14Data>(field: K, value: Section14Data[K]) => {
-    setData((prev) => ({ ...prev, [field]: value }));
+// ── Component ────────────────────────────────────────────────────────────────
+const Section14_AccessResources: React.FC<Section14Props> = ({
+  data,
+  onChange,
+}) => {
+  const update = <K extends keyof Section14Data>(
+    field: K,
+    value: Section14Data[K]
+  ) => {
+    onChange({ ...data, [field]: value });
   };
 
+  const activeBtnClass =
+    "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90";
+  const inactiveBtnClass =
+    "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10";
+
   const inputClass =
-    "w-full px-4 py-3 rounded-lg border border-[#C9A84C]/30 bg-white text-[#022c22] text-sm placeholder:text-[#64748b] focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C]/30 transition-all";
+    "w-full px-4 py-3 rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] text-sm placeholder:text-[#64748b] focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C]/30 transition-all resize-y";
 
   return (
     <div className="space-y-8">
@@ -140,10 +138,10 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, setData }) 
           <BookOpen className="w-6 h-6 text-[#C9A84C]" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-[#022c22]">
+          <h2 className="text-2xl font-bold text-[#022c22] dark:text-[#ecfdf5]">
             Section 14: Access to Resources &amp; Optional Engagements
           </h2>
-          <p className="text-sm text-[#065f46] mt-2 leading-relaxed">
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 mt-2 leading-relaxed">
             Explore the complete BIRD resource library and indicate your interest in follow-up
             engagements. Your participation shapes the Emerging Bangsamoro.
           </p>
@@ -151,9 +149,9 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, setData }) 
       </div>
 
       {/* ── Block 1: Resource Library ─────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
             <FileText className="w-5 h-5 text-[#C9A84C]" />
             Resource Library
           </CardTitle>
@@ -164,17 +162,17 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, setData }) 
             {RESOURCE_CHAPTERS.map((chapter) => (
               <div
                 key={chapter.title}
-                className="rounded-lg border border-[#C9A84C]/20 bg-white p-4 hover:shadow-md transition-shadow"
+                className="rounded-lg border border-[#C9A84C]/20 bg-white dark:bg-[#022c22]/60 p-4 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-md bg-[#1B4D3E]/10 shrink-0">
-                    <FileText className="w-4 h-4 text-[#1B4D3E]" />
+                  <div className="p-2 rounded-md bg-[#1B4D3E]/10 dark:bg-[#1B4D3E]/30 shrink-0">
+                    <FileText className="w-4 h-4 text-[#1B4D3E] dark:text-[#C9A84C]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#022c22] leading-snug">
+                    <p className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5] leading-snug">
                       {chapter.title}
                     </p>
-                    <p className="text-xs text-[#065f46] mt-1 leading-relaxed">
+                    <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mt-1 leading-relaxed">
                       {chapter.description}
                     </p>
                     <button
@@ -204,20 +202,26 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, setData }) 
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Video className="w-4 h-4 text-[#C9A84C]" />
-              <p className="text-sm font-semibold text-[#022c22]">Video Resources</p>
+              <p className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+                Video Resources
+              </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {RESOURCE_VIDEOS.map((video) => (
                 <div
                   key={video.title}
-                  className="flex items-center gap-3 rounded-lg border border-[#C9A84C]/20 bg-white p-3 hover:shadow-sm transition-shadow"
+                  className="flex items-center gap-3 rounded-lg border border-[#C9A84C]/20 bg-white dark:bg-[#022c22]/60 p-3 hover:shadow-sm transition-shadow"
                 >
                   <div className="p-2 rounded-md bg-[#C9A84C]/10 shrink-0">
                     <Video className="w-4 h-4 text-[#C9A84C]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#022c22]">{video.title}</p>
-                    <p className="text-xs text-[#065f46]">{video.duration}</p>
+                    <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
+                      {video.title}
+                    </p>
+                    <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
+                      {video.duration}
+                    </p>
                   </div>
                   <button
                     type="button"
@@ -233,17 +237,19 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, setData }) 
       </Card>
 
       {/* ── Block 2: Engagement Interest ──────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-[#C9A84C]" />
             Engagement Interest
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm font-medium text-[#022c22] mb-4">
+          <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-4">
             What type of follow-up engagement interests you?{" "}
-            <span className="text-[#065f46] font-normal">(Select all that apply)</span>
+            <span className="text-[#065f46] dark:text-[#ecfdf5]/60 font-normal">
+              (Select all that apply)
+            </span>
           </p>
 
           <div className="space-y-2">
@@ -253,8 +259,8 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, setData }) 
                 className={cn(
                   "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all",
                   data.q14_1_engagement_type.includes(opt)
-                    ? "border-[#1B4D3E] bg-[#1B4D3E]/5"
-                    : "border-[#C9A84C]/20 hover:bg-[#C9A84C]/5"
+                    ? "border-[#1B4D3E] bg-[#1B4D3E]/5 dark:bg-[#1B4D3E]/20"
+                    : "border-[#C9A84C]/20 hover:bg-[#C9A84C]/5 dark:hover:bg-[#C9A84C]/10"
                 )}
               >
                 <input
@@ -271,7 +277,9 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, setData }) 
                   }}
                   className="w-4 h-4 rounded border-[#C9A84C] text-[#1B4D3E] accent-[#1B4D3E] shrink-0"
                 />
-                <span className="text-sm text-[#022c22]">{opt}</span>
+                <span className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
+                  {opt}
+                </span>
               </label>
             ))}
           </div>
@@ -279,9 +287,9 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, setData }) 
       </Card>
 
       {/* ── Block 3: Follow-up Preferences ────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
             <Calendar className="w-5 h-5 text-[#C9A84C]" />
             Follow-up Preferences
           </CardTitle>
@@ -289,7 +297,7 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, setData }) 
         <CardContent className="space-y-6">
           {/* Contact method */}
           <div className="pb-6 border-b border-[#C9A84C]/20">
-            <p className="text-sm font-medium text-[#022c22] mb-3">
+            <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3">
               Preferred method for follow-up:
             </p>
             <div className="grid grid-cols-2 gap-3">
@@ -301,8 +309,8 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, setData }) 
                   className={cn(
                     "flex items-center gap-3 p-3 rounded-lg border text-sm text-left transition-all",
                     data.q14_2_contact_method === label
-                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                      : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                      ? activeBtnClass
+                      : inactiveBtnClass
                   )}
                 >
                   <Icon className="w-4 h-4 shrink-0" />
@@ -314,7 +322,9 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, setData }) 
 
           {/* Timing */}
           <div className="pb-6 border-b border-[#C9A84C]/20">
-            <p className="text-sm font-medium text-[#022c22] mb-3">Preferred timing:</p>
+            <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3">
+              Preferred timing:
+            </p>
             <div className="grid grid-cols-2 gap-3">
               {TIMING_OPTIONS.map((opt) => (
                 <button
@@ -324,8 +334,8 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, setData }) 
                   className={cn(
                     "p-3 rounded-lg border text-sm text-left transition-all",
                     data.q14_3_timing === opt
-                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                      : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                      ? activeBtnClass
+                      : inactiveBtnClass
                   )}
                 >
                   {opt}
@@ -336,7 +346,7 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, setData }) 
 
           {/* Role contribution */}
           <div>
-            <p className="text-sm font-medium text-[#022c22] mb-3">
+            <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3">
               How would you like to contribute?
             </p>
             <div className="grid grid-cols-2 gap-3">
@@ -348,8 +358,8 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, setData }) 
                   className={cn(
                     "p-3 rounded-lg border text-sm text-left transition-all",
                     data.q14_4_role_contribution === opt
-                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                      : "bg-white text-[#022c22] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                      ? activeBtnClass
+                      : inactiveBtnClass
                   )}
                 >
                   {opt}
@@ -361,15 +371,15 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, setData }) 
       </Card>
 
       {/* ── Block 4: Additional Comments ──────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/90 backdrop-blur-sm">
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] flex items-center gap-2">
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-[#C9A84C]" />
             Additional Comments
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-[#022c22] mb-3">
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90 mb-3">
             We welcome any additional thoughts, recommendations, or questions you may have.
           </p>
 
@@ -377,7 +387,8 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, setData }) 
             value={data.q14_5_additional_comments}
             onChange={(e) => update("q14_5_additional_comments", e.target.value)}
             placeholder="Share any additional thoughts, recommendations, or questions..."
-            className={cn(inputClass, "min-h-[120px] resize-y")}
+            rows={5}
+            className={cn(inputClass, "min-h-[120px]")}
           />
         </CardContent>
       </Card>
