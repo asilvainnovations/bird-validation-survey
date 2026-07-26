@@ -1,6 +1,6 @@
 // src/components/strategic/FloatingAIAssistant.tsx
 // BIRD 2026-2035 · AI Strategy Assistant for Validation Survey
-// Wired to: EDGE_FUNCTIONS.AI_STRATEGY_ASSISTANT (from @/lib/env)
+// Wired to: https://lydsisparsmvextskevw.supabase.co/functions/v1/ai-strategy-assistant
 // Updated: 2026-07-23
 
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
@@ -94,12 +94,13 @@ const FloatingAIAssistant: React.FC<FloatingAIAssistantProps> = ({
     setLoading(true);
 
     try {
-      const { EDGE_FUNCTIONS } = await import('@/lib/env');
-      const { getEdgeFunctionHeaders } = await import('@/lib/supabase');
-
-      const response = await fetch(EDGE_FUNCTIONS.AI_STRATEGY_ASSISTANT, {
+      const AI_ASSISTANT_URL = 'https://lydsisparsmvextskevw.supabase.co/functions/v1/ai-strategy-assistant';
+      
+      const response = await fetch(AI_ASSISTANT_URL, {
         method: 'POST',
-        headers: getEdgeFunctionHeaders(),
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           action: 'chat',
           data: {

@@ -1,9 +1,8 @@
 // src/lib/api.ts
 // BIRD 2026–2035 · Survey Submission API
-// Posts to Supabase Edge Function: survey-submit
+// Posts to Netlify function via /api/submit
 
 import type { SurveySchemaType } from "@/lib/survey-schema";
-import { EDGE_FUNCTIONS, getEdgeFunctionHeaders } from "@/lib/supabase";
 
 export interface SubmissionResponse {
   message: string;
@@ -12,8 +11,8 @@ export interface SubmissionResponse {
 }
 
 /**
- * Submits the validated survey data to the Supabase Edge Function.
- * Endpoint: POST /functions/v1/survey-submit
+ * Submits the validated survey data to the Netlify backend function.
+ * The netlify.toml redirects /api/* to /.netlify/functions/*
  */
 export async function submitSurvey(data: Partial<SurveySchemaType>): Promise<SubmissionResponse> {
   const payload = {
@@ -77,54 +76,55 @@ export async function submitSurvey(data: Partial<SurveySchemaType>): Promise<Sub
         section8_options: {
           strategy: data.q8_1_strategy,
           sequencing: data.q8_2_sequencing,
-          ieds_confidence: data.q8_3_ieds_confidence,
-          heds_confidence: data.q8_4_heds_confidence,
-          gems_confidence: data.q8_5_gems_confidence,
-          ifes_confidence: data.q8_6_ifes_confidence,
+          comments: data.q8_3_comments,
         },
-        section9_operating: {
-          governance: data.q9_1_governance,
-          digital: data.q9_2_digital,
-          monitoring: data.q9_3_monitoring,
-          feedback: data.q9_4_feedback,
+        section9_budget: { realism: data.q9_1_budget },
+        section10_targets: {
+          ambition: data.q10_1_ambition,
+          matrix: data.q10_matrix,
         },
-        section10_ieds: {
-          phase1: data.q10_1_phase1,
-          phase2: data.q10_2_phase2,
-          phase3: data.q10_3_phase3,
+        section11_equity: {
+          affirmative: data.q11_1_affirmative,
+          mechanisms: data.q11_2_mechanisms,
         },
-        section11_metrics: {
-          kpi_alignment: data.q11_1_kpi_alignment,
-          metrics_clarity: data.q11_2_metrics_clarity,
+        section12_climate: {
+          green_priority: data.q12_1_green_priority,
+          adaptation: data.q12_2_adaptation,
         },
-        section12_bsc: {
-          financial: data.q12_1_financial,
-          stakeholder: data.q12_2_stakeholder,
-          internal: data.q12_3_internal,
-          learning: data.q12_4_learning,
+        section13_policy: {
+          legislation: data.q13_1_legislation,
+          bicc: data.q13_2_bicc,
         },
-        section13_priority: {
-          top_actions: data.q13_1_top_actions,
-          budget_feasibility: data.q13_2_budget_feasibility,
-        },
-        section14_resources: {
-          resource_needs: data.q14_1_resource_needs,
-          engagement: data.q14_2_engagement,
+        section16_care: {
+          context: data.care_context,
+          action: data.care_action,
+          realtime: data.care_realtime,
+          evidence: data.care_evidence,
+          overall: data.care_overall,
         },
       },
+      demographics: {
+        category: data.demo_category,
+        province: data.demo_province,
+        expertise: data.demo_expertise,
+        name: data.demo_name,
+        email: data.demo_email,
+        organization: data.demo_organization,
+      },
+      consent: data.consent_final,
     },
   };
 
-  const response = await fetch(EDGE_FUNCTIONS.SURVEY_SUBMIT, {
+  const response = await fetch("/api/submit", {
     method: "POST",
-    headers: getEdgeFunctionHeaders(),
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
-    const errorText = await response.text().catch(() => "Unknown error");
-    throw new Error(`Survey submission failed (${response.status}): ${errorText}`);
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || `Server error: ${response.status}`);
   }
 
-  return (await response.json()) as SubmissionResponse;
+  return response.json();
 }
