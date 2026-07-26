@@ -6,6 +6,9 @@ import React, { useState, useCallback } from "react";
 import { submitSurvey } from "@/lib/api";
 import { surveySchema, type SurveySchemaType } from "@/lib/survey-schema";
 import { Toaster, toast } from "sonner";
+import FloatingAIAssistant from "./FloatingAIAssistant";
+import { triggerEmailNotification } from "@/lib/supabase";
+import { useAuth } from "@/hooks/useAuth";
 
 // ─── SECTION COMPONENTS & TYPES ──────────────────────────────────────────────
 import Section0_Orientation, { type Section0Data } from "./Section0_Orientation";
@@ -57,6 +60,7 @@ const STEP_LABELS = [
 // MAIN WIZARD COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════════
 const SurveyWizard: React.FC = () => {
+  const { user } = useAuth();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [birdScores, setBirdScores] = useState<Record<string, number>>({});
@@ -842,8 +846,15 @@ const SurveyWizard: React.FC = () => {
       };
 
       // This calls the Edge Function via your centralized api.ts wrapper
-      await submitSurvey(payload as any); 
+      await submitSurvey(payload as any);
       toast.success("Survey submitted successfully! Your input shapes the Emerging Bangsamoro.");
+
+      // Send confirmation email if user is signed in (best-effort, non-blocking)
+      if (user?.id) {
+        triggerEmailNotification('welcome', user.id, {
+          full_name: user.email?.split('@')[0] ?? 'Strategic Partner',
+        }).catch(() => {});
+      }
     } catch (err) {
       toast.error("Submission failed. Please try again or contact support.");
       console.error("Survey submission error:", err);
@@ -978,6 +989,9 @@ const SurveyWizard: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Floating AI Strategy Assistant */}
+      <FloatingAIAssistant />
     </div>
   );
 };
