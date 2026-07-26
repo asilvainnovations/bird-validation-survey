@@ -1,19 +1,17 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // BIRD 2026–2035 · Supabase Client & Edge Function Service Layer
-// Primary Supabase project: lydsisparsmvextskevw.supabase.co
-// Edge functions hosted on: lydsisparsmvextskevw.supabase.co
+// Primary Supabase project: cacimkjpkxflrtgspiay.supabase.co
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
 // ── Primary Supabase project (auth + data) ────────────────────────────────────
-// Values sourced from VITE_ env vars; hard-coded fallbacks for runtime resilience
 const supabaseUrl =
   (import.meta.env.VITE_SUPABASE_URL as string) ||
-  'https://lydsisparsmvextskevw.supabase.co';
+  "https://cacimkjpkxflrtgspiay.supabase.co";
 
 const supabaseKey =
-  (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZHNpc3BhcnNtdmV4dHNrZXZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NzIxNzEsImV4cCI6MjA5NzU0ODE3MX0.VM8BPXPLw7wGYCcUvwlTGeP4qB-M02Nq3x';
+  (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || "";
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
@@ -24,38 +22,65 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 });
 
 // ── Edge Function Endpoints ───────────────────────────────────────────────────
-// NOTE: Edge functions are deployed on a separate Supabase project.
-//       Use direct fetch() for these endpoints rather than supabase.functions.invoke()
-//       when calling from the primary project's client.
-const EDGE_BASE = 'https://lydsisparsmvextskevw.supabase.co/functions/v1';
+const EDGE_BASE = `${supabaseUrl}/functions/v1`;
 
 export const EDGE_FUNCTIONS = {
   AI_STRATEGY_ASSISTANT: `${EDGE_BASE}/ai-strategy-assistant`,
   STRATEGIC_PLANNER_SYNC: `${EDGE_BASE}/strategic-planner-sync`,
   EMAIL_NOTIFICATIONS:    `${EDGE_BASE}/email-notifications`,
   CRM_DISPATCHER:         `${EDGE_BASE}/crm-dispatcher`,
-  SUBMIT_SURVEY:          `${EDGE_BASE}/submit-survey`,
+  SUBMIT_SURVEY:          `${EDGE_BASE}/survey-submit`,
 } as const;
 
 // ── Branding Assets (CDN) ─────────────────────────────────────────────────────
 export const BRAND_ASSETS = {
-  LOGO_URL: import.meta.env.VITE_BRAND_LOGO_URL || 'https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/MTIT%20Logo.png',
-  AI_AVATAR_URL: import.meta.env.VITE_AI_STRATEGIST_AVATAR_URL || 'https://appimize.app/assets/apps/user_1097/images/2c7d825bf937_232_1097.png',
-  BANNER_URL: import.meta.env.VITE_BANNER_INVESTMENT_URL || 'https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/1.Banner.png',
+  LOGO_URL:
+    (import.meta.env.VITE_BRAND_LOGO_URL as string) ||
+    `${supabaseUrl}/storage/v1/object/public/bird-images/MTIT%20Logo.png`,
+  AI_AVATAR_URL:
+    (import.meta.env.VITE_AI_STRATEGIST_AVATAR_URL as string) ||
+    "https://appimize.app/assets/apps/user_1097/images/2c7d825bf937_232_1097.png",
+  BANNER_URL:
+    (import.meta.env.VITE_BANNER_INVESTMENT_URL as string) ||
+    `${supabaseUrl}/storage/v1/object/public/bird-images/1.Banner.png`,
 } as const;
 
 // ── External URLs ──────────────────────────────────────────────────────────────
 export const EXTERNAL_URLS = {
-  PWA:          import.meta.env.VITE_PWA_EXTERNAL_URL      || 'https://bangsamoro-investment-roadmap.asilvainnovations.com',
-  USER_MANUAL:  import.meta.env.VITE_USER_MANUAL_URL       || 'https://bird-user-manual.asilvainnovations.com',
-  DEV_DOCS:     import.meta.env.VITE_DEVELOPER_DOCS_URL    || 'https://asilvainnovations.github.io/strat-planner-pwa/developer-doc.html',
+  PWA:
+    (import.meta.env.VITE_PWA_EXTERNAL_URL as string) ||
+    "https://bangsamoro-investment-roadmap.asilvainnovations.com",
+  USER_MANUAL:
+    (import.meta.env.VITE_USER_MANUAL_URL as string) ||
+    "https://bird-user-manual.asilvainnovations.com",
+  DEV_DOCS:
+    (import.meta.env.VITE_DEVELOPER_DOCS_URL as string) ||
+    "https://asilvainnovations.github.io/strat-planner-pwa/developer-doc.html",
 } as const;
 
-// ── Typed Headers Helper ──────────────────────────────────────────────────────
+// ── Header Helpers ─────────────────────────────────────────────────────────────
+
+/**
+ * Returns headers for Edge Function calls that require a user JWT token.
+ * Used by planner sync operations that pass the user's auth token.
+ */
 export const getAuthHeaders = (token: string): HeadersInit => ({
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${token}`,
+  "Content-Type": "application/json",
+  Authorization: `Bearer ${token}`,
 });
+
+/**
+ * Returns standard headers for Edge Function fetch() calls using the anon key.
+ * Includes the anon key as Authorization bearer for Supabase auth context.
+ * This is the missing export that api.ts requires.
+ */
+export function getEdgeFunctionHeaders(): Record<string, string> {
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${supabaseKey}`,
+    apikey: supabaseKey,
+  };
+}
 
 // ── EDGE FUNCTION SERVICE CALLS ───────────────────────────────────────────────
 
@@ -63,7 +88,7 @@ export const getAuthHeaders = (token: string): HeadersInit => ({
 export async function fetchPlannerState(token: string): Promise<any | null> {
   try {
     const res = await fetch(EDGE_FUNCTIONS.STRATEGIC_PLANNER_SYNC, {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(token),
     });
     if (!res.ok) {
@@ -72,7 +97,7 @@ export async function fetchPlannerState(token: string): Promise<any | null> {
     }
     return res.json();
   } catch (err) {
-    console.error('[supabase] fetchPlannerState error:', err);
+    console.error("[supabase] fetchPlannerState error:", err);
     return null;
   }
 }
@@ -85,14 +110,14 @@ export async function saveFullState(
 ): Promise<boolean> {
   try {
     const res = await fetch(EDGE_FUNCTIONS.STRATEGIC_PLANNER_SYNC, {
-      method: 'POST',
+      method: "POST",
       headers: getAuthHeaders(token),
       body: JSON.stringify({ plans, currentPlanId }),
     });
     if (!res.ok) throw new Error(`Sync save failed: ${res.statusText}`);
     return true;
   } catch (err) {
-    console.error('[supabase] saveFullState error:', err);
+    console.error("[supabase] saveFullState error:", err);
     return false;
   }
 }
@@ -101,14 +126,14 @@ export async function saveFullState(
 export async function saveSinglePlan(plan: any, token: string): Promise<boolean> {
   try {
     const res = await fetch(EDGE_FUNCTIONS.STRATEGIC_PLANNER_SYNC, {
-      method: 'POST',
+      method: "POST",
       headers: getAuthHeaders(token),
       body: JSON.stringify({ plan }),
     });
     if (!res.ok) throw new Error(`Plan save failed: ${res.statusText}`);
     return true;
   } catch (err) {
-    console.error('[supabase] saveSinglePlan error:', err);
+    console.error("[supabase] saveSinglePlan error:", err);
     return false;
   }
 }
@@ -117,32 +142,32 @@ export async function saveSinglePlan(plan: any, token: string): Promise<boolean>
 export async function archivePlan(planId: string, token: string): Promise<boolean> {
   try {
     const res = await fetch(`${EDGE_FUNCTIONS.STRATEGIC_PLANNER_SYNC}?plan_id=${planId}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: getAuthHeaders(token),
     });
     if (!res.ok) throw new Error(`Archive failed: ${res.statusText}`);
     return true;
   } catch (err) {
-    console.error('[supabase] archivePlan error:', err);
+    console.error("[supabase] archivePlan error:", err);
     return false;
   }
 }
 
 /** POST: Send welcome or notification email */
 export async function triggerEmailNotification(
-  type: 'welcome' | 'share' | 'kpi_alert' | 'weekly_digest',
+  type: "welcome" | "share" | "kpi_alert" | "weekly_digest",
   userId: string,
   metadata?: Record<string, unknown>,
 ): Promise<boolean> {
   try {
     const res = await fetch(EDGE_FUNCTIONS.EMAIL_NOTIFICATIONS, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type, user_id: userId, ...metadata }),
     });
     return res.ok;
   } catch (err) {
-    console.error('[supabase] triggerEmailNotification error:', err);
+    console.error("[supabase] triggerEmailNotification error:", err);
     return false;
   }
 }
