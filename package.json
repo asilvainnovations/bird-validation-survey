@@ -25,8 +25,6 @@
     "@supabase/ssr": "^0.12.3",
     "@supabase/supabase-js": "^2.110.8",
     "@tanstack/react-query": "^5.56.2",
-    "baseline-browser-mapping": "^2.11.3",
-    "caniuse-lite": "^1.0.30001806",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.462.0",
