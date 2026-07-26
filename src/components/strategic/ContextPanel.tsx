@@ -1,7 +1,3 @@
-// src/components/strategic/ContextPanel.tsx
-// BIRD 2026-2035 · Context Reference Panel with Videos, Images, Sites & AI Assistant
-// Updated: 2026-07-23 — Integrated FloatingAIAssistant for Validation Survey
-
 import React, { useState } from "react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
@@ -11,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import {
-  Play, Image as ImageIcon, BookOpen, Globe, Info, Sparkles, MessageCircle,
+  Play, Image as ImageIcon, BookOpen, Globe, Info, Sparkles,
 } from "lucide-react";
 import {
   BIRD_VIDEOS, BIRD_IMAGES, BIRD_SITES,
@@ -54,11 +50,14 @@ interface ContextPanelProps {
 const VideoThumbnail: React.FC<{ video: BIRDVideo; compact?: boolean }> = ({ video, compact }) => {
   const [isOpen, setIsOpen] = useState(false);
   const videoId = video.url.split("/").pop()?.split("?")[0];
-  
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <button className={`flex items-center gap-2 rounded-lg bg-[#022c22]/60 border border-[#C9A84C]/30 hover:bg-[#C9A84C]/10 transition-all text-left w-full group ${compact ? "px-3 py-2" : "flex-col"}`}>
+        <button
+          type="button"
+          className={`flex items-center gap-2 rounded-lg bg-[#022c22]/60 border border-[#C9A84C]/30 hover:bg-[#C9A84C]/10 transition-all text-left w-full group ${compact ? "px-3 py-2" : "flex-col"}`}
+        >
           <div className={`rounded-full bg-[#C9A84C]/20 flex items-center justify-center group-hover:bg-[#C9A84C]/30 ${compact ? "w-8 h-8" : "w-14 h-14 mb-2"}`}>
             <Play className={`text-[#C9A84C] fill-current ${compact ? "w-4 h-4" : "w-6 h-6"}`} />
           </div>
@@ -92,11 +91,14 @@ const VideoThumbnail: React.FC<{ video: BIRDVideo; compact?: boolean }> = ({ vid
 const ImageCard: React.FC<{ image: BIRDImage; compact?: boolean }> = ({ image, compact }) => {
   const [isOpen, setIsOpen] = useState(false);
   const catStyle = getCategoryStyle(image.category);
-  
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <button className={`rounded-xl overflow-hidden border border-[#C9A84C]/20 hover:border-[#C9A84C]/50 transition-all bg-[#011a12] text-left w-full group ${compact ? "flex items-center gap-2 px-3 py-2" : ""}`}>
+        <button
+          type="button"
+          className={`rounded-xl overflow-hidden border border-[#C9A84C]/20 hover:border-[#C9A84C]/50 transition-all bg-[#011a12] text-left w-full group ${compact ? "flex items-center gap-2 px-3 py-2" : ""}`}
+        >
           {compact ? (
             <>
               <div className="w-8 h-8 rounded bg-[#C9A84C]/20 flex items-center justify-center">
@@ -120,8 +122,10 @@ const ImageCard: React.FC<{ image: BIRDImage; compact?: boolean }> = ({ image, c
               </div>
               <div className="p-3">
                 <p className="text-sm font-semibold text-[#E8C560] line-clamp-2">{image.title}</p>
-                {"description" in image && image.description && (
-                  <p className="text-[10px] text-[#ecfdf5]/40 mt-1 line-clamp-2">{image.description}</p>
+                {(image as BIRDImage & { description?: string }).description && (
+                  <p className="text-[10px] text-[#ecfdf5]/40 mt-1 line-clamp-2">
+                    {(image as BIRDImage & { description?: string }).description}
+                  </p>
                 )}
               </div>
             </>
@@ -138,7 +142,9 @@ const ImageCard: React.FC<{ image: BIRDImage; compact?: boolean }> = ({ image, c
         />
         <div className="flex items-start gap-2 mt-2">
           <Info className="w-4 h-4 text-[#C9A84C] mt-0.5 flex-shrink-0" />
-          <p className="text-sm text-[#ecfdf5]/70">{(image as BIRDImage & { description?: string }).description}</p>
+          <p className="text-sm text-[#ecfdf5]/70">
+            {(image as BIRDImage & { description?: string }).description}
+          </p>
         </div>
         <div className="flex gap-2 mt-1">
           <Badge variant="outline" className={`text-[10px] ${catStyle.border} ${catStyle.text} ${catStyle.bg}`}>
@@ -176,26 +182,26 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
   sectionId, showAll = false, compact = false,
 }) => {
   const [aiAssistantOpen, setAiAssistantOpen] = useState(false);
-  
+
   const sectionVideos = showAll
     ? Object.values(BIRD_VIDEOS)
     : sectionId
     ? getVideosForSection(sectionId)
     : [];
-    
+
   const sectionImages = showAll
     ? Object.values(BIRD_IMAGES)
     : sectionId
     ? getImagesForSection(sectionId)
     : [];
-    
+
   const hasContent = sectionVideos.length > 0 || sectionImages.length > 0;
-  
+
   if (!hasContent && !showAll) return null;
-  
+
   // Determine default tab
   const defaultTab = sectionVideos.length > 0 ? "videos" : sectionImages.length > 0 ? "images" : "sites";
-  
+
   return (
     <div className={`rounded-xl border border-[#C9A84C]/20 bg-[#011a12]/50 backdrop-blur-sm ${compact ? "p-3" : "p-4"}`}>
       <div className="flex items-center gap-2 mb-3">
@@ -207,6 +213,7 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
           </Badge>
         )}
         <Button
+          type="button"
           variant="outline"
           size="sm"
           className="ml-auto text-[10px] border-[#C9A84C]/30 text-[#C9A84C] hover:bg-[#C9A84C]/10"
@@ -216,7 +223,7 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
           Ask BIRD AI
         </Button>
       </div>
-      
+
       <Tabs defaultValue={defaultTab} className="w-full">
         <TabsList className="bg-[#022c22]/60 border border-[#C9A84C]/20 w-full mb-3 flex-wrap h-auto py-1">
           {(sectionVideos.length > 0 || showAll) && (
@@ -233,7 +240,7 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
             <Globe className="w-3 h-3 mr-1" /> Sites ({Object.keys(BIRD_SITES).length})
           </TabsTrigger>
         </TabsList>
-        
+
         {(sectionVideos.length > 0 || showAll) && (
           <TabsContent value="videos">
             <ScrollArea className={compact ? "h-48" : "h-64"}>
@@ -243,7 +250,7 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
             </ScrollArea>
           </TabsContent>
         )}
-        
+
         {(sectionImages.length > 0 || showAll) && (
           <TabsContent value="images">
             <ScrollArea className={compact ? "h-48" : "h-72"}>
@@ -253,7 +260,7 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
             </ScrollArea>
           </TabsContent>
         )}
-        
+
         <TabsContent value="sites">
           <ScrollArea className={compact ? "h-48" : "h-72"}>
             <div className="space-y-2">
@@ -262,7 +269,7 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
           </ScrollArea>
         </TabsContent>
       </Tabs>
-      
+
       {/* Floating AI Assistant Dialog */}
       <Dialog open={aiAssistantOpen} onOpenChange={setAiAssistantOpen}>
         <DialogContent className="max-w-4xl h-[80vh] bg-[#022c22] border-[#C9A84C]/30 p-0">
@@ -273,7 +280,7 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-hidden">
-            <FloatingAIAssistant 
+            <FloatingAIAssistant
               plan={null}
               activeView={sectionId || "survey"}
               compact={false}
@@ -292,9 +299,9 @@ export const ContextStrip: React.FC<{ sectionId: string }> = ({ sectionId }) => 
   const videos = getVideosForSection(sectionId);
   const images = getImagesForSection(sectionId);
   const total = videos.length + images.length;
-  
+
   if (total === 0) return null;
-  
+
   return (
     <div className="flex items-center gap-2 flex-wrap justify-center">
       {videos.map((v, i) => {
@@ -302,7 +309,10 @@ export const ContextStrip: React.FC<{ sectionId: string }> = ({ sectionId }) => 
         return (
           <Dialog key={`v-${i}`}>
             <DialogTrigger asChild>
-              <button className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#C9A84C]/10 border border-[#C9A84C]/30 text-[#E8C560] text-[10px] font-semibold hover:bg-[#C9A84C]/20 transition-colors">
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#C9A84C]/10 border border-[#C9A84C]/30 text-[#E8C560] text-[10px] font-semibold hover:bg-[#C9A84C]/20 transition-colors"
+              >
                 <Play className="w-3 h-3 fill-current" /> {v.duration}
               </button>
             </DialogTrigger>
@@ -326,7 +336,10 @@ export const ContextStrip: React.FC<{ sectionId: string }> = ({ sectionId }) => 
       {images.map((img, i) => (
         <Dialog key={`img-${i}`}>
           <DialogTrigger asChild>
-            <button className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#C9A84C]/10 border border-[#C9A84C]/30 text-[#E8C560] text-[10px] font-semibold hover:bg-[#C9A84C]/20 transition-colors">
+            <button
+              type="button"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#C9A84C]/10 border border-[#C9A84C]/30 text-[#E8C560] text-[10px] font-semibold hover:bg-[#C9A84C]/20 transition-colors"
+            >
               <ImageIcon className="w-3 h-3" /> {img.category}
             </button>
           </DialogTrigger>
@@ -338,7 +351,9 @@ export const ContextStrip: React.FC<{ sectionId: string }> = ({ sectionId }) => 
             {(img as BIRDImage & { description?: string }).description && (
               <div className="flex items-start gap-2 mt-2">
                 <Info className="w-4 h-4 text-[#C9A84C] mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-[#ecfdf5]/70">{(img as BIRDImage & { description?: string }).description}</p>
+                <p className="text-sm text-[#ecfdf5]/70">
+                  {(img as BIRDImage & { description?: string }).description}
+                </p>
               </div>
             )}
           </DialogContent>
@@ -353,7 +368,7 @@ export const MediaBrowser: React.FC<{ category?: string; title?: string }> = ({ 
   const images = category
     ? Object.values(BIRD_IMAGES).filter(img => img.category === category)
     : Object.values(BIRD_IMAGES);
-    
+
   return (
     <div className="space-y-4">
       {title && <h3 className="text-lg font-bold text-[#C9A84C] font-serif">{title}</h3>}
