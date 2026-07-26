@@ -190,10 +190,10 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
         )}
       </header>
 
-      {/* ── Main Content ── */}
-      <main className="flex-1">
-        {children}
-      </main>
+        {/* ── Survey ── */}
+  <main className="flex-1">
+    <SurveyWizard /> {/* <-- Rendered here */}
+  </main>
 
       {/* ── Footer ── */}
       <footer className="border-t border-white/5 bg-[#011a12]">
