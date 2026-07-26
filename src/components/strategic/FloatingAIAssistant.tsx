@@ -1,10 +1,15 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Sparkles, X, Send, Loader2, Brain, Target, BarChart3, Globe2, MessageCircle } from 'lucide-react';
+// src/components/strategic/FloatingAIAssistant.tsx
+// BIRD 2026-2035 · AI Strategy Assistant for Validation Survey
+// Wired to: https://lydsisparsmvextskevw.supabase.co/functions/v1/ai-strategy-assistant
+// Updated: 2026-07-23
+
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { Sparkles, X, Send, Loader2, ChevronDown, ChevronUp, Brain, Target, BarChart3, Globe2, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { EDGE_FUNCTIONS } from '@/lib/supabase';
+import { AIStrategistAvatar } from '@/components/branding/Logo';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface Msg {
@@ -89,7 +94,9 @@ const FloatingAIAssistant: React.FC<FloatingAIAssistantProps> = ({
     setLoading(true);
 
     try {
-      const response = await fetch(EDGE_FUNCTIONS.AI_STRATEGY_ASSISTANT, {
+      const AI_ASSISTANT_URL = 'https://lydsisparsmvextskevw.supabase.co/functions/v1/ai-strategy-assistant';
+      
+      const response = await fetch(AI_ASSISTANT_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -145,7 +152,6 @@ const FloatingAIAssistant: React.FC<FloatingAIAssistantProps> = ({
   if (compact) {
     return (
       <Button
-        type="button"
         onClick={() => setIsOpen(true)}
         className="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 rounded-full px-5 py-3 bg-gradient-to-r from-[#C9A84C] via-[#B8942E] to-[#E8C560] text-white shadow-xl hover:scale-105 transition-all"
       >
@@ -158,7 +164,6 @@ const FloatingAIAssistant: React.FC<FloatingAIAssistantProps> = ({
   if (!isOpen) {
     return (
       <Button
-        type="button"
         onClick={() => setIsOpen(true)}
         variant="outline"
         className="fixed bottom-5 right-5 z-50 rounded-full px-4 py-2 bg-[#C9A84C]/10 border-[#C9A84C]/30 text-[#C9A84C] hover:bg-[#C9A84C]/20"
@@ -174,9 +179,7 @@ const FloatingAIAssistant: React.FC<FloatingAIAssistantProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between gap-2 px-4 py-3 bg-gradient-to-r from-[#B8942E] via-[#A08028] to-[#C9A84C] text-white flex-shrink-0 rounded-t-lg">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white" />
-          </div>
+          <AIStrategistAvatar size="sm" />
           <div>
             <p className="font-bold text-sm">BIRD AI Assistant</p>
             <p className="text-[10px] text-white/70">Validation Survey Guide</p>
@@ -190,13 +193,12 @@ const FloatingAIAssistant: React.FC<FloatingAIAssistantProps> = ({
             </Badge>
           )}
           <Button
-            type="button"
             variant="ghost"
             size="sm"
             onClick={() => setIsOpen(false)}
             className="h-8 w-8 p-0 hover:bg-white/20 text-white"
           >
-            <X className="w-4 h-4" />
+            <ChevronDown className="w-4 h-4" />
           </Button>
         </div>
       </div>
@@ -253,7 +255,6 @@ const FloatingAIAssistant: React.FC<FloatingAIAssistantProps> = ({
               {SURVEY_SUGGESTIONS.map(({ icon: Icon, label }) => (
                 <button
                   key={label}
-                  type="button"
                   onClick={() => send(label)}
                   className={cn(
                     'flex items-start gap-2.5 text-left rounded-xl border border-[#C9A84C]/20 bg-[#022c22]/60',
@@ -289,7 +290,6 @@ const FloatingAIAssistant: React.FC<FloatingAIAssistantProps> = ({
           )}
         />
         <Button
-          type="button"
           onClick={() => send(input)}
           disabled={loading || !input.trim()}
           size="icon"

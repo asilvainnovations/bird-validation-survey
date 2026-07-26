@@ -7,7 +7,6 @@ import { AuthModal } from "@/components/auth/AuthModal";
 import { useTheme } from "@/components/theme-provider";
 import { Toggle } from "@/components/ui/toggle";
 import { ContextPanel } from "@/components/strategic/ContextPanel";
-import FloatingAIAssistant from "@/components/strategic/FloatingAIAssistant";
 import { Button } from "@/components/ui/button";
 import {
   Loader2,
@@ -44,8 +43,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const sectionId = React.useMemo(() => {
     const path = location.pathname;
     if (path.includes("section0") || path === "/" || path === "/validation-survey") return "section0";
-    if (path.includes("section1")) return "section1";
-    if (path.includes("section2")) return "section2";
     if (path.includes("section3")) return "section3";
     if (path.includes("section4")) return "section4";
     if (path.includes("section5")) return "section5";
@@ -57,8 +54,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
     if (path.includes("section11")) return "section11";
     if (path.includes("section12")) return "section12";
     if (path.includes("section13")) return "section13";
-    if (path.includes("section14")) return "section14";
-    if (path.includes("section15")) return "section15";
     return undefined;
   }, [location.pathname]);
 
@@ -135,7 +130,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
             <div className="flex items-center gap-2">
               {/* Context Panel Toggle */}
               <Button
-                type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => setContextPanelOpen((v) => !v)}
@@ -178,7 +172,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
                     </span>
                   </div>
                   <button
-                    type="button"
                     onClick={handleSignOut}
                     className="p-2 rounded-lg text-[#ecfdf5]/60 hover:text-rose-400 hover:bg-white/5 transition-colors"
                     title="Sign out"
@@ -188,7 +181,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
                 </div>
               ) : (
                 <button
-                  type="button"
                   onClick={() => setShowAuthModal(true)}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#C9A84C]/10 hover:bg-[#C9A84C]/20 text-[#C9A84C] text-xs font-bold border border-[#C9A84C]/30 transition-colors"
                 >
@@ -201,7 +193,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
           {/* Mobile Menu Toggle */}
           <div className="flex md:hidden items-center gap-2">
             <Button
-              type="button"
               variant="ghost"
               size="sm"
               onClick={() => setContextPanelOpen((v) => !v)}
@@ -225,7 +216,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
               )}
             </Toggle>
             <button
-              type="button"
               onClick={() => setMobileNavOpen((v) => !v)}
               className="p-2 rounded-lg text-[#ecfdf5]/70 hover:bg-white/5 transition-colors"
               aria-label="Toggle navigation"
@@ -255,7 +245,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
             <div className="border-t border-white/5 mt-2 pt-2">
               {isAuthenticated ? (
                 <button
-                  type="button"
                   onClick={() => {
                     handleSignOut();
                     setMobileNavOpen(false);
@@ -266,7 +255,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
                 </button>
               ) : (
                 <button
-                  type="button"
                   onClick={() => {
                     setShowAuthModal(true);
                     setMobileNavOpen(false);
@@ -310,7 +298,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-bold text-[#C9A84C]">Context & References</h3>
                   <button
-                    type="button"
                     onClick={() => setContextPanelOpen(false)}
                     className="p-1 rounded hover:bg-white/5"
                   >
@@ -365,13 +352,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
-      />
-
-      {/* ── Floating AI Assistant ── */}
-      <FloatingAIAssistant
-        plan={null}
-        activeView={sectionId || "survey"}
-        compact={true}
       />
     </div>
   );
