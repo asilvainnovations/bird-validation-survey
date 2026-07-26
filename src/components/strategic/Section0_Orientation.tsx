@@ -1,6 +1,6 @@
 // src/components/strategic/Section0_Orientation.tsx
 // BIRD 2026–2035 · Section 0: Welcome & Orientation
-// Updated: 2026-07-23 — Added interactive systems thinking quiz with CLD and feedback loop images
+// Updated: 2026-07-23 — Fixed prop name to match SurveyWizard (onChange instead of setData)
 
 import React, { useState } from "react";
 import { Sparkles, Play, ArrowRight, BookOpen, BarChart3, Users, CheckCircle2, XCircle } from "lucide-react";
@@ -20,10 +20,10 @@ export interface Section0Data {
 
 interface Section0Props {
   data: Section0Data;
-  setData: React.Dispatch<React.SetStateAction<Section0Data>>;
+  onChange: (data: Section0Data) => void; // ✅ FIXED: Changed from setData to onChange
 }
 
-const Section0_Orientation: React.FC<Section0Props> = ({ data, setData }) => {
+const Section0_Orientation: React.FC<Section0Props> = ({ data, onChange }) => {
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
   const [showQuizResults, setShowQuizResults] = useState(false);
 
@@ -31,7 +31,7 @@ const Section0_Orientation: React.FC<Section0Props> = ({ data, setData }) => {
     field: K,
     value: Section0Data[K]
   ) => {
-    setData((prev) => ({ ...prev, [field]: value }));
+    onChange({ ...data, [field]: value }); // ✅ FIXED: Use onChange
   };
 
   const handleQuizAnswer = (questionId: number, answer: string) => {
