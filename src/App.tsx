@@ -11,6 +11,7 @@ import AppLayout from "@components/AppLayout";
 // The survey wizard itself is the heaviest component; it loads on demand.
 const Index = lazy(() => import("@pages/Index"));
 const NotFound = lazy(() => import("@pages/NotFound"));
+const SurveyDashboard = lazy(() => import("@components/dashboard/SurveyDashboard"));
 
 // ─── LOADING FALLBACK ───────────────────────────────────────────────────────
 const AppLoadingFallback = React.memo(() => (
@@ -110,10 +111,11 @@ const App: React.FC = () => (
                 {/* Core SPA routes */}
                 <Route path="/" element={<Index />} />
                 <Route path="/validation-survey" element={<Index />} />
+                <Route path="/dashboard" element={<SurveyDashboard />} />
 
                 {/* Redirects: old static HTML pages → SPA equivalent */}
-                <Route path="/survey-dashboard" element={<Navigate to="/" replace />} />
-                <Route path="/survey-dashboard.html" element={<Navigate to="/" replace />} />
+                <Route path="/survey-dashboard" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/survey-dashboard.html" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/survey-orientation" element={<Navigate to="/" replace />} />
                 <Route path="/survey-orientation.html" element={<Navigate to="/" replace />} />
                 <Route path="/validation-survey.html" element={<Navigate to="/" replace />} />
