@@ -4,6 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   1. BASE LAYER (Variables, Resets, Inputs)
+   ═══════════════════════════════════════════════════════════════════════════ */
 @layer base {
   :root {
     /* Core Colors */
@@ -149,9 +152,7 @@
     --sidebar-border: 215 25% 27%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
@@ -164,34 +165,18 @@
   }
 
   pre, code {
-    @apply font-mono;
+    @apply font-mono text-foreground;
   }
 
-  /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
   }
 
-  /* Selection colors */
   ::selection {
     @apply bg-primary/20 text-foreground;
   }
-}
 
-@layer components {
-  @layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground font-sans antialiased;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    transition: background-color var(--transition-base), color var(--transition-base);
-  }
-
-  /* ðŸ”§ FIX: Ensure all text inputs have visible text color */
+  /* 🔧 FIX: Ensure all text inputs have visible text color */
   input,
   textarea,
   select,
@@ -206,7 +191,6 @@
     caret-color: hsl(var(--primary));
   }
 
-  /* Explicit input styles for better visibility */
   input::placeholder,
   textarea::placeholder {
     @apply text-muted-foreground;
@@ -222,19 +206,11 @@
     @apply text-muted-foreground;
   }
 
-  /* Fix for markdown editor specifically */
   .markdown-editor {
     @apply text-foreground !important;
     color: hsl(var(--foreground)) !important;
   }
 
-  /* Fix for code editors and preformatted text in inputs */
-  pre,
-  code {
-    @apply font-mono text-foreground;
-  }
-
-  /* Ensure form controls always have visible text */
   input[type="text"],
   input[type="email"],
   input[type="password"],
@@ -248,29 +224,21 @@
   input[type="month"],
   input[type="week"],
   textarea {
-    @apply bg-background text-foreground;
-    @apply border-border;
-    @apply placeholder:text-muted-foreground;
+    @apply bg-background text-foreground border-border placeholder:text-muted-foreground;
   }
 
-  /* Fix for readonly/disabled states */
   input:disabled,
   textarea:disabled,
   input[readonly],
   textarea[readonly] {
     @apply opacity-70 text-foreground;
   }
-
-  /* Smooth scrolling */
-  html {
-    scroll-behavior: smooth;
-  }
-
-  /* Selection colors */
-  ::selection {
-    @apply bg-primary/20 text-foreground;
-  }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   2. COMPONENTS LAYER (Glass, Materials, UI Elements)
+   ═══════════════════════════════════════════════════════════════════════════ */
+@layer components {
   /* Liquid Glass Surface */
   .glass {
     background: hsla(var(--glass-background) / var(--glass-background-alpha));
@@ -303,7 +271,6 @@
     box-shadow: var(--shadow-xl);
   }
 
-  /* Glass Card */
   .glass-card {
     @apply glass rounded-[--radius-lg] p-6 transition-all duration-300;
   }
@@ -313,7 +280,6 @@
     box-shadow: var(--shadow-xl);
   }
 
-  /* Vibrancy Effect */
   .vibrancy {
     position: relative;
     overflow: hidden;
@@ -337,51 +303,21 @@
     opacity: 1;
   }
 
-  /* Depth Layers */
-  .layer-1 {
-    box-shadow: var(--shadow-sm);
-    z-index: 1;
-  }
+  .layer-1 { box-shadow: var(--shadow-sm); z-index: 1; }
+  .layer-2 { box-shadow: var(--shadow-md); z-index: 2; }
+  .layer-3 { box-shadow: var(--shadow-lg); z-index: 3; }
+  .layer-4 { box-shadow: var(--shadow-xl); z-index: 4; }
 
-  .layer-2 {
-    box-shadow: var(--shadow-md);
-    z-index: 2;
-  }
+  .transition-smooth { transition: all var(--transition-base); }
+  .transition-spring { transition: all var(--transition-spring); }
 
-  .layer-3 {
-    box-shadow: var(--shadow-lg);
-    z-index: 3;
-  }
-
-  .layer-4 {
-    box-shadow: var(--shadow-xl);
-    z-index: 4;
-  }
-
-  /* Smooth Transitions */
-  .transition-smooth {
-    transition: all var(--transition-base);
-  }
-
-  .transition-spring {
-    transition: all var(--transition-spring);
-  }
-
-  /* Interactive States */
   .interactive {
     @apply cursor-pointer transition-all duration-200;
     will-change: transform, box-shadow;
   }
+  .interactive:hover { transform: scale(1.02); }
+  .interactive:active { transform: scale(0.98); }
 
-  .interactive:hover {
-    transform: scale(1.02);
-  }
-
-  .interactive:active {
-    transform: scale(0.98);
-  }
-
-  /* Frosted Glass Button */
   .btn-glass {
     @apply glass-md px-6 py-3 rounded-[--radius-md] font-medium;
     @apply transition-all duration-200 cursor-pointer;
@@ -393,78 +329,47 @@
     @apply hover:bg-primary/90;
   }
 
-  /* Material Surface */
   .material {
     @apply bg-card rounded-[--radius-lg] shadow-md;
     @apply border border-border/50;
     transition: all var(--transition-base);
   }
-
   .material:hover {
     @apply shadow-lg border-border;
   }
 
-  /* Elevated Surface */
   .elevated {
     @apply bg-card rounded-[--radius-lg];
     box-shadow: var(--shadow-lg);
     transform: translateZ(0);
     will-change: transform, box-shadow;
   }
-
   .elevated:hover {
     box-shadow: var(--shadow-xl);
     transform: translateY(-4px) translateZ(0);
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   3. UTILITIES LAYER
+   ═══════════════════════════════════════════════════════════════════════════ */
 @layer utilities {
-  /* Blur Utilities */
-  .blur-glass {
-    backdrop-filter: blur(var(--blur-lg));
-    -webkit-backdrop-filter: blur(var(--blur-lg));
-  }
+  .blur-glass { backdrop-filter: blur(var(--blur-lg)); -webkit-backdrop-filter: blur(var(--blur-lg)); }
+  .blur-glass-sm { backdrop-filter: blur(var(--blur-sm)); -webkit-backdrop-filter: blur(var(--blur-sm)); }
+  .blur-glass-md { backdrop-filter: blur(var(--blur-md)); -webkit-backdrop-filter: blur(var(--blur-md)); }
+  .blur-glass-xl { backdrop-filter: blur(var(--blur-xl)); -webkit-backdrop-filter: blur(var(--blur-xl)); }
 
-  .blur-glass-sm {
-    backdrop-filter: blur(var(--blur-sm));
-    -webkit-backdrop-filter: blur(var(--blur-sm));
-  }
+  .scroll-smooth { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
 
-  .blur-glass-md {
-    backdrop-filter: blur(var(--blur-md));
-    -webkit-backdrop-filter: blur(var(--blur-md));
-  }
-
-  .blur-glass-xl {
-    backdrop-filter: blur(var(--blur-xl));
-    -webkit-backdrop-filter: blur(var(--blur-xl));
-  }
-
-  /* Smooth Scroll */
-  .scroll-smooth {
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Safe Area Padding (for mobile) */
-  .safe-top {
-    padding-top: env(safe-area-inset-top);
-  }
-
-  .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-
-  .safe-left {
-    padding-left: env(safe-area-inset-left);
-  }
-
-  .safe-right {
-    padding-right: env(safe-area-inset-right);
-  }
+  .safe-top { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-left { padding-left: env(safe-area-inset-left); }
+  .safe-right { padding-right: env(safe-area-inset-right); }
 }
 
-/* Markdown Editor & Preview */
+/* ═══════════════════════════════════════════════════════════════════════════
+   4. MARKDOWN, ANIMATIONS & ACCESSIBILITY
+   ═══════════════════════════════════════════════════════════════════════════ */
 .markdown-editor {
   @apply font-mono text-base leading-relaxed;
   @apply bg-transparent p-4 rounded-[--radius-md];
@@ -487,121 +392,51 @@
   @apply text-sm leading-relaxed;
 }
 
-.markdown-preview code {
-  @apply font-mono text-sm;
+.markdown-preview code { @apply font-mono text-sm; }
+
+.markdown-preview h1, .markdown-preview h2, .markdown-preview h3,
+.markdown-preview h4, .markdown-preview h5, .markdown-preview h6 {
+  @apply font-sans font-semibold text-foreground scroll-mt-20;
 }
 
-.markdown-preview h1,
-.markdown-preview h2,
-.markdown-preview h3,
-.markdown-preview h4,
-.markdown-preview h5,
-.markdown-preview h6 {
-  @apply font-sans font-semibold text-foreground;
-  @apply scroll-mt-20;
-}
-
-.markdown-preview ul,
-.markdown-preview ol {
-  @apply my-4 ml-6;
-}
+.markdown-preview ul, .markdown-preview ol { @apply my-4 ml-6; }
 
 .markdown-preview blockquote {
   @apply border-l-4 border-primary/30 pl-4 italic;
   @apply bg-secondary/30 py-2 pr-4 rounded-r-[--radius-sm];
 }
 
-.markdown-preview table {
-  @apply w-full border-collapse;
-}
-
-.markdown-preview th {
-  @apply bg-secondary/50 font-semibold text-left p-3;
-  @apply border-b-2 border-border;
-}
-
-.markdown-preview td {
-  @apply p-3 border-b border-border/50;
-}
+.markdown-preview table { @apply w-full border-collapse; }
+.markdown-preview th { @apply bg-secondary/50 font-semibold text-left p-3 border-b-2 border-border; }
+.markdown-preview td { @apply p-3 border-b border-border/50; }
 
 .markdown-preview img {
-  @apply rounded-[--radius-md] shadow-md;
-  @apply transition-transform duration-300;
+  @apply rounded-[--radius-md] shadow-md transition-transform duration-300;
 }
+.markdown-preview img:hover { @apply scale-[1.02] shadow-lg; }
 
-.markdown-preview img:hover {
-  @apply scale-[1.02] shadow-lg;
-}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+.animate-fade-in { animation: fadeIn var(--transition-base) ease-out; }
+.animate-slide-in { animation: slideIn var(--transition-base) ease-out; }
+.animate-scale-in { animation: scaleIn var(--transition-base) ease-out; }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn var(--transition-base) ease-out;
-}
-
-.animate-slide-in {
-  animation: slideIn var(--transition-base) ease-out;
-}
-
-.animate-scale-in {
-  animation: scaleIn var(--transition-base) ease-out;
-}
-
-/* Focus Visible for Accessibility */
 :focus-visible {
-  @apply outline-none ring-2 ring-primary/50 ring-offset-2 ring-offset-background;
-  @apply rounded-[--radius-sm];
+  @apply outline-none ring-2 ring-primary/50 ring-offset-2 ring-offset-background rounded-[--radius-sm];
 }
 
-/* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
 
-/* High Contrast Mode */
 @media (prefers-contrast: high) {
-  .glass,
-  .glass-sm,
-  .glass-md,
-  .glass-lg {
+  .glass, .glass-sm, .glass-md, .glass-lg {
     border-width: 2px;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
@@ -609,28 +444,85 @@
   }
 }
 
-/* Print Styles */
 @media print {
-  .glass,
-  .glass-sm,
-  .glass-md,
-  .glass-lg {
+  .glass, .glass-sm, .glass-md, .glass-lg {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     background: white;
     border: 1px solid #e5e7eb;
   }
 }
-/* ========================================
-    ENHANCED PLATFORM BADGES
-   ======================================== */
 
-/* Primary Badge Selectors */
-#bolt-badge, 
-.bolt-badge,
-[data-bolt-badge],
-[id*="bolt"][id*="badge"],
-[class*="bolt"][class*="badge"] {
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. BIRD THEME-AWARE COMPONENT UTILITIES
+   ═══════════════════════════════════════════════════════════════════════════ */
+.surface-base   { @apply bg-white dark:bg-[#022c22]; }
+.surface-raised { @apply bg-white dark:bg-[#022c22]/60; }
+.surface-sunken { @apply bg-[#ecfdf5]/5 dark:bg-[#011a12]; }
+.surface-panel  { @apply bg-[#064e3b]/10 dark:bg-[#022c22]/40 border border-[#C9A84C]/20; }
+
+.text-primary-content   { @apply text-[#022c22] dark:text-[#E8C560]; }
+.text-secondary-content { @apply text-[#064e3b] dark:text-[#ecfdf5]/80; }
+.text-tertiary-content  { @apply text-[#64748b] dark:text-[#64748b]/80; }
+
+.border-subtle  { @apply border-[#C9A84C]/20 dark:border-[#C9A84C]/15; }
+.border-strong  { @apply border-[#C9A84C]/30 dark:border-[#C9A84C]/25; }
+
+.input-field {
+  @apply bg-white dark:bg-[#022c22]/60
+         text-slate-900 dark:text-[#ecfdf5]
+         border-[#C9A84C]/30 dark:border-[#C9A84C]/20
+         placeholder:text-[#64748b] dark:placeholder:text-[#64748b]/60
+         focus:ring-[#C9A84C] focus:border-[#C9A84C];
+}
+
+.card-surface {
+  @apply bg-white dark:bg-[#022c22]/40
+         border border-[#C9A84C]/20 dark:border-[#C9A84C]/15
+         rounded-xl shadow-sm;
+}
+
+.tab-bar { @apply bg-[#064e3b]/10 dark:bg-[#022c22]/60 rounded-xl p-1 border border-[#C9A84C]/20; }
+.tab-item { @apply text-[#64748b] dark:text-[#64748b] hover:text-[#C9A84C] dark:hover:text-[#E8C560]; }
+.tab-item-active { @apply bg-[#C9A84C]/20 shadow-sm text-[#022c22] dark:text-[#E8C560] ring-1 ring-[#C9A84C]/30; }
+
+.badge-neutral { @apply bg-[#064e3b]/10 dark:bg-[#022c22]/60 text-[#64748b] dark:text-[#64748b]; }
+
+.cld-canvas-bg {
+  @apply bg-gradient-to-br from-[#ecfdf5]/5 via-[#022c22]/20 to-[#064e3b]/10
+         dark:from-[#011a12] dark:via-[#022c22] dark:to-[#064e3b]/20
+         border border-[#C9A84C]/20 dark:border-[#C9A84C]/15;
+}
+
+.panel-overlay {
+  @apply bg-white dark:bg-[#022c22]
+         border border-[#C9A84C]/20 dark:border-[#C9A84C]/15
+         shadow-xl;
+}
+
+.section-header {
+  @apply bg-gradient-to-r from-[#064e3b]/5 to-[#064e3b]/10
+         dark:from-[#022c22] dark:to-[#011a12]
+         border-b border-[#C9A84C]/20 dark:border-[#C9A84C]/15;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   6. PLATFORM BADGES
+   ═══════════════════════════════════════════════════════════════════════════ */
+#bolt-badge, .bolt-badge, [data-bolt-badge], 
+[id*="bolt"][id*="badge"], [class*="bolt"][class*="badge"],
+iframe[src*="bolt"], iframe[src*="badge"], iframe[title*="bolt"], 
+iframe[title*="badge"], iframe[data-bolt], iframe.badge,
+[style*="position: fixed"][style*="bottom"], [style*="position:fixed"][style*="bottom"],
+div[style*="z-index: 999"], div[style*="z-index:999"], div[style*="z-index: 9999"],
+a[href*="bolt.new"], a[href*="bolt.diy"],
+[data-badge="bolt"], [data-platform="bolt"], [data-branding="bolt"],
+.platform-badge, .builder-badge, .powered-by-badge,
+[class*="made-in"], [class*="powered-by"], [class*="built-with"],
+body > div:last-child[style*="position: fixed"], body > div:last-child[style*="position:fixed"],
+body > a:last-child[style*="position: fixed"], body > a:last-child[style*="position:fixed"],
+svg[data-badge], svg[class*="badge"], svg[id*="badge"],
+[data-watermark], [data-attribution], .watermark, .attribution {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -646,137 +538,43 @@
   white-space: nowrap !important;
 }
 
-/* Iframe-based badges */
-iframe[src*="bolt"],
-iframe[src*="badge"],
-iframe[title*="bolt"],
-iframe[title*="badge"],
-iframe[data-bolt],
-iframe.badge {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  height: 0 !important;
-  width: 0 !important;
+/* ═══════════════════════════════════════════════════════════════════════════
+   7. DARK MODE TEXT READABILITY FALLBACKS
+   (Unlayered to ensure highest cascade priority. Automatically flips 
+   hardcoded dark text colors to light when dark mode is active, 
+   preventing invisible text if dark: classes were omitted in TSX).
+   ═══════════════════════════════════════════════════════════════════════════ */
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  color: hsl(150 10% 95%);
 }
 
-/* Fixed position badges (common placement) */
-[style*="position: fixed"][style*="bottom"],
-[style*="position:fixed"][style*="bottom"],
-div[style*="z-index: 999"],
-div[style*="z-index:999"],
-div[style*="z-index: 9999"],
-a[href*="bolt.new"],
-a[href*="bolt.diy"] {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
+.dark p, .dark span, .dark label, .dark li, .dark td, .dark th {
+  color: hsl(150 10% 90%);
 }
 
-/* Additional common badge patterns */
-[data-badge="bolt"],
-[data-platform="bolt"],
-[data-branding="bolt"],
-.platform-badge,
-.builder-badge,
-.powered-by-badge,
-[class*="made-in"],
-[class*="powered-by"],
-[class*="built-with"] {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
+/* Override hardcoded dark text colors that become invisible on dark backgrounds */
+.dark .text-\[\#022c22\],
+.dark .text-\[\#065f46\],
+.dark .text-\[\#064e3b\],
+.dark .text-\[\#047857\],
+.dark .text-slate-900,
+.dark .text-gray-900,
+.dark .text-black,
+.dark .text-slate-800,
+.dark .text-gray-800 {
+  color: hsl(150 10% 95%) !important; /* Light emerald/cream */
 }
 
-/* Bottom-right corner elements (typical badge placement) */
-body > div:last-child[style*="position: fixed"],
-body > div:last-child[style*="position:fixed"],
-body > a:last-child[style*="position: fixed"],
-body > a:last-child[style*="position:fixed"] {
-  display: none !important;
+/* Override hardcoded muted text colors for better contrast */
+.dark .text-\[\#64748b\],
+.dark .text-slate-500,
+.dark .text-gray-500,
+.dark .text-slate-600,
+.dark .text-gray-600 {
+  color: hsl(215 20.2% 65.1%) !important; /* slate-400 equivalent */
 }
 
-/* SVG-based badges */
-svg[data-badge],
-svg[class*="badge"],
-svg[id*="badge"] {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-/* Watermark and attribution elements */
-[data-watermark],
-[data-attribution],
-.watermark,
-.attribution {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-}
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   THEME-AWARE COMPONENT UTILITIES
-   These ensure all module pages respond correctly to light/dark mode.
-   Use these classes instead of hard-coded dark-only color values.
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-
-/* Surface layers — BIRD Deep Green palette */
-.surface-base   { @apply bg-white dark:bg-[#022c22]; }
-.surface-raised { @apply bg-white dark:bg-[#022c22]/60; }
-.surface-sunken { @apply bg-[#ecfdf5]/5 dark:bg-[#011a12]; }
-.surface-panel  { @apply bg-[#064e3b]/10 dark:bg-[#022c22]/40 border border-[#C9A84C]/20; }
-
-/* Text layers — BIRD Metallic Gold + Cream */
-.text-primary-content   { @apply text-[#022c22] dark:text-[#E8C560]; }
-.text-secondary-content { @apply text-[#064e3b] dark:text-[#ecfdf5]/80; }
-.text-tertiary-content  { @apply text-[#64748b] dark:text-[#64748b]/80; }
-
-/* Border layers — BIRD Gold accents */
-.border-subtle  { @apply border-[#C9A84C]/20 dark:border-[#C9A84C]/15; }
-.border-strong  { @apply border-[#C9A84C]/30 dark:border-[#C9A84C]/25; }
-
-/* Input fields — BIRD branded */
-.input-field {
-  @apply bg-white dark:bg-[#022c22]/60
-         text-slate-900 dark:text-[#ecfdf5]
-         border-[#C9A84C]/30 dark:border-[#C9A84C]/20
-         placeholder:text-[#64748b] dark:placeholder:text-[#64748b]/60
-         focus:ring-[#C9A84C] focus:border-[#C9A84C];
-}
-
-/* Card surface — BIRD branded */
-.card-surface {
-  @apply bg-white dark:bg-[#022c22]/40
-         border border-[#C9A84C]/20 dark:border-[#C9A84C]/15
-         rounded-xl shadow-sm;
-}
-
-/* Tab / pill navigation — BIRD Gold */
-.tab-bar { @apply bg-[#064e3b]/10 dark:bg-[#022c22]/60 rounded-xl p-1 border border-[#C9A84C]/20; }
-.tab-item { @apply text-[#64748b] dark:text-[#64748b] hover:text-[#C9A84C] dark:hover:text-[#E8C560]; }
-.tab-item-active { @apply bg-[#C9A84C]/20 shadow-sm text-[#022c22] dark:text-[#E8C560] ring-1 ring-[#C9A84C]/30; }
-
-/* Stat badges — BIRD branded */
-.badge-neutral { @apply bg-[#064e3b]/10 dark:bg-[#022c22]/60 text-[#64748b] dark:text-[#64748b]; }
-
-/* CLD canvas background — BIRD branded */
-.cld-canvas-bg {
-  @apply bg-gradient-to-br from-[#ecfdf5]/5 via-[#022c22]/20 to-[#064e3b]/10
-         dark:from-[#011a12] dark:via-[#022c22] dark:to-[#064e3b]/20
-         border border-[#C9A84C]/20 dark:border-[#C9A84C]/15;
-}
-
-/* Panel overlays — BIRD branded */
-.panel-overlay {
-  @apply bg-white dark:bg-[#022c22]
-         border border-[#C9A84C]/20 dark:border-[#C9A84C]/15
-         shadow-xl;
-}
-
-/* Section header strip — BIRD branded */
-.section-header {
-  @apply bg-gradient-to-r from-[#064e3b]/5 to-[#064e3b]/10
-         dark:from-[#022c22] dark:to-[#011a12]
-         border-b border-[#C9A84C]/20 dark:border-[#C9A84C]/15;
+/* Ensure links are visible */
+.dark a {
+  color: hsl(150 10% 95%);
 }
