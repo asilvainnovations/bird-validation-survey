@@ -114,11 +114,8 @@ const App: React.FC = () => (
                 <Route path="/dashboard" element={<SurveyDashboard />} />
 
                 {/* Redirects: old static HTML pages → SPA equivalent */}
-                <Route path="/survey-dashboard" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/survey-dashboard.html" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/survey-orientation" element={<Navigate to="/" replace />} />
                 <Route path="/survey-orientation.html" element={<Navigate to="/" replace />} />
-                <Route path="/validation-survey.html" element={<Navigate to="/" replace />} />
 
                 {/* Catch-all */}
                 <Route path="*" element={<NotFound />} />
