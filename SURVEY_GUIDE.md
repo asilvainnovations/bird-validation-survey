@@ -136,3 +136,159 @@ This section documents the technical architecture for developers, system adminis
 |                                      v                                      |
 |            [Public View: survey_response_stats (PII-stripped)]              |
 +-----------------------------------------------------------------------------+
+```
+
+### 6.1 SurveyWizard.tsx & State Management
+The wizard uses React `useState` hooks for each section. State is strictly typed using `SurveySchemaType` (via Zod) to ensure zero schema drift between the frontend and backend.
+
+### 6.2 formulas.ts (Real-Time Scoring)
+The BIRD Live Score Panel uses the following formulas from `src/lib/formulas.ts` to compute metrics on the fly:
+
+| Formula | Purpose | Calculation |
+| :--- | :--- | :--- |
+| `calculateStrengthRI` | Strength Resilience Index | `(Impact × Likelihood) / 5` |
+| `calculateOpportunityRI` | Opportunity Resilience Index | `√(Impact × Likelihood)` |
+| `calculateWeaknessRisk` | Weakness Risk Level | `Impact × Likelihood` |
+| `calculateThreatVI` | Threat Vulnerability Index | `(Impact² × Likelihood) / 25` |
+
+### 6.3 api.ts & Edge Function Submission
+The `submitSurvey()` function in `src/lib/api.ts` handles persistence via the **`survey-submit` Supabase Edge Function**. The Edge Function validates consent, wraps the flat payload into a `response_data` JSONB column, and extracts key filtering fields (`demo_province`, `demo_category`) for dashboard performance.
+
+```typescript
+// Simplified flow of src/lib/api.ts
+export async function submitSurvey(data: Partial<SurveySchemaType>) {
+  try {
+    // 1. Invoke Edge Function via HTTP POST
+    const response = await fetch(EDGE_FUNCTIONS.SUBMIT_SURVEY, {
+      method: "POST",
+      headers: getEdgeFunctionHeaders(),
+      body: JSON.stringify(data), 
+    });
+    
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error);
+    
+    // 2. Clear offline queue on success
+    localStorage.removeItem("bird-survey-draft-v1");
+    return { success: true, responseId: result.id };
+  } catch (err) {
+    // 3. Fallback to localStorage queue for offline resilience
+    saveToLocalStorageQueue(data);
+    return { success: false, fallback: "localStorage" };
+  }
+}
+```
+
+---
+
+## 7. Question Types Explained
+
+### SWOT Factor Scales (Impact × Likelihood)
+Used in Steps 3–9. You provide two independent ratings (1-5) for each factor. The combined score determines strategic priority.
+* **Impact (1-5):** How big of an effect does this factor have? (1 = Very small, 5 = Very large)
+* **Likelihood (1-5):** How likely is this factor to persist or happen? (1 = Very unlikely, 5 = Very likely)
+
+### Systems Archetype Validation
+Used in Steps 4–9. You select how accurately a causal loop model describes BARMM's reality. These map to a net scoring system for aggregation:
+* **Very accurately** (+2)
+* **Somewhat accurately** (+1)
+* **Needs revision** (-1)
+* **Not accurate** (-2)
+
+### Rating Scales & Open Text
+Standard 1-5 Likert scales are used for KPI, BSC, and feasibility validation. Open text fields are used for qualitative feedback, archetype follow-ups, and additional comments.
+
+---
+
+## 8. BIRD Score Interpretation
+
+The **BIRD Live Score Panel** updates in real-time as you rate SWOT factors in Steps 3–9.
+
+### Score Range Interpretations (Normalized 1-5 Scale)
+*Applies to Strength RI, Opportunity RI, and Threat VI.*
+| Score Range | Interpretation |
+| :--- | :--- |
+| **4.0 - 5.0** | **Critical Priority:** Immediate strategic attention required. |
+| **3.0 - 3.9** | **High Priority:** Significant strategic relevance. |
+| **2.0 - 2.9** | **Moderate:** Monitor and plan intervention. |
+| **1.0 - 1.9** | **Low/Negligible:** Routine monitoring. |
+*(Note: Weakness Risk is calculated on a 1-25 scale, where higher numbers indicate greater risk exposure.)*
+
+### Strategic Balance Index (SBI)
+The panel synthesizes all four SWOT dimensions into a single 0-100 composite score:
+`SBI = ((Strength RI + Opportunity RI) / 2) - ((Weakness Risk_norm + Threat VI) / 2) + 50`
+* **> 60:** Favorable strategic position.
+* **40 - 60:** Neutral/Balanced position.
+* **< 40:** Challenging position requiring urgent intervention.
+
+---
+
+## 9. For Administrators
+
+### Deployment & Monitoring
+1. **Frontend Deploy:** `npm run build` → Deploy `dist/` to Vercel (or preferred static host).
+2. **Backend Deploy:** Ensure the database migration is applied (`supabase db push`) and the Edge Function is deployed:
+   ```bash
+   supabase functions deploy survey-submit
+   ```
+3. **Monitor:** Check the `survey_response_stats` Supabase view for real-time, PII-stripped completion rates and demographic breakdowns.
+
+### Iteration Triggers
+Consider revising the survey instrument or conducting targeted follow-ups if:
+* Overall completion rate drops below 60%.
+* A specific Systems Archetype scores a net validation of `< -0.5` (indicating strong stakeholder disagreement with the model).
+* Significant demographic skew is detected (e.g., <20% representation from island provinces).
+
+### Data Export
+Access the `survey_responses` table via the Supabase Dashboard. Use the `survey_response_stats` view for safe, anonymized analytics. Export to CSV/JSON for external MEL dashboard integration.
+
+---
+
+## 10. Troubleshooting
+
+| Issue | Solution |
+| :--- | :--- |
+| **Survey won't load** | Clear browser cache, disable ad-blockers/script-blockers, and ensure JavaScript is enabled. |
+| **Images not loading** | Check internet connection. Images are lazy-loaded from Supabase Storage and may take a moment on slow networks. |
+| **Lost progress** | Progress is saved in `localStorage` under the key `bird-survey-draft-v1`. Do not use Incognito/Private mode or clear site data mid-survey. |
+| **Submission fails** | The survey will automatically queue your response in `localStorage` and retry when online. Check your network connection. |
+
+---
+
+## 11. Frequently Asked Questions (FAQ)
+
+**Q: Can I skip questions?**  
+A: Yes. In pilot mode, all fields are optional *except* the consent checkboxes in Step 1 and the final consent confirmation in Step 15.
+
+**Q: What happens if I close my browser?**  
+A: Your progress is saved locally in your browser. Reopen the survey link on the same device and browser to resume exactly where you left off.
+
+**Q: Do I need an account or to log in?**  
+A: No. The survey is anonymous-friendly and requires no login or registration.
+
+**Q: How are my responses used?**  
+A: They are aggregated, anonymized, and fed into the MEL Dashboard to shape the final BIRD 2026-2035 document. Individual responses are never publicly attributed.
+
+**Q: Can I change my answers after submitting?**  
+A: No. Once the final "Submit Survey" button is clicked, the record is finalized. If you need to make a correction, please contact the BIRD technical team.
+
+---
+
+## 12. Appendix
+
+### Glossary of BIRD Terms
+* **BEIE:** Bangsamoro Economic and Investment Ecosystem.
+* **BIMP-EAGA:** Brunei-Indonesia-Malaysia-Philippines East ASEAN Growth Area.
+* **CLD:** Causal Loop Diagram (a visual tool mapping cause-and-effect relationships in complex systems).
+* **IEDS:** Integrated Ecosystem Development Strategy.
+* **MEL:** Monitoring, Evaluation, and Learning.
+* **RLS:** Row-Level Security (a PostgreSQL feature ensuring data access control).
+
+### Contact Information
+* **Technical Support:** `bird-team@asilvainnovations.com`
+* **BOI-MTIT BARMM:** Cotabato City, Philippines
+* **Survey Portal:** `https://bird-survey.asilvainnovations.com`
+* **Live Dashboard:** `https://bird-survey-dashboard.asilvainnovations.com`
+
+---
+*Document Version: 2.2 | Updated: 2026-07-29 | Prepared for BOI-MTIT, BARMM*
