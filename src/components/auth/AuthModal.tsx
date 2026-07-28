@@ -17,6 +17,7 @@ export function AuthModal({ isOpen, onClose, defaultView = 'login' }: AuthModalP
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
+
   const { signIn, signUp, resetPassword } = useAuth();
 
   if (!isOpen) return null;
@@ -51,7 +52,7 @@ export function AuthModal({ isOpen, onClose, defaultView = 'login' }: AuthModalP
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div
-        className="relative w-full max-w-md rounded-2xl border border-gold/20 bg-gradient-to-b from-[#022c22] to-[#011a12] p-8 shadow-2xl"
+        className="relative w-full max-w-md rounded-2xl border border-[#C9A84C]/20 bg-gradient-to-b from-[#022c22] to-[#011a12] p-8 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <button onClick={onClose} className="absolute right-4 top-4 text-white/40 hover:text-white transition-colors">
@@ -59,10 +60,10 @@ export function AuthModal({ isOpen, onClose, defaultView = 'login' }: AuthModalP
         </button>
 
         <div className="text-center mb-8">
-          <h2 className="font-cinzel text-2xl font-bold text-gold-gradient mb-2">
+          <h2 className="text-2xl font-bold text-[#E8C560] mb-2">
             {view === 'login' ? 'Welcome Back' : view === 'signup' ? 'Get Started' : 'Reset Password'}
           </h2>
-          <p className="text-white/50 text-sm">
+          <p className="text-white/60 text-sm">
             {view === 'login' ? 'Sign in to access your strategic plans' : view === 'signup' ? 'Create your BIRD account' : 'Enter your email to reset password'}
           </p>
         </div>
@@ -72,8 +73,9 @@ export function AuthModal({ isOpen, onClose, defaultView = 'login' }: AuthModalP
             {error}
           </div>
         )}
+
         {success && (
-          <div className="mb-4 rounded-lg bg-green-500/10 border border-green-500/30 p-3 text-green-300 text-sm">
+          <div className="mb-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30 p-3 text-emerald-300 text-sm">
             {success}
           </div>
         )}
@@ -81,15 +83,15 @@ export function AuthModal({ isOpen, onClose, defaultView = 'login' }: AuthModalP
         <form onSubmit={handleSubmit} className="space-y-4">
           {view === 'signup' && (
             <div>
-              <label className="block text-xs font-medium text-gold/70 mb-1.5 uppercase tracking-wider">Full Name</label>
+              <label className="block text-xs font-medium text-[#C9A84C]/80 mb-1.5 uppercase tracking-wider">Full Name</label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" size={16} />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" size={16} />
                 <input
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Juan dela Cruz"
-                  className="pl-10"
+                  className="w-full pl-10 py-2.5 rounded-lg bg-white/5 border border-white/10 text-[#ecfdf5] placeholder:text-white/40 focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] transition-all"
                   required
                 />
               </div>
@@ -97,15 +99,15 @@ export function AuthModal({ isOpen, onClose, defaultView = 'login' }: AuthModalP
           )}
 
           <div>
-            <label className="block text-xs font-medium text-gold/70 mb-1.5 uppercase tracking-wider">Email</label>
+            <label className="block text-xs font-medium text-[#C9A84C]/80 mb-1.5 uppercase tracking-wider">Email</label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" size={16} />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" size={16} />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="pl-10"
+                className="w-full pl-10 py-2.5 rounded-lg bg-white/5 border border-white/10 text-[#ecfdf5] placeholder:text-white/40 focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] transition-all"
                 required
               />
             </div>
@@ -113,22 +115,22 @@ export function AuthModal({ isOpen, onClose, defaultView = 'login' }: AuthModalP
 
           {view !== 'reset' && (
             <div>
-              <label className="block text-xs font-medium text-gold/70 mb-1.5 uppercase tracking-wider">Password</label>
+              <label className="block text-xs font-medium text-[#C9A84C]/80 mb-1.5 uppercase tracking-wider">Password</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" size={16} />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" size={16} />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Min 6 characters"
-                  className="pl-10 pr-10"
+                  className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-white/5 border border-white/10 text-[#ecfdf5] placeholder:text-white/40 focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] transition-all"
                   required={true}
                   minLength={6}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -139,7 +141,7 @@ export function AuthModal({ isOpen, onClose, defaultView = 'login' }: AuthModalP
           <button
             type="submit"
             disabled={loading}
-            className="btn btn-primary w-full mt-2"
+            className="w-full py-2.5 rounded-lg bg-[#C9A84C] text-[#011a12] font-bold text-sm hover:bg-[#E8C560] transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading ? (
               <span className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
@@ -155,20 +157,20 @@ export function AuthModal({ isOpen, onClose, defaultView = 'login' }: AuthModalP
         <div className="mt-6 text-center space-y-2 text-sm">
           {view === 'login' ? (
             <>
-              <button onClick={() => { setView('signup'); setError(''); setSuccess(''); }} className="text-gold hover:text-gold-light transition-colors">
+              <button onClick={() => { setView('signup'); setError(''); setSuccess(''); }} className="text-[#C9A84C] hover:text-[#E8C560] transition-colors font-medium">
                 Don't have an account? Sign up
               </button>
               <br />
-              <button onClick={() => { setView('reset'); setError(''); setSuccess(''); }} className="text-white/40 hover:text-white/60 transition-colors">
+              <button onClick={() => { setView('reset'); setError(''); setSuccess(''); }} className="text-white/60 hover:text-white transition-colors">
                 Forgot password?
               </button>
             </>
           ) : view === 'signup' ? (
-            <button onClick={() => { setView('login'); setError(''); setSuccess(''); }} className="text-gold hover:text-gold-light transition-colors">
+            <button onClick={() => { setView('login'); setError(''); setSuccess(''); }} className="text-[#C9A84C] hover:text-[#E8C560] transition-colors font-medium">
               Already have an account? Sign in
             </button>
           ) : (
-            <button onClick={() => { setView('login'); setError(''); setSuccess(''); }} className="text-gold hover:text-gold-light transition-colors">
+            <button onClick={() => { setView('login'); setError(''); setSuccess(''); }} className="text-[#C9A84C] hover:text-[#E8C560] transition-colors font-medium">
               Back to sign in
             </button>
           )}
