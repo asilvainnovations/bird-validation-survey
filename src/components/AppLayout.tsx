@@ -1,4 +1,7 @@
 // src/components/AppLayout.tsx
+// BIRD 2026–2035 · Validation Survey Shell
+// Updated: 2026-07-29 · Resolved double footer, wired Live Dashboard to React route
+
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -22,13 +25,15 @@ import {
   PanelRightOpen,
 } from "lucide-react";
 
+// ─── STATIC COMPANION PAGES & REACT ROUTES ──────────────────────────────────
 const NAV_LINKS = [
   { label: "Orientation", href: "/survey-orientation.html" },
-  { label: "Live Dashboard", href: "/dashboard" },
+  { label: "Live Dashboard", href: "/dashboard" }, // Wired to React Route
   { label: "Resources", href: "/resources.html" },
   { label: "Privacy", href: "/privacy-policy.html" },
 ] as const;
 
+// ─── MAIN LAYOUT ────────────────────────────────────────────────────────────
 const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const { user, profile, isAuthenticated, isLoading: authLoading, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
@@ -38,13 +43,13 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [contextPanelOpen, setContextPanelOpen] = useState(false);
 
-  // Derive section ID for ContextPanel
+  // Derive section ID from pathname for ContextPanel context-awareness
   const sectionId = React.useMemo(() => {
     const path = location.pathname;
     if (path.includes("section") || path === "/" || path === "/validation-survey") {
       const match = path.match(/section(\d+)/);
       return match ? `section${match[1]}` : "section0";
- }
+    }
     return undefined;
   }, [location.pathname]);
 
@@ -67,6 +72,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
     await signOut();
   };
 
+  // ── Full-screen loader while auth session initializes ──
   if (authLoading) {
     return (
       <div className="min-h-screen bg-[#011a12] flex flex-col items-center justify-center p-6">
@@ -84,10 +90,15 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-[#011a12] text-[#ecfdf5] flex flex-col">
-      {/* ── Global Header (HIDDEN on survey route to prevent duplication) ── */}
+      
+      {/* ═══════════════════════════════════════════════════════════════════════
+          GLOBAL HEADER (HIDDEN on survey route to prevent duplication)
+          ═══════════════════════════════════════════════════════════════════════ */}
       {!isSurveyRoute && (
         <header className="sticky top-0 z-40 border-b border-[#C9A84C]/15 bg-[#022c22]/85 backdrop-blur-md h-16">
           <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between gap-3">
+            
+            {/* Logo */}
             <a href="/" className="flex items-center gap-3 min-w-0">
               <StratLogo size="sm" variant="icon" />
               <div className="min-w-0">
@@ -96,6 +107,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
               </div>
             </a>
 
+            {/* ── DESKTOP NAV & ACTIONS ── */}
             <div className="hidden md:flex items-center gap-4">
               <nav className="flex items-center gap-1">
                 {NAV_LINKS.map((l) => (
@@ -149,6 +161,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
               </div>
             </div>
 
+            {/* ── MOBILE MENU TOGGLE ── */}
             <div className="flex md:hidden items-center gap-2">
               <Button type="button" variant="ghost" size="sm" onClick={() => setContextPanelOpen((v) => !v)} className="text-[#ecfdf5]/60 hover:text-[#C9A84C]">
                 <BookOpen className="w-4 h-4" />
@@ -166,6 +179,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
             </div>
           </div>
 
+          {/* ── MOBILE NAV DROPDOWN ── */}
           {mobileNavOpen && (
             <nav className="md:hidden border-t border-white/5 px-4 py-2 flex flex-col bg-[#022c22]/95">
               {NAV_LINKS.map((l) => (
@@ -189,17 +203,19 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
         </header>
       )}
 
-      {/* ── Main Content ── */}
+      {/* ── Main Content with optional Context Panel ── */}
       <div className="flex-1 flex relative">
         <main className="flex-1 min-w-0">{children}</main>
 
         {contextPanelOpen && !isSurveyRoute && (
           <>
+            {/* Context Panel Sidebar (desktop) */}
             <aside className="hidden lg:block w-80 xl:w-96 border-l border-[#C9A84C]/15 bg-[#011a12]/90 backdrop-blur-md overflow-y-auto">
               <div className="p-4 sticky top-0">
                 <ContextPanel sectionId={sectionId} showAll={!sectionId} compact={false} />
               </div>
             </aside>
+            {/* Context Panel Drawer (mobile) */}
             <div className="lg:hidden fixed inset-0 z-50 flex">
               <div className="flex-1 bg-black/50 backdrop-blur-sm" onClick={() => setContextPanelOpen(false)} />
               <div className="w-80 bg-[#011a12] border-l border-[#C9A84C]/15 overflow-y-auto">
@@ -218,7 +234,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
         )}
       </div>
 
-      {/* ── Global Footer (HIDDEN on survey route) ── */}
+      {/* ── Global Footer (HIDDEN on survey route to prevent double-footer clash) ── */}
       {!isSurveyRoute && (
         <footer className="border-t border-white/5 bg-[#011a12]">
           <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#ecfdf5]/40">
