@@ -1,6 +1,6 @@
 // src/components/AppLayout.tsx
 // BIRD 2026–2035 · Validation Survey Shell
-// Updated: 2026-07-27 · Integrated FloatingAIAssistant, removed duplicate nav, dark-mode
+// Updated: 2026-07-29 · Resolved double footer, wired Live Dashboard to React route
 
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -26,10 +26,10 @@ import {
   PanelRightOpen,
 } from "lucide-react";
 
-// ─── STATIC COMPANION PAGES (served from /public) ───────────────────────────
+// ─── STATIC COMPANION PAGES & REACT ROUTES ──────────────────────────────────
 const NAV_LINKS = [
   { label: "Orientation", href: "/survey-orientation.html" },
-  { label: "Live Dashboard", href: "/survey-dashboard.html" },
+  { label: "Live Dashboard", href: "/dashboard" }, // Wired to React Route (configure in App.tsx)
   { label: "Resources", href: "/resources.html" },
   { label: "Privacy", href: "/privacy-policy.html" },
 ] as const;
@@ -65,6 +65,9 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
     if (path.includes("section15")) return "section15";
     return undefined;
   }, [location.pathname]);
+
+  // Hide global footer during the survey to prevent double-footer visual clash
+  const isSurveyRoute = location.pathname === "/" || location.pathname === "/validation-survey";
 
   const userDisplayInfo = React.useMemo(() => {
     const email = user?.email || "";
@@ -104,9 +107,9 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-[#011a12] text-[#ecfdf5] flex flex-col">
-      {/* ── Header ── */}
-      <header className="sticky top-0 z-40 border-b border-[#C9A84C]/15 bg-[#022c22]/85 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+      {/* ── Global Header ── */}
+      <header className="sticky top-0 z-40 border-b border-[#C9A84C]/15 bg-[#022c22]/85 backdrop-blur-md h-16">
+        <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between gap-3">
           {/* Logo */}
           <a href="/" className="flex items-center gap-3 min-w-0">
             <StratLogo size="sm" variant="icon" />
@@ -332,35 +335,37 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
         )}
       </div>
 
-      {/* ── Footer ── */}
-      <footer className="border-t border-white/5 bg-[#011a12]">
-        <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#ecfdf5]/40">
-          <p>
-            © {new Date().getFullYear()} BOI-MTIT, BARMM · BIRD 2026–2035
-            Validation Survey · Developed by ASilva Innovations
-          </p>
-          <div className="flex items-center gap-4">
-            <a
-              href="/privacy-policy.html"
-              className="hover:text-[#E8C560] transition-colors"
-            >
-              Privacy Policy
-            </a>
-            <a
-              href="/cookie-policy.html"
-              className="hover:text-[#E8C560] transition-colors"
-            >
-              Cookie Policy
-            </a>
-            <a
-              href="mailto:boi@bangsamoro.gov.ph"
-              className="hover:text-[#E8C560] transition-colors"
-            >
-              Contact
-            </a>
+      {/* ── Global Footer (Hidden during survey to prevent double-footer clash) ── */}
+      {!isSurveyRoute && (
+        <footer className="border-t border-white/5 bg-[#011a12]">
+          <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#ecfdf5]/40">
+            <p>
+              © {new Date().getFullYear()} BOI-MTIT, BARMM · BIRD 2026–2035
+              Validation Survey · Developed by ASilva Innovations
+            </p>
+            <div className="flex items-center gap-4">
+              <a
+                href="/privacy-policy.html"
+                className="hover:text-[#E8C560] transition-colors"
+              >
+                Privacy Policy
+              </a>
+              <a
+                href="/cookie-policy.html"
+                className="hover:text-[#E8C560] transition-colors"
+              >
+                Cookie Policy
+              </a>
+              <a
+                href="mailto:boi@bangsamoro.gov.ph"
+                className="hover:text-[#E8C560] transition-colors"
+              >
+                Contact
+              </a>
+            </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      )}
 
       {/* ── Floating MTIT badge ── */}
       <PlatformBadge />
