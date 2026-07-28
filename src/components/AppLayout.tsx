@@ -1,7 +1,4 @@
 // src/components/AppLayout.tsx
-// BIRD 2026–2035 · Validation Survey Shell
-// Updated: 2026-07-29 · Resolved double footer, wired Live Dashboard to React route
-
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -14,7 +11,6 @@ import { ContextPanel } from "@/components/strategic/ContextPanel";
 import FloatingAIAssistant from "@/components/strategic/FloatingAIAssistant";
 import { Button } from "@/components/ui/button";
 import {
-  Loader2,
   LogIn,
   LogOut,
   Menu,
@@ -26,15 +22,13 @@ import {
   PanelRightOpen,
 } from "lucide-react";
 
-// ─── STATIC COMPANION PAGES & REACT ROUTES ──────────────────────────────────
 const NAV_LINKS = [
   { label: "Orientation", href: "/survey-orientation.html" },
-  { label: "Live Dashboard", href: "/dashboard" }, // Wired to React Route (configure in App.tsx)
+  { label: "Live Dashboard", href: "/dashboard" },
   { label: "Resources", href: "/resources.html" },
   { label: "Privacy", href: "/privacy-policy.html" },
 ] as const;
 
-// ─── MAIN LAYOUT ────────────────────────────────────────────────────────────
 const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const { user, profile, isAuthenticated, isLoading: authLoading, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
@@ -44,29 +38,17 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [contextPanelOpen, setContextPanelOpen] = useState(false);
 
-  // Derive section ID from pathname for ContextPanel context-awareness
+  // Derive section ID for ContextPanel
   const sectionId = React.useMemo(() => {
     const path = location.pathname;
-    if (path.includes("section0") || path === "/" || path === "/validation-survey") return "section0";
-    if (path.includes("section1")) return "section1";
-    if (path.includes("section2")) return "section2";
-    if (path.includes("section3")) return "section3";
-    if (path.includes("section4")) return "section4";
-    if (path.includes("section5")) return "section5";
-    if (path.includes("section6")) return "section6";
-    if (path.includes("section7")) return "section7";
-    if (path.includes("section8")) return "section8";
-    if (path.includes("section9")) return "section9";
-    if (path.includes("section10")) return "section10";
-    if (path.includes("section11")) return "section11";
-    if (path.includes("section12")) return "section12";
-    if (path.includes("section13")) return "section13";
-    if (path.includes("section14")) return "section14";
-    if (path.includes("section15")) return "section15";
+    if (path.includes("section") || path === "/" || path === "/validation-survey") {
+      const match = path.match(/section(\d+)/);
+      return match ? `section${match[1]}` : "section0";
+ }
     return undefined;
   }, [location.pathname]);
 
-  // Hide global footer during the survey to prevent double-footer visual clash
+  // CRITICAL FIX: Hide global header/footer on the survey route to prevent duplicate headers
   const isSurveyRoute = location.pathname === "/" || location.pathname === "/validation-survey";
 
   const userDisplayInfo = React.useMemo(() => {
@@ -85,303 +67,174 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
     await signOut();
   };
 
-  // ── Full-screen loader while auth session initializes ──
   if (authLoading) {
     return (
       <div className="min-h-screen bg-[#011a12] flex flex-col items-center justify-center p-6">
         <div className="relative mb-6">
-          <div className="w-20 h-20 rounded-full overflow-hidden ring-2 ring-[#C9A84C] shadow-2xl border border-white/20 animate-pulse">
+          <div className="w-20 h-20 rounded-full overflow-hidden ring-2 ring-[#C9A84C] shadow-2xl border border-white/20 animate-pulse bg-[#022c22] flex items-center justify-center">
             <StratLogo size="lg" variant="icon" />
           </div>
           <div className="absolute -bottom-2 -right-2 w-8 h-8 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
         </div>
-        <h2 className="text-[#ecfdf5] font-bold text-xl mb-2">
-          Loading BIRD Validation Survey
-        </h2>
-        <p className="text-[#ecfdf5]/50 text-sm">
-          Preparing the stakeholder validation instrument…
-        </p>
+        <h2 className="text-[#ecfdf5] font-bold text-xl mb-2">Loading BIRD Validation Survey</h2>
+        <p className="text-[#ecfdf5]/50 text-sm">Preparing the stakeholder validation instrument…</p>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-[#011a12] text-[#ecfdf5] flex flex-col">
-      {/* ── Global Header ── */}
-      <header className="sticky top-0 z-40 border-b border-[#C9A84C]/15 bg-[#022c22]/85 backdrop-blur-md h-16">
-        <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between gap-3">
-          {/* Logo */}
-          <a href="/" className="flex items-center gap-3 min-w-0">
-            <StratLogo size="sm" variant="icon" />
-            <div className="min-w-0">
-              <p className="text-sm font-bold text-[#E8C560] leading-tight truncate">
-                BIRD 2026–2035
-              </p>
-              <p className="text-[10px] uppercase tracking-widest text-[#ecfdf5]/50 leading-tight">
-                Validation Survey
-              </p>
-            </div>
-          </a>
+      {/* ── Global Header (HIDDEN on survey route to prevent duplication) ── */}
+      {!isSurveyRoute && (
+        <header className="sticky top-0 z-40 border-b border-[#C9A84C]/15 bg-[#022c22]/85 backdrop-blur-md h-16">
+          <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between gap-3">
+            <a href="/" className="flex items-center gap-3 min-w-0">
+              <StratLogo size="sm" variant="icon" />
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-[#E8C560] leading-tight truncate">BIRD 2026–2035</p>
+                <p className="text-[10px] uppercase tracking-widest text-[#ecfdf5]/50 leading-tight">Validation Survey</p>
+              </div>
+            </a>
 
-          {/* Desktop Nav & Actions */}
-          <div className="hidden md:flex items-center gap-4">
-            <nav className="flex items-center gap-1">
-              {NAV_LINKS.map((l) => (
-                <a
-                  key={l.href}
-                  href={l.href}
-                  className="px-3 py-2 text-xs font-medium text-[#ecfdf5]/70 hover:text-[#E8C560] rounded-lg hover:bg-white/5 transition-colors"
+            <div className="hidden md:flex items-center gap-4">
+              <nav className="flex items-center gap-1">
+                {NAV_LINKS.map((l) => (
+                  <a
+                    key={l.href}
+                    href={l.href}
+                    className="px-3 py-2 text-xs font-medium text-[#ecfdf5]/70 hover:text-[#E8C560] rounded-lg hover:bg-white/5 transition-colors"
+                  >
+                    {l.label}
+                  </a>
+                ))}
+              </nav>
+              <div className="h-6 w-px bg-[#C9A84C]/20" />
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setContextPanelOpen((v) => !v)}
+                  className="text-[#ecfdf5]/60 hover:text-[#C9A84C] hover:bg-white/5 text-xs"
                 >
+                  {contextPanelOpen ? <PanelRightOpen className="w-4 h-4" /> : <PanelRightClose className="w-4 h-4" />}
+                  <span className="ml-1 hidden lg:inline">Context</span>
+                </Button>
+                <Toggle
+                  pressed={theme === "dark"}
+                  onPressedChange={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="text-[#ecfdf5]/60 hover:text-[#C9A84C] hover:bg-white/5 data-[state=on]:text-[#C9A84C] data-[state=on]:bg-[#C9A84C]/10"
+                >
+                  {theme === "dark" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+                </Toggle>
+                {isAuthenticated ? (
+                  <div className="flex items-center gap-2">
+                    <div className="flex flex-col items-end mr-1">
+                      <span className="text-xs font-medium text-[#ecfdf5] truncate max-w-[120px]">{userDisplayInfo.name}</span>
+                      <span className="text-[10px] text-[#ecfdf5]/50 truncate max-w-[120px]">{userDisplayInfo.email}</span>
+                    </div>
+                    <button type="button" onClick={handleSignOut} className="p-2 rounded-lg text-[#ecfdf5]/60 hover:text-rose-400 hover:bg-white/5 transition-colors" title="Sign out">
+                      <LogOut className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowAuthModal(true)}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#C9A84C]/10 hover:bg-[#C9A84C]/20 text-[#C9A84C] text-xs font-bold border border-[#C9A84C]/30 transition-colors"
+                  >
+                    <LogIn className="w-3.5 h-3.5" /> Sign In
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="flex md:hidden items-center gap-2">
+              <Button type="button" variant="ghost" size="sm" onClick={() => setContextPanelOpen((v) => !v)} className="text-[#ecfdf5]/60 hover:text-[#C9A84C]">
+                <BookOpen className="w-4 h-4" />
+              </Button>
+              <Toggle
+                pressed={theme === "dark"}
+                onPressedChange={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="text-[#ecfdf5]/60 hover:text-[#C9A84C] hover:bg-white/5 data-[state=on]:text-[#C9A84C] data-[state=on]:bg-[#C9A84C]/10"
+              >
+                {theme === "dark" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+              </Toggle>
+              <button type="button" onClick={() => setMobileNavOpen((v) => !v)} className="p-2 rounded-lg text-[#ecfdf5]/70 hover:bg-white/5 transition-colors">
+                {mobileNavOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          {mobileNavOpen && (
+            <nav className="md:hidden border-t border-white/5 px-4 py-2 flex flex-col bg-[#022c22]/95">
+              {NAV_LINKS.map((l) => (
+                <a key={l.href} href={l.href} className="px-2 py-2.5 text-sm text-[#ecfdf5]/80 hover:text-[#E8C560] transition-colors" onClick={() => setMobileNavOpen(false)}>
                   {l.label}
                 </a>
               ))}
-            </nav>
-
-            <div className="h-6 w-px bg-[#C9A84C]/20" />
-
-            <div className="flex items-center gap-2">
-              {/* Context Panel Toggle */}
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setContextPanelOpen((v) => !v)}
-                className="text-[#ecfdf5]/60 hover:text-[#C9A84C] hover:bg-white/5 text-xs"
-                aria-label="Toggle context panel"
-              >
-                {contextPanelOpen ? (
-                  <PanelRightOpen className="w-4 h-4" />
-                ) : (
-                  <PanelRightClose className="w-4 h-4" />
-                )}
-                <span className="ml-1 hidden lg:inline">Context</span>
-              </Button>
-
-              {/* Theme Toggle */}
-              <Toggle
-                pressed={theme === "dark"}
-                onPressedChange={() =>
-                  setTheme(theme === "dark" ? "light" : "dark")
-                }
-                className="text-[#ecfdf5]/60 hover:text-[#C9A84C] hover:bg-white/5 data-[state=on]:text-[#C9A84C] data-[state=on]:bg-[#C9A84C]/10"
-                aria-label="Toggle theme"
-              >
-                {theme === "dark" ? (
-                  <Moon className="w-4 h-4" />
-                ) : (
-                  <Sun className="w-4 h-4" />
-                )}
-              </Toggle>
-
-              {/* Auth State */}
-              {isAuthenticated ? (
-                <div className="flex items-center gap-2">
-                  <div className="flex flex-col items-end mr-1">
-                    <span className="text-xs font-medium text-[#ecfdf5] truncate max-w-[120px]">
-                      {userDisplayInfo.name}
-                    </span>
-                    <span className="text-[10px] text-[#ecfdf5]/50 truncate max-w-[120px]">
-                      {userDisplayInfo.email}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleSignOut}
-                    className="p-2 rounded-lg text-[#ecfdf5]/60 hover:text-rose-400 hover:bg-white/5 transition-colors"
-                    title="Sign out"
-                  >
-                    <LogOut className="w-4 h-4" />
+              <div className="border-t border-white/5 mt-2 pt-2">
+                {isAuthenticated ? (
+                  <button type="button" onClick={() => { handleSignOut(); setMobileNavOpen(false); }} className="w-full flex items-center gap-2 px-2 py-2.5 text-sm text-rose-400 hover:bg-white/5 transition-colors">
+                    <LogOut className="w-4 h-4" /> Sign Out ({userDisplayInfo.name})
                   </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setShowAuthModal(true)}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#C9A84C]/10 hover:bg-[#C9A84C]/20 text-[#C9A84C] text-xs font-bold border border-[#C9A84C]/30 transition-colors"
-                >
-                  <LogIn className="w-3.5 h-3.5" /> Sign In
-                </button>
-              )}
-            </div>
-          </div>
+                ) : (
+                  <button type="button" onClick={() => { setShowAuthModal(true); setMobileNavOpen(false); }} className="w-full flex items-center gap-2 px-2 py-2.5 text-sm text-[#C9A84C] hover:bg-white/5 transition-colors">
+                    <LogIn className="w-4 h-4" /> Sign In
+                  </button>
+                )}
+              </div>
+            </nav>
+          )}
+        </header>
+      )}
 
-          {/* Mobile Menu Toggle */}
-          <div className="flex md:hidden items-center gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setContextPanelOpen((v) => !v)}
-              className="text-[#ecfdf5]/60 hover:text-[#C9A84C]"
-              aria-label="Toggle context panel"
-            >
-              <BookOpen className="w-4 h-4" />
-            </Button>
-            <Toggle
-              pressed={theme === "dark"}
-              onPressedChange={() =>
-                setTheme(theme === "dark" ? "light" : "dark")
-              }
-              className="text-[#ecfdf5]/60 hover:text-[#C9A84C] hover:bg-white/5 data-[state=on]:text-[#C9A84C] data-[state=on]:bg-[#C9A84C]/10"
-              aria-label="Toggle theme"
-            >
-              {theme === "dark" ? (
-                <Moon className="w-4 h-4" />
-              ) : (
-                <Sun className="w-4 h-4" />
-              )}
-            </Toggle>
-            <button
-              type="button"
-              onClick={() => setMobileNavOpen((v) => !v)}
-              className="p-2 rounded-lg text-[#ecfdf5]/70 hover:bg-white/5 transition-colors"
-              aria-label="Toggle navigation"
-            >
-              {mobileNavOpen ? (
-                <X className="w-4 h-4" />
-              ) : (
-                <Menu className="w-4 h-4" />
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Nav Dropdown */}
-        {mobileNavOpen && (
-          <nav className="md:hidden border-t border-white/5 px-4 py-2 flex flex-col bg-[#022c22]/95">
-            {NAV_LINKS.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                className="px-2 py-2.5 text-sm text-[#ecfdf5]/80 hover:text-[#E8C560] transition-colors"
-                onClick={() => setMobileNavOpen(false)}
-              >
-                {l.label}
-              </a>
-            ))}
-            <div className="border-t border-white/5 mt-2 pt-2">
-              {isAuthenticated ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleSignOut();
-                    setMobileNavOpen(false);
-                  }}
-                  className="w-full flex items-center gap-2 px-2 py-2.5 text-sm text-rose-400 hover:bg-white/5 transition-colors"
-                >
-                  <LogOut className="w-4 h-4" /> Sign Out ({userDisplayInfo.name})
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowAuthModal(true);
-                    setMobileNavOpen(false);
-                  }}
-                  className="w-full flex items-center gap-2 px-2 py-2.5 text-sm text-[#C9A84C] hover:bg-white/5 transition-colors"
-                >
-                  <LogIn className="w-4 h-4" /> Sign In
-                </button>
-              )}
-            </div>
-          </nav>
-        )}
-      </header>
-
-      {/* ── Main Content with optional Context Panel ── */}
+      {/* ── Main Content ── */}
       <div className="flex-1 flex relative">
         <main className="flex-1 min-w-0">{children}</main>
 
-        {/* Context Panel Sidebar (desktop) */}
-        {contextPanelOpen && (
-          <aside className="hidden lg:block w-80 xl:w-96 border-l border-[#C9A84C]/15 bg-[#011a12]/90 backdrop-blur-md overflow-y-auto">
-            <div className="p-4 sticky top-0">
-              <ContextPanel
-                sectionId={sectionId}
-                showAll={!sectionId}
-                compact={false}
-              />
-            </div>
-          </aside>
-        )}
-
-        {/* Context Panel Drawer (mobile) */}
-        {contextPanelOpen && (
-          <div className="lg:hidden fixed inset-0 z-50 flex">
-            <div
-              className="flex-1 bg-black/50 backdrop-blur-sm"
-              onClick={() => setContextPanelOpen(false)}
-            />
-            <div className="w-80 bg-[#011a12] border-l border-[#C9A84C]/15 overflow-y-auto">
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-bold text-[#C9A84C]">Context & References</h3>
-                  <button
-                    type="button"
-                    onClick={() => setContextPanelOpen(false)}
-                    className="p-1 rounded hover:bg-white/5"
-                  >
-                    <X className="w-4 h-4 text-[#ecfdf5]/60" />
-                  </button>
+        {contextPanelOpen && !isSurveyRoute && (
+          <>
+            <aside className="hidden lg:block w-80 xl:w-96 border-l border-[#C9A84C]/15 bg-[#011a12]/90 backdrop-blur-md overflow-y-auto">
+              <div className="p-4 sticky top-0">
+                <ContextPanel sectionId={sectionId} showAll={!sectionId} compact={false} />
+              </div>
+            </aside>
+            <div className="lg:hidden fixed inset-0 z-50 flex">
+              <div className="flex-1 bg-black/50 backdrop-blur-sm" onClick={() => setContextPanelOpen(false)} />
+              <div className="w-80 bg-[#011a12] border-l border-[#C9A84C]/15 overflow-y-auto">
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-[#C9A84C]">Context & References</h3>
+                    <button type="button" onClick={() => setContextPanelOpen(false)} className="p-1 rounded hover:bg-white/5">
+                      <X className="w-4 h-4 text-[#ecfdf5]/60" />
+                    </button>
+                  </div>
+                  <ContextPanel sectionId={sectionId} showAll={!sectionId} compact={true} />
                 </div>
-                <ContextPanel
-                  sectionId={sectionId}
-                  showAll={!sectionId}
-                  compact={true}
-                />
               </div>
             </div>
-          </div>
+          </>
         )}
       </div>
 
-      {/* ── Global Footer (Hidden during survey to prevent double-footer clash) ── */}
+      {/* ── Global Footer (HIDDEN on survey route) ── */}
       {!isSurveyRoute && (
         <footer className="border-t border-white/5 bg-[#011a12]">
           <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#ecfdf5]/40">
-            <p>
-              © {new Date().getFullYear()} BOI-MTIT, BARMM · BIRD 2026–2035
-              Validation Survey · Developed by ASilva Innovations
-            </p>
+            <p>© {new Date().getFullYear()} BOI-MTIT, BARMM · BIRD 2026–2035 Validation Survey · Developed by ASilva Innovations</p>
             <div className="flex items-center gap-4">
-              <a
-                href="/privacy-policy.html"
-                className="hover:text-[#E8C560] transition-colors"
-              >
-                Privacy Policy
-              </a>
-              <a
-                href="/cookie-policy.html"
-                className="hover:text-[#E8C560] transition-colors"
-              >
-                Cookie Policy
-              </a>
-              <a
-                href="mailto:boi@bangsamoro.gov.ph"
-                className="hover:text-[#E8C560] transition-colors"
-              >
-                Contact
-              </a>
+              <a href="/privacy-policy.html" className="hover:text-[#E8C560] transition-colors">Privacy Policy</a>
+              <a href="/cookie-policy.html" className="hover:text-[#E8C560] transition-colors">Cookie Policy</a>
+              <a href="mailto:boi@bangsamoro.gov.ph" className="hover:text-[#E8C560] transition-colors">Contact</a>
             </div>
           </div>
         </footer>
       )}
 
-      {/* ── Floating MTIT badge ── */}
       <PlatformBadge />
-
-      {/* ── Auth Modal ── */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-      />
-
-      {/* ── Floating AI Assistant ── */}
-      <FloatingAIAssistant
-        plan={null}
-        activeView={sectionId || "survey"}
-        compact={true}
-      />
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+      <FloatingAIAssistant plan={null} activeView={isSurveyRoute ? "survey" : (sectionId || "survey")} compact={true} />
     </div>
   );
 };
