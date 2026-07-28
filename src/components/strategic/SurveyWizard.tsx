@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from "react";
 import { submitSurvey } from "@/lib/api";
 import { surveySchema, type SurveySchemaType } from "@/lib/survey-schema";
 import { Toaster, toast } from "sonner";
-import { z } from "zod";
+import { BarChart3 } from "lucide-react";
 
 // ─── SECTION COMPONENTS & TYPES ──────────────────────────────────────────────
 import Section0_Orientation, { type Section0Data } from "./Section0_Orientation";
@@ -390,7 +390,7 @@ const SurveyWizard: React.FC = () => {
   });
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // LOCALSTORAGE PERSISTENCE
+  // LOCALSTORAGE PERSISTENCE (LOAD)
   // ═══════════════════════════════════════════════════════════════════════════
   useEffect(() => {
     try {
@@ -422,6 +422,9 @@ const SurveyWizard: React.FC = () => {
     }
   }, []);
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // LOCALSTORAGE PERSISTENCE (SAVE)
+  // ═══════════════════════════════════════════════════════════════════════════
   useEffect(() => {
     const draft = { step, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, birdScores };
     localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(draft));
@@ -537,10 +540,12 @@ const SurveyWizard: React.FC = () => {
         q0_1_ready: s0.ready_to_begin || undefined,
         q0_2_ecosystem_understanding: s0.ecosystem_understanding || undefined,
         q0_3_systems_thinking_value: s0.systems_thinking_value || undefined,
+
         q1_1_consent_participate: s1.consent_participate,
         q1_2_consent_anonymize: s1.consent_anonymize,
         q1_3_consent_email_copy: s1.consent_email_copy,
         q1_4_consent_voluntary: s1.consent_voluntary,
+
         demo_name: s2.demo_name || undefined,
         demo_email: s2.demo_email || undefined,
         demo_organization: s2.demo_organization || undefined,
@@ -548,6 +553,7 @@ const SurveyWizard: React.FC = () => {
         demo_province: s2.demo_province || undefined,
         demo_category: s2.demo_category || undefined,
         demo_expertise: s2.demo_expertise,
+
         q3_1_beie_collaboration: s3.q3_1_beie_collaboration || undefined,
         q3_2_beie_understanding: s3.q3_2_beie_understanding || undefined,
         q3_3_beie_relevance: s3.q3_3_beie_relevance || undefined,
@@ -558,6 +564,7 @@ const SurveyWizard: React.FC = () => {
         q_s1_bimpeaga_likelihood: s3.q_s1_bimpeaga_likelihood,
         q_s1_aff_base_impact: s3.q_s1_aff_base_impact,
         q_s1_aff_base_likelihood: s3.q_s1_aff_base_likelihood,
+
         q4_1_foundations_banner_understanding: s4.q4_1_foundations_banner_understanding,
         q4_2_tragedy_commons_accuracy: s4.q4_2_tragedy_commons_accuracy || undefined,
         q4_3_tragedy_followup: s4.q4_3_tragedy_followup || undefined,
@@ -571,6 +578,7 @@ const SurveyWizard: React.FC = () => {
         q4_11_poverty_likelihood: s4.q4_11_poverty_likelihood,
         q4_12_limits_growth_accuracy: s4.q4_12_limits_growth_accuracy || undefined,
         q4_13_limits_followup: s4.q4_13_limits_followup || undefined,
+
         q5_1_transformers_banner_understanding: s5.q5_1_transformers_banner_understanding,
         q5_2_halal_advantage_understanding: s5.q5_2_halal_advantage_understanding,
         q5_3_farm_to_market_understanding: s5.q5_3_farm_to_market_understanding,
@@ -587,6 +595,7 @@ const SurveyWizard: React.FC = () => {
         q5_14_uae_corridor_likelihood: s5.q5_14_uae_corridor_likelihood,
         q5_15_competition_impact: s5.q5_15_competition_impact,
         q5_16_competition_likelihood: s5.q5_16_competition_likelihood,
+
         q6_1_halal_sector_rank: s6.q6_1_halal_sector_rank || undefined,
         q6_2_sequencing_effectiveness: s6.q6_2_sequencing_effectiveness,
         q6_3_begmp_confidence: s6.q6_3_begmp_confidence,
@@ -621,6 +630,7 @@ const SurveyWizard: React.FC = () => {
         q_s6_shifting_followup: s6.q_s6_shifting_followup || undefined,
         q_s6_growth_underinvest: s6.q_s6_growth_underinvest || undefined,
         q_s6_growth_followup: s6.q_s6_growth_followup || undefined,
+
         q7_1_connectivity_priority: s7.q7_1_connectivity_priority || undefined,
         q7_2_integration_challenge: s7.q7_2_integration_challenge || undefined,
         q7_3_priority_node: s7.q7_3_priority_node || undefined,
@@ -666,6 +676,7 @@ const SurveyWizard: React.FC = () => {
         q_s7_escalation_followup: s7.q_s7_escalation_followup || undefined,
         q_s7_limits_growth: s7.q_s7_limits_growth || undefined,
         q_s7_limits_followup: s7.q_s7_limits_followup || undefined,
+
         q8_1_finance_tier_priority: s8.q8_1_finance_tier_priority || undefined,
         q8_2_roadmap_achievable: s8.q8_2_roadmap_achievable,
         q8_3_priority_action: s8.q8_3_priority_action || undefined,
@@ -712,6 +723,7 @@ const SurveyWizard: React.FC = () => {
         q_s8_big_man_followup: s8.q_s8_big_man_followup || undefined,
         q_s8_shifting_burden: s8.q_s8_shifting_burden || undefined,
         q_s8_shifting_followup: s8.q_s8_shifting_followup || undefined,
+
         q9_1_moral_governance_derisk: s9.q9_1_moral_governance_derisk,
         q9_2_critical_loop: s9.q9_2_critical_loop || undefined,
         q9_3_regulatory_priority: s9.q9_3_regulatory_priority || undefined,
@@ -750,6 +762,7 @@ const SurveyWizard: React.FC = () => {
         q_s9_investment_loop_followup: s9.q_s9_investment_loop_followup || undefined,
         q_s9_governance_loop: s9.q_s9_governance_loop || undefined,
         q_s9_governance_loop_followup: s9.q_s9_governance_loop_followup || undefined,
+
         q10_1_ieds_preference: s10.q10_1_ieds_preference || undefined,
         q10_2_sequence_a_priority: s10.q10_2_sequence_a_priority,
         q10_3_sequence_b_priority: s10.q10_3_sequence_b_priority,
@@ -758,6 +771,7 @@ const SurveyWizard: React.FC = () => {
         q10_6_risk_mitigation: s10.q10_6_risk_mitigation || undefined,
         q10_7_outcomes_achievable: s10.q10_7_outcomes_achievable,
         q10_matrix: s10.q10_matrix,
+
         q11_1_calibration_appropriate: s11.q11_1_calibration_appropriate || undefined,
         q11_2_governance_kpi_importance: s11.q11_2_governance_kpi_importance,
         q11_3_resilience_kpi_importance: s11.q11_3_resilience_kpi_importance,
@@ -765,6 +779,7 @@ const SurveyWizard: React.FC = () => {
         q11_5_peace_kpi_importance: s11.q11_5_peace_kpi_importance,
         q11_6_cluster_kpi_sufficient: s11.q11_6_cluster_kpi_sufficient || undefined,
         q11_7_benchmark_priority: s11.q11_7_benchmark_priority || undefined,
+
         q12_1_learning_growth_alignment: s12.q12_1_learning_growth_alignment,
         q12_2_internal_process_alignment: s12.q12_2_internal_process_alignment,
         q12_3_stakeholder_alignment: s12.q12_3_stakeholder_alignment,
@@ -775,6 +790,7 @@ const SurveyWizard: React.FC = () => {
         q12_8_mission_alignment: s12.q12_8_mission_alignment,
         q12_9_bsc_useful: s12.q12_9_bsc_useful,
         q12_10_adaptive_frequency: s12.q12_10_adaptive_frequency || undefined,
+
         q13_1_funding_mix_fair: s13.q13_1_funding_mix_fair,
         q13_2_targets_realistic: s13.q13_2_targets_realistic,
         q13_3_high_risk_concern: s13.q13_3_high_risk_concern,
@@ -783,15 +799,18 @@ const SurveyWizard: React.FC = () => {
         q13_6_budget_priority_phase: s13.q13_6_budget_priority_phase || undefined,
         q13_7_budget_priority_cluster: s13.q13_7_budget_priority_cluster || undefined,
         q13_8_blended_finance_opinion: s13.q13_8_blended_finance_opinion || undefined,
+
         q14_1_engagement_type: s14.q14_1_engagement_type,
         q14_2_contact_method: s14.q14_2_contact_method || undefined,
         q14_3_timing: s14.q14_3_timing || undefined,
         q14_4_role_contribution: s14.q14_4_role_contribution || undefined,
         q14_5_additional_comments: s14.q14_5_additional_comments || undefined,
+
         q15_1_confirm_accurate: s15.q15_1_confirm_accurate,
         q15_2_consent_anonymous_use: s15.q15_2_consent_anonymous_use,
         q15_3_consent_voluntary: s15.q15_3_consent_voluntary,
         q15_4_ready_to_submit: s15.q15_4_ready_to_submit,
+
         consent_final: true,
       };
 
@@ -833,19 +852,24 @@ const SurveyWizard: React.FC = () => {
   const progress = ((step + 1) / totalSteps) * 100;
 
   return (
-    <div ref={mainRef} className="min-h-screen bg-gradient-to-br from-[#ecfdf5] via-white to-[#d1fae5] relative">
+    <div ref={mainRef} className="min-h-screen bg-gradient-to-br from-[#ecfdf5] via-white to-[#d1fae5] dark:from-[#011a12] dark:via-[#022c22] dark:to-[#1B4D3E] relative">
       <Toaster position="top-right" richColors />
 
-      {/* ── Progress Bar (Sits perfectly below AppLayout's h-16 header) ── */}
-      <div className="sticky top-16 z-30 bg-white/80 backdrop-blur-md border-b border-[#C9A84C]/20">
+      {/* ── Progress Bar (Acts as the SOLE header for the survey) ── */}
+      <div className="sticky top-0 z-30 bg-white/80 dark:bg-[#022c22]/80 backdrop-blur-md border-b border-[#C9A84C]/20">
         <div className="max-w-5xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-[#C9A84C] uppercase tracking-wider">BIRD Validation</span>
               <span className="text-xs text-[#64748b]">|</span>
-              <span className="text-xs text-[#022c22]">Step {step + 1} of {totalSteps}</span>
+              <span className="text-xs text-[#022c22] dark:text-[#ecfdf5]">Step {step + 1} of {totalSteps}</span>
             </div>
-            <span className="text-xs font-bold text-[#022c22]">{Math.round(progress)}%</span>
+            <a 
+              href="/dashboard" 
+              className="text-xs font-semibold text-[#1B4D3E] dark:text-[#C9A84C] hover:text-[#C9A84C] dark:hover:text-[#E8C560] flex items-center gap-1 transition-colors"
+            >
+              <BarChart3 className="w-3.5 h-3.5" /> Live Dashboard
+            </a>
           </div>
           <div className="h-1.5 bg-[#C9A84C]/10 rounded-full overflow-hidden">
             <div 
@@ -862,7 +886,7 @@ const SurveyWizard: React.FC = () => {
                   i === step 
                     ? "bg-[#C9A84C] text-white font-bold" 
                     : i < step 
-                      ? "bg-[#1B4D3E]/20 text-[#1B4D3E]" 
+                      ? "bg-[#1B4D3E]/20 dark:bg-[#C9A84C]/20 text-[#1B4D3E] dark:text-[#ecfdf5]" 
                       : "bg-[#C9A84C]/10 text-[#64748b]"
                 }`}
               >
@@ -876,12 +900,12 @@ const SurveyWizard: React.FC = () => {
       {/* ── BIRD Score Panel (visible on SWOT steps) ── */}
       {step >= 3 && step <= 9 && Object.keys(birdScores).length > 0 && (
         <div className="max-w-5xl mx-auto px-4 pt-4">
-          <div className="rounded-lg border border-[#C9A84C]/20 bg-[#022c22]/5 p-3 flex flex-wrap items-center gap-3">
+          <div className="rounded-lg border border-[#C9A84C]/20 bg-[#022c22]/5 dark:bg-[#1B4D3E]/20 p-3 flex flex-wrap items-center gap-3">
             <span className="text-[10px] font-bold text-[#C9A84C] uppercase tracking-wider">Live Scores:</span>
             {Object.entries(birdScores).slice(0, 6).map(([key, val]) => (
               <span 
                 key={key} 
-                className="text-[10px] px-2 py-0.5 rounded-full bg-[#C9A84C]/10 text-[#022c22] font-semibold border border-[#C9A84C]/20"
+                className="text-[10px] px-2 py-0.5 rounded-full bg-[#C9A84C]/10 text-[#022c22] dark:text-[#ecfdf5] font-semibold border border-[#C9A84C]/20"
               >
                 {key.replace(/_/g, " ")}: {val.toFixed(2)}
               </span>
@@ -890,18 +914,18 @@ const SurveyWizard: React.FC = () => {
         </div>
       )}
 
-      {/* ── Content (pb-24 ensures sticky footer never covers final step content) ── */}
+      {/* ── Content ── */}
       <main className="max-w-5xl mx-auto px-4 py-8 pb-24">
         {renderStep()}
       </main>
 
       {/* ── Navigation Footer ── */}
-      <div className="sticky bottom-0 z-40 bg-white/90 backdrop-blur-md border-t border-[#C9A84C]/20">
+      <div className="sticky bottom-0 z-40 bg-white/90 dark:bg-[#022c22]/90 backdrop-blur-md border-t border-[#C9A84C]/20">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <button 
             onClick={goPrev} 
             disabled={step === 0}
-            className="px-4 py-2 rounded-lg text-sm font-semibold border border-[#C9A84C]/30 text-[#022c22] hover:bg-[#C9A84C]/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            className="px-4 py-2 rounded-lg text-sm font-semibold border border-[#C9A84C]/30 text-[#022c22] dark:text-[#ecfdf5] hover:bg-[#C9A84C]/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
           >
             ← Previous
           </button>
