@@ -34,9 +34,16 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
+    // Defensive cap: this endpoint aggregates in application code rather than in SQL,
+    // so an unbounded table scan would get slower (and costlier) as responses grow.
+    // 20,000 responses is far beyond this survey's expected scale; if it's ever hit,
+    // move the aggregation into a SQL view/materialized view instead of raising this.
     const { data: responses, error } = await supabase
       .from("survey_responses")
-      .select("id, demo_province, demo_category, created_at, response_data");
+      .select("id, demo_province, demo_category, created_at, response_data")
+      .eq("consent_final", true)
+      .order("created_at", { ascending: false })
+      .limit(20000);
 
     if (error) throw error;
 
@@ -81,12 +88,20 @@ serve(async (req) => {
       'q7_t1_halal_competition', 'q7_t2_economic_downturn', 'q7_t3_price_volatility',
       'q9_t1_climate_change', 'q9_t2_drifting_goals', 'q9_t3_security_incidents', 'q9_t4_political_transition', 'q9_t5_natl_coordination', 'q9_t6_fragmented_mandates',
     ];
+    // String-typed archetype/CLD "accuracy" questions ("Very accurately" / "Somewhat
+    // accurately" / "Needs revision" / "Not accurate").
     const archetypeKeys = [
       'q4_arch_tragedy_commons', 'q5_arch_growth_underinvest', 'q6_arch_limits_growth',
       'q7_arch_success_successful', 'q8_arch_shifting_burden',
       'q9_arch_fixes_fail', 'q9_arch_escalation', 'q9_arch_big_man',
       'q11_arch_drifting_goals',
     ];
+    // Numeric-typed (1–5) "governance-scale" question — q9_arch_moral_governance_derisk_accuracy
+    // is a number per survey-schema.ts's archetypeFieldsFor(), not a string like the rest, so it
+    // needs its own bucket and its own "counts as accurate" rule (rating >= 4) rather than the
+    // string comparison used below. This was previously missing entirely from this file, so the
+    // "Moral Governance De-Risks Capital" question never appeared in the analytics dashboard.
+    const governanceScaleKeys = ['q9_arch_moral_governance_derisk'];
 
     for (const row of responses || []) {
       const d = row.response_data || {};
@@ -106,13 +121,23 @@ serve(async (req) => {
       for (const k of weaknessKeys) { const p = getPair(d, k); if (p) { sumW += calcWeaknessRisk(p.i, p.l); cntW++; } }
       for (const k of threatKeys) { const p = getPair(d, k); if (p) { sumT += calcThreatVI(p.i, p.l); cntT++; } }
 
-      // Archetype Consensus
+      // Archetype Consensus — string-typed ("Very/Somewhat accurately")
       for (const a of archetypeKeys) {
         const val = d[`${a}_accuracy`];
         if (val) {
           if (!archetypes[a]) archetypes[a] = { accurate: 0, total: 0 };
           archetypes[a].total++;
           if (val === "Very accurately" || val === "Somewhat accurately") archetypes[a].accurate++;
+        }
+      }
+
+      // Archetype Consensus — numeric governance-scale (1–5 rating; >=4 counts as "accurate")
+      for (const a of governanceScaleKeys) {
+        const val = d[`${a}_accuracy`];
+        if (typeof val === "number") {
+          if (!archetypes[a]) archetypes[a] = { accurate: 0, total: 0 };
+          archetypes[a].total++;
+          if (val >= 4) archetypes[a].accurate++;
         }
       }
     }
