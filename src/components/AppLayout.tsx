@@ -1,6 +1,5 @@
 // src/components/AppLayout.tsx
 // BIRD 2026–2035 · Validation Survey Shell
-// Updated: 2026-07-29 · Resolved double footer, wired Live Dashboard to React route
 
 import React, { useState, useMemo, useCallback, lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
@@ -22,7 +21,6 @@ import {
   X,
   Sun,
   Moon,
-  BookOpen,
   PanelRightClose,
   PanelRightOpen,
 } from "lucide-react";
@@ -50,7 +48,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [contextPanelOpen, setContextPanelOpen] = useState(false);
 
-  // Derive section ID for ContextPanel context-awareness
   const sectionId = useMemo(() => {
     const path = location.pathname;
     if (path.includes("section") || path === "/" || path === "/validation-survey") {
@@ -60,7 +57,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
     return undefined;
   }, [location.pathname]);
 
-  // Hide global header/footer on survey route to prevent duplication with SurveyWizard's own chrome
   const isSurveyRoute = location.pathname === "/" || location.pathname === "/validation-survey";
 
   const userDisplayInfo = useMemo(() => {
@@ -80,7 +76,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
     setShowProfileModal(false);
   }, [signOut]);
 
-  // ── Auth loading screen ──
   if (authLoading) {
     return (
       <div className="min-h-screen bg-[#011a12] flex flex-col items-center justify-center p-6">
@@ -99,14 +94,10 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   return (
     <div className="min-h-screen bg-[#011a12] text-[#ecfdf5] flex flex-col relative">
       
-      {/* ═══════════════════════════════════════════════════════════════════════
-          HEADER (hidden on survey route)
-          ═══════════════════════════════════════════════════════════════════════ */}
       {!isSurveyRoute && (
         <header className="sticky top-0 z-40 border-b border-[#C9A84C]/15 bg-[#022c22]/85 backdrop-blur-md">
           <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
             
-            {/* Logo */}
             <a href={BIRD_SITES.home.url} className="flex items-center gap-3 min-w-0">
               <StratLogo size="sm" variant="icon" />
               <div className="min-w-0">
@@ -115,7 +106,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
               </div>
             </a>
 
-            {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-4">
               <nav className="flex items-center gap-1">
                 {NAV_LINKS.map((l) => (
@@ -133,7 +123,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
               <div className="h-6 w-px bg-[#C9A84C]/20" />
               
               <div className="flex items-center gap-2">
-                {/* Context Panel Toggle */}
                 <Button
                   type="button"
                   variant="ghost"
@@ -145,7 +134,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
                   <span className="ml-1 hidden lg:inline">Context</span>
                 </Button>
 
-                {/* Theme Toggle */}
                 <Toggle
                   pressed={theme === "dark"}
                   onPressedChange={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -155,7 +143,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
                   {theme === "dark" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
                 </Toggle>
 
-                {/* Auth */}
                 {isAuthenticated ? (
                   <div className="flex items-center gap-2">
                     <button
@@ -189,7 +176,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
               </div>
             </div>
 
-            {/* Mobile Toggle */}
             <div className="flex md:hidden items-center gap-2">
               <Toggle
                 pressed={theme === "dark"}
@@ -209,7 +195,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
             </div>
           </div>
 
-          {/* Mobile Nav Dropdown */}
           {mobileNavOpen && (
             <nav className="md:hidden border-t border-white/5 px-4 py-2 flex flex-col bg-[#022c22]/95">
               {NAV_LINKS.map((l) => (
@@ -245,11 +230,9 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
         </header>
       )}
 
-      {/* ── Main Content + Context Panel ── */}
       <div className="flex-1 flex relative">
         <main className="flex-1 min-w-0">{children}</main>
 
-        {/* Context Panel Sidebar (desktop) */}
         {contextPanelOpen && !isSurveyRoute && (
           <>
             <aside className="hidden lg:block w-80 xl:w-96 border-l border-[#C9A84C]/15 bg-[#011a12]/90 backdrop-blur-md overflow-y-auto">
@@ -257,7 +240,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
                 <ContextPanel sectionId={sectionId} showAll={!sectionId} compact={false} />
               </div>
             </aside>
-            {/* Context Panel Drawer (mobile) */}
             <div className="lg:hidden fixed inset-0 z-50 flex">
               <div className="flex-1 bg-black/50 backdrop-blur-sm" onClick={() => setContextPanelOpen(false)} />
               <div className="w-80 bg-[#011a12] border-l border-[#C9A84C]/15 overflow-y-auto">
@@ -276,9 +258,6 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
         )}
       </div>
 
-      {/* ═══════════════════════════════════════════════════════════════════════
-          FOOTER (hidden on survey route)
-          ═══════════════════════════════════════════════════════════════════════ */}
       {!isSurveyRoute && (
         <footer className="border-t border-white/5 bg-[#011a12]">
           <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#ecfdf5]/40">
@@ -294,11 +273,9 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
         </footer>
       )}
 
-      {/* ── Floating Elements ── */}
       <PlatformBadge />
       <FloatingAIAssistant plan={null} activeView={isSurveyRoute ? "survey" : (sectionId || "survey")} compact={true} />
 
-      {/* ── Auth Modals ── */}
       <Suspense fallback={null}>
         {showAuthModal && (
           <AuthModal isOpen onClose={() => setShowAuthModal(false)} />
