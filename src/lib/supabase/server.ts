@@ -1,27 +1,22 @@
-import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+// src/lib/supabase/server.ts
+// Server-side Supabase client for Edge Function contexts.
+// NOTE: This must NOT be imported by browser components. Use
+// src/lib/supabase.ts (createClient with auth persistence) for UI code.
 
-export function createClient(request: Request) {
-  const headers = new Headers()
+import { createClient } from "@supabase/supabase-js";
 
-  const supabase = createServerClient(
-    process.env.VITE_SUPABASE_URL!,
-    process.env.VITE_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return parseCookieHeader(request.headers.get('Cookie') ?? '') as {
-            name: string
-            value: string
-          }[]
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
-          )
-        },
-      },
-    }
-  )
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-  return { supabase, headers }
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error(
+    "Missing Supabase environment variables: VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be set."
+  );
 }
+
+export const supabaseServer = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+  },
+});
