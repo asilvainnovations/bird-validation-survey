@@ -81,15 +81,24 @@ const SurveyWizard: React.FC = () => {
   });
 
   // ── Section 2: Demographics ──
-  const [s2, setS2] = useState<Section2Data>({
-    demo_name: "",
-    demo_email: "",
-    demo_organization: "",
-    demo_position: "",
-    demo_province: "",
-    demo_category: "",
-    demo_expertise: [],
-    q2_network_accuracy: "",
+    q2_name: s2.q2_name || undefined,
+    q2_email: s2.q2_email || undefined,
+    q2_organization: s2.q2_organization || undefined,
+    q2_position: s2.q2_position || undefined,
+    q2_province: s2.q2_province || undefined,
+    q2_category: s2.q2_category || undefined,
+    q2_expertise: s2.q2_expertise,
+    q2_network_accuracy: s2.q2_network_accuracy,
+
+    const [s2, setS2] = useState<Section2Data>({
+    q2_name: "",
+    q2_email: "",
+    q2_organization: "",
+    q2_position: "",
+    q2_province: "",
+    q2_category: "",
+    q2_expertise: [],
+    q2_network_accuracy: undefined,
   });
 
   // ── Section 3: BEIE & Systems Thinking ──
