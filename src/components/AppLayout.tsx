@@ -41,24 +41,6 @@ const AuthModal = lazy(() => import('./auth/AuthModal').then((m) => ({ default: 
 const UserProfileModal = lazy(() => import('./auth/UserProfileModal').then((m) => ({ default: m.UserProfileModal })));
 
 // ─── NAVIGATION ─────────────────────────────────────────────────────────────────
-// Each link now carries a `kind` so it's rendered correctly instead of every
-// item being an identical <a target="_blank"> regardless of where it
-// actually points:
-//   - "step"     → internal survey deep-link. SurveyWizard has no URL-based
-//                  routing for its 16 internal steps (step is local state,
-//                  not reflected in the path), so the only way to tell it
-//                  "jump to Section 0" from outside is the gotoStep router
-//                  state read by the new useEffect in SurveyWizard.tsx.
-//                  Clicking this always navigates to "/" first (where Index
-//                  renders SurveyWizard), then requests the step.
-//   - "internal" → a real SPA route (react-router), navigated in-app with no
-//                  full page reload.
-//   - "external" → a genuinely different, separately-hosted site
-//                  (bird-resources.asilvainnovations.com) — a normal new-tab
-//                  link is correct here, not a routing bug.
-//   - "static"   → a real static HTML file this app serves from /public
-//                  (privacy-policy.html), not an SPA route — a plain anchor
-//                  causing a real navigation is correct here too.
 type NavLink =
   | { label: string; kind: 'step'; step: number }
   | { label: string; kind: 'internal'; href: string }
@@ -78,11 +60,6 @@ interface AppLayoutProps {
 }
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
-  // useAuthContext(), not useAuth() directly: App.tsx wraps this whole tree
-  // in <AuthProvider>, which already calls useAuth() once and owns the single
-  // supabase.auth.onAuthStateChange subscription. Calling useAuth() again
-  // here would open a second, independent subscription instead of reading
-  // the shared one.
   const { user, profile, isAuthenticated, isLoading: authLoading, signOut } = useAuthContext();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
@@ -108,8 +85,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     setShowProfileModal(false);
   }, [signOut]);
 
-  // Handles all four NavLink kinds. Passed to both the desktop nav and the
-  // mobile dropdown so the routing logic exists in exactly one place.
   const handleNavClick = useCallback((link: NavLink, e: React.MouseEvent) => {
     if (link.kind === 'step') {
       e.preventDefault();
@@ -120,15 +95,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       navigate(link.href);
       setMobileNavOpen(false);
     }
-    // 'external' and 'static' fall through to the anchor's native href/target
-    // behavior — no preventDefault, nothing to intercept.
   }, [navigate]);
 
   const navHref = (link: NavLink) => (link.kind === 'step' ? '/' : link.href);
   const navExternalProps = (link: NavLink) =>
     link.kind === 'external' ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 
-  // ── Full-screen loader while auth session initializes ──
   if (authLoading) {
     return (
       <div className="min-h-screen bg-[#011a12] flex flex-col items-center justify-center p-6">
@@ -163,13 +135,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <div className="hidden md:flex items-center gap-4">
             <nav className="flex items-center gap-1">
               {NAV_LINKS.map((l) => (
-                
-                  key={l.label}
-                  href={navHref(l)}
-                  {...navExternalProps(l)}
-                  onClick={(e) => handleNavClick(l, e)}
-                  className="px-3 py-2 text-xs font-medium text-[#ecfdf5]/70 hover:text-[#E8C560] rounded-lg hover:bg-white/5 transition-colors"
-                >
+                <a key={l.label} href={navHref(l)} {...navExternalProps(l)} onClick={(e) => handleNavClick(l, e)} className="px-3 py-2 text-xs font-medium text-[#ecfdf5]/70 hover:text-[#E8C560] rounded-lg hover:bg-white/5 transition-colors">
                   {l.label}
                 </a>
               ))}
@@ -200,8 +166,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 </SheetContent>
               </Sheet>
 
-              {/* Auth State — Sign In already correctly opens AuthModal via
-                  showAuthModal state; kept exactly as in the uploaded file. */}
               {isAuthenticated ? (
                 <div className="flex items-center gap-2">
                   <button
@@ -259,13 +223,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         {mobileNavOpen && (
           <nav className="md:hidden border-t border-white/5 px-4 py-2 flex flex-col bg-[#022c22]/95">
             {NAV_LINKS.map((l) => (
-              
-                key={l.label}
-                href={navHref(l)}
-                {...navExternalProps(l)}
-                onClick={(e) => handleNavClick(l, e)}
-                className="px-2 py-2.5 text-sm text-[#ecfdf5]/80 hover:text-[#E8C560] transition-colors"
-              >
+              <a key={l.label} href={navHref(l)} {...navExternalProps(l)} onClick={(e) => handleNavClick(l, e)} className="px-2 py-2.5 text-sm text-[#ecfdf5]/80 hover:text-[#E8C560] transition-colors">
                 {l.label}
               </a>
             ))}
@@ -309,8 +267,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </div>
       </footer>
 
-      {/* ── Floating Elements — both restored: PlatformBadge was already
-          here, FloatingAIAssistant was missing from the uploaded file. ── */}
+      {/* ── Floating Elements ── */}
       <PlatformBadge />
       <FloatingAIAssistant plan={null} activeView="survey" compact={true} />
 
