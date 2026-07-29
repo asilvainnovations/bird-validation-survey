@@ -1,9 +1,11 @@
 // src/components/AppLayout.tsx
 // BIRD 2026–2035 · Validation Survey Shell
+// Contains ALL visual chrome: header, footer, nav, AuthModal, FloatingAIAssistant,
+// ContextPanel, and theme toggle. Renders {children} as the main page content.
 
 import React, { useState, useMemo, useCallback, lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthContext } from "@/contexts/AuthContext";
 import { useTheme } from "@/components/theme-provider";
 import { BIRD_SITES } from "@/lib/bird-urls";
 
@@ -26,6 +28,14 @@ import {
 } from "lucide-react";
 
 // ─── LAZY LOADED MODALS ─────────────────────────────────────────────────────
+// NOTE: this repo's actual auth surface is AuthModal (login/signup) +
+// UserProfileModal (account/sign-out), not separate Login/Logout/UserMenu
+// components — there are no such files under src/components/auth today.
+// Wiring against files that don't exist would just be new dead code, so this
+// layout uses what's actually there. If dedicated Login/Logout/UserMenu
+// components are added later, swap the two lazy imports below; useAuthContext()'s
+// return shape (user, profile, isAuthenticated, isLoading, signOut) already
+// supports either.
 const AuthModal = lazy(() => import("./auth/AuthModal").then((m) => ({ default: m.AuthModal })));
 const UserProfileModal = lazy(() => import("./auth/UserProfileModal").then((m) => ({ default: m.UserProfileModal })));
 
@@ -37,9 +47,41 @@ const NAV_LINKS = [
   { label: "Privacy", href: "/privacy-policy.html", external: true },
 ] as const;
 
+// ─── RequireAuth ────────────────────────────────────────────────────────────
+// The BIRD Validation Survey is intentionally public — stakeholders must be
+// able to submit without creating an account (see survey-submit's anon RLS
+// policy). This guard exists for future admin-only routes (e.g. a raw
+// response review page) and currently passes children through unconditionally
+// while authentication is still loading or absent, redirecting nothing. It
+// reads real auth state from useAuthContext() rather than being a no-op stub,
+// so it's ready to gate a route the moment one needs it:
+//
+//   <RequireAuth><AdminReviewPage /></RequireAuth>
+//
+// To actually enforce it, uncomment the redirect below once an admin route
+// exists — left inert here to avoid rejecting real stakeholder respondents.
+export const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuthContext();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[40vh] flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    // return <Navigate to="/" replace />; // enable once an admin-only route exists
+    console.warn("[RequireAuth] Route reached without authentication — currently non-blocking.");
+  }
+
+  return <>{children}</>;
+};
+
 // ─── MAIN LAYOUT ────────────────────────────────────────────────────────────
 const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
-  const { user, profile, isAuthenticated, isLoading: authLoading, signOut } = useAuth();
+  const { user, profile, isAuthenticated, isLoading: authLoading, signOut } = useAuthContext();
   const { theme, setTheme } = useTheme();
   const location = useLocation();
 
@@ -48,6 +90,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [contextPanelOpen, setContextPanelOpen] = useState(false);
 
+  // Derive section ID for ContextPanel context-awareness
   const sectionId = useMemo(() => {
     const path = location.pathname;
     if (path.includes("section") || path === "/" || path === "/validation-survey") {
@@ -57,6 +100,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
     return undefined;
   }, [location.pathname]);
 
+  // Hide global header/footer on survey route to prevent duplication with SurveyWizard's own chrome
   const isSurveyRoute = location.pathname === "/" || location.pathname === "/validation-survey";
 
   const userDisplayInfo = useMemo(() => {
@@ -76,6 +120,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
     setShowProfileModal(false);
   }, [signOut]);
 
+  // ── Auth loading screen ──
   if (authLoading) {
     return (
       <div className="min-h-screen bg-[#011a12] flex flex-col items-center justify-center p-6">
@@ -94,10 +139,14 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   return (
     <div className="min-h-screen bg-[#011a12] text-[#ecfdf5] flex flex-col relative">
       
+      {/* ═══════════════════════════════════════════════════════════════════════
+          HEADER (hidden on survey route)
+          ═══════════════════════════════════════════════════════════════════════ */}
       {!isSurveyRoute && (
         <header className="sticky top-0 z-40 border-b border-[#C9A84C]/15 bg-[#022c22]/85 backdrop-blur-md">
           <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
             
+            {/* Logo */}
             <a href={BIRD_SITES.home.url} className="flex items-center gap-3 min-w-0">
               <StratLogo size="sm" variant="icon" />
               <div className="min-w-0">
@@ -106,10 +155,11 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
               </div>
             </a>
 
+            {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-4">
               <nav className="flex items-center gap-1">
                 {NAV_LINKS.map((l) => (
-                  <a
+                  
                     key={l.label}
                     href={l.href}
                     {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
@@ -123,6 +173,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
               <div className="h-6 w-px bg-[#C9A84C]/20" />
               
               <div className="flex items-center gap-2">
+                {/* Context Panel Toggle */}
                 <Button
                   type="button"
                   variant="ghost"
@@ -134,6 +185,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
                   <span className="ml-1 hidden lg:inline">Context</span>
                 </Button>
 
+                {/* Theme Toggle */}
                 <Toggle
                   pressed={theme === "dark"}
                   onPressedChange={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -143,6 +195,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
                   {theme === "dark" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
                 </Toggle>
 
+                {/* Auth — dynamic: shows Sign In when logged out, avatar + Sign Out when authenticated */}
                 {isAuthenticated ? (
                   <div className="flex items-center gap-2">
                     <button
@@ -176,6 +229,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
               </div>
             </div>
 
+            {/* Mobile Toggle */}
             <div className="flex md:hidden items-center gap-2">
               <Toggle
                 pressed={theme === "dark"}
@@ -195,10 +249,11 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
             </div>
           </div>
 
+          {/* Mobile Nav Dropdown */}
           {mobileNavOpen && (
             <nav className="md:hidden border-t border-white/5 px-4 py-2 flex flex-col bg-[#022c22]/95">
               {NAV_LINKS.map((l) => (
-                <a
+                
                   key={l.label}
                   href={l.href}
                   {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
@@ -230,9 +285,11 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
         </header>
       )}
 
+      {/* ── Main Content + Context Panel ── */}
       <div className="flex-1 flex relative">
         <main className="flex-1 min-w-0">{children}</main>
 
+        {/* Context Panel Sidebar (desktop) */}
         {contextPanelOpen && !isSurveyRoute && (
           <>
             <aside className="hidden lg:block w-80 xl:w-96 border-l border-[#C9A84C]/15 bg-[#011a12]/90 backdrop-blur-md overflow-y-auto">
@@ -240,6 +297,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
                 <ContextPanel sectionId={sectionId} showAll={!sectionId} compact={false} />
               </div>
             </aside>
+            {/* Context Panel Drawer (mobile) */}
             <div className="lg:hidden fixed inset-0 z-50 flex">
               <div className="flex-1 bg-black/50 backdrop-blur-sm" onClick={() => setContextPanelOpen(false)} />
               <div className="w-80 bg-[#011a12] border-l border-[#C9A84C]/15 overflow-y-auto">
@@ -258,6 +316,9 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
         )}
       </div>
 
+      {/* ═══════════════════════════════════════════════════════════════════════
+          FOOTER (hidden on survey route)
+          ═══════════════════════════════════════════════════════════════════════ */}
       {!isSurveyRoute && (
         <footer className="border-t border-white/5 bg-[#011a12]">
           <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#ecfdf5]/40">
@@ -273,9 +334,11 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
         </footer>
       )}
 
+      {/* ── Floating Elements ── */}
       <PlatformBadge />
       <FloatingAIAssistant plan={null} activeView={isSurveyRoute ? "survey" : (sectionId || "survey")} compact={true} />
 
+      {/* ── Auth Modals ── */}
       <Suspense fallback={null}>
         {showAuthModal && (
           <AuthModal isOpen onClose={() => setShowAuthModal(false)} />
