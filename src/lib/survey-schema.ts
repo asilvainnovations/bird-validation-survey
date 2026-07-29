@@ -83,7 +83,7 @@ export const surveySchema = z.object({
   q02_demo_organization: optionalString,
   q02_demo_position: optionalString,
   q02_network_accuracy: optionalString,
-
+  
   // ═══ Step 3: BEIE & Systems Thinking ═══
   // No SWOT scale items belong here — SWOT_Scale_Questions.md maps them to
   // Sections 4-9 only. Section 3 carries framework comprehension + the two
