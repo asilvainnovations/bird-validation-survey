@@ -1,83 +1,72 @@
-// src/components/strategic/Section8_Financiers.tsx
-// BIRD 2026–2035 · Section 8: Cluster 5 — Financiers
-//
-// SYSTEMS ARCHITECTURE ALIGNMENT:
-// • Primitives: ImageWithFallback, LikertScale, SectionProgress, SWOTScalePair, ArchetypeCard
-// • Animations: Framer Motion staggered entrance
-// • Accessibility: All scales are true radio groups with keyboard nav
-// • Theme: Dark-first consistent with Sections 0–7
-// • Content: Single-source-of-truth from swot-content.ts (SWOT_BY_SECTION[8], ARCHETYPES_BY_SECTION[8])
-
 import React from "react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-
-// ── Primitives ───────────────────────────────────────────────────────────────
-import { ImageWithFallback } from "@/lib/primitives/ImageWithFallback";
-import { SectionProgress } from "@/lib/primitives/SectionProgress";
-import { LikertScale } from "@/lib/primitives/LikertScale";
-import { SWOTScalePair } from "@/lib/primitives/SWOTScalePair";
-import { ArchetypeCard } from "@/lib/primitives/ArchetypeCard";
-
-// ── BIRD Content ─────────────────────────────────────────────────────────────
-import { BIRD_IMAGES } from "@/lib/bird-urls";
-import {
-  ARCHETYPES_BY_SECTION,
-  SWOT_BY_SECTION,
-  ACCURACY_OPTIONS,
-} from "@/lib/swot-content";
-
-// ── shadcn/ui ────────────────────────────────────────────────────────────────
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-
-// ── Formulas ─────────────────────────────────────────────────────────────────
+import {
+  Landmark,
+  TrendingUp,
+  Target,
+  AlertTriangle,
+} from "lucide-react";
+import { BIRD_IMAGES } from "@/lib/bird-urls";
 import {
   calculateStrengthRI,
   calculateWeaknessRisk,
   calculateOpportunityRI,
+  calculateThreatVI,
 } from "@/lib/formulas";
 
-// ── Icons ────────────────────────────────────────────────────────────────────
-import {
-  Landmark,
-  BarChart3,
-  TrendingUp,
-  TrendingDown,
-  Zap,
-  ShieldAlert,
-  BookOpen,
-  HandCoins,
-  Scale,
-  Globe,
-  TrendingUpIcon,
-} from "lucide-react";
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// TYPES — CONTRACT WITH SURVEYWIZARD.TSX
-// ═══════════════════════════════════════════════════════════════════════════════
+// ── Types (exact runtime contract with SurveyWizard.tsx s8 state) ────────────
 export interface Section8Data {
-  // Banner understanding
-  q8_1_banner_understanding?: number;
-  // Archetype
-  q8_arch_shifting_burden_accuracy?: string;
-  q8_arch_shifting_burden_followup?: string;
-  // SWOT — Strengths
-  q8_s1_islamic_finance_framework_impact?: number;
-  q8_s1_islamic_finance_framework_likelihood?: number;
-  // SWOT — Weaknesses
-  q8_w1_financial_penetration_impact?: number;
-  q8_w1_financial_penetration_likelihood?: number;
-  // SWOT — Opportunities
-  q8_o1_islamic_ecosystem_impact?: number;
-  q8_o1_islamic_ecosystem_likelihood?: number;
-  // Additional understanding questions
-  q8_2_capital_bloodstream_understanding?: number;
-  q8_3_islamic_finance_roadmap_understanding?: number;
-  q8_4_finance_tier_priority?: string;
-  q8_5_roadmap_achievable?: number;
-  q8_6_priority_action?: string;
-  q8_7_islamic_authority?: string;
+  q8_1_finance_tier_priority: string;
+  q8_2_roadmap_achievable?: number;
+  q8_3_priority_action: string;
+  q8_4_islamic_authority: string;
+  q_s8_domestic_halal_impact?: number;
+  q_s8_domestic_halal_likelihood?: number;
+  q_s8_youth_pop_impact?: number;
+  q_s8_youth_pop_likelihood?: number;
+  q_s8_policy_recognition_impact?: number;
+  q_s8_policy_recognition_likelihood?: number;
+  q_s8_islamic_finance_fw_impact?: number;
+  q_s8_islamic_finance_fw_likelihood?: number;
+  q_s8_peace_dividend_impact?: number;
+  q_s8_peace_dividend_likelihood?: number;
+  q_s8_infra_deficits_impact?: number;
+  q_s8_infra_deficits_likelihood?: number;
+  q_s8_literacy_impact?: number;
+  q_s8_literacy_likelihood?: number;
+  q_s8_financial_penetration_impact?: number;
+  q_s8_financial_penetration_likelihood?: number;
+  q_s8_fragmented_policy_impact?: number;
+  q_s8_fragmented_policy_likelihood?: number;
+  q_s8_skills_mismatch_impact?: number;
+  q_s8_skills_mismatch_likelihood?: number;
+  q_s8_global_halal_impact?: number;
+  q_s8_global_halal_likelihood?: number;
+  q_s8_renewable_invest_impact?: number;
+  q_s8_renewable_invest_likelihood?: number;
+  q_s8_asean_halal_impact?: number;
+  q_s8_asean_halal_likelihood?: number;
+  q_s8_islamic_ecosystem_impact?: number;
+  q_s8_islamic_ecosystem_likelihood?: number;
+  q_s8_uae_corridor_impact?: number;
+  q_s8_uae_corridor_likelihood?: number;
+  q_s8_halal_competition_impact?: number;
+  q_s8_halal_competition_likelihood?: number;
+  q_s8_halal_standards_impact?: number;
+  q_s8_halal_standards_likelihood?: number;
+  q_s8_security_incidents_impact?: number;
+  q_s8_security_incidents_likelihood?: number;
+  q_s8_political_transition_impact?: number;
+  q_s8_political_transition_likelihood?: number;
+  q_s8_big_man: string;
+  q_s8_big_man_followup: string;
+  q_s8_shifting_burden: string;
+  q_s8_shifting_followup: string;
 }
 
 interface Section8Props {
@@ -85,624 +74,547 @@ interface Section8Props {
   onChange: (data: Section8Data) => void;
 }
 
-// ── Animation variants ───────────────────────────────────────────────────────
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.1 },
-  },
-};
+// ── Design tokens ────────────────────────────────────────────────────────────
+const activeBtn =
+  "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90 dark:bg-[#1B4D3E] dark:text-white dark:border-[#1B4D3E]";
+const inactiveBtn =
+  "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10";
+const activeScale =
+  "bg-[#C9A84C] text-white border-[#C9A84C] hover:bg-[#C9A84C]/90";
+const inactiveScale =
+  "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]";
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, ease: "easeOut" },
-  },
-};
+const archetypeOptions = [
+  "Very accurately",
+  "Somewhat accurately",
+  "Needs revision",
+  "Not accurate",
+];
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// COMPONENT
-// ═══════════════════════════════════════════════════════════════════════════════
-const Section8_Financiers: React.FC<Section8Props> = ({ data, onChange }) => {
-  const update = <K extends keyof Section8Data>(field: K, value: Section8Data[K]) => {
-    onChange({ ...data, [field]: value });
-  };
+export const Section8_Financiers: React.FC<Section8Props> = ({ data, onChange }) => {
+  const update = <K extends keyof Section8Data>(
+    field: K,
+    value: Section8Data[K]
+  ) => onChange({ ...data, [field]: value });
 
-  const swotItems = SWOT_BY_SECTION[8];
-  const archetype = ARCHETYPES_BY_SECTION[8]?.[0];
+  const renderScale = (field: keyof Section8Data) => (
+    <div className="flex gap-2">
+      {[1, 2, 3, 4, 5].map((v) => (
+        <Button
+          key={v}
+          type="button"
+          variant="outline"
+          size="icon"
+          className={cn(
+            "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
+            data[field] === v ? activeScale : inactiveScale
+          )}
+          onClick={() => update(field, v as any)}
+        >
+          {v}
+        </Button>
+      ))}
+    </div>
+  );
 
-  // ── Compute sub-progress ──
-  const filledCount = [
-    data.q8_1_banner_understanding != null,
-    data.q8_arch_shifting_burden_accuracy,
-    data.q8_arch_shifting_burden_followup,
-    ...swotItems.map((item) => {
-      const impact = data[`${item.field}_impact` as keyof Section8Data] as number | undefined;
-      const likelihood = data[`${item.field}_likelihood` as keyof Section8Data] as number | undefined;
-      return impact != null && likelihood != null;
-    }),
-    data.q8_2_capital_bloodstream_understanding != null,
-    data.q8_3_islamic_finance_roadmap_understanding != null,
-    data.q8_4_finance_tier_priority,
-    data.q8_5_roadmap_achievable != null,
-    data.q8_6_priority_action,
-    data.q8_7_islamic_authority,
-  ].filter(Boolean).length;
-  const totalFields = 3 + swotItems.length * 2 + 6;
-
-  // ── Live scores (dynamic from registry) ──
-  const scores: Array<{ label: string; score: number | null; suffix: string; color: string }> = [];
-  swotItems.forEach((item) => {
-    const impact = data[`${item.field}_impact` as keyof Section8Data] as number | undefined;
-    const likelihood = data[`${item.field}_likelihood` as keyof Section8Data] as number | undefined;
-    if (impact == null || likelihood == null) return;
-
+  const renderSwotPair = (
+    label: string,
+    desc: string,
+    impactField: keyof Section8Data,
+    likelihoodField: keyof Section8Data,
+    category: "strength" | "weakness" | "opportunity" | "threat"
+  ) => {
+    const impact = data[impactField] as number | undefined;
+    const likelihood = data[likelihoodField] as number | undefined;
     let score: number | null = null;
-    let suffix = "";
-    let color = "";
-    switch (item.category) {
-      case "S":
-        score = calculateStrengthRI(impact, likelihood);
-        suffix = "RI";
-        color = "text-emerald-400";
-        break;
-      case "W":
-        score = calculateWeaknessRisk(impact, likelihood);
-        suffix = "Risk";
-        color = "text-rose-400";
-        break;
-      case "O":
-        score = calculateOpportunityRI(impact, likelihood);
-        suffix = "RI";
-        color = "text-sky-400";
-        break;
+    let scoreLabel = "";
+    let badgeClass = "";
+
+    if (impact && likelihood) {
+      switch (category) {
+        case "strength":
+          score = calculateStrengthRI(impact, likelihood);
+          scoreLabel = "RI";
+          badgeClass = "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300";
+          break;
+        case "weakness":
+          score = calculateWeaknessRisk(impact, likelihood);
+          scoreLabel = "Risk";
+          badgeClass = "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300";
+          break;
+        case "opportunity":
+          score = calculateOpportunityRI(impact, likelihood);
+          scoreLabel = "RI";
+          badgeClass = "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300";
+          break;
+        case "threat":
+          score = calculateThreatVI(impact, likelihood);
+          scoreLabel = "VI";
+          badgeClass = "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
+          break;
+      }
     }
-    if (score !== null) {
-      scores.push({ label: item.id, score, suffix, color });
-    }
-  });
 
-  const shiftingAgree =
-    data.q8_arch_shifting_burden_accuracy === "Very accurately" ||
-    data.q8_arch_shifting_burden_accuracy === "Somewhat accurately";
-
-  return (
-    <motion.div
-      className="space-y-8 max-w-4xl mx-auto px-4 py-6"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      {/* ── Progress Header ── */}
-      <SectionProgress
-        currentSection={8}
-        totalSections={16}
-        sectionLabel="Cluster 5: Financiers"
-      />
-
-      {/* ── Sub-progress ── */}
-      <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#022c22]/40 border border-[#C9A84C]/10">
-        <span className="text-[11px] text-[#ecfdf5]/40 uppercase tracking-wider">
-          Section completion
-        </span>
-        <span className="text-[11px] text-[#C9A84C]/70">
-          {filledCount}/{totalFields} fields
-        </span>
-      </div>
-
-      {/* ── Header ── */}
-      <motion.div variants={cardVariants} className="space-y-2">
-        <div className="flex items-center gap-3">
-          <Landmark className="w-6 h-6 text-[#C9A84C]" />
-          <h2 className="text-xl font-bold text-[#ecfdf5]">
-            Section 8: Cluster 5 — Financiers
-          </h2>
+    return (
+      <div className="space-y-4 p-4 rounded-lg border border-[#C9A84C]/20 bg-emerald-50/40 dark:bg-[#1B4D3E]/10">
+        <div className="flex items-center gap-2">
+          <Target className="w-4 h-4 text-[#C9A84C]" />
+          <p className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            {label}
+          </p>
+          {score !== null && (
+            <Badge variant="secondary" className={cn("ml-auto border", badgeClass)}>
+              <TrendingUp className="w-3 h-3 mr-1" />
+              {scoreLabel}: {score.toFixed(2)}
+            </Badge>
+          )}
         </div>
-        <p className="text-sm text-[#ecfdf5]/70">
-          Powering the Bloodstream of the Economy — Islamic finance through ethical and faith-aligned capital mechanisms
-        </p>
-      </motion.div>
-
-      {/* ── Banner Image ── */}
-      <motion.div variants={cardVariants}>
-        <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-2xl">
-          <ImageWithFallback
-            src={BIRD_IMAGES.cluster5Financiers.url}
-            alt={BIRD_IMAGES.cluster5Financiers.alt}
-            className="w-full h-56 sm:h-72"
-            imgClassName="object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-4">
-            <p className="text-xs text-[#ecfdf5]/70 italic">
-              {BIRD_IMAGES.cluster5Financiers.title}
-            </p>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* ── Cluster Description ── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold text-[#E5C560]">
-              The Capital Bloodstream
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-[#ecfdf5]/80 leading-relaxed">
-              Cluster 5 | Financiers powers the bloodstream of the Bangsamoro economy through Shariah-compliant
-              capital mechanisms. From macro-capital (Islamic banking & Sukuk) to risk mitigation (Takaful)
-              and micro-access (Islamic microfinance & Waqf), this cluster ensures that financial flows align
-              with ethical values and religious principles.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {[
-                { icon: <Scale className="w-4 h-4" />, title: "Islamic Banking & Sukuk", desc: "Macro-capital mobilization through Shariah-compliant bonds and banking institutions enabled by RA 11439." },
-                { icon: <ShieldAlert className="w-4 h-4" />, title: "Takaful (Islamic Insurance)", desc: "Risk mitigation and protection for investments, communities, and enterprises against unforeseen shocks." },
-                { icon: <HandCoins className="w-4 h-4" />, title: "Islamic Microfinance", desc: "Micro-access for MSMEs and rural communities excluded from conventional banking systems." },
-                { icon: <Globe className="w-4 h-4" />, title: "Waqf & Social Finance", desc: "Endowment-based perpetual capital for education, health, and community infrastructure." },
-              ].map((item) => (
-                <div
-                  key={item.title}
-                  className="p-3 rounded-xl bg-[#022c22]/60 border border-[#C9A84C]/10"
+        <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/70">{desc}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <Label className="text-xs font-medium text-[#065f46] dark:text-[#ecfdf5]/70 mb-2 block">
+              Impact (1–5)
+            </Label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-10 h-10 rounded-lg border text-sm font-semibold transition-all",
+                    impact === v
+                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
+                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                  )}
+                  onClick={() => update(impactField, v as any)}
                 >
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[#C9A84C]">{item.icon}</span>
-                    <span className="text-xs font-bold text-[#ecfdf5]">{item.title}</span>
-                  </div>
-                  <p className="text-[11px] text-[#ecfdf5]/50 leading-relaxed">{item.desc}</p>
-                </div>
+                  {v}
+                </Button>
               ))}
             </div>
-
-            {/* Banner understanding check */}
-            <div className="pt-4 border-t border-[#C9A84C]/10">
-              <LikertScale
-                name="q8_1_banner_understanding"
-                label="How clearly does the Financiers cluster description convey its role as the ethical capital bloodstream of BARMM?"
-                value={data.q8_1_banner_understanding}
-                onChange={(v) => update("q8_1_banner_understanding", v)}
-              />
+          </div>
+          <div>
+            <Label className="text-xs font-medium text-[#065f46] dark:text-[#ecfdf5]/70 mb-2 block">
+              Likelihood (1–5)
+            </Label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-10 h-10 rounded-lg border text-sm font-semibold transition-all",
+                    likelihood === v
+                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
+                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                  )}
+                  onClick={() => update(likelihoodField, v as any)}
+                >
+                  {v}
+                </Button>
+              ))}
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
-      {/* ── Archetype: Shifting the Burden ── */}
-      {archetype && (
-        <motion.div variants={cardVariants}>
-          <Card className="bg-[#011a12]/80 border-rose-500/20">
-            <CardHeader>
-              <CardTitle className="text-base font-semibold text-[#E5C560] flex items-center gap-2">
-                <ShieldAlert className="w-5 h-5 text-rose-400" />
-                Systems Archetype: {archetype.name}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <ArchetypeCard archetype={archetype} />
+  return (
+    <div className="space-y-8">
+      {/* ── Header ────────────────────────────────────────────────── */}
+      <div className="flex items-center gap-3 mb-4">
+        <Landmark className="w-6 h-6 text-[#C9A84C]" />
+        <h2 className="text-xl font-bold text-[#022c22] dark:text-[#ecfdf5]">
+          Section 8: Cluster 5 — Financiers: Powering the Bloodstream of the Economy
+        </h2>
+      </div>
+      <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 -mt-2 max-w-3xl">
+        The Financiers cluster shows how Islamic finance underpins Bangsamoro's economic system through ethical and faith-aligned capital mechanisms — from Shariah banking to microfinance.
+      </p>
 
-              <p className="text-xs text-[#ecfdf5]/60 italic border-l-2 border-rose-500/30 pl-3">
-                Without building indigenous Shariah-compliant institutions, BARMM remains dependent on
-                conventional banking that does not serve Muslim-majority communities equitably,
-                perpetuating a{" "}
-                <strong className="text-rose-300">structural dependency</strong>.
-              </p>
+      {/* ── 1. Cluster Banner ────────────────────────────────────── */}
+      <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
+        <img
+          src={BIRD_IMAGES.cluster5Financiers.url}
+          alt={BIRD_IMAGES.cluster5Financiers.alt}
+          className="w-full h-auto max-h-[500px] object-contain transition-transform duration-500 group-hover:scale-[1.02]"
+          loading="lazy"
+        />
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+          <p className="text-xs italic text-white/70">
+            {BIRD_IMAGES.cluster5Financiers.description}
+          </p>
+        </div>
+      </div>
 
-              {/* Archetype accuracy */}
-              <div className="pt-4 border-t border-[#C9A84C]/10 space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
-                    How accurately does &quot;{archetype.name}&quot; reflect BARMM&apos;s reliance on
-                    conventional banking instead of fully investing in Islamic finance institutions?
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {ACCURACY_OPTIONS.map((opt) => (
-                      <button
-                        key={opt}
-                        type="button"
-                        onClick={() => update("q8_arch_shifting_burden_accuracy", opt)}
-                        className={cn(
-                          "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
-                          data.q8_arch_shifting_burden_accuracy === opt
-                            ? "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]"
-                            : "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
-                        )}
-                      >
-                        <div
-                          className={cn(
-                            "w-3.5 h-3.5 rounded-full border flex-shrink-0",
-                            data.q8_arch_shifting_burden_accuracy === opt
-                              ? "bg-[#C9A84C] border-[#C9A84C]"
-                              : "border-[#C9A84C]/40"
-                          )}
-                        />
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {shiftingAgree && (
-                  <div>
-                    <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
-                      {archetype.followupLabel}
-                    </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {archetype.followupOptions.map((opt) => (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => update("q8_arch_shifting_burden_followup", opt)}
-                          className={cn(
-                            "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
-                            data.q8_arch_shifting_burden_followup === opt
-                              ? "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]"
-                              : "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
-                          )}
-                        >
-                          <div
-                            className={cn(
-                              "w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0",
-                              data.q8_arch_shifting_burden_followup === opt
-                                ? "bg-[#C9A84C] border-[#C9A84C]"
-                                : "border-[#C9A84C]/40"
-                            )}
-                          >
-                            {data.q8_arch_shifting_burden_followup === opt && (
-                              <svg className="w-2.5 h-2.5 text-[#011a12]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                              </svg>
-                            )}
-                          </div>
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Other (please specify)..."
-                      value={
-                        data.q8_arch_shifting_burden_followup &&
-                        !archetype.followupOptions.includes(data.q8_arch_shifting_burden_followup)
-                          ? data.q8_arch_shifting_burden_followup
-                          : ""
-                      }
-                      onChange={(e) => update("q8_arch_shifting_burden_followup", e.target.value)}
-                      className={cn(
-                        "mt-3 w-full px-3 py-2 rounded-lg border text-sm placeholder:text-[#ecfdf5]/30",
-                        "bg-[#022c22]/60 border-[#C9A84C]/20 text-[#ecfdf5]",
-                        "focus:outline-none focus:border-[#C9A84C]"
-                      )}
-                    />
-                  </div>
+      {/* ── 2. The Capital Bloodstream ───────────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            The Capital Bloodstream: Scaling Shariah-Compliant Finance
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Financiers.png"
+              alt="The Capital Bloodstream"
+              className="w-full h-auto max-h-[500px] object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
+            Three-tier pyramid: <strong>Macro-Capital</strong> (Islamic Banking & Sukuk for infrastructure), <strong>Risk Mitigation</strong> (Takaful for agriculture/climate shocks), <strong>Micro-Access</strong> (Islamic Microfinance & Waqf for farmers/MSMEs).
+          </p>
+          <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+            Which tier of Shariah-compliant finance should be the highest priority for BARMM?
+          </Label>
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              "Macro-Capital (Sukuk, infrastructure banking)",
+              "Risk Mitigation (Takaful, insurance)",
+              "Micro-Access (Microfinance, Waqf for MSMEs)",
+            ].map((opt) => (
+              <Button
+                key={opt}
+                type="button"
+                variant="outline"
+                className={cn(
+                  "justify-start h-auto py-3 text-sm text-left",
+                  data.q8_1_finance_tier_priority === opt ? activeBtn : inactiveBtn
                 )}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
+                onClick={() => update("q8_1_finance_tier_priority", opt)}
+              >
+                {opt}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* ── SWOT Assessment ── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold text-[#E5C560] flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-[#C9A84C]" />
-              Risk & Resilience Assessment — Financiers Cluster
-            </CardTitle>
-            <p className="text-xs text-[#ecfdf5]/50 pt-1">
-              Rate each factor&apos;s <strong className="text-[#ecfdf5]">Impact</strong> (severity if realized)
-              and <strong className="text-[#ecfdf5]">Likelihood</strong> (probability of occurrence) on a 1–5 scale.
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Strengths */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <TrendingUp className="w-4 h-4 text-emerald-400" />
-                <h3 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
-                  Strengths — Internal Resilience Drivers
-                </h3>
-              </div>
-              <div className="space-y-4">
-                {swotItems
-                  .filter((i) => i.category === "S")
-                  .map((item) => (
-                    <SWOTScalePair
-                      key={item.field}
-                      category={item.category}
-                      factorLabel={`${item.id} — ${item.label}`}
-                      factorDescription={item.factor}
-                      impact={data[`${item.field}_impact` as keyof Section8Data] as number | undefined}
-                      likelihood={data[`${item.field}_likelihood` as keyof Section8Data] as number | undefined}
-                      onImpactChange={(v) => update(`${item.field}_impact` as keyof Section8Data, v)}
-                      onLikelihoodChange={(v) => update(`${item.field}_likelihood` as keyof Section8Data, v)}
-                    />
-                  ))}
-              </div>
-            </div>
+      {/* ── 3. Islamic Finance Roadmap ───────────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Islamic Finance Roadmap (2024–2028)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Islamic%20Finance%20Roadmap.png"
+              alt="Islamic Finance Roadmap"
+              className="w-full h-auto max-h-[500px] object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
+            Six progressive layers: Strengthen Islamic Banking, Enhance Microfinance & Waqf, Establish Takaful, Facilitate Sukuk Capital Market, Harness Fintech, Develop Human Capital. Timeline: 2024–2025 (Foundation), Mid-Term (Takaful), 2028 Goal (Functional System & Tax Neutrality).
+          </p>
+          <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+            How achievable is the 2028 goal of a functional Islamic finance system with tax neutrality in BARMM?
+          </Label>
+          {renderScale("q8_2_roadmap_achievable")}
+          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">1 = Not achievable, 5 = Very achievable</p>
 
-            {/* Weaknesses */}
-            <div className="pt-6 border-t border-[#C9A84C]/10">
-              <div className="flex items-center gap-2 mb-4">
-                <TrendingDown className="w-4 h-4 text-rose-400" />
-                <h3 className="text-xs font-bold text-rose-400 uppercase tracking-wider">
-                  Weaknesses — Internal Risk Exposure
-                </h3>
-              </div>
-              <div className="space-y-4">
-                {swotItems
-                  .filter((i) => i.category === "W")
-                  .map((item) => (
-                    <SWOTScalePair
-                      key={item.field}
-                      category={item.category}
-                      factorLabel={`${item.id} — ${item.label}`}
-                      factorDescription={item.factor}
-                      impact={data[`${item.field}_impact` as keyof Section8Data] as number | undefined}
-                      likelihood={data[`${item.field}_likelihood` as keyof Section8Data] as number | undefined}
-                      onImpactChange={(v) => update(`${item.field}_impact` as keyof Section8Data, v)}
-                      onLikelihoodChange={(v) => update(`${item.field}_likelihood` as keyof Section8Data, v)}
-                    />
-                  ))}
-              </div>
-            </div>
+          <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block mt-4">
+            What is the single most important action to accelerate Islamic finance adoption?
+          </Label>
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              "Strengthen regulatory framework (tax neutrality, Shariah governance)",
+              "Build human capital (Islamic finance education, training)",
+              "Expand digital infrastructure (fintech, mobile banking)",
+              "Promote awareness (financial literacy, community outreach)",
+              "Attract foreign Islamic banks (incentives, partnerships)",
+            ].map((opt) => (
+              <Button
+                key={opt}
+                type="button"
+                variant="outline"
+                className={cn(
+                  "justify-start h-auto py-3 text-sm text-left",
+                  data.q8_3_priority_action === opt ? activeBtn : inactiveBtn
+                )}
+                onClick={() => update("q8_3_priority_action", opt)}
+              >
+                {opt}
+              </Button>
+            ))}
+          </div>
 
-            {/* Opportunities */}
-            <div className="pt-6 border-t border-[#C9A84C]/10">
-              <div className="flex items-center gap-2 mb-4">
-                <Zap className="w-4 h-4 text-sky-400" />
-                <h3 className="text-xs font-bold text-sky-400 uppercase tracking-wider">
-                  Opportunities — External Resilience Drivers
-                </h3>
-              </div>
-              <div className="space-y-4">
-                {swotItems
-                  .filter((i) => i.category === "O")
-                  .map((item) => (
-                    <SWOTScalePair
-                      key={item.field}
-                      category={item.category}
-                      factorLabel={`${item.id} — ${item.label}`}
-                      factorDescription={item.factor}
-                      impact={data[`${item.field}_impact` as keyof Section8Data] as number | undefined}
-                      likelihood={data[`${item.field}_likelihood` as keyof Section8Data] as number | undefined}
-                      onImpactChange={(v) => update(`${item.field}_impact` as keyof Section8Data, v)}
-                      onLikelihoodChange={(v) => update(`${item.field}_likelihood` as keyof Section8Data, v)}
-                    />
-                  ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+          <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block mt-4">
+            Should BARMM establish a dedicated Islamic Finance Authority?
+          </Label>
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              "Yes — essential for coordination and governance",
+              "Yes — but only after basic banking is strengthened",
+              "No — existing agencies can handle it",
+              "No — too resource-intensive at this stage",
+            ].map((opt) => (
+              <Button
+                key={opt}
+                type="button"
+                variant="outline"
+                className={cn(
+                  "justify-start h-auto py-3 text-sm text-left",
+                  data.q8_4_islamic_authority === opt ? activeBtn : inactiveBtn
+                )}
+                onClick={() => update("q8_4_islamic_authority", opt)}
+              >
+                {opt}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* ── Additional Deep-Dive: The Capital Bloodstream ── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardContent className="pt-6 space-y-4">
-            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-xl">
-              <ImageWithFallback
-                src={BIRD_IMAGES.financiersCapitalBloodstream.url}
-                alt={BIRD_IMAGES.financiersCapitalBloodstream.alt}
-                className="w-full h-48 sm:h-64"
-                imgClassName="object-cover object-center"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <p className="text-xs text-[#ecfdf5]/70 italic">
-                  {BIRD_IMAGES.financiersCapitalBloodstream.title}
-                </p>
-              </div>
-            </div>
-            <p className="text-sm text-[#ecfdf5]/70 leading-relaxed">
-              <strong>Three tiers of Islamic finance:</strong> Macro-Capital (Islamic Banking & Sukuk),{" "}
-              Risk Mitigation (Takaful), and Micro-Access (Islamic Microfinance & Waqf).{" "}
-              Together they form a comprehensive ethical capital ecosystem aligned with BARMM&apos;s values.
-            </p>
-            <div className="pt-2">
-              <LikertScale
-                name="q8_2_capital_bloodstream_understanding"
-                label="How clearly does the Capital Bloodstream diagram explain the three tiers of Islamic finance in BARMM?"
-                value={data.q8_2_capital_bloodstream_understanding}
-                onChange={(v) => update("q8_2_capital_bloodstream_understanding", v)}
-              />
-            </div>
+      {/* ── 4. SWOT Scale Questions ──────────────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2 text-[#022c22] dark:text-[#ecfdf5]">
+            <span className="px-2 py-1 rounded text-xs font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+              SWOT
+            </span>
+            Financiers Cluster: Strengths, Weaknesses, Opportunities, Threats
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-8">
+          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 italic">
+            Rate each factor: Impact (1 = very small, 5 = very large) × Likelihood (1 = very unlikely, 5 = very likely)
+          </p>
 
-            {/* Finance tier priority */}
-            <div className="pt-4 border-t border-[#C9A84C]/10">
-              <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
-                Which finance tier should be the highest priority for BARMM in the next 3 years?
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {/* Strengths */}
+          {renderSwotPair(
+            "S4 — Large Domestic Halal Market",
+            "5.69 million Muslim consumers create strong built-in demand for Shariah-compliant financial products.",
+            "q_s8_domestic_halal_impact",
+            "q_s8_domestic_halal_likelihood",
+            "strength"
+          )}
+          {renderSwotPair(
+            "S5 — Young and Growing Population",
+            "3.43% annual growth creates a large future workforce and consumer base needing financial services.",
+            "q_s8_youth_pop_impact",
+            "q_s8_youth_pop_likelihood",
+            "strength"
+          )}
+          {renderSwotPair(
+            "S7 — Growing Policy Recognition",
+            "BOL, BIC, and SIPP creating stronger institutional mandate and investment climate for Islamic finance.",
+            "q_s8_policy_recognition_impact",
+            "q_s8_policy_recognition_likelihood",
+            "strength"
+          )}
+          {renderSwotPair(
+            "S9 — Islamic Finance Legal Framework",
+            "RA 11439 allows Shariah-compliant banking and finance through Al-Amanah and CARD Islamic.",
+            "q_s8_islamic_finance_fw_impact",
+            "q_s8_islamic_finance_fw_likelihood",
+            "strength"
+          )}
+          {renderSwotPair(
+            "S12 — Peace Dividend Momentum",
+            "Improved security in select zones creates space for financial institutions to expand into rural and island areas.",
+            "q_s8_peace_dividend_impact",
+            "q_s8_peace_dividend_likelihood",
+            "strength"
+          )}
+
+          {/* Weaknesses */}
+          {renderSwotPair(
+            "W1 — Critical Infrastructure Deficits",
+            "Limited digital connectivity restricts mobile banking and fintech reach in island provinces.",
+            "q_s8_infra_deficits_impact",
+            "q_s8_infra_deficits_likelihood",
+            "weakness"
+          )}
+          {renderSwotPair(
+            "W4 — Low Functional Literacy Rate",
+            "59.3% literacy rate limits financial literacy and capacity to use formal banking services.",
+            "q_s8_literacy_impact",
+            "q_s8_literacy_likelihood",
+            "weakness"
+          )}
+          {renderSwotPair(
+            "W5 — Minimal Formal Financial Penetration",
+            "Many people and MSMEs cannot access formal banking or credit services, especially in rural/island areas.",
+            "q_s8_financial_penetration_impact",
+            "q_s8_financial_penetration_likelihood",
+            "weakness"
+          )}
+          {renderSwotPair(
+            "W6 — Fragmented Policy Frameworks",
+            "Islamic banking, halal certification, and trade agencies operate in silos without coordinated strategy.",
+            "q_s8_fragmented_policy_impact",
+            "q_s8_fragmented_policy_likelihood",
+            "weakness"
+          )}
+          {renderSwotPair(
+            "W8 — Skills Mismatch",
+            "TVIs not aligned with Islamic finance and fintech industry needs, slowing workforce readiness.",
+            "q_s8_skills_mismatch_impact",
+            "q_s8_skills_mismatch_likelihood",
+            "weakness"
+          )}
+
+          {/* Opportunities */}
+          {renderSwotPair(
+            "O1 — Global Halal Market Growth",
+            "USD 2.3 trillion market creating demand for Shariah-compliant trade finance and investment products.",
+            "q_s8_global_halal_impact",
+            "q_s8_global_halal_likelihood",
+            "opportunity"
+          )}
+          {renderSwotPair(
+            "O2 — Renewable Energy Investment Opportunities",
+            "Growing interest in solar, hydro, and biomass projects needing Islamic project finance structures.",
+            "q_s8_renewable_invest_impact",
+            "q_s8_renewable_invest_likelihood",
+            "opportunity"
+          )}
+          {renderSwotPair(
+            "O3 — ASEAN Halal Economy",
+            "USD 1.38 trillion market. BARMM can position as an Islamic finance hub for BIMP-EAGA.",
+            "q_s8_asean_halal_impact",
+            "q_s8_asean_halal_likelihood",
+            "opportunity"
+          )}
+          {renderSwotPair(
+            "O4 — Islamic Finance Ecosystem Growth",
+            "Global Shariah-compliant funds seeking ethical destinations — BARMM can be a hub.",
+            "q_s8_islamic_ecosystem_impact",
+            "q_s8_islamic_ecosystem_likelihood",
+            "opportunity"
+          )}
+          {renderSwotPair(
+            "O6 — UAE/GCC Halal Export Corridor",
+            "Partnerships connecting BARMM to Middle Eastern Islamic finance centers and investors.",
+            "q_s8_uae_corridor_impact",
+            "q_s8_uae_corridor_likelihood",
+            "opportunity"
+          )}
+
+          {/* Threats */}
+          {renderSwotPair(
+            "T2 — Competition from Established Halal Hubs",
+            "Malaysia's Islamic finance ecosystem is decades ahead — BARMM must differentiate quickly.",
+            "q_s8_halal_competition_impact",
+            "q_s8_halal_competition_likelihood",
+            "threat"
+          )}
+          {renderSwotPair(
+            "T3 — Halal Standards Recognition Risk",
+            "BARMM's Islamic finance products not yet aligned with OIC/SMIIC international standards.",
+            "q_s8_halal_standards_impact",
+            "q_s8_halal_standards_likelihood",
+            "threat"
+          )}
+          {renderSwotPair(
+            "T4 — Residual Security Incidents",
+            "Security concerns limit willingness of financial institutions to establish presence in remote areas.",
+            "q_s8_security_incidents_impact",
+            "q_s8_security_incidents_likelihood",
+            "threat"
+          )}
+          {renderSwotPair(
+            "T5 — Political Transition Uncertainties",
+            "Elections and leadership changes may disrupt Islamic finance policy continuity and investor confidence.",
+            "q_s8_political_transition_impact",
+            "q_s8_political_transition_likelihood",
+            "threat"
+          )}
+        </CardContent>
+      </Card>
+
+      {/* ── 5. Archetype: Shifting the Burden ────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2 text-[#022c22] dark:text-[#ecfdf5]">
+            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            Archetype: Shifting the Burden
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Shifting%20the%20Burden.png"
+              alt="Shifting the Burden Archetype"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90 leading-relaxed">
+            BARMM's economic ecosystem faces a problem symptom: limited access to culturally aligned, Shariah-compliant financing despite RA 11439 providing a legal framework. Instead of fully investing in Islamic finance institutions, the region often relies on conventional banking systems as a symptomatic solution. This temporarily meets capital needs but does not resolve the structural gap — creating a self-reinforcing cycle of stagnation where delays reduce investor confidence and demand for Islamic finance products.
+          </p>
+
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+              How accurately does "Shifting the Burden" reflect how BARMM addresses capital access and financial inclusion challenges?
+            </Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {archetypeOptions.map((opt) => (
+                <Button
+                  key={opt}
+                  type="button"
+                  variant="outline"
+                  className={cn(
+                    "justify-start h-auto py-3 text-sm text-left",
+                    data.q_s8_shifting_burden === opt ? activeBtn : inactiveBtn
+                  )}
+                  onClick={() => update("q_s8_shifting_burden", opt)}
+                >
+                  {opt}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {(data.q_s8_shifting_burden === "Very accurately" ||
+            data.q_s8_shifting_burden === "Somewhat accurately") && (
+            <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20 animate-in fade-in slide-in-from-top-2 duration-200">
+              <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+                Describe a case where a short-term capital fix either led to long-term reform or failed and the problem returned.
+              </Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {[
-                  "Islamic Banking & Sukuk (Macro-Capital)",
-                  "Takaful (Risk Mitigation)",
-                  "Islamic Microfinance (Micro-Access)",
-                  "Waqf & Social Finance",
+                  "Led to long-term reform",
+                  "Failed and problem returned",
+                  "Mixed results",
                 ].map((opt) => (
-                  <button
+                  <Button
                     key={opt}
                     type="button"
-                    onClick={() => update("q8_4_finance_tier_priority", opt)}
+                    variant="outline"
                     className={cn(
-                      "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
-                      data.q8_4_finance_tier_priority === opt
-                        ? "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]"
-                        : "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
+                      "justify-start h-auto py-3 text-sm text-left",
+                      data.q_s8_shifting_followup === opt ? activeBtn : inactiveBtn
                     )}
+                    onClick={() => update("q_s8_shifting_followup", opt)}
                   >
-                    <div
-                      className={cn(
-                        "w-3.5 h-3.5 rounded-full border flex-shrink-0",
-                        data.q8_4_finance_tier_priority === opt
-                          ? "bg-[#C9A84C] border-[#C9A84C]"
-                          : "border-[#C9A84C]/40"
-                      )}
-                    />
                     {opt}
-                  </button>
+                  </Button>
                 ))}
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* ── Additional Deep-Dive: Islamic Finance Roadmap ── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardContent className="pt-6 space-y-4">
-            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-xl">
-              <ImageWithFallback
-                src={BIRD_IMAGES.islamicFinanceRoadmap.url}
-                alt={BIRD_IMAGES.islamicFinanceRoadmap.alt}
-                className="w-full h-48 sm:h-64"
-                imgClassName="object-cover object-center"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <p className="text-xs text-[#ecfdf5]/70 italic">
-                  {BIRD_IMAGES.islamicFinanceRoadmap.title}
-                </p>
-              </div>
-            </div>
-            <p className="text-sm text-[#ecfdf5]/70 leading-relaxed">
-              The <strong>Islamic Finance Roadmap (2024–2028)</strong> outlines six progressive layers:
-              from strengthening Islamic banking foundations to developing human capital. This phased
-              approach ensures institutional capacity keeps pace with capital mobilization.
-            </p>
-            <div className="pt-2">
-              <LikertScale
-                name="q8_3_islamic_finance_roadmap_understanding"
-                label="How achievable do you consider the 2024–2028 Islamic Finance Roadmap timeline?"
-                value={data.q8_3_islamic_finance_roadmap_understanding}
-                onChange={(v) => update("q8_3_islamic_finance_roadmap_understanding", v)}
+              <Textarea
+                placeholder="Describe the case in more detail..."
+                rows={3}
+                value={data.q_s8_shifting_followup || ""}
+                onChange={(e) => update("q_s8_shifting_followup", e.target.value)}
+                className="w-full rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 px-3 py-2 text-sm text-[#022c22] dark:text-[#ecfdf5] placeholder:text-[#64748b] focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/50 resize-y"
               />
             </div>
-
-            {/* Roadmap achievable */}
-            <div className="pt-4 border-t border-[#C9A84C]/10">
-              <LikertScale
-                name="q8_5_roadmap_achievable"
-                label="Rate your confidence that the Islamic Finance Roadmap targets are achievable (1 = not confident, 5 = fully confident)"
-                value={data.q8_5_roadmap_achievable}
-                onChange={(v) => update("q8_5_roadmap_achievable", v)}
-              />
-            </div>
-
-            {/* Priority action */}
-            <div className="pt-4 border-t border-[#C9A84C]/10">
-              <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
-                What is the single most important action to accelerate Islamic finance in BARMM?
-              </label>
-              <div className="grid grid-cols-1 gap-2">
-                {[
-                  "Strengthen the Bangsamoro Islamic Finance Board (BIFB)",
-                  "Fast-track RA 11439 implementing rules",
-                  "Launch a BARMM Sukuk pilot program",
-                  "Expand Islamic microfinance to rural areas",
-                  "Build Shariah advisory capacity",
-                  "Other (please specify)",
-                ].map((opt) => (
-                  <button
-                    key={opt}
-                    type="button"
-                    onClick={() => update("q8_6_priority_action", opt)}
-                    className={cn(
-                      "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
-                      data.q8_6_priority_action === opt
-                        ? "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]"
-                        : "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        "w-3.5 h-3.5 rounded-full border flex-shrink-0",
-                        data.q8_6_priority_action === opt
-                          ? "bg-[#C9A84C] border-[#C9A84C]"
-                          : "border-[#C9A84C]/40"
-                      )}
-                    />
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Islamic authority */}
-            <div className="pt-4 border-t border-[#C9A84C]/10">
-              <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
-                Which body should serve as the primary Shariah authority for Islamic finance in BARMM?
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {[
-                  "Bangsamoro Islamic Finance Board (BIFB)",
-                  "National Shariah Advisory Council (BSP)",
-                  "Independent BARMM Shariah Council",
-                  "MABDA (Moro Affairs and Development Authority)",
-                  "Other (please specify)",
-                ].map((opt) => (
-                  <button
-                    key={opt}
-                    type="button"
-                    onClick={() => update("q8_7_islamic_authority", opt)}
-                    className={cn(
-                      "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
-                      data.q8_7_islamic_authority === opt
-                        ? "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]"
-                        : "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        "w-3.5 h-3.5 rounded-full border flex-shrink-0",
-                        data.q8_7_islamic_authority === opt
-                          ? "bg-[#C9A84C] border-[#C9A84C]"
-                          : "border-[#C9A84C]/40"
-                      )}
-                    />
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* ── Live Score Summary ── */}
-      {scores.length > 0 && (
-        <motion.div variants={cardVariants}>
-          <Card className="bg-gradient-to-r from-[#022c22]/60 to-[#C9A84C]/5 border-[#C9A84C]/20">
-            <CardContent className="pt-5 pb-5">
-              <div className="flex items-center gap-2 mb-3">
-                <BookOpen className="w-4 h-4 text-[#C9A84C]" />
-                <span className="text-xs font-bold text-[#C9A84C] uppercase tracking-wider">
-                  Live SWOT Scores — Financiers
-                </span>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {scores.map(({ label, score, suffix, color }) => (
-                  <div
-                    key={label}
-                    className="rounded-lg border border-[#C9A84C]/10 bg-[#011a12]/60 p-3 text-center"
-                  >
-                    <p className="text-[10px] text-[#ecfdf5]/40 font-medium mb-1">{label}</p>
-                    <p className={cn("text-lg font-bold", color)}>{score?.toFixed(1) ?? "—"}</p>
-                    <p className="text-[9px] text-[#ecfdf5]/30">{suffix}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
-    </motion.div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

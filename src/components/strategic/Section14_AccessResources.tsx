@@ -1,11 +1,6 @@
-// src/components/strategic/Section14_AccessResources.tsx
-// BIRD 2026–2035 · Section 14: Access to Resources & Engagements
-// Updated: 2026-07-30 · Fixed import paths and primitive APIs
-
 import React from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
   BookOpen,
   FileText,
@@ -17,10 +12,7 @@ import {
   Heart,
 } from "lucide-react";
 
-// ─── REUSABLE PRIMITIVES ─────────────────────────────────────────────────────
-import { SectionProgress } from "@/lib/primitives/SectionProgress";
-
-// ── Types (exact runtime contract with SurveyWizard.tsx s14 state) ──────────
+// ── Types ────────────────────────────────────────────────────────────────────
 export interface Section14Data {
   q14_1_engagement_type: string[];
   q14_2_contact_method: string;
@@ -119,13 +111,19 @@ const ROLE_CONTRIBUTIONS = [
 ];
 
 // ── Component ────────────────────────────────────────────────────────────────
-const Section14_AccessResources: React.FC<Section14Props> = ({ data, onChange }) => {
-  const update = <K extends keyof Section14Data>(field: K, value: Section14Data[K]) => {
+const Section14_AccessResources: React.FC<Section14Props> = ({
+  data,
+  onChange,
+}) => {
+  const update = <K extends keyof Section14Data>(
+    field: K,
+    value: Section14Data[K]
+  ) => {
     onChange({ ...data, [field]: value });
   };
 
   const activeBtnClass =
-    "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90 dark:bg-[#1B4D3E] dark:text-white dark:border-[#1B4D3E]";
+    "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90";
   const inactiveBtnClass =
     "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10";
 
@@ -133,14 +131,7 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, onChange })
     "w-full px-4 py-3 rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] text-sm placeholder:text-[#64748b] focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C]/30 transition-all resize-y";
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto px-4 py-6">
-      {/* ── Section Progress ────────────────────────────────────── */}
-      <SectionProgress
-        currentSection={14}
-        totalSections={16}
-        sectionLabel="Resources & Engagements"
-      />
-
+    <div className="space-y-8">
       {/* ── Header ────────────────────────────────────────────── */}
       <div className="flex items-start gap-4">
         <div className="p-3 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/30 shrink-0">
@@ -311,21 +302,20 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, onChange })
             </p>
             <div className="grid grid-cols-2 gap-3">
               {CONTACT_METHODS.map(({ label, icon: Icon }) => (
-                <Button
+                <button
                   key={label}
                   type="button"
-                  variant="outline"
                   onClick={() => update("q14_2_contact_method", label)}
                   className={cn(
-                    "justify-start h-auto py-3 text-sm text-left transition-all",
+                    "flex items-center gap-3 p-3 rounded-lg border text-sm text-left transition-all",
                     data.q14_2_contact_method === label
                       ? activeBtnClass
                       : inactiveBtnClass
                   )}
                 >
-                  <Icon className="w-4 h-4 mr-2 shrink-0" />
+                  <Icon className="w-4 h-4 shrink-0" />
                   {label}
-                </Button>
+                </button>
               ))}
             </div>
           </div>
@@ -337,20 +327,19 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, onChange })
             </p>
             <div className="grid grid-cols-2 gap-3">
               {TIMING_OPTIONS.map((opt) => (
-                <Button
+                <button
                   key={opt}
                   type="button"
-                  variant="outline"
                   onClick={() => update("q14_3_timing", opt)}
                   className={cn(
-                    "justify-start h-auto py-3 text-sm text-left transition-all",
+                    "p-3 rounded-lg border text-sm text-left transition-all",
                     data.q14_3_timing === opt
                       ? activeBtnClass
                       : inactiveBtnClass
                   )}
                 >
                   {opt}
-                </Button>
+                </button>
               ))}
             </div>
           </div>
@@ -362,20 +351,19 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, onChange })
             </p>
             <div className="grid grid-cols-2 gap-3">
               {ROLE_CONTRIBUTIONS.map((opt) => (
-                <Button
+                <button
                   key={opt}
                   type="button"
-                  variant="outline"
                   onClick={() => update("q14_4_role_contribution", opt)}
                   className={cn(
-                    "justify-start h-auto py-3 text-sm text-left transition-all",
+                    "p-3 rounded-lg border text-sm text-left transition-all",
                     data.q14_4_role_contribution === opt
                       ? activeBtnClass
                       : inactiveBtnClass
                   )}
                 >
                   {opt}
-                </Button>
+                </button>
               ))}
             </div>
           </div>

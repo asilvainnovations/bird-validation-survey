@@ -1,16 +1,10 @@
-// src/components/strategic/Section15_Submission.tsx
-// BIRD 2026–2035 · Section 15: Review & Submit
-// Updated: 2026-07-30 · Fixed import paths and primitive APIs
-
 import React from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Send, CheckCircle, FileCheck, ShieldCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Send, CheckCircle, ArrowDown, Mail, ShieldCheck, FileCheck } from "lucide-react";
 
-// ─── REUSABLE PRIMITIVES ─────────────────────────────────────────────────────
-import { SectionProgress } from "@/lib/primitives/SectionProgress";
-
-// ── Types (exact runtime contract with SurveyWizard.tsx s15 state) ──────────
+// ── Types ────────────────────────────────────────────────────────────────────
 export interface Section15Data {
   q15_1_confirm_accurate: boolean;
   q15_2_consent_anonymous_use: boolean;
@@ -30,24 +24,22 @@ interface Section15Props {
   onChange: (data: Section15Data) => void;
 }
 
-// Aligned with STEP_LABELS in SurveyWizard.tsx
 const SECTIONS_LIST = [
-  { num: 0, name: "Welcome & Orientation" },
-  { num: 1, name: "Privacy & Consent" },
-  { num: 2, name: "Your Profile" },
-  { num: 3, name: "Systems Thinking" },
-  { num: 4, name: "Cluster 1: Foundations" },
-  { num: 5, name: "Cluster 2: Transformers" },
-  { num: 6, name: "Cluster 3: Enablers" },
-  { num: 7, name: "Cluster 4: Connectors" },
-  { num: 8, name: "Cluster 5: Financiers" },
-  { num: 9, name: "Operating Systems" },
-  { num: 10, name: "IEDS & 3-Phase Plan" },
-  { num: 11, name: "Metrics & KPIs" },
-  { num: 12, name: "Balanced Scorecard" },
-  { num: 13, name: "Priority Actions & Budget" },
-  { num: 14, name: "Resources & Engagements" },
-  { num: 15, name: "Review & Submit" },
+  { num: 1, name: "Welcome & Orientation" },
+  { num: 2, name: "Privacy & Consent" },
+  { num: 3, name: "Your Profile" },
+  { num: 4, name: "Systems Thinking & BEIE" },
+  { num: 5, name: "Cluster 1: Foundations" },
+  { num: 6, name: "Cluster 2: Transformers" },
+  { num: 7, name: "Cluster 3: Enablers" },
+  { num: 8, name: "Cluster 4: Connectors" },
+  { num: 9, name: "Cluster 5: Financiers" },
+  { num: 10, name: "Operating Systems" },
+  { num: 11, name: "IEDS & Three-Phase Implementation" },
+  { num: 12, name: "Metrics Architecture" },
+  { num: 13, name: "Balanced Scorecard" },
+  { num: 14, name: "Priority Actions & Budget" },
+  { num: 15, name: "Resources & Engagements" },
 ];
 
 // ── Component ────────────────────────────────────────────────────────────────
@@ -56,20 +48,11 @@ const Section15_Submission: React.FC<Section15Props> = ({ data, onChange }) => {
     onChange({ ...data, [field]: value });
   };
 
-  const allChecked = data.q15_1_confirm_accurate && data.q15_2_consent_anonymous_use && data.q15_3_consent_voluntary && data.q15_4_ready_to_submit;
-
   return (
-    <div className="space-y-8 max-w-4xl mx-auto px-4 py-6">
-      {/* ── Section Progress ────────────────────────────────────── */}
-      <SectionProgress
-        currentSection={15}
-        totalSections={16}
-        sectionLabel="Review & Submit"
-      />
-
-      {/* ── HEADER ──────────────────────────────────────────────── */}
+    <div className="space-y-8">
+      {/* ── HEADER ─────────────────────────────────────────── */}
       <div className="flex items-start gap-4">
-        <div className="rounded-lg bg-[#C9A84C]/10 dark:bg-[#C9A84C]/20 p-3 shrink-0">
+        <div className="rounded-lg bg-[#C9A84C]/10 dark:bg-[#C9A84C]/20 p-3">
           <Send className="h-6 w-6 text-[#C9A84C]" />
         </div>
         <div>
@@ -79,12 +62,12 @@ const Section15_Submission: React.FC<Section15Props> = ({ data, onChange }) => {
           <p className="mt-1 text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed max-w-3xl">
             Please review your responses across all sections before submitting.
             Your feedback is invaluable to the Bangsamoro Investment Roadmap
-            2026–2035.
+            2026-2035.
           </p>
         </div>
       </div>
 
-      {/* ── BLOCK 1: Completion Summary ───────────────────────── */}
+      {/* ── BLOCK 1: Completion Summary ────────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
@@ -106,7 +89,7 @@ const Section15_Submission: React.FC<Section15Props> = ({ data, onChange }) => {
               >
                 <CheckCircle className="h-5 w-5 flex-shrink-0 text-emerald-600 dark:text-emerald-400" />
                 <span className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
-                  Step {section.num}: {section.name}
+                  {section.num}. {section.name}
                 </span>
               </div>
             ))}
@@ -120,7 +103,7 @@ const Section15_Submission: React.FC<Section15Props> = ({ data, onChange }) => {
         </CardContent>
       </Card>
 
-      {/* ── BLOCK 2: Final Consent ────────────────────────────── */}
+      {/* ── BLOCK 2: Final Consent ─────────────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
@@ -137,7 +120,6 @@ const Section15_Submission: React.FC<Section15Props> = ({ data, onChange }) => {
           <div className="space-y-4">
             {/* Checkbox 1 */}
             <label
-              htmlFor="confirm-accurate"
               className={cn(
                 "flex items-start gap-3 p-4 rounded-lg border transition-all cursor-pointer",
                 data.q15_1_confirm_accurate
@@ -146,22 +128,19 @@ const Section15_Submission: React.FC<Section15Props> = ({ data, onChange }) => {
               )}
             >
               <input
-                id="confirm-accurate"
                 type="checkbox"
                 checked={data.q15_1_confirm_accurate}
                 onChange={(e) => update("q15_1_confirm_accurate", e.target.checked)}
                 className="w-5 h-5 mt-0.5 rounded border-[#C9A84C] text-[#1B4D3E] accent-[#1B4D3E] shrink-0"
               />
-              <div>
-                <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
-                  I confirm that my responses are accurate and reflect my true assessment.
-                </p>
-              </div>
+              <span className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
+                I confirm that the information I have provided is accurate and
+                reflects my professional assessment.
+              </span>
             </label>
 
             {/* Checkbox 2 */}
             <label
-              htmlFor="consent-anonymous"
               className={cn(
                 "flex items-start gap-3 p-4 rounded-lg border transition-all cursor-pointer",
                 data.q15_2_consent_anonymous_use
@@ -170,22 +149,19 @@ const Section15_Submission: React.FC<Section15Props> = ({ data, onChange }) => {
               )}
             >
               <input
-                id="consent-anonymous"
                 type="checkbox"
                 checked={data.q15_2_consent_anonymous_use}
                 onChange={(e) => update("q15_2_consent_anonymous_use", e.target.checked)}
                 className="w-5 h-5 mt-0.5 rounded border-[#C9A84C] text-[#1B4D3E] accent-[#1B4D3E] shrink-0"
               />
-              <div>
-                <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
-                  I consent to the anonymous use of my responses for research and planning purposes.
-                </p>
-              </div>
+              <span className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
+                I consent to my anonymized responses being used in the BIRD
+                2026-2035 synthesis report and stakeholder analysis.
+              </span>
             </label>
 
             {/* Checkbox 3 */}
             <label
-              htmlFor="consent-voluntary"
               className={cn(
                 "flex items-start gap-3 p-4 rounded-lg border transition-all cursor-pointer",
                 data.q15_3_consent_voluntary
@@ -194,54 +170,161 @@ const Section15_Submission: React.FC<Section15Props> = ({ data, onChange }) => {
               )}
             >
               <input
-                id="consent-voluntary"
                 type="checkbox"
                 checked={data.q15_3_consent_voluntary}
                 onChange={(e) => update("q15_3_consent_voluntary", e.target.checked)}
                 className="w-5 h-5 mt-0.5 rounded border-[#C9A84C] text-[#1B4D3E] accent-[#1B4D3E] shrink-0"
               />
-              <div>
-                <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
-                  I understand that my participation is voluntary and I may withdraw at any time.
-                </p>
-              </div>
+              <span className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
+                I understand that my participation is voluntary and I may withdraw
+                at any time by contacting the BIRD team.
+              </span>
             </label>
 
-            {/* Checkbox 4 */}
+            {/* Checkbox 4 — Required for submission */}
             <label
-              htmlFor="ready-submit"
               className={cn(
-                "flex items-start gap-3 p-4 rounded-lg border transition-all cursor-pointer",
+                "flex items-start gap-3 p-4 rounded-lg border-2 transition-all cursor-pointer",
                 data.q15_4_ready_to_submit
-                  ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-300 dark:border-emerald-700"
-                  : "bg-white dark:bg-[#022c22]/60 border-[#C9A84C]/20 hover:border-[#C9A84C]/40"
+                  ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-400 dark:border-emerald-600"
+                  : "bg-white dark:bg-[#022c22]/60 border-[#C9A84C]/30 hover:border-[#C9A84C]/60"
               )}
             >
               <input
-                id="ready-submit"
                 type="checkbox"
                 checked={data.q15_4_ready_to_submit}
                 onChange={(e) => update("q15_4_ready_to_submit", e.target.checked)}
                 className="w-5 h-5 mt-0.5 rounded border-[#C9A84C] text-[#1B4D3E] accent-[#1B4D3E] shrink-0"
               />
               <div>
-                <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
+                <span className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5]">
                   I am ready to submit my survey response.
-                </p>
+                </span>
+                {!data.q15_4_ready_to_submit && (
+                  <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mt-1 italic">
+                    This checkbox must be ticked to enable the Submit Survey
+                    button.
+                  </p>
+                )}
               </div>
             </label>
           </div>
+        </CardContent>
+      </Card>
 
-          {/* Status indicator */}
-          <div className={cn(
-            "rounded-lg px-4 py-3 text-center text-sm font-medium transition-all",
-            allChecked
-              ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700"
-              : "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700"
-          )}>
-            {allChecked
-              ? "✓ All declarations confirmed. You may now submit your survey."
-              : "⚠ Please tick all four declarations above to enable submission."}
+      {/* ── BLOCK 3: Submission Preview ────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
+            <FileCheck className="h-5 w-5 text-[#C9A84C]" />
+            Submission Preview
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="rounded-lg border border-[#C9A84C]/20 bg-white dark:bg-[#022c22]/60 p-4">
+              <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 uppercase tracking-wide mb-1">
+                Survey Sections Completed
+              </p>
+              <p className="text-2xl font-bold text-[#022c22] dark:text-[#ecfdf5]">15</p>
+            </div>
+            <div className="rounded-lg border border-[#C9A84C]/20 bg-white dark:bg-[#022c22]/60 p-4">
+              <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 uppercase tracking-wide mb-1">
+                Completion Time Tracked
+              </p>
+              <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
+                Tracked during your session
+              </p>
+            </div>
+            <div className="rounded-lg border border-[#C9A84C]/20 bg-white dark:bg-[#022c22]/60 p-4">
+              <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 uppercase tracking-wide mb-1">
+                Data Handling
+              </p>
+              <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
+                Anonymized for analysis
+              </p>
+            </div>
+            <div className="rounded-lg border border-[#C9A84C]/20 bg-white dark:bg-[#022c22]/60 p-4">
+              <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 uppercase tracking-wide mb-1">
+                Email Copy
+              </p>
+              <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
+                Sent if requested in Section 1
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+            <Mail className="h-4 w-4 text-[#C9A84C]" />
+            <span>
+              Contact for questions:{" "}
+              <a
+                href="mailto:bird-team@asilvainnovations.com"
+                className="font-medium text-[#1B4D3E] dark:text-[#C9A84C] underline hover:text-[#022c22] dark:hover:text-[#E8C560]"
+              >
+                bird-team@asilvainnovations.com
+              </a>
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── BLOCK 4: Submit Button Area ────────────────────── */}
+      <Card className="border-2 border-dashed border-[#C9A84C]/40 bg-[#C9A84C]/5 dark:bg-[#C9A84C]/10">
+        <CardContent className="p-8 text-center">
+          <div className="flex justify-center mb-4">
+            <div className="rounded-full bg-[#C9A84C]/20 p-4">
+              <ArrowDown className="h-8 w-8 text-[#C9A84C] animate-bounce" />
+            </div>
+          </div>
+          <p className="text-lg font-semibold text-[#022c22] dark:text-[#ecfdf5] mb-2">
+            Ready to finalize your submission?
+          </p>
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+            Click the <strong className="text-[#022c22] dark:text-[#ecfdf5]">&ldquo;Submit Survey&rdquo;</strong> button in the
+            navigation bar below to finalize your submission.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* ── BLOCK 5: Post-Submission Note ──────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
+            <Mail className="h-5 w-5 text-[#C9A84C]" />
+            What Happens After Submission?
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+            After submission, you will receive:
+          </p>
+          <ul className="space-y-3">
+            {[
+              "A confirmation email with your response summary (if opted in)",
+              "Access to the preliminary stakeholder analysis dashboard",
+              "Invitation to validation workshops in your province",
+              "Quarterly updates on BIRD implementation progress",
+            ].map((item, i) => (
+              <li
+                key={i}
+                className="flex items-start gap-3 text-sm text-[#022c22] dark:text-[#ecfdf5]/90"
+              >
+                <CheckCircle className="h-4 w-4 flex-shrink-0 mt-0.5 text-[#C9A84C]" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="flex items-center gap-2 rounded-lg bg-[#C9A84C]/10 dark:bg-[#C9A84C]/10 border border-[#C9A84C]/20 px-4 py-3 text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+            <Mail className="h-4 w-4 text-[#C9A84C] flex-shrink-0" />
+            <span>
+              For questions, contact:{" "}
+              <a
+                href="mailto:bird-team@asilvainnovations.com"
+                className="font-medium text-[#1B4D3E] dark:text-[#C9A84C] underline hover:text-[#022c22] dark:hover:text-[#E8C560]"
+              >
+                bird-team@asilvainnovations.com
+              </a>
+            </span>
           </div>
         </CardContent>
       </Card>

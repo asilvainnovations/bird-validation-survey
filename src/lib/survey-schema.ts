@@ -60,7 +60,7 @@ const iedsMatrixSchema = z.object({
 
 // ── Main Survey Schema ──────────────────────────────────────────────────────
 export const surveySchema = z.object({
-  // ═══ Step 0: Welcome & Orientation ═══
+  // ═══ Step 0: Welcome & Orientation ══
   q0_1_ready: optionalString,
   q0_2_ecosystem_understanding: optionalString,
   q0_3_systems_thinking_value: optionalNumber,
@@ -75,20 +75,15 @@ export const surveySchema = z.object({
   q01_consent_voluntary: optionalBoolean,
 
   // ═══ Step 2: Respondent Profile ═══
-  q2_name: optionalString,
-  q2_email: z.string().email("Invalid email format").optional().or(z.literal("")),
-  q2_organization: optionalString,
-  q2_position: optionalString,
-  q2_province: optionalString,
-  q2_category: optionalString,
-  q2_expertise: optionalStringArray,
-  
-  // SCHEMA CONFLICT RESOLUTION: 
-  // Converted plain text to a proper inline comment to prevent TS1005/TS1127 syntax errors.
-  // Note: q2_network_accuracy changed from optionalString → optionalNumber
-  // because it now uses LikertScale (1–5) instead of free-text options.
-  q2_network_accuracy: optionalNumber,
-  
+  q02_demo_category: optionalString,
+  q02_demo_province: optionalString,
+  q02_demo_expertise: optionalStringArray,
+  q02_demo_name: optionalString,
+  q02_demo_email: z.string().email("Invalid email format").optional().or(z.literal("")),
+  q02_demo_organization: optionalString,
+  q02_demo_position: optionalString,
+  q02_network_accuracy: optionalString,
+
   // ═══ Step 3: BEIE & Systems Thinking ═══
   // No SWOT scale items belong here — SWOT_Scale_Questions.md maps them to
   // Sections 4-9 only. Section 3 carries framework comprehension + the two
@@ -160,7 +155,7 @@ export const surveySchema = z.object({
   q10_leverage_points: optionalNumber,
   q10_ieds_execution: optionalNumber,
 
-  // ═══ Step 11: Metrics Architecture & KPIs ═══
+  // ══ Step 11: Metrics Architecture & KPIs ═══
   q11_calibration_appropriate: optionalString,
   q11_governance_kpi_importance: optionalNumber,
   q11_resilience_kpi_importance: optionalNumber,

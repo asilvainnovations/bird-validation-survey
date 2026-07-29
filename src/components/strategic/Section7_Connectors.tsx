@@ -1,24 +1,27 @@
 // src/components/strategic/Section7_Connectors.tsx
 // BIRD 2026–2035 · Section 7: Cluster 4 — Connectors
-// Updated: 2026-07-30 · Fixed imports, primitive APIs, and cut-off ending
+// Updated: 2026-07-27 · Strict alignment with SurveyWizard.tsx, .md SWOT & archetypes
 
 import React from "react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Globe } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  Globe,
+  TrendingUp,
+  Target,
+  AlertTriangle,
+} from "lucide-react";
 import { BIRD_IMAGES } from "@/lib/bird-urls";
-import { ARCHETYPES_BY_SECTION, ACCURACY_OPTIONS } from "@/lib/swot-content";
-
-// ─── REUSABLE PRIMITIVES ─────────────────────────────────────────────────────
-import { ImageWithFallback } from "@/lib/primitives/ImageWithFallback";
-import { ArchetypeCard } from "@/lib/primitives/ArchetypeCard";
-import { SWOTScalePair } from "@/lib/primitives/SWOTScalePair";
-import { LikertScale } from "@/lib/primitives/LikertScale";
-import { SectionProgress } from "@/lib/primitives/SectionProgress";
+import {
+  calculateStrengthRI,
+  calculateWeaknessRisk,
+  calculateOpportunityRI,
+  calculateThreatVI,
+} from "@/lib/formulas";
 
 // ── Types (exact runtime contract with SurveyWizard.tsx s7 state) ────────────
 export interface Section7Data {
@@ -74,816 +77,759 @@ interface Section7Props {
   onChange: (data: Section7Data) => void;
 }
 
-// ── Animation variants ───────────────────────────────────────────────────────
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
-  },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, ease: "easeOut" },
-  },
-};
-
-// Design tokens for custom selection buttons
+// ── Design tokens ────────────────────────────────────────────────────────────
 const activeBtn =
-  "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]";
+  "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90 dark:bg-[#1B4D3E] dark:text-white dark:border-[#1B4D3E]";
 const inactiveBtn =
-  "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30";
+  "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10";
+const activeScale =
+  "bg-[#C9A84C] text-white border-[#C9A84C] hover:bg-[#C9A84C]/90";
+const inactiveScale =
+  "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]";
 
-const Section7_Connectors: React.FC<Section7Props> = ({ data, onChange }) => {
-  const update = <K extends keyof Section7Data>(field: K, value: Section7Data[K]) =>
-    onChange({ ...data, [field]: value });
+const archetypeOptions = [
+  "Very accurately",
+  "Somewhat accurately",
+  "Needs revision",
+  "Not accurate",
+];
 
-  const archetypes = ARCHETYPES_BY_SECTION[7] ?? [];
-  const escalationArchetype = archetypes.find((a) => a.name.toLowerCase().includes("escalation"));
-  const limitsArchetype = archetypes.find((a) => a.name.toLowerCase().includes("limits"));
+// ═══════════════════════════════════════════════════════════════════════════════
+export const Section7_Connectors: React.FC<Section7Props> = ({ data, onChange }) => {
+  const update = <K extends keyof Section7Data>(
+    field: K,
+    value: Section7Data[K]
+  ) => onChange({ ...data, [field]: value });
 
-  const escalationAgree =
-    data.q_s7_escalation === "Very accurately" ||
-    data.q_s7_escalation === "Somewhat accurately";
-  const limitsAgree =
-    data.q_s7_limits_growth === "Very accurately" ||
-    data.q_s7_limits_growth === "Somewhat accurately";
+  const renderScale = (field: keyof Section7Data) => (
+    <div className="flex gap-2">
+      {[1, 2, 3, 4, 5].map((v) => (
+        <Button
+          key={v}
+          type="button"
+          variant="outline"
+          size="icon"
+          className={cn(
+            "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
+            data[field] === v ? activeScale : inactiveScale
+          )}
+          onClick={() => update(field, v as any)}
+        >
+          {v}
+        </Button>
+      ))}
+    </div>
+  );
 
-  return (
-    <motion.div
-      className="space-y-8 max-w-4xl mx-auto px-4 py-6"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      {/* ── Section Progress ────────────────────────────────────── */}
-      <SectionProgress
-        currentSection={7}
-        totalSections={16}
-        sectionLabel="Cluster 4: Connectors"
-      />
+  const renderSwotPair = (
+    label: string,
+    desc: string,
+    impactField: keyof Section7Data,
+    likelihoodField: keyof Section7Data,
+    category: "strength" | "weakness" | "opportunity" | "threat"
+  ) => {
+    const impact = data[impactField] as number | undefined;
+    const likelihood = data[likelihoodField] as number | undefined;
+    let score: number | null = null;
+    let scoreLabel = "";
+    let badgeClass = "";
 
-      {/* ── Header ──────────────────────────────────────────────── */}
-      <motion.div variants={cardVariants} className="space-y-2">
-        <div className="flex items-center gap-3">
-          <Globe className="w-6 h-6 text-[#C9A84C]" />
-          <h2 className="text-xl font-bold text-[#ecfdf5]">
-            Section 7: Cluster 4 — Connectors
-          </h2>
+    if (impact && likelihood) {
+      switch (category) {
+        case "strength":
+          score = calculateStrengthRI(impact, likelihood);
+          scoreLabel = "RI";
+          badgeClass = "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300";
+          break;
+        case "weakness":
+          score = calculateWeaknessRisk(impact, likelihood);
+          scoreLabel = "Risk";
+          badgeClass = "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300";
+          break;
+        case "opportunity":
+          score = calculateOpportunityRI(impact, likelihood);
+          scoreLabel = "RI";
+          badgeClass = "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300";
+          break;
+        case "threat":
+          score = calculateThreatVI(impact, likelihood);
+          scoreLabel = "VI";
+          badgeClass = "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
+          break;
+      }
+    }
+
+    return (
+      <div className="space-y-4 p-4 rounded-lg border border-[#C9A84C]/20 bg-emerald-50/40 dark:bg-[#1B4D3E]/10">
+        <div className="flex items-center gap-2">
+          <Target className="w-4 h-4 text-[#C9A84C]" />
+          <p className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            {label}
+          </p>
+          {score !== null && (
+            <Badge variant="secondary" className={cn("ml-auto border", badgeClass)}>
+              <TrendingUp className="w-3 h-3 mr-1" />
+              {scoreLabel}: {score.toFixed(2)}
+            </Badge>
+          )}
         </div>
-        <p className="text-sm text-[#ecfdf5]/70">
-          The Connectors cluster maps how Bangsamoro connects its halal and cultural assets to international markets through BIMP-EAGA and UAE/GCC trade corridors.
-        </p>
-      </motion.div>
-
-      {/* ── Banner Image ─────────────────────────────────────────── */}
-      <motion.div variants={cardVariants}>
-        <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-2xl">
-          <ImageWithFallback
-            src={BIRD_IMAGES.cluster4Connectors?.url || ""}
-            alt={BIRD_IMAGES.cluster4Connectors?.alt || "Cluster 4 Connectors Banner"}
-            className="w-full h-56 sm:h-72"
-            imgClassName="object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-4">
-            <p className="text-xs text-[#ecfdf5]/70 italic">
-              {BIRD_IMAGES.cluster4Connectors?.title || "Cluster 4: Connectors"}
-            </p>
+        <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/70">{desc}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <Label className="text-xs font-medium text-[#065f46] dark:text-[#ecfdf5]/70 mb-2 block">
+              Impact (1–5)
+            </Label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-10 h-10 rounded-lg border text-sm font-semibold transition-all",
+                    impact === v
+                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
+                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                  )}
+                  onClick={() => update(impactField, v as any)}
+                >
+                  {v}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <Label className="text-xs font-medium text-[#065f46] dark:text-[#ecfdf5]/70 mb-2 block">
+              Likelihood (1–5)
+            </Label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-10 h-10 rounded-lg border text-sm font-semibold transition-all",
+                    likelihood === v
+                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
+                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                  )}
+                  onClick={() => update(likelihoodField, v as any)}
+                >
+                  {v}
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
-      </motion.div>
+      </div>
+    );
+  };
 
-      {/* ── Archetype 1: Escalation ───────────────────────────── */}
-      {escalationArchetype && (
-        <motion.div variants={cardVariants}>
-          <Card className="bg-[#011a12]/80 border-orange-500/20">
-            <CardHeader>
-              <CardTitle className="text-base font-semibold text-[#E5C560] flex items-center gap-2">
-                <Globe className="w-5 h-5 text-orange-400" />
-                Systems Archetype: {escalationArchetype.name}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <ArchetypeCard archetype={escalationArchetype} />
-              <div className="pt-4 border-t border-[#C9A84C]/10 space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
-                    How accurately does the &quot;Escalation&quot; archetype reflect competitive dynamics among clans, provinces, or agencies competing for trade corridors and connectivity investments in BARMM?
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {ACCURACY_OPTIONS.map((opt) => (
-                      <button
-                        key={opt}
-                        type="button"
-                        onClick={() => update("q_s7_escalation", opt)}
-                        className={cn(
-                          "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
-                          data.q_s7_escalation === opt ? activeBtn : inactiveBtn
-                        )}
-                      >
-                        <div className={cn(
-                          "w-3.5 h-3.5 rounded-full border flex-shrink-0",
-                          data.q_s7_escalation === opt ? "bg-[#C9A84C] border-[#C9A84C]" : "border-[#C9A84C]/40"
-                        )} />
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                {escalationAgree && (
-                  <div>
-                    <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
-                      In which domain do you see this escalation dynamic most clearly?
-                    </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {[
-                        "Clan rivalries (rido)",
-                        "Inter-provincial competition",
-                        "Inter-agency rivalry",
-                        "External market competition",
-                        "Other (please specify)",
-                      ].map((opt) => (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => update("q_s7_escalation_followup", opt)}
-                          className={cn(
-                            "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
-                            data.q_s7_escalation_followup === opt ? activeBtn : inactiveBtn
-                          )}
-                        >
-                          <div className={cn(
-                            "w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0",
-                            data.q_s7_escalation_followup === opt ? "bg-[#C9A84C] border-[#C9A84C]" : "border-[#C9A84C]/40"
-                          )}>
-                            {data.q_s7_escalation_followup === opt && (
-                              <svg className="w-2.5 h-2.5 text-[#011a12]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                              </svg>
-                            )}
-                          </div>
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Other (please specify)..."
-                      value={
-                        data.q_s7_escalation_followup &&
-                        !["Clan rivalries (rido)", "Inter-provincial competition", "Inter-agency rivalry", "External market competition"].includes(data.q_s7_escalation_followup)
-                          ? data.q_s7_escalation_followup
-                          : ""
-                      }
-                      onChange={(e) => update("q_s7_escalation_followup", e.target.value)}
-                      className={cn(
-                        "mt-3 w-full px-3 py-2 rounded-lg border text-sm placeholder:text-[#ecfdf5]/30",
-                        "bg-[#022c22]/60 border-[#C9A84C]/20 text-[#ecfdf5]",
-                        "focus:outline-none focus:border-[#C9A84C]"
-                      )}
-                    />
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
+  return (
+    <div className="space-y-8">
+      {/* ── Header ────────────────────────────────────────────────── */}
+      <div className="flex items-center gap-3 mb-4">
+        <Globe className="w-6 h-6 text-[#C9A84C]" />
+        <h2 className="text-xl font-bold text-[#022c22] dark:text-[#ecfdf5]">
+          Section 7: Cluster 4 — Connectors: Linking Local Value to Global Demand
+        </h2>
+      </div>
+      <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 -mt-2 max-w-3xl">
+        The Connectors cluster maps how Bangsamoro connects its halal and cultural assets to international markets through BIMP-EAGA and UAE/GCC trade corridors.
+      </p>
 
-      {/* ── Archetype 2: Limits to Growth ───────────────────────── */}
-      {limitsArchetype && (
-        <motion.div variants={cardVariants}>
-          <Card className="bg-[#011a12]/80 border-violet-500/20">
-            <CardHeader>
-              <CardTitle className="text-base font-semibold text-[#E5C560] flex items-center gap-2">
-                <Globe className="w-5 h-5 text-violet-400" />
-                Systems Archetype: {limitsArchetype.name}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <ArchetypeCard archetype={limitsArchetype} />
-              <div className="pt-4 border-t border-[#C9A84C]/10 space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
-                    How accurately does &quot;{limitsArchetype.name}&quot; reflect the structural constraints limiting BARMM&apos;s connectivity and trade corridor development?
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {ACCURACY_OPTIONS.map((opt) => (
-                      <button
-                        key={opt}
-                        type="button"
-                        onClick={() => update("q_s7_limits_growth", opt)}
-                        className={cn(
-                          "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
-                          data.q_s7_limits_growth === opt ? activeBtn : inactiveBtn
-                        )}
-                      >
-                        <div className={cn(
-                          "w-3.5 h-3.5 rounded-full border flex-shrink-0",
-                          data.q_s7_limits_growth === opt ? "bg-[#C9A84C] border-[#C9A84C]" : "border-[#C9A84C]/40"
-                        )} />
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                {limitsAgree && (
-                  <div>
-                    <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
-                      Which capacity constraint most limits connectivity growth in your sector?
-                    </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {[
-                        "Infrastructure bottlenecks",
-                        "Regulatory fragmentation",
-                        "Skills shortage",
-                        "Funding gaps",
-                        "Other (please specify)",
-                      ].map((opt) => (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => update("q_s7_limits_followup", opt)}
-                          className={cn(
-                            "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
-                            data.q_s7_limits_followup === opt ? activeBtn : inactiveBtn
-                          )}
-                        >
-                          <div className={cn(
-                            "w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0",
-                            data.q_s7_limits_followup === opt ? "bg-[#C9A84C] border-[#C9A84C]" : "border-[#C9A84C]/40"
-                          )}>
-                            {data.q_s7_limits_followup === opt && (
-                              <svg className="w-2.5 h-2.5 text-[#011a12]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                              </svg>
-                            )}
-                          </div>
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Other (please specify)..."
-                      value={
-                        data.q_s7_limits_followup &&
-                        !["Infrastructure bottlenecks", "Regulatory fragmentation", "Skills shortage", "Funding gaps"].includes(data.q_s7_limits_followup)
-                          ? data.q_s7_limits_followup
-                          : ""
-                      }
-                      onChange={(e) => update("q_s7_limits_followup", e.target.value)}
-                      className={cn(
-                        "mt-3 w-full px-3 py-2 rounded-lg border text-sm placeholder:text-[#ecfdf5]/30",
-                        "bg-[#022c22]/60 border-[#C9A84C]/20 text-[#ecfdf5]",
-                        "focus:outline-none focus:border-[#C9A84C]"
-                      )}
-                    />
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
+      {/* ── 1. Cluster Banner Image ──────────────────────────────── */}
+      <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
+        <img
+          src={BIRD_IMAGES.cluster4Connectors.url}
+          alt={BIRD_IMAGES.cluster4Connectors.alt}
+          className="w-full h-auto max-h-[500px] object-contain transition-transform duration-500 group-hover:scale-[1.02]"
+          loading="lazy"
+        />
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+          <p className="text-xs italic text-white/70">
+            {BIRD_IMAGES.cluster4Connectors.description}
+          </p>
+        </div>
+      </div>
 
-      {/* ── SWOT Scale Table ──────────────────────────────────── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold text-[#E5C560] flex items-center gap-2">
-              <Globe className="w-5 h-5 text-[#C9A84C]" />
-              Risk & Resilience Assessment — Connectors Cluster
-            </CardTitle>
-            <p className="text-xs text-[#ecfdf5]/50 pt-1">
-              Rate each factor&apos;s <strong className="text-[#ecfdf5]">Impact</strong> (severity if realized)
-              and <strong className="text-[#ecfdf5]">Likelihood</strong> (probability of occurrence) on a 1–5 scale.
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Strengths */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Globe className="w-4 h-4 text-emerald-400" />
-                <h3 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
-                  Strengths — Internal Resilience Drivers
-                </h3>
-              </div>
-              <div className="space-y-4">
-                <SWOTScalePair
-                  category="S"
-                  factorLabel="S1 — Strategic BIMP-EAGA Location"
-                  factorDescription="BARMM is close to Sabah and ASEAN trade routes, making it a natural gateway for regional trade."
-                  impact={data.q_s7_bimpeaga_loc_impact}
-                  likelihood={data.q_s7_bimpeaga_loc_likelihood}
-                  onImpactChange={(v) => update("q_s7_bimpeaga_loc_impact", v)}
-                  onLikelihoodChange={(v) => update("q_s7_bimpeaga_loc_likelihood", v)}
-                />
-                <SWOTScalePair
-                  category="S"
-                  factorLabel="S4 — Large Domestic Halal Market"
-                  factorDescription="5.69 million Muslim consumers create strong built-in local demand for halal products and services."
-                  impact={data.q_s7_domestic_halal_impact}
-                  likelihood={data.q_s7_domestic_halal_likelihood}
-                  onImpactChange={(v) => update("q_s7_domestic_halal_impact", v)}
-                  onLikelihoodChange={(v) => update("q_s7_domestic_halal_likelihood", v)}
-                />
-                <SWOTScalePair
-                  category="S"
-                  factorLabel="S6 — Polloc Freeport & Economic Zone"
-                  factorDescription="Strategic logistics and trade hub serving as a gateway for goods entering and leaving BARMM."
-                  impact={data.q_s7_polloc_impact}
-                  likelihood={data.q_s7_polloc_likelihood}
-                  onImpactChange={(v) => update("q_s7_polloc_impact", v)}
-                  onLikelihoodChange={(v) => update("q_s7_polloc_likelihood", v)}
-                />
-              </div>
-            </div>
-
-            {/* Weaknesses */}
-            <div className="pt-6 border-t border-[#C9A84C]/10">
-              <div className="flex items-center gap-2 mb-4">
-                <Globe className="w-4 h-4 text-rose-400" />
-                <h3 className="text-xs font-bold text-rose-400 uppercase tracking-wider">
-                  Weaknesses — Internal Risk Exposure
-                </h3>
-              </div>
-              <div className="space-y-4">
-                <SWOTScalePair
-                  category="W"
-                  factorLabel="W1 — Critical Infrastructure Deficits"
-                  factorDescription="Gaps in energy, roads, digital connectivity, and water supply — especially in island provinces."
-                  impact={data.q_s7_infra_deficits_impact}
-                  likelihood={data.q_s7_infra_deficits_likelihood}
-                  onImpactChange={(v) => update("q_s7_infra_deficits_impact", v)}
-                  onLikelihoodChange={(v) => update("q_s7_infra_deficits_likelihood", v)}
-                />
-                <SWOTScalePair
-                  category="W"
-                  factorLabel="W6 — Fragmented Policy Frameworks"
-                  factorDescription="Different ministries lack coordination, causing delays and underspending in connectivity projects."
-                  impact={data.q_s7_fragmented_policy_impact}
-                  likelihood={data.q_s7_fragmented_policy_likelihood}
-                  onImpactChange={(v) => update("q_s7_fragmented_policy_impact", v)}
-                  onLikelihoodChange={(v) => update("q_s7_fragmented_policy_likelihood", v)}
-                />
-                <SWOTScalePair
-                  category="W"
-                  factorLabel="W9 — Weak Market Linkages"
-                  factorDescription="Farmers and producers struggle to find buyers and get fair price information for exports."
-                  impact={data.q_s7_market_linkages_impact}
-                  likelihood={data.q_s7_market_linkages_likelihood}
-                  onImpactChange={(v) => update("q_s7_market_linkages_impact", v)}
-                  onLikelihoodChange={(v) => update("q_s7_market_linkages_likelihood", v)}
-                />
-                <SWOTScalePair
-                  category="W"
-                  factorLabel="W10 — Low Technology Adoption"
-                  factorDescription="Slow uptake of modern tools for farming, processing, and online selling across the trade corridor."
-                  impact={data.q_s7_tech_adoption_impact}
-                  likelihood={data.q_s7_tech_adoption_likelihood}
-                  onImpactChange={(v) => update("q_s7_tech_adoption_impact", v)}
-                  onLikelihoodChange={(v) => update("q_s7_tech_adoption_likelihood", v)}
-                />
-              </div>
-            </div>
-
-            {/* Opportunities */}
-            <div className="pt-6 border-t border-[#C9A84C]/10">
-              <div className="flex items-center gap-2 mb-4">
-                <Globe className="w-4 h-4 text-sky-400" />
-                <h3 className="text-xs font-bold text-sky-400 uppercase tracking-wider">
-                  Opportunities — External Resilience Drivers
-                </h3>
-              </div>
-              <div className="space-y-4">
-                <SWOTScalePair
-                  category="O"
-                  factorLabel="O2 — ASEAN Halal Economy"
-                  factorDescription="USD 1.38 trillion addressable market; BARMM can target a share through BIMP-EAGA corridor and halal parks."
-                  impact={data.q_s7_asean_halal_impact}
-                  likelihood={data.q_s7_asean_halal_likelihood}
-                  onImpactChange={(v) => update("q_s7_asean_halal_impact", v)}
-                  onLikelihoodChange={(v) => update("q_s7_asean_halal_likelihood", v)}
-                />
-                <SWOTScalePair
-                  category="O"
-                  factorLabel="O3 — BIMP-EAGA Regional Integration"
-                  factorDescription="Cross-border trade agreements and eco-corridors with Sabah can open new markets for Bangsamoro producers."
-                  impact={data.q_s7_bimpeaga_integration_impact}
-                  likelihood={data.q_s7_bimpeaga_integration_likelihood}
-                  onImpactChange={(v) => update("q_s7_bimpeaga_integration_impact", v)}
-                  onLikelihoodChange={(v) => update("q_s7_bimpeaga_integration_likelihood", v)}
-                />
-                <SWOTScalePair
-                  category="O"
-                  factorLabel="O4 — UAE/GCC Halal Export Corridor"
-                  factorDescription="Partnerships like MAFAR-Prime Group connect BARMM producers directly to Middle East buyers."
-                  impact={data.q_s7_uae_corridor_impact}
-                  likelihood={data.q_s7_uae_corridor_likelihood}
-                  onImpactChange={(v) => update("q_s7_uae_corridor_impact", v)}
-                  onLikelihoodChange={(v) => update("q_s7_uae_corridor_likelihood", v)}
-                />
-                <SWOTScalePair
-                  category="O"
-                  factorLabel="O5 — Mindanao Central Logistics Land-Bridge"
-                  factorDescription="SGA serves as the primary land bridge connecting Polloc Freeport to General Santos and Davao export gateways."
-                  impact={data.q_s7_tourism_potential_impact}
-                  likelihood={data.q_s7_tourism_potential_likelihood}
-                  onImpactChange={(v) => update("q_s7_tourism_potential_impact", v)}
-                  onLikelihoodChange={(v) => update("q_s7_tourism_potential_likelihood", v)}
-                />
-              </div>
-            </div>
-
-            {/* Threats */}
-            <div className="pt-6 border-t border-[#C9A84C]/10">
-              <div className="flex items-center gap-2 mb-4">
-                <Globe className="w-4 h-4 text-amber-400" />
-                <h3 className="text-xs font-bold text-amber-400 uppercase tracking-wider">
-                  Threats — External Vulnerability Factors
-                </h3>
-              </div>
-              <div className="space-y-4">
-                <SWOTScalePair
-                  category="T"
-                  factorLabel="T1 — Competition from Halal Hubs"
-                  factorDescription="Malaysia, Indonesia, and Thailand already dominate the halal market with established certification and logistics."
-                  impact={data.q_s7_halal_competition_impact}
-                  likelihood={data.q_s7_halal_competition_likelihood}
-                  onImpactChange={(v) => update("q_s7_halal_competition_impact", v)}
-                  onLikelihoodChange={(v) => update("q_s7_halal_competition_likelihood", v)}
-                />
-                <SWOTScalePair
-                  category="T"
-                  factorLabel="T3 — Residual Security Incidents"
-                  factorDescription="Clan conflicts and armed groups create fear among investors and tourists along trade corridors."
-                  impact={data.q_s7_security_incidents_impact}
-                  likelihood={data.q_s7_security_incidents_likelihood}
-                  onImpactChange={(v) => update("q_s7_security_incidents_impact", v)}
-                  onLikelihoodChange={(v) => update("q_s7_security_incidents_likelihood", v)}
-                />
-                <SWOTScalePair
-                  category="T"
-                  factorLabel="T4 — Global Market Price Volatility"
-                  factorDescription="World prices for rubber, coconut, and seaweed fluctuate often, affecting producer incomes."
-                  impact={data.q_s7_price_volatility_impact}
-                  likelihood={data.q_s7_price_volatility_likelihood}
-                  onImpactChange={(v) => update("q_s7_price_volatility_impact", v)}
-                  onLikelihoodChange={(v) => update("q_s7_price_volatility_likelihood", v)}
-                />
-                <SWOTScalePair
-                  category="T"
-                  factorLabel="T5 — Limited National Government Coordination"
-                  factorDescription="Gaps in funding and alignment with national programs leave BARMM connectivity projects behind schedule."
-                  impact={data.q_s7_natl_coord_impact}
-                  likelihood={data.q_s7_natl_coord_likelihood}
-                  onImpactChange={(v) => update("q_s7_natl_coord_impact", v)}
-                  onLikelihoodChange={(v) => update("q_s7_natl_coord_likelihood", v)}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* ── Q1: Connectivity Capital Matrix ─────────────────────── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold text-[#E5C560]">
-              The Connectivity Capital Matrix
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-xl">
-              <ImageWithFallback
-                src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/The%20Connectivity%20Capital%20.png"
-                alt="The Connectivity Capital Matrix"
-                className="w-full h-48 sm:h-64"
-                imgClassName="object-cover object-center"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <p className="text-xs text-[#ecfdf5]/70 italic">
-                  Three pillars define Bangsamoro&apos;s infrastructure and digital investment priorities: Physical Pipelines, Digital Backbones, Market-Access Assets.
-                </p>
-              </div>
-            </div>
-            <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
-              Which connectivity pillar should receive the highest priority investment?
-            </label>
-            <div className="grid grid-cols-1 gap-2">
-              {["Physical pipelines (roads, ports)", "Digital backbones (broadband, e-gov)", "Market-access assets (cold-chain, logistics)"].map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => update("q7_1_connectivity_priority", opt)}
-                  className={cn(
-                    "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
-                    data.q7_1_connectivity_priority === opt ? activeBtn : inactiveBtn
-                  )}
-                >
-                  <div className={cn(
-                    "w-3.5 h-3.5 rounded-full border flex-shrink-0",
-                    data.q7_1_connectivity_priority === opt ? "bg-[#C9A84C] border-[#C9A84C]" : "border-[#C9A84C]/40"
-                  )} />
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* ── Q2: Critical Test ─────────────────────────────────── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold text-[#E5C560]">
-              The Critical Test: Integrating Zones & Scaling Capital
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-xl">
-              <ImageWithFallback
-                src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/Critical%20Test%20-%20Integrating%20Zones%20and%20Scaling%20Capiral%20-%20Think%20of%20one%20challenge%20%20we%20must%20overcome%20to%20achieve%20this%20vision.png"
-                alt="The Critical Test"
-                className="w-full h-48 sm:h-64"
-                imgClassName="object-cover object-center"
-              />
-            </div>
-            <p className="text-xs text-[#ecfdf5]/60 italic">
-              The Connectivity Map and Ethical Bloodstream Pyramid show that true integration requires both physical and financial connectivity.
-            </p>
-            <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
-              What is the single biggest challenge to integrating BARMM&apos;s economic zones with global trade corridors?
-            </label>
-            <Textarea
-              rows={3}
-              value={data.q7_2_integration_challenge || ""}
-              onChange={(e) => update("q7_2_integration_challenge", e.target.value)}
-              placeholder="Describe the biggest integration challenge..."
-              className={cn(
-                "w-full rounded-lg border text-sm placeholder:text-[#ecfdf5]/30",
-                "bg-[#022c22]/60 border-[#C9A84C]/20 text-[#ecfdf5]",
-                "focus:outline-none focus:border-[#C9A84C] resize-y"
-              )}
+      {/* ── 2. Connectivity Capital Matrix ───────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            The Connectivity Capital Matrix
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/The%20Connectivity%20Capital%20.png"
+              alt="The Connectivity Capital Matrix"
+              className="w-full h-auto max-h-[500px] object-contain"
+              loading="lazy"
             />
-          </CardContent>
-        </Card>
-      </motion.div>
+          </div>
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
+            Three pillars define Bangsamoro's infrastructure and digital investment priorities:
+            <strong> Physical Pipelines</strong> (₱627M MPW projects, 1,000km farm-to-market roads),
+            <strong> Digital Backbones</strong> (fiber-optic, e-governance, 1-day business registration by 2028),
+            <strong> Market-Access Assets</strong> (cold-chain in Tawi-Tawi, 10 provincial port upgrades).
+          </p>
+          <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+            Which connectivity pillar should receive the highest priority investment?
+          </Label>
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              "Physical pipelines (roads, ports)",
+              "Digital backbones (broadband, e-gov)",
+              "Market-access assets (cold-chain, logistics)",
+            ].map((opt) => (
+              <Button
+                key={opt}
+                type="button"
+                variant="outline"
+                className={cn(
+                  "justify-start h-auto py-3 text-sm text-left",
+                  data.q7_1_connectivity_priority === opt ? activeBtn : inactiveBtn
+                )}
+                onClick={() => update("q7_1_connectivity_priority", opt)}
+              >
+                {opt}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* ── Q3: Provincial Specialized Nodes ──────────────────── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold text-[#E5C560]">
-              Layer 1: Provincial Specialized Nodes — &quot;One Bangsamoro&quot;
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-xl">
-              <ImageWithFallback
-                src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Layer%201%20-%20Provincial%20-%20Geopolitical%20Specialized%20Nodes.png"
-                alt="Layer 1 - Provincial Specialized Nodes"
-                className="w-full h-48 sm:h-64"
-                imgClassName="object-cover object-center"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <p className="text-xs text-[#ecfdf5]/70 italic">
-                  Six provincial hubs: Mainland (Maguindanao del Norte & Cotabato, Maguindanao del Sur, Lanao del Sur, SGA) and Archipelagic (Basilan, Tawi-Tawi).
-                </p>
-              </div>
-            </div>
-            <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
-              Which provincial node should be the highest priority for connectivity investment?
-            </label>
-            <div className="grid grid-cols-1 gap-2">
-              {["Maguindanao del Norte (Polloc/Halal Hub)", "Maguindanao del Sur (Agro-Industrial)", "Lanao del Sur (Energy/Agro)", "Basilan (Logistics Gateway)", "Tawi-Tawi (Maritime Gateway)", "SGA (Mindanao Bridge)"].map((opt) => (
-                <button
+      {/* ── 3. Critical Test ─────────────────────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            The Critical Test: Integrating Zones & Scaling Capital
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/Critical%20Test%20-%20Integrating%20Zones%20and%20Scaling%20Capiral%20-%20Think%20of%20one%20challenge%20%20we%20must%20overcome%20to%20achieve%20this%20vision.png"
+              alt="The Critical Test: Integrating Zones & Scaling Capital"
+              className="w-full h-auto max-h-[500px] object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
+            The Connectivity Map and Ethical Bloodstream Pyramid show that true integration requires both physical and financial connectivity.
+          </p>
+          <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+            What is the single biggest challenge to integrating BARMM's economic zones with global trade corridors?
+          </Label>
+          <Textarea
+            rows={3}
+            value={data.q7_2_integration_challenge || ""}
+            onChange={(e) => update("q7_2_integration_challenge", e.target.value)}
+            placeholder="Describe the biggest integration challenge..."
+            className="w-full rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 px-3 py-2 text-sm text-[#022c22] dark:text-[#ecfdf5] placeholder:text-[#64748b] focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/50 resize-y"
+          />
+        </CardContent>
+      </Card>
+
+      {/* ── 4. Provincial Specialized Nodes ──────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Layer 1: Provincial Specialized Nodes — "One Bangsamoro"
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Layer%201%20-%20Provincial%20-%20Geopolitical%20Specialized%20Nodes.png"
+              alt="Layer 1 - Provincial Specialized Nodes"
+              className="w-full h-auto max-h-[500px] object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
+            Six provincial hubs: <strong>Mainland</strong> (Maguindanao del Norte & Cotabato — Admin/Halal Hub, Maguindanao del Sur — Agri-Industrial Breadbasket, Lanao del Sur — Clean Energy & Agro-Hub, SGA — Agro-Industrial Corridor) and <strong>Archipelagic</strong> (Basilan — Logistics Gateway, Tawi-Tawi — Maritime Gateway).
+          </p>
+          <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+            Which provincial node should be the highest priority for connectivity investment?
+          </Label>
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              "Maguindanao del Norte (Polloc/Halal Hub)",
+              "Maguindanao del Sur (Agro-Industrial)",
+              "Lanao del Sur (Energy/Agro)",
+              "Basilan (Logistics Gateway)",
+              "Tawi-Tawi (Maritime Gateway)",
+              "SGA (Mindanao Bridge)",
+            ].map((opt) => (
+              <Button
+                key={opt}
+                type="button"
+                variant="outline"
+                className={cn(
+                  "justify-start h-auto py-3 text-sm text-left",
+                  data.q7_3_priority_node === opt ? activeBtn : inactiveBtn
+                )}
+                onClick={() => update("q7_3_priority_node", opt)}
+              >
+                {opt}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── 5. The Trapped Value ─────────────────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            The Trapped Value: Geographic Reality
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/The%20Trapped%20Value.png"
+              alt="The Trapped Value"
+              className="w-full h-auto max-h-[500px] object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
+            Shows how limited connectivity traps economic potential — Basilan's 48,386ha rubber and Tawi-Tawi's 40% of national seaweed output isolated from global trade. The Law of Sequencing highlights the Zamboanga-Basilan Interconnection and digital backbones as essential unlock steps.
+          </p>
+          <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+            Which trapped-value province would benefit most from immediate connectivity investment?
+          </Label>
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              "Basilan (rubber, aquaculture)",
+              "Tawi-Tawi (seaweed, BIMP-EAGA)",
+              "Sulu (fisheries, tourism)",
+              "Lanao del Sur (energy, agriculture)",
+            ].map((opt) => (
+              <Button
+                key={opt}
+                type="button"
+                variant="outline"
+                className={cn(
+                  "justify-start h-auto py-3 text-sm text-left",
+                  data.q7_4_trapped_value_province === opt ? activeBtn : inactiveBtn
+                )}
+                onClick={() => update("q7_4_trapped_value_province", opt)}
+              >
+                {opt}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── 6. Shattering Geographic Isolation ─────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Shattering Geographic Isolation: The Archipelagic Bridge
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Shattering%20Geographical%20Isolation.png"
+              alt="Shattering Geographic Isolation"
+              className="w-full h-auto max-h-[500px] object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
+            Three key initiatives: <strong>Zamboanga–Basilan Interconnection</strong> (6.67B, 69kV transmission), <strong>Basilan–Zamboanga Bridge</strong> (31km corridor by 2030), <strong>Bongao Bridge Tawi-Tawi</strong> (541m span). Systemic interventions improving market access and labor mobility.
+          </p>
+          <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+            Which bridge/interconnection project will have the most transformative impact?
+          </Label>
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              "Zamboanga-Basilan Interconnection (energy)",
+              "Basilan-Zamboanga Bridge (transport)",
+              "Bongao Bridge Tawi-Tawi (intra-provincial)",
+            ].map((opt) => (
+              <Button
+                key={opt}
+                type="button"
+                variant="outline"
+                className={cn(
+                  "justify-start h-auto py-3 text-sm text-left",
+                  data.q7_5_bridge_impact === opt ? activeBtn : inactiveBtn
+                )}
+                onClick={() => update("q7_5_bridge_impact", opt)}
+              >
+                {opt}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── 7. Basilan and Tawi-Tawi ─────────────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Basilan and Tawi-Tawi: Provincial Endowments & Strategic Leverages
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Basilan%20and%20tawi-Tawi.png"
+              alt="Basilan and Tawi-Tawi"
+              className="w-full h-auto max-h-[500px] object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
+            <strong>Basilan — The Archipelagic Catalyst:</strong> 48,366ha rubber, coastal aquaculture, ZBIP power project, Basilan-Zamboanga Bridge. <strong>Tawi-Tawi — The Maritime & Eco-Tourism Hub:</strong> BIMP-EAGA location, marine biodiversity, maritime gateway for trade and blue economy.
+          </p>
+          <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+            Which province has greater potential to become Bangsamoro's primary maritime trade gateway?
+          </Label>
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              "Basilan (rubber, ZBIP, closer to Mindanao)",
+              "Tawi-Tawi (seaweed, BIMP-EAGA, direct Sabah route)",
+              "Both equally — they serve different corridors",
+            ].map((opt) => (
+              <Button
+                key={opt}
+                type="button"
+                variant="outline"
+                className={cn(
+                  "justify-start h-auto py-3 text-sm text-left",
+                  data.q7_6_gateway_province === opt ? activeBtn : inactiveBtn
+                )}
+                onClick={() => update("q7_6_gateway_province", opt)}
+              >
+                {opt}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── 8. Global Integration Vectors ────────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Layer 3: Global Integration Vectors
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Global%20Integration%20Vectors.png"
+              alt="Global Integration Vectors"
+              className="w-full h-auto max-h-[500px] object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
+            <strong>Vector 1 — BIMP-EAGA Corridor:</strong> proximity-based maritime trade, 3% of ASEAN halal market via Tawi-Tawi. <strong>Vector 2 — UAE & GCC Corridor:</strong> standards-based air/sea logistics, $2.3T global halal market via Polloc Freeport and OIC/SMIIC accreditation.
+          </p>
+          <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+            Which global integration vector should Bangsamoro prioritize?
+          </Label>
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              "BIMP-EAGA (regional, proximity-based, lower barriers)",
+              "UAE/GCC (global, higher value, standards-based)",
+              "Both simultaneously — they complement each other",
+            ].map((opt) => (
+              <Button
+                key={opt}
+                type="button"
+                variant="outline"
+                className={cn(
+                  "justify-start h-auto py-3 text-sm text-left",
+                  data.q7_7_priority_vector === opt ? activeBtn : inactiveBtn
+                )}
+                onClick={() => update("q7_7_priority_vector", opt)}
+              >
+                {opt}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── 9. UAE & GCC Connectivity ────────────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            BARMM Connectivity vis-à-vis UAE & GCC
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/UAE%20&%20GCC.png"
+              alt="UAE & GCC Connectivity"
+              className="w-full h-auto max-h-[500px] object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
+            Three hubs linked to $2.3T global halal market: <strong>Basilan</strong> (₱23.15B GDP, Archipelagic Logistics Gateway, ZBIP), <strong>Maguindanao del Norte</strong> (₱81.91B GDP, Admin & Halal Hub, Polloc), <strong>Maguindanao del Sur</strong> (₱39.54B GDP, Agri-Industrial Breadbasket).
+          </p>
+          <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+            How realistic is BARMM's goal of capturing a meaningful share of the UAE/GCC halal market by 2030?
+          </Label>
+          {renderScale("q7_8_uae_feasibility")}
+          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">1 = Not realistic, 5 = Very realistic</p>
+        </CardContent>
+      </Card>
+
+      {/* ── 10. BIMP-EAGA Connectivity Map ───────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            BARMM Strategic Connectivity Map
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/BARMM%20Connectivity-BIMP-EAGA.png"
+              alt="BARMM Strategic Connectivity Map"
+              className="w-full h-auto max-h-[500px] object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
+            Tawi-Tawi and Basilan as maritime gateways feeding BIMP-EAGA. Maguindanao del Norte and Polloc Freeport as halal export centers to UAE/GCC. Maguindanao del Sur and Lanao del Sur as inland production zones.
+          </p>
+          <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+            How effectively is Bangsamoro leveraging the BIMP-EAGA corridor for regional trade?
+          </Label>
+          {renderScale("q7_9_bimpeaga_leverage")}
+          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">1 = Not effectively, 5 = Very effectively</p>
+        </CardContent>
+      </Card>
+
+      {/* ── 11. SWOT Scale Questions ───────────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2 text-[#022c22] dark:text-[#ecfdf5]">
+            <span className="px-2 py-1 rounded text-xs font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+              SWOT
+            </span>
+            Connectors Cluster: Strengths, Weaknesses, Opportunities, Threats
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-8">
+          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 italic">
+            Rate each factor: Impact (1 = very small, 5 = very large) × Likelihood (1 = very unlikely, 5 = very likely)
+          </p>
+
+          {/* Strengths */}
+          {renderSwotPair(
+            "S1 — Strategic BIMP-EAGA Location",
+            "BARMM is close to Sabah and ASEAN trade routes, making it a natural gateway for regional trade.",
+            "q_s7_bimpeaga_loc_impact",
+            "q_s7_bimpeaga_loc_likelihood",
+            "strength"
+          )}
+          {renderSwotPair(
+            "S4 — Large Domestic Halal Market",
+            "5.69 million Muslim consumers create strong built-in local demand for halal products and services.",
+            "q_s7_domestic_halal_impact",
+            "q_s7_domestic_halal_likelihood",
+            "strength"
+          )}
+          {renderSwotPair(
+            "S6 — Polloc Freeport & Economic Zone",
+            "Strategic logistics and trade hub serving as a gateway for goods entering and leaving BARMM.",
+            "q_s7_polloc_impact",
+            "q_s7_polloc_likelihood",
+            "strength"
+          )}
+
+          {/* Weaknesses */}
+          {renderSwotPair(
+            "W1 — Critical Infrastructure Deficits",
+            "Gaps in energy, roads, digital connectivity, and water supply — especially in island provinces.",
+            "q_s7_infra_deficits_impact",
+            "q_s7_infra_deficits_likelihood",
+            "weakness"
+          )}
+          {renderSwotPair(
+            "W6 — Fragmented Policy Frameworks",
+            "Different ministries lack coordination, causing delays and underspending in connectivity projects.",
+            "q_s7_fragmented_policy_impact",
+            "q_s7_fragmented_policy_likelihood",
+            "weakness"
+          )}
+          {renderSwotPair(
+            "W9 — Weak Market Linkages",
+            "Farmers and producers struggle to find buyers and get fair price information for exports.",
+            "q_s7_market_linkages_impact",
+            "q_s7_market_linkages_likelihood",
+            "weakness"
+          )}
+          {renderSwotPair(
+            "W10 — Low Technology Adoption",
+            "Slow uptake of modern tools for farming, processing, and online selling across the trade corridor.",
+            "q_s7_tech_adoption_impact",
+            "q_s7_tech_adoption_likelihood",
+            "weakness"
+          )}
+
+          {/* Opportunities */}
+          {renderSwotPair(
+            "O2 — ASEAN Halal Economy",
+            "USD 1.38 trillion addressable market; BARMM can target a share through BIMP-EAGA corridor and halal parks.",
+            "q_s7_asean_halal_impact",
+            "q_s7_asean_halal_likelihood",
+            "opportunity"
+          )}
+          {renderSwotPair(
+            "O3 — BIMP-EAGA Regional Integration",
+            "Cross-border trade agreements and eco-corridors with Sabah can open new markets for Bangsamoro producers.",
+            "q_s7_bimpeaga_integration_impact",
+            "q_s7_bimpeaga_integration_likelihood",
+            "opportunity"
+          )}
+          {renderSwotPair(
+            "O4 — UAE/GCC Halal Export Corridor",
+            "Partnerships like MAFAR-Prime Group connect BARMM producers directly to Middle East buyers.",
+            "q_s7_uae_corridor_impact",
+            "q_s7_uae_corridor_likelihood",
+            "opportunity"
+          )}
+          {renderSwotPair(
+            "O5 — Mindanao Central Logistics Land-Bridge",
+            "SGA serves as the primary land bridge connecting Polloc Freeport to General Santos and Davao export gateways.",
+            "q_s7_tourism_potential_impact",
+            "q_s7_tourism_potential_likelihood",
+            "opportunity"
+          )}
+
+          {/* Threats */}
+          {renderSwotPair(
+            "T1 — Competition from Halal Hubs",
+            "Malaysia, Indonesia, and Thailand already dominate the halal market with established certification and logistics.",
+            "q_s7_halal_competition_impact",
+            "q_s7_halal_competition_likelihood",
+            "threat"
+          )}
+          {renderSwotPair(
+            "T3 — Residual Security Incidents",
+            "Clan conflicts and armed groups create fear among investors and tourists along trade corridors.",
+            "q_s7_security_incidents_impact",
+            "q_s7_security_incidents_likelihood",
+            "threat"
+          )}
+          {renderSwotPair(
+            "T4 — Global Market Price Volatility",
+            "World prices for rubber, coconut, and seaweed fluctuate often, affecting producer incomes.",
+            "q_s7_price_volatility_impact",
+            "q_s7_price_volatility_likelihood",
+            "threat"
+          )}
+          {renderSwotPair(
+            "T5 — Limited National Government Coordination",
+            "Gaps in funding and alignment with national programs leave BARMM connectivity projects behind schedule.",
+            "q_s7_natl_coord_impact",
+            "q_s7_natl_coord_likelihood",
+            "threat"
+          )}
+        </CardContent>
+      </Card>
+
+      {/* ── 12. Archetype: Success to the Successful ─────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2 text-[#022c22] dark:text-[#ecfdf5]">
+            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            Archetype: Success to the Successful
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Success%20to%20the%20Successful%20Aarchetype.png"
+              alt="Success to the Successful Archetype"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90 leading-relaxed">
+            "Success to the Successful" illustrates how initial advantages reinforce uneven development between BARMM's mainland and island provinces. It captures a self-reinforcing cycle where success breeds more success, widening the gap between the mainland (Maguindanao del Norte, Lanao del Sur — ₱81.91B GDP, 4.1% GRDP growth) and island provinces (Tawi-Tawi 1.1%, Sulu 1.13%, Basilan 1.6%) — threatening BARMM's goal of inclusive, balanced development.
+          </p>
+
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+              How accurately does "Success to the Successful" reflect the imbalance between mainland and island provinces?
+            </Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {archetypeOptions.map((opt) => (
+                <Button
                   key={opt}
                   type="button"
-                  onClick={() => update("q7_3_priority_node", opt)}
+                  variant="outline"
                   className={cn(
-                    "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
-                    data.q7_3_priority_node === opt ? activeBtn : inactiveBtn
+                    "justify-start h-auto py-3 text-sm text-left",
+                    data.q_s7_escalation === opt ? activeBtn : inactiveBtn
                   )}
+                  onClick={() => update("q_s7_escalation", opt)}
                 >
-                  <div className={cn(
-                    "w-3.5 h-3.5 rounded-full border flex-shrink-0",
-                    data.q7_3_priority_node === opt ? "bg-[#C9A84C] border-[#C9A84C]" : "border-[#C9A84C]/40"
-                  )} />
                   {opt}
-                </button>
+                </Button>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+          </div>
 
-      {/* ── Q4: The Trapped Value ─────────────────────────────── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold text-[#E5C560]">
-              The Trapped Value: Geographic Reality
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-xl">
-              <ImageWithFallback
-                src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/The%20Trapped%20Value.png"
-                alt="The Trapped Value"
-                className="w-full h-48 sm:h-64"
-                imgClassName="object-cover object-center"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <p className="text-xs text-[#ecfdf5]/70 italic">
-                  Shows how limited connectivity traps economic potential — Basilan&apos;s rubber and Tawi-Tawi&apos;s seaweed output isolated from global trade.
-                </p>
+          {(data.q_s7_escalation === "Very accurately" ||
+            data.q_s7_escalation === "Somewhat accurately") && (
+            <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20 animate-in fade-in slide-in-from-top-2 duration-200">
+              <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+                Which island province has the greatest untapped potential, and what investment would unlock it?
+              </Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[
+                  "Tawi-Tawi (seaweed, BIMP-EAGA)",
+                  "Basilan (rubber, ZBIP)",
+                  "Sulu (fisheries, tourism)",
+                ].map((opt) => (
+                  <Button
+                    key={opt}
+                    type="button"
+                    variant="outline"
+                    className={cn(
+                      "justify-start h-auto py-3 text-sm text-left",
+                      data.q_s7_escalation_followup === opt ? activeBtn : inactiveBtn
+                    )}
+                    onClick={() => update("q_s7_escalation_followup", opt)}
+                  >
+                    {opt}
+                  </Button>
+                ))}
               </div>
-            </div>
-            <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
-              Which trapped-value province would benefit most from immediate connectivity investment?
-            </label>
-            <div className="grid grid-cols-1 gap-2">
-              {["Basilan (rubber, aquaculture)", "Tawi-Tawi (seaweed, BIMP-EAGA)", "Sulu (fisheries, tourism)", "Lanao del Sur (energy, agriculture)"].map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => update("q7_4_trapped_value_province", opt)}
-                  className={cn(
-                    "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
-                    data.q7_4_trapped_value_province === opt ? activeBtn : inactiveBtn
-                  )}
-                >
-                  <div className={cn(
-                    "w-3.5 h-3.5 rounded-full border flex-shrink-0",
-                    data.q7_4_trapped_value_province === opt ? "bg-[#C9A84C] border-[#C9A84C]" : "border-[#C9A84C]/40"
-                  )} />
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* ── Q5: Shattering Geographic Isolation ─────────────── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold text-[#E5C560]">
-              Shattering Geographic Isolation: The Archipelagic Bridge
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-xl">
-              <ImageWithFallback
-                src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Shattering%20Geographical%20Isolation.png"
-                alt="Shattering Geographic Isolation"
-                className="w-full h-48 sm:h-64"
-                imgClassName="object-cover object-center"
+              <Textarea
+                placeholder="Or describe another province and investment..."
+                rows={2}
+                value={data.q_s7_escalation_followup || ""}
+                onChange={(e) => update("q_s7_escalation_followup", e.target.value)}
+                className="w-full rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 px-3 py-2 text-sm text-[#022c22] dark:text-[#ecfdf5] placeholder:text-[#64748b] focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/50 resize-y"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <p className="text-xs text-[#ecfdf5]/70 italic">
-                  Three key initiatives: Zamboanga–Basilan Interconnection, Basilan–Zamboanga Bridge, Bongao Bridge Tawi-Tawi.
-                </p>
-              </div>
             </div>
-            <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
-              Which bridge/interconnection project will have the most transformative impact?
-            </label>
-            <div className="grid grid-cols-1 gap-2">
-              {["Zamboanga-Basilan Interconnection (energy)", "Basilan-Zamboanga Bridge (transport)", "Bongao Bridge Tawi-Tawi (intra-provincial)"].map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => update("q7_5_bridge_impact", opt)}
-                  className={cn(
-                    "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
-                    data.q7_5_bridge_impact === opt ? activeBtn : inactiveBtn
-                  )}
-                >
-                  <div className={cn(
-                    "w-3.5 h-3.5 rounded-full border flex-shrink-0",
-                    data.q7_5_bridge_impact === opt ? "bg-[#C9A84C] border-[#C9A84C]" : "border-[#C9A84C]/40"
-                  )} />
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* ── Q6: Basilan and Tawi-Tawi ─────────────────────────── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold text-[#E5C560]">
-              Basilan and Tawi-Tawi: Provincial Endowments & Strategic Leverages
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-xl">
-              <ImageWithFallback
-                src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Basilan%20and%20tawi-Tawi.png"
-                alt="Basilan and Tawi-Tawi"
-                className="w-full h-48 sm:h-64"
-                imgClassName="object-cover object-center"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <p className="text-xs text-[#ecfdf5]/70 italic">
-                  Basilan: Archipelagic Catalyst. Tawi-Tawi: Maritime & Eco-Tourism Hub.
-                </p>
-              </div>
-            </div>
-            <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
-              Which province has greater potential to become Bangsamoro&apos;s primary maritime trade gateway?
-            </label>
-            <div className="grid grid-cols-1 gap-2">
-              {["Basilan (rubber, ZBIP, closer to Mindanao)", "Tawi-Tawi (seaweed, BIMP-EAGA, direct Sabah route)", "Both equally — they serve different corridors"].map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => update("q7_6_gateway_province", opt)}
-                  className={cn(
-                    "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
-                    data.q7_6_gateway_province === opt ? activeBtn : inactiveBtn
-                  )}
-                >
-                  <div className={cn(
-                    "w-3.5 h-3.5 rounded-full border flex-shrink-0",
-                    data.q7_6_gateway_province === opt ? "bg-[#C9A84C] border-[#C9A84C]" : "border-[#C9A84C]/40"
-                  )} />
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* ── Q7: Global Integration Vectors ──────────────────────── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold text-[#E5C560]">
-              Layer 3: Global Integration Vectors
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-xl">
-              <ImageWithFallback
-                src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/Global%20Integration%20Vectors.png"
-                alt="Global Integration Vectors"
-                className="w-full h-48 sm:h-64"
-                imgClassName="object-cover object-center"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <p className="text-xs text-[#ecfdf5]/70 italic">
-                  Vector 1: BIMP-EAGA Corridor. Vector 2: UAE & GCC Corridor.
-                </p>
-              </div>
-            </div>
-            <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
-              Which global integration vector should Bangsamoro prioritize?
-            </label>
-            <div className="grid grid-cols-1 gap-2">
-              {["BIMP-EAGA (regional, proximity-based, lower barriers)", "UAE/GCC (global, higher value, standards-based)", "Both simultaneously — they complement each other"].map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => update("q7_7_priority_vector", opt)}
-                  className={cn(
-                    "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
-                    data.q7_7_priority_vector === opt ? activeBtn : inactiveBtn
-                  )}
-                >
-                  <div className={cn(
-                    "w-3.5 h-3.5 rounded-full border flex-shrink-0",
-                    data.q7_7_priority_vector === opt ? "bg-[#C9A84C] border-[#C9A84C]" : "border-[#C9A84C]/40"
-                  )} />
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </motion.div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

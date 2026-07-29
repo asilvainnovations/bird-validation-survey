@@ -1,45 +1,12 @@
-// src/components/strategic/Section10_IEDS.tsx
-// BIRD 2026–2035 · Section 10: IEDS & Three-Phase Implementation
-//
-// SYSTEMS ARCHITECTURE ALIGNMENT:
-// • Primitives: ImageWithFallback, LikertScale, SectionProgress
-// • Animations: Framer Motion staggered entrance
-// • Accessibility: All scales are true radio groups with keyboard nav
-// • Theme: Dark-first consistent with Sections 0–9
-
 import React from "react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-
-// ── Primitives ───────────────────────────────────────────────────────────────
-import { ImageWithFallback } from "@/lib/primitives/ImageWithFallback";
-import { SectionProgress } from "@/lib/primitives/SectionProgress";
-import { LikertScale } from "@/lib/primitives/LikertScale";
-
-// ── shadcn/ui ────────────────────────────────────────────────────────────────
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Rocket, CheckCircle2, TrendingUp } from "lucide-react";
 
-// ── BIRD Content ─────────────────────────────────────────────────────────────
-import { BIRD_IMAGES } from "@/lib/bird-urls";
-
-// ── Icons ────────────────────────────────────────────────────────────────────
-import {
-  Map,
-  Layers,
-  Target,
-  TrendingUp,
-  ShieldAlert,
-  BookOpen,
-  Zap,
-  GitBranch,
-  BarChart3,
-} from "lucide-react";
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// TYPES — CONTRACT WITH SURVEYWIZARD.TSX
-// ═══════════════════════════════════════════════════════════════════════════════
+// ── Data Interface (exact runtime contract with SurveyWizard.tsx s10 state) ──
 export interface Section10Data {
   q10_1_ieds_preference: string;
   q10_2_sequence_a_priority?: number;
@@ -49,27 +16,18 @@ export interface Section10Data {
   q10_6_risk_mitigation: string;
   q10_7_outcomes_achievable?: number;
   q10_matrix: {
-    heds: MatrixRow;
-    gems: MatrixRow;
-    ifes: MatrixRow;
-    ieds: MatrixRow;
+    heds: Record<string, number>;
+    gems: Record<string, number>;
+    ifes: Record<string, number>;
+    ieds: Record<string, number>;
   };
+  // Optional educational scale questions (wizard may omit — safe for forward compatibility)
   q10_leverage_points_clarity?: number;
   q10_activating_leverage?: number;
   q10_capacity_traps?: number;
   q10_iceberg_model?: number;
   q10_collaborative_governance?: number;
-  q10_strategic_ranking: string;
-}
-
-interface MatrixRow {
-  economic_impact: number;
-  feasibility: number;
-  identity_alignment: number;
-  systems_leverage: number;
-  risk_return: number;
-  inclusivity: number;
-  sustainability: number;
+  q10_strategic_ranking?: string;
 }
 
 interface Section10Props {
@@ -77,442 +35,535 @@ interface Section10Props {
   onChange: (data: Section10Data) => void;
 }
 
-// ── Animation variants ───────────────────────────────────────────────────────
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.1 },
-  },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, ease: "easeOut" },
-  },
-};
-
-// ── Constants ────────────────────────────────────────────────────────────────
-const IEDS_OPTIONS = [
-  { key: "heds", label: "HEDS — Halal-Centered Economic Development Strategy", desc: "Prioritizes halal industry as the primary growth engine, leveraging BARMM's Muslim-majority identity and BIMP-EAGA access." },
-  { key: "gems", label: "GEMS — Green Economy & Moral Stewardship Strategy", desc: "Centers on carbon markets, PES, and sustainable resource management through the Bangsamoro Forestry Code." },
-  { key: "ifes", label: "IFES — Islamic Finance & Ethical Capital Strategy", desc: "Builds Shariah-compliant financial infrastructure as the backbone for all other investments." },
-  { key: "ieds", label: "IEDS — Integrated Economic Development Strategy", desc: "Synchronizes all three pathways (Halal + Green + Islamic Finance) through moral governance and systems thinking." },
-];
-
-const MATRIX_CRITERIA = [
-  { key: "economic_impact", label: "Economic Impact" },
-  { key: "feasibility", label: "Feasibility" },
-  { key: "identity_alignment", label: "Identity Alignment" },
-  { key: "systems_leverage", label: "Systems Leverage" },
-  { key: "risk_return", label: "Risk-Return" },
-  { key: "inclusivity", label: "Inclusivity" },
-  { key: "sustainability", label: "Sustainability" },
-] as const;
-
-const STRATEGIC_RANKINGS = [
-  "HEDS → GEMS → IFES (Halal first, then Green, then Finance)",
-  "GEMS → HEDS → IFES (Green first, then Halal, then Finance)",
-  "IFES → HEDS → GEMS (Finance first, then Halal, then Green)",
-  "IEDS — All three in parallel from the start",
-  "Other (please specify)",
-];
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// COMPONENT
-// ═══════════════════════════════════════════════════════════════════════════════
+// ── Component ────────────────────────────────────────────────────────────────
 const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
-  const update = <K extends keyof Section10Data>(field: K, value: Section10Data[K]) => {
-    onChange({ ...data, [field]: value });
-  };
+  const update = <K extends keyof Section10Data>(
+    field: K,
+    value: Section10Data[K]
+  ) => onChange({ ...data, [field]: value });
 
-  const updateMatrix = (
-    strategy: keyof Section10Data["q10_matrix"],
-    criterion: keyof MatrixRow,
-    value: number
-  ) => {
-    onChange({
-      ...data,
-      q10_matrix: {
-        ...data.q10_matrix,
-        [strategy]: {
-          ...data.q10_matrix[strategy],
-          [criterion]: value,
-        },
-      },
-    });
-  };
+  const activeBtnClass =
+    "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90 dark:bg-[#1B4D3E] dark:text-white dark:border-[#1B4D3E]";
+  const inactiveBtnClass =
+    "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10";
+  const activeScaleClass =
+    "bg-[#C9A84C] text-white border-[#C9A84C] hover:bg-[#C9A84C]/90";
+  const inactiveScaleClass =
+    "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]";
 
-  const activeBtn = "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]";
-  const inactiveBtn = "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30";
+  const renderScale = (field: keyof Section10Data) => (
+    <div className="flex gap-2 flex-wrap">
+      {[1, 2, 3, 4, 5].map((v) => (
+        <Button
+          key={v}
+          type="button"
+          variant="outline"
+          size="icon"
+          className={cn(
+            "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
+            data[field] === v ? activeScaleClass : inactiveScaleClass
+          )}
+          onClick={() => update(field, v as any)}
+        >
+          {v}
+        </Button>
+      ))}
+    </div>
+  );
 
-  // Sub-progress
-  const filledCount = [
-    data.q10_1_ieds_preference,
-    data.q10_2_sequence_a_priority != null,
-    data.q10_3_sequence_b_priority != null,
-    data.q10_4_sequence_c_priority != null,
-    data.q10_5_sequencing_logic,
-    data.q10_6_risk_mitigation,
-    data.q10_7_outcomes_achievable != null,
-    data.q10_leverage_points_clarity != null,
-    data.q10_activating_leverage != null,
-    data.q10_capacity_traps != null,
-    data.q10_iceberg_model != null,
-    data.q10_collaborative_governance != null,
-    data.q10_strategic_ranking,
-  ].filter(Boolean).length;
-  const totalFields = 13;
+  const strategicOptions = [
+    { code: "HEDS", name: "Halal Economy Dominance Strategy", score: "7.61/10", grdp: "₱150–200B" },
+    { code: "GEMS", name: "Green Economy Monetization Strategy", score: "7.16/10", grdp: "₱80–120B" },
+    { code: "IFES", name: "Infrastructure-First Enabling Strategy", score: "7.48/10", grdp: "₱200–280B" },
+    { code: "IEDS", name: "Integrated Ecosystem Development Strategy", score: "8.93/10", grdp: "₱550B+", highlight: true },
+  ];
 
   return (
-    <motion.div
-      className="space-y-8 max-w-4xl mx-auto px-4 py-6"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      {/* ── Progress Header ── */}
-      <SectionProgress
-        currentSection={10}
-        totalSections={16}
-        sectionLabel="IEDS & 3-Phase Plan"
-      />
-
-      {/* ── Sub-progress ── */}
-      <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#022c22]/40 border border-[#C9A84C]/10">
-        <span className="text-[11px] text-[#ecfdf5]/40 uppercase tracking-wider">
-          Section completion
-        </span>
-        <span className="text-[11px] text-[#C9A84C]/70">
-          {filledCount}/{totalFields} fields
-        </span>
+    <div className="space-y-8">
+      {/* ═══════════════════════════════════════════ HEADER */}
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-lg bg-[#022c22] dark:bg-[#011a12] flex items-center justify-center shadow-md">
+          <Rocket className="w-5 h-5 text-[#C9A84C]" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-[#022c22] dark:text-[#ecfdf5]">
+            Section 10: Integrated Ecosystem Development Strategy (IEDS)
+          </h2>
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 mt-1 max-w-3xl">
+            The IEDS sequences three strategic options into a coherent, time-bound execution plan
+            to achieve the full ₱550B GRDP target by 2035.
+          </p>
+        </div>
       </div>
 
-      {/* ── Header ── */}
-      <motion.div variants={cardVariants} className="space-y-2">
-        <div className="flex items-center gap-3">
-          <Map className="w-6 h-6 text-[#C9A84C]" />
-          <h2 className="text-xl font-bold text-[#ecfdf5]">
-            Section 10: IEDS & Three-Phase Implementation
-          </h2>
-        </div>
-        <p className="text-sm text-[#ecfdf5]/70">
-          Strategic Options Evaluation — selecting and sequencing the optimal investment development strategy for BARMM 2026–2035
-        </p>
-      </motion.div>
-
-      {/* ── Banner Image ── */}
-      <motion.div variants={cardVariants}>
-        <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-2xl">
-          <ImageWithFallback
-            src={BIRD_IMAGES.iedsStrategicOptions?.url || BIRD_IMAGES.validationSurveyBanner?.url || ""}
-            alt={BIRD_IMAGES.iedsStrategicOptions?.alt || "IEDS Strategic Options"}
-            className="w-full h-56 sm:h-72"
-            imgClassName="object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-4">
-            <p className="text-xs text-[#ecfdf5]/70 italic">
-              {BIRD_IMAGES.iedsStrategicOptions?.title || "IEDS Strategic Options Evaluation"}
-            </p>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* ── Block 1: IEDS Preference ── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold text-[#E5C560] flex items-center gap-2">
-              <Layers className="w-5 h-5 text-[#C9A84C]" />
-              Select Your Preferred Strategy
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-[#ecfdf5]/70 leading-relaxed">
-              The BIRD evaluates four strategic options through a 7-criteria matrix.
-              Which integrated strategy do you believe offers BARMM the highest
-              probability of achieving the ₱550B GRDP target by 2035?
-            </p>
-            <div className="grid grid-cols-1 gap-3">
-              {IEDS_OPTIONS.map((opt) => (
-                <button
-                  key={opt.key}
-                  type="button"
-                  onClick={() => update("q10_1_ieds_preference", opt.key)}
-                  className={cn(
-                    "p-4 rounded-xl border text-left transition-all",
-                    data.q10_1_ieds_preference === opt.key ? activeBtn : inactiveBtn
-                  )}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className={cn(
-                      "w-4 h-4 rounded-full border mt-0.5 flex-shrink-0",
-                      data.q10_1_ieds_preference === opt.key ? "bg-[#C9A84C] border-[#C9A84C]" : "border-[#C9A84C]/40"
-                    )} />
-                    <div>
-                      <p className="text-sm font-semibold text-[#ecfdf5]">{opt.label}</p>
-                      <p className="text-xs text-[#ecfdf5]/50 mt-1 leading-relaxed">{opt.desc}</p>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* ── Block 2: Evaluation Matrix ── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold text-[#E5C560] flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-[#C9A84C]" />
-              7-Criteria Evaluation Matrix
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-[#ecfdf5]/70 leading-relaxed">
-              Rate each strategic option across seven criteria on a 1–5 scale.
-              This matrix feeds the TOWS-based selection logic for the IEDS.
-            </p>
-            <div className="overflow-x-auto rounded-lg border border-[#C9A84C]/20">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-[#022c22] text-white">
-                    <th className="px-3 py-2 text-left font-semibold">Strategy</th>
-                    {MATRIX_CRITERIA.map((c) => (
-                      <th key={c.key} className="px-2 py-2 text-center font-semibold text-[10px] uppercase">
-                        {c.label}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#C9A84C]/10">
-                  {(Object.keys(data.q10_matrix) as Array<keyof Section10Data["q10_matrix"]>).map((strategy) => {
-                    const labels: Record<string, string> = { heds: "HEDS", gems: "GEMS", ifes: "IFES", ieds: "IEDS" };
-                    return (
-                      <tr key={strategy} className="bg-white/5 hover:bg-[#C9A84C]/5">
-                        <td className="px-3 py-2 font-semibold text-[#ecfdf5] text-xs">{labels[strategy]}</td>
-                        {MATRIX_CRITERIA.map((criterion) => (
-                          <td key={criterion.key} className="px-1 py-2">
-                            <div className="flex gap-1 justify-center">
-                              {[1, 2, 3, 4, 5].map((v) => (
-                                <button
-                                  key={v}
-                                  type="button"
-                                  onClick={() => updateMatrix(strategy, criterion.key as keyof MatrixRow, v)}
-                                  className={cn(
-                                    "w-7 h-7 rounded text-[10px] font-bold border transition-all",
-                                    data.q10_matrix[strategy][criterion.key as keyof MatrixRow] === v
-                                      ? "bg-[#C9A84C] text-white border-[#C9A84C]"
-                                      : "bg-[#022c22]/60 text-[#ecfdf5]/50 border-[#C9A84C]/20 hover:border-[#C9A84C]/50"
-                                  )}
-                                >
-                                  {v}
-                                </button>
-                              ))}
-                            </div>
-                          </td>
-                        ))}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* ── Block 3: Sequencing Priorities ── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold text-[#E5C560] flex items-center gap-2">
-              <GitBranch className="w-5 h-5 text-[#C9A84C]" />
-              Phase Sequencing Assessment
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <LikertScale
-                name="q10_2_sequence_a_priority"
-                label="Rate the priority of Sequence A (Activate: 2026–2028)"
-                value={data.q10_2_sequence_a_priority}
-                onChange={(v) => update("q10_2_sequence_a_priority", v)}
-              />
-              <LikertScale
-                name="q10_3_sequence_b_priority"
-                label="Rate the priority of Sequence B (Scale: 2029–2031)"
-                value={data.q10_3_sequence_b_priority}
-                onChange={(v) => update("q10_3_sequence_b_priority", v)}
-              />
-              <LikertScale
-                name="q10_4_sequence_c_priority"
-                label="Rate the priority of Sequence C (Consolidate: 2032–2035)"
-                value={data.q10_4_sequence_c_priority}
-                onChange={(v) => update("q10_4_sequence_c_priority", v)}
-              />
-            </div>
-
-            <div className="pt-4 border-t border-[#C9A84C]/10 space-y-4">
-              <div>
-                <Label className="text-sm font-medium text-[#ecfdf5] mb-2 block">
-                  What is the core logic that should govern sequencing?
-                </Label>
-                <Textarea
-                  rows={3}
-                  value={data.q10_5_sequencing_logic}
-                  onChange={(e) => update("q10_5_sequencing_logic", e.target.value)}
-                  placeholder="Describe your preferred sequencing logic (e.g., enablers-first, quick-wins-first, risk-adjusted)..."
-                  className={cn(
-                    "w-full rounded-lg border text-sm placeholder:text-[#ecfdf5]/30",
-                    "bg-[#022c22]/60 border-[#C9A84C]/20 text-[#ecfdf5]",
-                    "focus:outline-none focus:border-[#C9A84C] resize-y"
-                  )}
-                />
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-[#ecfdf5] mb-2 block">
-                  What is the primary risk mitigation mechanism for your preferred sequence?
-                </Label>
-                <Textarea
-                  rows={3}
-                  value={data.q10_6_risk_mitigation}
-                  onChange={(e) => update("q10_6_risk_mitigation", e.target.value)}
-                  placeholder="Describe the key risk and how to mitigate it..."
-                  className={cn(
-                    "w-full rounded-lg border text-sm placeholder:text-[#ecfdf5]/30",
-                    "bg-[#022c22]/60 border-[#C9A84C]/20 text-[#ecfdf5]",
-                    "focus:outline-none focus:border-[#C9A84C] resize-y"
-                  )}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* ── Block 4: Outcomes Achievable ── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold text-[#E5C560] flex items-center gap-2">
-              <Target className="w-5 h-5 text-[#C9A84C]" />
-              Outcomes Assessment
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <LikertScale
-              name="q10_7_outcomes_achievable"
-              label="How achievable are the IEDS 2035 outcomes (₱550B GRDP, 20,000+ jobs, &lt;20% poverty) with the proposed 3-phase plan?"
-              value={data.q10_7_outcomes_achievable}
-              onChange={(v) => update("q10_7_outcomes_achievable", v)}
+      {/* ═══════════════════════════════════════════ VIDEO: STRATEGIC OPTIONS */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Strategic Options & Path to Growth
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg aspect-video">
+            <iframe
+              src="https://www.youtube.com/embed/kb_snh8mo1k"
+              title="Strategic Options & Path to Growth"
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
             />
-          </CardContent>
-        </Card>
-      </motion.div>
+          </div>
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+            Discover the strategic choices shaping Bangsamoro's Investment Roadmap 2026–2035.
+            This video shows how well-crafted strategies and priorities can fuel inclusive growth,
+            sustainability, and regional competitiveness in BARMM.
+          </p>
+        </CardContent>
+      </Card>
 
-      {/* ── Block 5: Systems Thinking Deep-Dive ── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold text-[#E5C560] flex items-center gap-2">
-              <Zap className="w-5 h-5 text-[#C9A84C]" />
-              Systems Thinking Validation
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <LikertScale
-                name="q10_leverage_points_clarity"
-                label="How clearly do the identified leverage points (BIFOSS, BHB, BIF-Net) stand out as high-impact, low-effort interventions?"
-                value={data.q10_leverage_points_clarity}
-                onChange={(v) => update("q10_leverage_points_clarity", v)}
-              />
-              <LikertScale
-                name="q10_activating_leverage"
-                label="How confident are you that activating these leverage points will produce disproportionate results across the ecosystem?"
-                value={data.q10_activating_leverage}
-                onChange={(v) => update("q10_activating_leverage", v)}
-              />
-              <LikertScale
-                name="q10_capacity_traps"
-                label="How well does the plan identify and address capacity traps (institutional bottlenecks that stall progress)?"
-                value={data.q10_capacity_traps}
-                onChange={(v) => update("q10_capacity_traps", v)}
-              />
-              <LikertScale
-                name="q10_iceberg_model"
-                label="How useful is the Iceberg Model for distinguishing symptoms from root causes in BARMM's investment challenges?"
-                value={data.q10_iceberg_model}
-                onChange={(v) => update("q10_iceberg_model", v)}
-              />
-            </div>
-            <div className="pt-4 border-t border-[#C9A84C]/10">
-              <LikertScale
-                name="q10_collaborative_governance"
-                label="How essential is collaborative governance (BIF-Net, multi-stakeholder coordination) for IEDS success?"
-                value={data.q10_collaborative_governance}
-                onChange={(v) => update("q10_collaborative_governance", v)}
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+      {/* ═══════════════════════════════════════════ LEVERAGE POINTS: HOW TO IDENTIFY */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            How to Identify Leverage Points
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/How%20to%20Identify%20Leverage%20Points.png"
+              alt="How to Identify Leverage Points"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+            Three-step process using Donella Meadows' Hierarchy of System Change (L1–L12):
+            <br />
+            <strong>1. Diagnostic Synthesis</strong> – identifying recurring patterns and limiting factors.
+            <br />
+            <strong>2. Mapping the Loops</strong> – visualizing reinforcing (R) and balancing (B) feedback loops.
+            <br />
+            <strong>3. Tiered Selection</strong> – categorizing interventions as Transformative (L1–L3),
+            Systemic (L4–L6), or Incremental (L10–L12).
+          </p>
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How clear is this methodology for identifying leverage points? (1-5)
+            </Label>
+            {renderScale("q10_leverage_points_clarity")}
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* ── Block 6: Strategic Ranking ── */}
-      <motion.div variants={cardVariants}>
-        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold text-[#E5C560] flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-[#C9A84C]" />
-              Strategic Ranking
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-[#ecfdf5]/70 leading-relaxed">
-              Based on your evaluation above, what is the optimal sequencing of
-              strategic pathways for BARMM?
-            </p>
-            <div className="grid grid-cols-1 gap-2">
-              {STRATEGIC_RANKINGS.map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => update("q10_strategic_ranking", opt)}
-                  className={cn(
-                    "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
-                    data.q10_strategic_ranking === opt ? activeBtn : inactiveBtn
-                  )}
-                >
-                  <div className={cn(
-                    "w-3.5 h-3.5 rounded-full border flex-shrink-0",
-                    data.q10_strategic_ranking === opt ? "bg-[#C9A84C] border-[#C9A84C]" : "border-[#C9A84C]/40"
-                  )} />
-                  {opt}
-                </button>
-              ))}
-            </div>
-            {data.q10_strategic_ranking === "Other (please specify)" && (
-              <input
-                type="text"
-                placeholder="Please specify your preferred sequencing..."
+      {/* ═══════════════════════════════════════════ ACTIVATING LEVERAGE POINTS */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Activating Strategic Leverage Points
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/Activating%20Leverage%20Points.png"
+              alt="Activating Leverage Points"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+            Three tiers of interventions to dismantle structural constraints:
+            <br />
+            <strong>L3 (Goals & Operating System):</strong> Link political legitimacy to investment climate.
+            <br />
+            <strong>L5 (Rules & Incentives):</strong> Align investment incentives with institutional capacity.
+            <br />
+            <strong>L6 (Information Flows):</strong> Deploy digital traceability for halal supply chains.
+          </p>
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How effective will these leverage points be in accelerating BARMM's growth? (1-5)
+            </Label>
+            {renderScale("q10_activating_leverage")}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ LEVERAGE POINTS IN CAPACITY TRAPS */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Leverage Points for Capacity Traps
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Leverage%20Points%20for%20Capacity%20Traps.png"
+              alt="Leverage Points for Capacity Traps"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+            <strong>Prescription: Front-Loading the Ecosystem Enablers</strong> — Leverage Point L10
+            (Stock-Flow Structure) expands system capacity ahead of market demand to break the
+            Limits to Growth and Growth and Underinvestment archetypes.
+          </p>
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How critical is front-loading enablers before scaling production? (1-5)
+            </Label>
+            {renderScale("q10_capacity_traps")}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ══════════════════════════════════════════ ICEBERG MODEL */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            The Iceberg Model: Systems Thinking Paradigm
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Iceberg%20Model%20Paradigm.png"
+              alt="Iceberg Model Paradigm"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+            Three layers of the system:
+            <br />
+            <strong>Events (Top 10%):</strong> Visible outcomes like investment approvals.
+            <br />
+            <strong>Structures (Body 40%):</strong> Systemic traps like fragmented plans.
+            <br />
+            <strong>Mental Models (Base 50%):</strong> Deep-rooted beliefs shaping policy behavior.
+          </p>
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How important is addressing mental models and structures vs. just events? (1-5)
+            </Label>
+            {renderScale("q10_iceberg_model")}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ══════════════════════════════════════════ COLLABORATIVE GOVERNANCE */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Architecting Collaborative Governance
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Leverage%20Points%20in%20Governance.png"
+              alt="Leverage Points in Governance"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+            Transition from disconnected, clashing nodes to a unified, synchronized network through:
+            <br />
+            <strong>L1 (Paradigm):</strong> Shift from Power Over to Power With.
+            <br />
+            <strong>L2 (Mindset):</strong> Institutionalize inter-provincial development compacts.
+            <br />
+            <strong>L5 (Rules):</strong> Establish transparent, formula-based resource allocation.
+          </p>
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How transformative will collaborative governance be for BARMM? (1-5)
+            </Label>
+            {renderScale("q10_collaborative_governance")}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ ARCHETYPES & LEVERAGE POINTS */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            6 Archetypes and Leverage Points
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Archetypes%20&%20Leverage%20Points.png"
+              alt="Archetypes and Leverage Points"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ FOUR STRATEGIC OPTIONS */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Four Strategic Options
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/Strategic%20Options.png"
+              alt="Strategic Options"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+            Four distinct pathways to scale regional value creation:
+            <br />
+            <strong>1. HEDS:</strong> Halal Economy Dominance — leverage cultural authenticity.
+            <br />
+            <strong>2. GEMS:</strong> Green Economy Monetization — convert environmental assets.
+            <br />
+            <strong>3. IFES:</strong> Infrastructure-First Enabling — remove energy and logistics constraints.
+            <br />
+            <strong>4. IEDS:</strong> Integrated Ecosystem Development — synchronize all three strategies.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ STRATEGIC OPTIONS RANKING */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Strategic Options Ranking and Scoring Matrix
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/3.%20Strategic%20Options%20Ranking.png"
+              alt="Strategic Options Ranking"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+            Comparative evaluation across seven weighted criteria: Economic Impact (25%),
+            Systems Leverage (15%), Identity Alignment (15%), Inclusivity (10%),
+            Sustainability (5%), Feasibility (20%), and Risk-Return (10%).
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+            {strategicOptions.map((opt) => (
+              <Button
+                key={opt.code}
+                type="button"
+                variant="outline"
                 className={cn(
-                  "w-full px-3 py-2 rounded-lg border text-sm placeholder:text-[#ecfdf5]/30",
-                  "bg-[#022c22]/60 border-[#C9A84C]/20 text-[#ecfdf5]",
-                  "focus:outline-none focus:border-[#C9A84C]"
+                  "justify-start h-auto py-3 text-left",
+                  opt.highlight
+                    ? "bg-[#1B4D3E] text-white border-[#1B4D3E] dark:bg-[#1B4D3E] dark:text-white"
+                    : data.q10_strategic_ranking === opt.code
+                    ? "bg-[#C9A84C] text-white border-[#C9A84C]"
+                    : inactiveBtnClass
                 )}
-              />
-            )}
-          </CardContent>
-        </Card>
-      </motion.div>
-    </motion.div>
+                onClick={() => update("q10_strategic_ranking", opt.code)}
+              >
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant={opt.highlight ? "default" : "outline"}
+                      className="text-xs"
+                    >
+                      {opt.code}
+                    </Badge>
+                    {opt.highlight && <CheckCircle2 className="w-4 h-4" />}
+                  </div>
+                  <p className="text-sm font-semibold mt-1">{opt.name}</p>
+                  <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mt-1">
+                    Score: {opt.score} | GRDP: {opt.grdp}
+                  </p>
+                </div>
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ IEDS EXECUTION ENGINE */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            The Execution Engine: Integrated Ecosystem Development Strategy
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
+            <img
+              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/The%20Execution%20Engine%20-IEDS.png"
+              alt="The Execution Engine - IEDS"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+            Three golden phases flowing forward:
+            <br />
+            <strong>Phase 1 (2026–2028): Activate Enablers & Governance</strong> — build enabling infrastructure.
+            <br />
+            <strong>Phase 2 (2029–2032): Scale Transformers</strong> — activate Bangsamoro Halal Park.
+            <br />
+            <strong>Phase 3 (2033–2035): Consolidate Connectors</strong> — distribute wealth through BIMP-EAGA corridors.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ IEDS PREFERENCE */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            IEDS Strategy Preference
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+            Given the evaluation scores, do you agree that IEDS is the optimal strategy for BARMM?
+          </Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {["Yes", "Partially agree", "Need more evidence", "Prefer a different option"].map((opt) => (
+              <Button
+                key={opt}
+                type="button"
+                variant="outline"
+                className={cn(
+                  "justify-start h-auto py-3 text-sm text-left",
+                  data.q10_1_ieds_preference === opt ? activeBtnClass : inactiveBtnClass
+                )}
+                onClick={() => update("q10_1_ieds_preference", opt)}
+              >
+                {opt}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ SEQUENCE PRIORITIES */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Three-Phase Implementation Priorities
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
+              Rate the priority of Sequence A investments (2026-2028: Enablers & Governance)
+            </Label>
+            {renderScale("q10_2_sequence_a_priority")}
+            <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">1 = Low priority, 5 = Critical priority</p>
+          </div>
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
+              Rate the priority of Sequence B investments (2029-2032: Transformers)
+            </Label>
+            {renderScale("q10_3_sequence_b_priority")}
+          </div>
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
+              Rate the priority of Sequence C investments (2033-2035: Connectors)
+            </Label>
+            {renderScale("q10_4_sequence_c_priority")}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ══════════════════════════════════════════ SEQUENCING LOGIC */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Sequencing Logic Validation
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+            Do you agree with this sequencing logic (Enablers → Transformers → Connectors)?
+          </Label>
+          <div className="grid grid-cols-2 gap-3">
+            {["Strongly agree", "Agree", "Neutral", "Disagree"].map((opt) => (
+              <Button
+                key={opt}
+                type="button"
+                variant="outline"
+                className={cn(
+                  "justify-start h-auto py-3 text-sm text-left",
+                  data.q10_5_sequencing_logic === opt ? activeBtnClass : inactiveBtnClass
+                )}
+                onClick={() => update("q10_5_sequencing_logic", opt)}
+              >
+                {opt}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ RISK MITIGATION */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Risk Mitigation
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+            Which risk mitigation measure is most critical for IEDS success?
+          </Label>
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              "Bangsamoro Investment Command Center",
+              "Trigger-based budgeting",
+              "ODA climate finance for green sequencing",
+              "20% contingency reserve",
+            ].map((opt) => (
+              <Button
+                key={opt}
+                type="button"
+                variant="outline"
+                className={cn(
+                  "justify-start h-auto py-3 text-sm text-left",
+                  data.q10_6_risk_mitigation === opt ? activeBtnClass : inactiveBtnClass
+                )}
+                onClick={() => update("q10_6_risk_mitigation", opt)}
+              >
+                {opt}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ═══════════════════════════════════════════ OUTCOMES ACHIEVABLE */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Expected 2035 Outcomes
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+            How achievable are the IEDS 2035 targets (₱550B+ GRDP, {'<'}20% poverty, 100% electrification)?
+          </Label>
+          {renderScale("q10_7_outcomes_achievable")}
+          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mt-2">1 = Unrealistic, 5 = Very achievable</p>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

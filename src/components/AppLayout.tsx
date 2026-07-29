@@ -1,5 +1,17 @@
 // src/components/AppLayout.tsx
 // BIRD 2026–2035 · Main Application Layout Shell
+//
+// Built from the version you uploaded, with the header/nav visual design,
+// Sheet-based ContextPanel trigger, and mobile nav dropdown all kept intact.
+// Three changes from that file, explained where they happen below:
+//   1. Renders {children} instead of hardcoding <SurveyWizard/> — required
+//      because App.tsx wraps EVERY route (Index, /dashboard, /validation-survey)
+//      in this one shared AppLayout. Hardcoding SurveyWizard here means the
+//      Dashboard route would render the survey instead of the dashboard.
+//   2. FloatingAIAssistant restored alongside PlatformBadge (present in an
+//      earlier version, missing from the one you uploaded).
+//   3. Nav items wired to real destinations — see NAV_LINKS and the Sign In
+//      button notes below.
 
 import React, { useState, useMemo, useCallback, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -13,14 +25,40 @@ import { Toggle } from '@/components/ui/toggle';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 
-import { LogIn, LogOut, Menu, X, Sun, Moon, BookOpen } from 'lucide-react';
+import {
+  LogIn, LogOut, Menu, X, Sun, Moon, BookOpen
+} from 'lucide-react';
 
+// ─── CORE COMPONENTS ────────────────────────────────────────────────────────────
+// SurveyWizard is NOT imported here anymore — see header comment. ContextPanel
+// and FloatingAIAssistant are layout chrome (they belong on every route), so
+// they stay.
 import ContextPanel from './strategic/ContextPanel';
 import FloatingAIAssistant from './strategic/FloatingAIAssistant';
 
+// ─── LAZY LOADED MODALS ─────────────────────────────────────────────────────────
 const AuthModal = lazy(() => import('./auth/AuthModal').then((m) => ({ default: m.AuthModal })));
 const UserProfileModal = lazy(() => import('./auth/UserProfileModal').then((m) => ({ default: m.UserProfileModal })));
 
+// ─── NAVIGATION ─────────────────────────────────────────────────────────────────
+// Each link now carries a `kind` so it's rendered correctly instead of every
+// item being an identical <a target="_blank"> regardless of where it
+// actually points:
+//   - "step"     → internal survey deep-link. SurveyWizard has no URL-based
+//                  routing for its 16 internal steps (step is local state,
+//                  not reflected in the path), so the only way to tell it
+//                  "jump to Section 0" from outside is the gotoStep router
+//                  state read by the new useEffect in SurveyWizard.tsx.
+//                  Clicking this always navigates to "/" first (where Index
+//                  renders SurveyWizard), then requests the step.
+//   - "internal" → a real SPA route (react-router), navigated in-app with no
+//                  full page reload.
+//   - "external" → a genuinely different, separately-hosted site
+//                  (bird-resources.asilvainnovations.com) — a normal new-tab
+//                  link is correct here, not a routing bug.
+//   - "static"   → a real static HTML file this app serves from /public
+//                  (privacy-policy.html), not an SPA route — a plain anchor
+//                  causing a real navigation is correct here too.
 type NavLink =
   | { label: string; kind: 'step'; step: number }
   | { label: string; kind: 'internal'; href: string }
@@ -34,11 +72,17 @@ const NAV_LINKS: NavLink[] = [
   { label: 'Privacy', kind: 'static', href: '/privacy-policy.html' },
 ];
 
+// ─── MAIN LAYOUT ────────────────────────────────────────────────────────────────
 interface AppLayoutProps {
   children?: React.ReactNode;
 }
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
+  // useAuthContext(), not useAuth() directly: App.tsx wraps this whole tree
+  // in <AuthProvider>, which already calls useAuth() once and owns the single
+  // supabase.auth.onAuthStateChange subscription. Calling useAuth() again
+  // here would open a second, independent subscription instead of reading
+  // the shared one.
   const { user, profile, isAuthenticated, isLoading: authLoading, signOut } = useAuthContext();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
@@ -64,6 +108,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     setShowProfileModal(false);
   }, [signOut]);
 
+  // Handles all four NavLink kinds. Passed to both the desktop nav and the
+  // mobile dropdown so the routing logic exists in exactly one place.
   const handleNavClick = useCallback((link: NavLink, e: React.MouseEvent) => {
     if (link.kind === 'step') {
       e.preventDefault();
@@ -74,12 +120,15 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       navigate(link.href);
       setMobileNavOpen(false);
     }
+    // 'external' and 'static' fall through to the anchor's native href/target
+    // behavior — no preventDefault, nothing to intercept.
   }, [navigate]);
 
   const navHref = (link: NavLink) => (link.kind === 'step' ? '/' : link.href);
   const navExternalProps = (link: NavLink) =>
     link.kind === 'external' ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 
+  // ── Full-screen loader while auth session initializes ──
   if (authLoading) {
     return (
       <div className="min-h-screen bg-[#011a12] flex flex-col items-center justify-center p-6">
@@ -100,6 +149,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       {/* ── Header ── */}
       <header className="sticky top-0 z-40 border-b border-[#C9A84C]/15 bg-[#022c22]/85 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+
+          {/* Logo */}
           <a href={BIRD_SITES.home.url} className="flex items-center gap-3 min-w-0">
             <StratLogo size="sm" variant="icon" />
             <div className="min-w-0">
@@ -112,7 +163,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <div className="hidden md:flex items-center gap-4">
             <nav className="flex items-center gap-1">
               {NAV_LINKS.map((l) => (
-                <a
+                
                   key={l.label}
                   href={navHref(l)}
                   {...navExternalProps(l)}
@@ -127,6 +178,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             <div className="h-6 w-px bg-[#C9A84C]/20" />
 
             <div className="flex items-center gap-2">
+              {/* Theme Toggle */}
               <Toggle
                 pressed={theme === 'dark'}
                 onPressedChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -136,6 +188,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 {theme === 'dark' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
               </Toggle>
 
+              {/* Context Panel Trigger */}
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className="text-[#ecfdf5]/60 hover:text-[#C9A84C] hover:bg-white/5">
@@ -147,6 +200,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 </SheetContent>
               </Sheet>
 
+              {/* Auth State — Sign In already correctly opens AuthModal via
+                  showAuthModal state; kept exactly as in the uploaded file. */}
               {isAuthenticated ? (
                 <div className="flex items-center gap-2">
                   <button
@@ -204,7 +259,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         {mobileNavOpen && (
           <nav className="md:hidden border-t border-white/5 px-4 py-2 flex flex-col bg-[#022c22]/95">
             {NAV_LINKS.map((l) => (
-              <a
+              
                 key={l.label}
                 href={navHref(l)}
                 {...navExternalProps(l)}
@@ -235,7 +290,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         )}
       </header>
 
-      {/* ── Page Content ── */}
+      {/* ── Page Content — renders whatever route was actually matched ── */}
       <main className="flex-1">
         {children}
       </main>
@@ -254,12 +309,19 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </div>
       </footer>
 
+      {/* ── Floating Elements — both restored: PlatformBadge was already
+          here, FloatingAIAssistant was missing from the uploaded file. ── */}
       <PlatformBadge />
       <FloatingAIAssistant plan={null} activeView="survey" compact={true} />
 
+      {/* ── Auth Modals ── */}
       <Suspense fallback={null}>
-        {showAuthModal && <AuthModal isOpen onClose={() => setShowAuthModal(false)} />}
-        {showProfileModal && <UserProfileModal isOpen onClose={() => setShowProfileModal(false)} />}
+        {showAuthModal && (
+          <AuthModal isOpen onClose={() => setShowAuthModal(false)} />
+        )}
+        {showProfileModal && (
+          <UserProfileModal isOpen onClose={() => setShowProfileModal(false)} />
+        )}
       </Suspense>
     </div>
   );
