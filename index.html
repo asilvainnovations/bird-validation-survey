@@ -1,45 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2CNG7D15Q7"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-2CNG7D15Q7');
+    </script>
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BIRD 2026-2035 Validation Survey | Bangsamoro Investment Roadmap</title>
 
-    <title>BIRD 2026–2035 Validation Survey | Bangsamoro Investment Roadmap</title>
-
+    <!-- Meta Description (max 160 chars for SEO) -->
     <meta
       name="description"
-      content="Official 16-section stakeholder validation survey for the Bangsamoro Investment Roadmap Development (BIRD) 2026–2035. Built by ASilva Innovations for BOI-MTIT, BARMM."
+      content="Official stakeholder validation survey for the Bangsamoro Investment Roadmap Development (BIRD) 2026-2035. 16 sections covering the BEIE framework, strategic pillars, KPIs, and priority actions. BOI-MTIT, BARMM."
     />
-    <meta
-      name="keywords"
-      content="BIRD 2026-2035, Bangsamoro Investment Roadmap, BARMM, BOI-MTIT, validation survey, stakeholder survey, BEIE framework, Bangsamoro"
-    />
-    <meta name="author" content="ASilva Innovations for BOI-MTIT, BARMM" />
-    <meta name="theme-color" content="#0A1628" />
+    <meta name="keywords" content="BARMM, Bangsamoro, investment roadmap, BIRD, validation survey, stakeholder consultation, halal, BIMP-EAGA, BOI-MTIT, MTIT, Philippines, Mindanao" />
+    <meta name="author" content="BOI-MTIT, BARMM" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
 
-    <!-- Canonical URL — substituted at build time from VITE_CANONICAL_DOMAIN -->
+    <!-- Canonical URL -->
     <link rel="canonical" href="%VITE_CANONICAL_DOMAIN%" />
 
     <!-- Favicon (MTIT official logo) -->
     <link rel="icon" type="image/png" href="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/MTIT%20Logo.png" />
     <link rel="apple-touch-icon" href="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/MTIT%20Logo.png" />
+    <link rel="manifest" href="/manifest.json" />
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="BIRD 2026–2035 Validation Survey" />
-    <meta
-      property="og:title"
-      content="BIRD 2026–2035 Validation Survey | Bangsamoro Investment Roadmap"
-    />
+    <!-- Preconnect for faster CDN asset loading -->
+    <link rel="preconnect" href="https://lydsisparsmvextskevw.supabase.co" crossorigin />
+
+    <!-- Open Graph (Facebook, LinkedIn, etc.) -->
+    <meta property="og:title" content="BIRD 2026-2035 Validation Survey" />
     <meta
       property="og:description"
-      content="Official 16-section stakeholder validation survey for the Bangsamoro Investment Roadmap Development (BIRD) 2026–2035. Built by ASilva Innovations for BOI-MTIT, BARMM."
+      content="Have your say on the Bangsamoro Investment Roadmap Development 2026-2035. Official 16-section stakeholder validation instrument — BOI-MTIT, BARMM."
     />
-    <meta
-      property="og:image"
-      content="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Validation%20Survey%20Banner.png"
-    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="BIRD 2026-2035 Validation Survey" />
+    <meta property="og:locale" content="en_PH" />
+    <meta property="og:locale:alternate" content="fil_PH" />
+    <meta property="og:image" content="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Validation%20Survey%20Banner.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="BIRD 2026-2035 Validation Survey Banner" />
@@ -47,24 +52,79 @@
 
     <!-- Twitter/X Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="BIRD 2026–2035 Validation Survey | Bangsamoro Investment Roadmap" />
+    <meta name="twitter:site" content="@BOI_MTIT" />
+    <meta name="twitter:creator" content="@BOI_MTIT" />
+    <meta name="twitter:title" content="BIRD 2026-2035 Validation Survey" />
     <meta
       name="twitter:description"
-      content="Official 16-section stakeholder validation survey for the Bangsamoro Investment Roadmap Development (BIRD) 2026–2035."
+      content="Official stakeholder validation survey for the Bangsamoro Investment Roadmap Development 2026-2035 — BOI-MTIT, BARMM."
     />
-    <meta
-      name="twitter:image"
-      content="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Validation%20Survey%20Banner.png"
-    />
+    <meta name="twitter:image" content="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Validation%20Survey%20Banner.png" />
+    <meta name="twitter:image:alt" content="BIRD 2026-2035 Validation Survey" />
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <!-- PWA / Theme -->
+    <meta name="theme-color" content="#022c22" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="BIRD Survey" />
+    <meta name="application-name" content="BIRD Validation Survey" />
+    <meta name="msapplication-TileColor" content="#022c22" />
+
+    <!-- Structured Data (JSON-LD) for Search Engines -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "BIRD 2026-2035 Validation Survey",
+        "description": "Official 16-section stakeholder validation survey for the Bangsamoro Investment Roadmap Development (BIRD) 2026-2035, covering the BEIE framework, strategic pillars, KPIs, and priority actions.",
+        "url": "%VITE_CANONICAL_DOMAIN%/",
+        "applicationCategory": "GovernmentApplication",
+        "operatingSystem": "Any",
+        "author": {
+          "@type": "Organization",
+          "name": "BOI-MTIT, BARMM",
+          "url": "https://www.facebook.com/BOI.MTIT.BARMM"
+        },
+        "creator": {
+          "@type": "Organization",
+          "name": "ASilva Innovations",
+          "url": "https://asilvainnovations.com"
+        },
+        "publisher": {
+          "@type": "GovernmentOrganization",
+          "name": "Ministry of Trade, Investments and Tourism - BARMM",
+          "alternateName": "BOI-MTIT, BARMM"
+        },
+        "inLanguage": "en",
+        "image": "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/1.Banner.png",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "PHP"
+        }
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "GovernmentOrganization",
+        "name": "Ministry of Trade, Investments and Tourism - BARMM",
+        "alternateName": "BOI-MTIT, BARMM",
+        "logo": "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/MTIT%20Logo.png",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Cotabato City",
+          "addressRegion": "Bangsamoro Autonomous Region in Muslim Mindanao",
+          "addressCountry": "PH"
+        },
+        "sameAs": [
+          "https://www.facebook.com/BOI.MTIT.BARMM"
+        ]
+      }
+    </script>
   </head>
+
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
