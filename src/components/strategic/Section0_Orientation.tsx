@@ -1,7 +1,7 @@
 // src/components/strategic/Section0_Orientation.tsx
 // BIRD 2026–2035 · Section 0: Welcome & Orientation
 //
-// SYSTEMS ARCHITECTURE NOTES:
+// SYSTEMS ARCHITECTURE:
 // ┌─────────────────────────────────────────────────────────────────────────────┐
 // │  BLOCK  │  CONTENT                              │  STATE      │  PERSISTED  │
 // ├─────────────────────────────────────────────────────────────────────────────┤
@@ -12,18 +12,9 @@
 // │  E      │  Quick-Start readiness gate           │  s0 prop    │  ✅ Yes     │
 // └─────────────────────────────────────────────────────────────────────────────┘
 //
-// SCHEMA IMPACT:
-//   • survey-schema.ts: q0_2–q0_6 REMOVED (only q0_1_ready remains)
-//   • SurveyWizard.tsx: s0 state simplified to { q0_1_ready: "" }
-//   • handleSubmit payload: only q0_1_ready forwarded
-//
-// PRIMITIVES USED:
-//   • ImageWithFallback  → BIRD banner, CLD diagram, Feedback Loops diagram
-//   • SectionProgress    → Section 0 of 16 indicator
-//   • LikertScale        → Block B practice Q1
-//   • QuizCard           → Blocks C & D practice quizzes
+// SCHEMA IMPACT: Only q0_1_ready is persisted. q0_2–q0_6 removed from schema.
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 
 // ── Primitives ───────────────────────────────────────────────────────────────
@@ -61,6 +52,7 @@ import {
   CheckCircle,
   XCircle,
   HelpCircle,
+  Sparkles,
 } from "lucide-react";
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -100,14 +92,17 @@ const FEATURES = [
 // ═══════════════════════════════════════════════════════════════════════════════
 // BLOCK B — VIDEO + PRACTICE Q1 (Local state only)
 // ═══════════════════════════════════════════════════════════════════════════════
-// Q1: "After watching the video, how valuable do you find systems thinking?"
-// Stored in local component state — NOT forwarded to onChange / NOT persisted.
+const Q1_LABELS: Record<number, string> = {
+  1: "Not valuable",
+  2: "Slightly valuable",
+  3: "Moderately valuable",
+  4: "Very valuable",
+  5: "Extremely valuable",
+};
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // BLOCK C — CLD IMAGE + PRACTICE Q2 (Local state only)
 // ═══════════════════════════════════════════════════════════════════════════════
-// Q2: "'s' polarity = ?" — 4-option MCQ with immediate feedback.
-
 const Q2_OPTIONS = [
   { key: "A", label: "Same direction change", correct: true },
   { key: "B", label: "Opposite direction change", correct: false },
@@ -118,7 +113,6 @@ const Q2_OPTIONS = [
 // ═══════════════════════════════════════════════════════════════════════════════
 // BLOCK D — FEEDBACK LOOPS + PRACTICE Q3+Q4 (Local state only)
 // ═══════════════════════════════════════════════════════════════════════════════
-
 const Q3_OPTIONS = [
   { key: "A", label: "It balances and stabilizes the system", correct: false },
   { key: "B", label: "It amplifies change and drives growth or decline", correct: true },
@@ -137,10 +131,10 @@ const Q4_OPTIONS = [
 // BLOCK E — QUICK-START (The ONLY persisted field)
 // ═══════════════════════════════════════════════════════════════════════════════
 const READINESS_OPTIONS = [
-  { value: "yes_ready", label: "Yes, I feel ready to proceed", icon: <CheckCircle2 className="w-4 h-4" /> },
-  { value: "need_info", label: "I need a bit more orientation", icon: <HelpCircle className="w-4 h-4" /> },
-  { value: "review_later", label: "I will review and return later", icon: <ArrowRight className="w-4 h-4" /> },
-  { value: "not_ready", label: "Not ready at this time", icon: <AlertCircle className="w-4 h-4" /> },
+  { value: "Very ready", label: "Very ready", icon: <Sparkles className="w-4 h-4" /> },
+  { value: "Somewhat ready", label: "Somewhat ready", icon: <CheckCircle2 className="w-4 h-4" /> },
+  { value: "Curious but unsure", label: "Curious but unsure", icon: <HelpCircle className="w-4 h-4" /> },
+  { value: "Just exploring", label: "Just exploring", icon: <BookOpen className="w-4 h-4" /> },
 ] as const;
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -156,19 +150,68 @@ const Section0_Orientation: React.FC<Section0OrientationProps> = ({
   const [practiceQ3, setPracticeQ3] = useState<string | null>(null);
   const [practiceQ4, setPracticeQ4] = useState<string | null>(null);
 
-  const isReady = data.q0_1_ready === "yes_ready";
+  const isReady = data.q0_1_ready === "Very ready";
+  const isSomewhatReady = data.q0_1_ready === "Somewhat ready";
+
+  // ── Sub-progress: which block are we in? ──
+  const currentBlock = useMemo(() => {
+    if (data.q0_1_ready) return 5;
+    if (practiceQ4 !== null) return 4;
+    if (practiceQ3 !== null) return 4;
+    if (practiceQ2 !== null) return 3;
+    if (practiceQ1 !== undefined) return 2;
+    return 1;
+  }, [data.q0_1_ready, practiceQ1, practiceQ2, practiceQ3, practiceQ4]);
+
+  const totalBlocks = 5;
+  const blockLabels = ["A", "B", "C", "D", "E"] as const;
+
+  // Questions answered within current block
+  const questionsInBlock = useMemo(() => {
+    if (currentBlock === 2) return practiceQ1 !== undefined ? 1 : 0;
+    if (currentBlock === 3) return practiceQ2 !== null ? 1 : 0;
+    if (currentBlock === 4) {
+      let count = 0;
+      if (practiceQ3 !== null) count++;
+      if (practiceQ4 !== null) count++;
+      return count;
+    }
+    if (currentBlock === 5) return data.q0_1_ready ? 1 : 0;
+    return 0;
+  }, [currentBlock, practiceQ1, practiceQ2, practiceQ3, practiceQ4, data.q0_1_ready]);
+
+  const totalQuestionsInBlock = useMemo(() => {
+    if (currentBlock === 2) return 1;
+    if (currentBlock === 3) return 1;
+    if (currentBlock === 4) return 2;
+    if (currentBlock === 5) return 1;
+    return 0;
+  }, [currentBlock]);
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto px-4 py-6">
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* BLOCK A — WELCOME                                                  */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* ── Progress Header ── */}
       <SectionProgress
         currentSection={0}
         totalSections={16}
         sectionLabel="Welcome & Orientation"
       />
 
+      {/* ── Sub-Progress Indicator ── */}
+      <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#022c22]/40 border border-[#C9A84C]/10">
+        <span className="text-[11px] text-[#ecfdf5]/40 uppercase tracking-wider">
+          Block {blockLabels[currentBlock - 1]} of {blockLabels[totalBlocks - 1]}
+        </span>
+        {totalQuestionsInBlock > 0 && (
+          <span className="text-[11px] text-[#C9A84C]/70">
+            Question {questionsInBlock} of {totalQuestionsInBlock}
+          </span>
+        )}
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* BLOCK A — WELCOME                                                  */}
+      {/* ═══════════════════════════════════════════════════════════════════ */}
       {/* Hero Banner */}
       <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-2xl">
         <ImageWithFallback
@@ -272,6 +315,7 @@ const Section0_Orientation: React.FC<Section0OrientationProps> = ({
               label="After watching the video, how valuable do you find systems thinking as an approach to strategic planning?"
               value={practiceQ1}
               onChange={setPracticeQ1}
+              labels={Q1_LABELS}
             />
           </div>
         </CardContent>
@@ -537,25 +581,34 @@ const Section0_Orientation: React.FC<Section0OrientationProps> = ({
             <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 animate-in fade-in">
               <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
               <p className="text-xs text-emerald-300/80">
-                Great! You are ready to proceed. Click <strong>Next</strong> to move to Section 1: Privacy & Consent.
+                Excellent! You are ready to proceed. Click <strong>Next</strong> to move to Section 1: Privacy & Consent.
               </p>
             </div>
           )}
 
-          {data.q0_1_ready === "need_info" && (
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-sky-500/10 border border-sky-500/20">
-              <HelpCircle className="w-4 h-4 text-sky-400 shrink-0" />
+          {isSomewhatReady && (
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-sky-500/10 border border-sky-500/20 animate-in fade-in">
+              <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
               <p className="text-xs text-sky-300/80">
-                Take your time reviewing the materials above. When ready, select "Yes, I feel ready to proceed."
+                Good to go! You can always revisit the orientation materials from the navigation menu.
               </p>
             </div>
           )}
 
-          {data.q0_1_ready === "not_ready" && (
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-rose-500/10 border border-rose-500/20">
-              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
-              <p className="text-xs text-rose-300/80">
-                No problem. Your progress is saved locally. You can return anytime using the same device and browser.
+          {data.q0_1_ready === "Curious but unsure" && (
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 animate-in fade-in">
+              <HelpCircle className="w-4 h-4 text-amber-400 shrink-0" />
+              <p className="text-xs text-amber-300/80">
+                That's perfectly fine. The survey is designed to guide you. Feel free to review the materials above before proceeding.
+              </p>
+            </div>
+          )}
+
+          {data.q0_1_ready === "Just exploring" && (
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-[#C9A84C]/10 border border-[#C9A84C]/20 animate-in fade-in">
+              <BookOpen className="w-4 h-4 text-[#C9A84C] shrink-0" />
+              <p className="text-xs text-[#ecfdf5]/70">
+                Welcome, explorer! Your progress is saved locally. You can return anytime using the same device and browser.
               </p>
             </div>
           )}
