@@ -8,6 +8,9 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 // ── Environment ─────────────────────────────────────────────────────────────
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+// FROM_EMAIL is a Supabase secret (Project Settings → Edge Functions →
+// Secrets). Falls back to the BIRD 2026-2035 address if unset.
+const FROM_EMAIL = Deno.env.get("FROM_EMAIL") || "bird2026-2035@asilvainnovations.com";
 // CANONICAL_DOMAIN is set as a Supabase secret (not VITE_-prefixed) so
 // this Edge Function can use it. Falls back to the Bolt host for safety.
 const CANONICAL_DOMAIN =
@@ -61,7 +64,10 @@ async function sendEmail(payload: EmailPayload): Promise<{ id?: string; error?: 
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: payload.from || "BIRD Survey <no-reply@asilvainnovations.com>",
+        // FROM_EMAIL was read above but never actually used here before —
+        // every send silently ignored the configured sender address in
+        // favor of the hardcoded no-reply@asilvainnovations.com fallback.
+        from: payload.from || `BIRD 2026–2035 <${FROM_EMAIL}>`,
         to: payload.to,
         subject: payload.subject,
         html: payload.html,
