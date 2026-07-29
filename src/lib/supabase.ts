@@ -5,18 +5,18 @@
 
 import { createClient } from "@supabase/supabase-js";
 
-// ── Primary Supabase project (auth + data) ────────────────────────────────────
-const supabaseUrl =
-  (import.meta.env.VITE_SUPABASE_URL as string) ||
-  "https://cacimkjpkxflrtgspiay.supabase.co";
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-const supabaseKey =
-  (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || "";
-
-export const supabase = createClient(supabaseUrl, supabaseKey, {
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error(
+    "Missing Supabase environment variables: VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be set."
+  );
+}
+export const supabaseServer = createClient(supabaseUrl, supabaseKey, {
   auth: {
-    autoRefreshToken: true,
-    persistSession: true,
+    autoRefreshToken: false,
+    persistSession: false,
     detectSessionInUrl: true,
   },
 });
@@ -30,6 +30,7 @@ export const EDGE_FUNCTIONS = {
   EMAIL_NOTIFICATIONS:    `${EDGE_BASE}/email-notifications`,
   CRM_DISPATCHER:         `${EDGE_BASE}/crm-dispatcher`,
   SUBMIT_SURVEY:          `${EDGE_BASE}/survey-submit`,
+  SURVEY_ANALYTICS:       `${EDGE_BASE}/survey-analytics`,
 } as const;
 
 // ── Branding Assets (CDN) ─────────────────────────────────────────────────────
@@ -39,20 +40,20 @@ export const BRAND_ASSETS = {
     `${supabaseUrl}/storage/v1/object/public/bird-images/MTIT%20Logo.png`,
   AI_AVATAR_URL:
     (import.meta.env.VITE_AI_STRATEGIST_AVATAR_URL as string) ||
-    "https://appimize.app/assets/apps/user_1097/images/2c7d825bf937_232_1097.png",
+    `${supabaseUrl}/storage/v1/object/public/bird-images/ASilva%20Innovations%20Logo.png`,
   BANNER_URL:
-    (import.meta.env.VITE_BANNER_INVESTMENT_URL as string) ||
-    `${supabaseUrl}/storage/v1/object/public/bird-images/1.Banner.png`,
+    (import.meta.env.VITE_VALIDATION_SURVEY_BANNER_URL as string) ||
+    `${supabaseUrl}/storage/v1/object/public/validation-survey-images/Validation%20Survey%20Banner.png`,
 } as const;
 
 // ── External URLs ──────────────────────────────────────────────────────────────
 export const EXTERNAL_URLS = {
   PWA:
     (import.meta.env.VITE_PWA_EXTERNAL_URL as string) ||
-    "https://bangsamoro-investment-roadmap.asilvainnovations.com",
+    "https://bird-app.asilvainnovations.com",
   USER_MANUAL:
     (import.meta.env.VITE_USER_MANUAL_URL as string) ||
-    "https://bird-user-manual.asilvainnovations.com",
+    "https://user-manual.asilvainnovations.com",
   DEV_DOCS:
     (import.meta.env.VITE_DEVELOPER_DOCS_URL as string) ||
     "https://asilvainnovations.github.io/strat-planner-pwa/developer-doc.html",
