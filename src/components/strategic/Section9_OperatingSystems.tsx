@@ -1,22 +1,43 @@
+// src/components/strategic/Section9_OperatingSystems.tsx
+// BIRD 2026–2035 · Section 9: Operating Systems — Moral Governance, Resilience, Inclusivity & Peace
+//
+// SYSTEMS ARCHITECTURE ALIGNMENT:
+// • Primitives: ImageWithFallback, LikertScale, SectionProgress, SWOTScalePair, ArchetypeCard
+// • Animations: Framer Motion staggered entrance
+// • Accessibility: All scales are true radio groups with keyboard nav
+// • Theme: Dark-first consistent with Sections 0–8
+// • Content: Single-source-of-truth from swot-content.ts (SWOT_BY_SECTION[9], ARCHETYPES_BY_SECTION[9])
+//
+// FIELD COMPATIBILITY: Matches current SurveyWizard.tsx s9 state.
+//   — SWOT fields use q_s9_* prefix (aligned with wizard state)
+//   — Archetype fields: Fixes That Fail → q_s9_investment_loop/_followup
+//                       Escalation → q_s9_governance_loop/_followup
+//                       Big Man → q9_arch_big_man_accuracy/_followup (NEW — add to wizard)
+
 import React from "react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import {
-  ShieldCheck,
-  AlertTriangle,
-  HandCoins,
-  TreePine,
-  Users,
-  Zap,
-  TrendingUp,
-  Target,
-  BookOpen,
-} from "lucide-react";
+
+// ── Primitives ───────────────────────────────────────────────────────────────
+import { ImageWithFallback } from "@/lib/primitives/ImageWithFallback";
+import { SectionProgress } from "@/lib/primitives/SectionProgress";
+import { LikertScale } from "@/lib/primitives/LikertScale";
+import { SWOTScalePair } from "@/lib/primitives/SWOTScalePair";
+import { ArchetypeCard } from "@/lib/primitives/ArchetypeCard";
+
+// ── BIRD Content ─────────────────────────────────────────────────────────────
 import { BIRD_IMAGES } from "@/lib/bird-urls";
+import {
+  ARCHETYPES_BY_SECTION,
+  SWOT_BY_SECTION,
+  ACCURACY_OPTIONS,
+} from "@/lib/swot-content";
+
+// ── shadcn/ui ────────────────────────────────────────────────────────────────
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+// ── Formulas ─────────────────────────────────────────────────────────────────
 import {
   calculateStrengthRI,
   calculateWeaknessRisk,
@@ -24,8 +45,40 @@ import {
   calculateThreatVI,
 } from "@/lib/formulas";
 
-// ── Types (exact runtime contract with SurveyWizard.tsx s9 state) ────────────
+// ── Icons ────────────────────────────────────────────────────────────────────
+import {
+  ShieldCheck,
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
+  Zap,
+  ShieldAlert,
+  BookOpen,
+  TreePine,
+  Users,
+  AlertTriangle,
+  Landmark,
+  Scale,
+  FileText,
+} from "lucide-react";
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TYPES — CONTRACT WITH SURVEYWIZARD.TSX
+// ═══════════════════════════════════════════════════════════════════════════════
 export interface Section9Data {
+  // Banner understanding
+  q9_1_banner_understanding?: number;
+
+  // Archetype — Fixes That Fail
+  q_s9_investment_loop: string;
+  q_s9_investment_loop_followup: string;
+  // Archetype — Escalation
+  q_s9_governance_loop: string;
+  q_s9_governance_loop_followup: string;
+  // Archetype — Big Man (NEW fields — add to SurveyWizard.tsx)
+  q9_arch_big_man_accuracy?: string;
+  q9_arch_big_man_followup?: string;
+
   // SWOT — Strengths
   q_s9_policy_recognition_impact?: number;
   q_s9_policy_recognition_likelihood?: number;
@@ -37,10 +90,10 @@ export interface Section9Data {
   q_s9_peace_dividend_likelihood?: number;
 
   // SWOT — Weaknesses
-  q_s9_literacy_impact?: number;
-  q_s9_literacy_likelihood?: number;
   q_s9_fragmented_policy_impact?: number;
   q_s9_fragmented_policy_likelihood?: number;
+  q_s9_literacy_impact?: number;
+  q_s9_literacy_likelihood?: number;
   q_s9_underspending_impact?: number;
   q_s9_underspending_likelihood?: number;
 
@@ -62,19 +115,13 @@ export interface Section9Data {
   q_s9_fragmented_agency_impact?: number;
   q_s9_fragmented_agency_likelihood?: number;
 
-  // Archetype / CLD fields (mapped per .md spec)
+  // Deep-dive questions
   q9_1_moral_governance_derisk?: number;
   q9_2_critical_loop: string;
   q9_3_regulatory_priority: string;
   q9_4_revenue_channel: string;
   q9_5_stakeholder_alignment: string;
   q9_6_reform_priority: string;
-
-  // Causal loop reflection fields (repurposed for archetype accuracy + followup)
-  q_s9_investment_loop: string;
-  q_s9_investment_loop_followup: string;
-  q_s9_governance_loop: string;
-  q_s9_governance_loop_followup: string;
 }
 
 interface Section9Props {
@@ -82,951 +129,1067 @@ interface Section9Props {
   onChange: (data: Section9Data) => void;
 }
 
-// ── Design tokens ────────────────────────────────────────────────────────────
-const activeBtn =
-  "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90 dark:bg-[#1B4D3E] dark:text-white dark:border-[#1B4D3E]";
-const inactiveBtn =
-  "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10";
-const activeScale =
-  "bg-[#C9A84C] text-white border-[#C9A84C] hover:bg-[#C9A84C]/90";
-const inactiveScale =
-  "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]";
+// ── Animation variants ───────────────────────────────────────────────────────
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 },
+  },
+};
 
-const archetypeOptions = [
-  "Very accurately",
-  "Somewhat accurately",
-  "Needs revision",
-  "Not accurate",
-];
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" },
+  },
+};
 
-const moralGovernanceAspects = [
-  "Transparency",
-  "Accountability",
-  "Efficiency",
-  "Islamic ethics",
-  "Other (please specify)",
-];
-
-const bigManLoops = [
-  "R1: Patronage eroding governance",
-  "R2: Exclusion fueling conflict",
-  "R3: Patronage draining development resources",
-  "Other (please specify)",
-];
+// ── Local SWOT registry fallback (uses q_s9_* fields to match SurveyWizard) ──
+const SECTION9_SWOT = SWOT_BY_SECTION[9] ?? [];
 
 // ═══════════════════════════════════════════════════════════════════════════════
-export const Section9_OperatingSystems: React.FC<Section9Props> = ({
-  data,
-  onChange,
-}) => {
-  const update = <K extends keyof Section9Data>(
-    field: K,
-    value: Section9Data[K]
-  ) => onChange({ ...data, [field]: value });
-
-  const renderScale = (field: keyof Section9Data) => (
-    <div className="flex gap-2 flex-wrap">
-      {[1, 2, 3, 4, 5].map((v) => (
-        <Button
-          key={v}
-          type="button"
-          variant="outline"
-          size="icon"
-          className={cn(
-            "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
-            data[field] === v ? activeScale : inactiveScale
-          )}
-          onClick={() => update(field, v as never)}
-        >
-          {v}
-        </Button>
-      ))}
-    </div>
-  );
-
-  const renderSwotPair = (
-    label: string,
-    desc: string,
-    impactField: keyof Section9Data,
-    likelihoodField: keyof Section9Data,
-    category: "strength" | "weakness" | "opportunity" | "threat"
-  ) => {
-    const impact = data[impactField] as number | undefined;
-    const likelihood = data[likelihoodField] as number | undefined;
-    let score: number | null = null;
-    let scoreLabel = "";
-    let badgeClass = "";
-
-    if (impact && likelihood) {
-      switch (category) {
-        case "strength":
-          score = calculateStrengthRI(impact, likelihood);
-          scoreLabel = "RI";
-          badgeClass = "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300";
-          break;
-        case "weakness":
-          score = calculateWeaknessRisk(impact, likelihood);
-          scoreLabel = "Risk";
-          badgeClass = "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300";
-          break;
-        case "opportunity":
-          score = calculateOpportunityRI(impact, likelihood);
-          scoreLabel = "RI";
-          badgeClass = "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300";
-          break;
-        case "threat":
-          score = calculateThreatVI(impact, likelihood);
-          scoreLabel = "VI";
-          badgeClass = "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
-          break;
-      }
-    }
-
-    return (
-      <div className="space-y-4 p-4 rounded-lg border border-[#C9A84C]/20 bg-emerald-50/40 dark:bg-[#1B4D3E]/10">
-        <div className="flex items-center gap-2">
-          <Target className="w-4 h-4 text-[#C9A84C]" />
-          <p className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5]">
-            {label}
-          </p>
-          {score !== null && (
-            <Badge variant="secondary" className={cn("ml-auto border", badgeClass)}>
-              <TrendingUp className="w-3 h-3 mr-1" />
-              {scoreLabel}: {score.toFixed(2)}
-            </Badge>
-          )}
-        </div>
-        <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/70">{desc}</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <Label className="text-xs font-medium text-[#065f46] dark:text-[#ecfdf5]/70 mb-2 block">
-              Impact (1–5)
-            </Label>
-            <div className="flex gap-2">
-              {[1, 2, 3, 4, 5].map((v) => (
-                <Button
-                  key={v}
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className={cn(
-                    "w-10 h-10 rounded-lg border text-sm font-semibold transition-all",
-                    impact === v
-                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
-                  )}
-                  onClick={() => update(impactField, v as never)}
-                >
-                  {v}
-                </Button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <Label className="text-xs font-medium text-[#065f46] dark:text-[#ecfdf5]/70 mb-2 block">
-              Likelihood (1–5)
-            </Label>
-            <div className="flex gap-2">
-              {[1, 2, 3, 4, 5].map((v) => (
-                <Button
-                  key={v}
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className={cn(
-                    "w-10 h-10 rounded-lg border text-sm font-semibold transition-all",
-                    likelihood === v
-                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
-                  )}
-                  onClick={() => update(likelihoodField, v as never)}
-                >
-                  {v}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+// COMPONENT
+// ═══════════════════════════════════════════════════════════════════════════════
+const Section9_OperatingSystems: React.FC<Section9Props> = ({ data, onChange }) => {
+  const update = <K extends keyof Section9Data>(field: K, value: Section9Data[K]) => {
+    onChange({ ...data, [field]: value });
   };
 
+  const archetypes = ARCHETYPES_BY_SECTION[9] ?? [];
+
+  // ── Compute sub-progress ──
+  const swotItems = SECTION9_SWOT;
+  const filledCount = [
+    data.q9_1_banner_understanding != null,
+    data.q_s9_investment_loop,
+    data.q_s9_investment_loop_followup,
+    data.q_s9_governance_loop,
+    data.q_s9_governance_loop_followup,
+    data.q9_arch_big_man_accuracy,
+    data.q9_arch_big_man_followup,
+    ...swotItems.map((item) => {
+      const impact = data[`${item.field}_impact` as keyof Section9Data] as number | undefined;
+      const likelihood = data[`${item.field}_likelihood` as keyof Section9Data] as number | undefined;
+      return impact != null && likelihood != null;
+    }),
+    data.q9_1_moral_governance_derisk != null,
+    data.q9_2_critical_loop,
+    data.q9_3_regulatory_priority,
+    data.q9_4_revenue_channel,
+    data.q9_5_stakeholder_alignment,
+    data.q9_6_reform_priority,
+  ].filter(Boolean).length;
+  const totalFields = 6 + swotItems.length * 2 + 6;
+
+  // ── Live scores (dynamic from registry) ──
+  const scores: Array<{ label: string; score: number | null; suffix: string; color: string }> = [];
+  swotItems.forEach((item) => {
+    const impact = data[`${item.field}_impact` as keyof Section9Data] as number | undefined;
+    const likelihood = data[`${item.field}_likelihood` as keyof Section9Data] as number | undefined;
+    if (impact == null || likelihood == null) return;
+
+    let score: number | null = null;
+    let suffix = "";
+    let color = "";
+    switch (item.category) {
+      case "S":
+        score = calculateStrengthRI(impact, likelihood);
+        suffix = "RI";
+        color = "text-emerald-400";
+        break;
+      case "W":
+        score = calculateWeaknessRisk(impact, likelihood);
+        suffix = "Risk";
+        color = "text-rose-400";
+        break;
+      case "O":
+        score = calculateOpportunityRI(impact, likelihood);
+        suffix = "RI";
+        color = "text-sky-400";
+        break;
+      case "T":
+        score = calculateThreatVI(impact, likelihood);
+        suffix = "VI";
+        color = "text-amber-400";
+        break;
+    }
+    if (score !== null) {
+      scores.push({ label: item.id, score, suffix, color });
+    }
+  });
+
+  // ── Archetype helpers ──
+  const fixesAgree =
+    data.q_s9_investment_loop === "Very accurately" ||
+    data.q_s9_investment_loop === "Somewhat accurately";
+  const escalationAgree =
+    data.q_s9_governance_loop === "Very accurately" ||
+    data.q_s9_governance_loop === "Somewhat accurately";
+  const bigManAgree =
+    data.q9_arch_big_man_accuracy === "Very accurately" ||
+    data.q9_arch_big_man_accuracy === "Somewhat accurately";
+
+  // ── Big Man loops (for followup) ──
+  const bigManLoops = [
+    "R1: Patronage eroding governance",
+    "R2: Exclusion fueling conflict",
+    "R3: Patronage draining development resources",
+    "Other (please specify)",
+  ];
+
   return (
-    <div className="space-y-8">
-      {/* ── Header ────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 mb-4">
-        <ShieldCheck className="w-6 h-6 text-[#C9A84C]" />
-        <h2 className="text-xl font-bold text-[#022c22] dark:text-[#ecfdf5]">
-          Section 9: Operating Systems — Moral Governance, Resilience, Inclusivity & Peace
-        </h2>
-      </div>
-      <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 -mt-2 max-w-3xl">
-        Moral Governance serves as the central operating system of the Bangsamoro ecosystem —
-        ensuring justice, transparency, accountability, and Islamic ethics (khalifa stewardship).
-        Peace provides stability, Resilience enables climate-smart planning, and Inclusivity
-        broadens participation.
-      </p>
+    <motion.div
+      className="space-y-8 max-w-4xl mx-auto px-4 py-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {/* ── Progress Header ── */}
+      <SectionProgress
+        currentSection={9}
+        totalSections={16}
+        sectionLabel="Operating Systems"
+      />
 
-      {/* ── 1. Operating Systems Banner ──────────────────────────── */}
-      <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
-        <img
-          src={BIRD_IMAGES.operatingSystemsOS.url}
-          alt={BIRD_IMAGES.operatingSystemsOS.alt}
-          className="w-full h-auto max-h-[500px] object-contain transition-transform duration-500 group-hover:scale-[1.02]"
-          loading="lazy"
-        />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
-          <p className="text-xs italic text-white/70">
-            {BIRD_IMAGES.operatingSystemsOS.description}
-          </p>
+      {/* ── Sub-progress ── */}
+      <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#022c22]/40 border border-[#C9A84C]/10">
+        <span className="text-[11px] text-[#ecfdf5]/40 uppercase tracking-wider">
+          Section completion
+        </span>
+        <span className="text-[11px] text-[#C9A84C]/70">
+          {filledCount}/{totalFields} fields
+        </span>
+      </div>
+
+      {/* ── Header ── */}
+      <motion.div variants={cardVariants} className="space-y-2">
+        <div className="flex items-center gap-3">
+          <ShieldCheck className="w-6 h-6 text-[#C9A84C]" />
+          <h2 className="text-xl font-bold text-[#ecfdf5]">
+            Section 9: Operating Systems
+          </h2>
         </div>
-      </div>
+        <p className="text-sm text-[#ecfdf5]/70">
+          Moral Governance, Resilience, Inclusivity & Peace — the central operating system of the Bangsamoro ecosystem
+        </p>
+      </motion.div>
 
-      {/* ── 2. Three Foundational Pillars ──────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
-            The Operating Systems
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-lg bg-emerald-50/60 dark:bg-[#1B4D3E]/20 border border-emerald-200 dark:border-emerald-800/30">
-              <div className="flex items-center gap-2 mb-2">
-                <ShieldCheck className="w-5 h-5 text-emerald-700 dark:text-emerald-400" />
-                <h4 className="text-sm font-bold text-[#022c22] dark:text-[#ecfdf5]">Peace</h4>
-              </div>
-              <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/70">
-                Provides long-term stability for investment and community trust.
-              </p>
-            </div>
-            <div className="p-4 rounded-lg bg-amber-50/60 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/30">
-              <div className="flex items-center gap-2 mb-2">
-                <TreePine className="w-5 h-5 text-amber-700 dark:text-amber-400" />
-                <h4 className="text-sm font-bold text-[#022c22] dark:text-[#ecfdf5]">Resilience</h4>
-              </div>
-              <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/70">
-                Promotes adaptive, climate-smart planning to withstand external shocks.
-              </p>
-            </div>
-            <div className="p-4 rounded-lg bg-sky-50/60 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800/30">
-              <div className="flex items-center gap-2 mb-2">
-                <Users className="w-5 h-5 text-sky-700 dark:text-sky-400" />
-                <h4 className="text-sm font-bold text-[#022c22] dark:text-[#ecfdf5]">Inclusivity</h4>
-              </div>
-              <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/70">
-                Broadens participation so marginalized communities share in value creation.
-              </p>
-            </div>
+      {/* ── Banner Image ── */}
+      <motion.div variants={cardVariants}>
+        <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-2xl">
+          <ImageWithFallback
+            src={BIRD_IMAGES.operatingSystemsOS.url}
+            alt={BIRD_IMAGES.operatingSystemsOS.alt}
+            className="w-full h-56 sm:h-72"
+            imgClassName="object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 p-4">
+            <p className="text-xs text-[#ecfdf5]/70 italic">
+              {BIRD_IMAGES.operatingSystemsOS.title}
+            </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </motion.div>
 
-      {/* ── 3. Moral Governance De-Risks Capital (CLD) ───────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2 text-[#022c22] dark:text-[#ecfdf5]">
-            <BookOpen className="w-5 h-5 text-[#C9A84C]" />
-            Causal Loop: Moral Governance De-Risks Capital
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src={BIRD_IMAGES.moralGovernanceDeRisks.url}
-              alt={BIRD_IMAGES.moralGovernanceDeRisks.alt}
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
-          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90 leading-relaxed">
-            This reinforcing feedback loop demonstrates how moral governance reduces investment risk.
-            When government implements transparent systems (like BIFOSS), it lowers bureaucratic friction
-            and makes it easier for investors to do business. This efficiency raises investor confidence,
-            leading to increased foreign direct investment. More FDI boosts regional revenue, which enables
-            stronger governance capacity, creating a self-reinforcing system of growth and stability.
-          </p>
-
-          <div className="space-y-3">
-            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
-              On a scale of 1-5, how effective is moral governance at de-risking capital investment in BARMM compared to traditional governance approaches?
-            </Label>
-            {renderScale("q9_1_moral_governance_derisk")}
-            <div className="flex justify-between max-w-[272px]">
-              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">1 (Not effective)</span>
-              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">5 (Very effective)</span>
-            </div>
-          </div>
-
-          <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20">
-            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
-              Which aspect of moral governance most reduces investment risk?
-            </Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {moralGovernanceAspects.map((opt) => (
-                <Button
-                  key={opt}
-                  type="button"
-                  variant="outline"
-                  className={cn(
-                    "justify-start h-auto py-3 text-sm text-left",
-                    data.q9_2_critical_loop === opt ? activeBtn : inactiveBtn
-                  )}
-                  onClick={() => update("q9_2_critical_loop", opt)}
-                >
-                  {opt}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* ── 4. Regulatory Architecture ─────────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
-            Regulatory Architecture Securing Capital
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src={BIRD_IMAGES.regulatoryArchitecture.url}
-              alt={BIRD_IMAGES.regulatoryArchitecture.alt}
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
-          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
-            At its core is the Bangsamoro Organic Law (RA 11054) — the constitutional mandate
-            for economic self-determination — supported by five pillars: 2nd BDP & SIPP,
-            BHIDP, BSEMP, RA 11439 & CREATE MORE Act, and Pending Forestry Code.
-          </p>
-          <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20">
-            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
-              Which regulatory pillar should be the highest priority for strengthening investment security?
-            </Label>
-            <div className="grid grid-cols-1 gap-3">
+      {/* ── Cluster Description ── */}
+      <motion.div variants={cardVariants}>
+        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold text-[#E5C560]">
+              The Operating Systems
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-[#ecfdf5]/80 leading-relaxed">
+              Moral Governance serves as the central operating system of the Bangsamoro ecosystem — ensuring
+              justice, transparency, accountability, and Islamic ethics (khalifa stewardship). Peace provides
+              stability, Resilience enables climate-smart planning, and Inclusivity broadens participation.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {[
-                "Bangsamoro Organic Law (RA 11054) enforcement",
-                "2nd BDP & SIPP alignment",
-                "BHIDP implementation",
-                "BSEMP (Bangsamoro Spatial & Environmental Master Plan)",
-                "RA 11439 Islamic Finance & CREATE MORE Act",
-                "Pending Bangsamoro Forestry Code",
-              ].map((opt) => (
-                <Button
-                  key={opt}
-                  type="button"
-                  variant="outline"
-                  className={cn(
-                    "justify-start h-auto py-3 text-sm text-left",
-                    data.q9_3_regulatory_priority === opt ? activeBtn : inactiveBtn
-                  )}
-                  onClick={() => update("q9_3_regulatory_priority", opt)}
+                { icon: <ShieldCheck className="w-4 h-4" />, title: "Peace", desc: "Long-term stability for investment and community trust." },
+                { icon: <TreePine className="w-4 h-4" />, title: "Resilience", desc: "Adaptive, climate-smart planning to withstand external shocks." },
+                { icon: <Users className="w-4 h-4" />, title: "Inclusivity", desc: "Broadened participation so marginalized communities share in value creation." },
+              ].map((item) => (
+                <div
+                  key={item.title}
+                  className="p-3 rounded-xl bg-[#022c22]/60 border border-[#C9A84C]/10"
                 >
-                  {opt}
-                </Button>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[#C9A84C]">{item.icon}</span>
+                    <span className="text-xs font-bold text-[#ecfdf5]">{item.title}</span>
+                  </div>
+                  <p className="text-[11px] text-[#ecfdf5]/50 leading-relaxed">{item.desc}</p>
+                </div>
               ))}
             </div>
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* ── 5. Draft JMC 2026-01 ─────────────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
-            Draft Joint Memorandum Circular 2026-01
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src={BIRD_IMAGES.draftJMC.url}
-              alt={BIRD_IMAGES.draftJMC.alt}
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
-          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
-            Transforms conservation into municipal revenue streams through three flowing channels:
-            Carbon Credits, Payment for Ecosystem Services (PES), and Eco-Tourism User Fees —
-            merging into a Revenue River that feeds Local Government Units.
-          </p>
-          <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20">
-            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
-              Which revenue channel from JMC 2026-01 should be prioritized for pilot implementation?
-            </Label>
-            <div className="grid grid-cols-1 gap-3">
-              {[
-                "Carbon Credits (REDD+ monetization)",
-                "Payment for Ecosystem Services (PES)",
-                "Eco-Tourism User Fees",
-                "All three simultaneously",
-              ].map((opt) => (
-                <Button
-                  key={opt}
-                  type="button"
-                  variant="outline"
-                  className={cn(
-                    "justify-start h-auto py-3 text-sm text-left",
-                    data.q9_4_revenue_channel === opt ? activeBtn : inactiveBtn
-                  )}
-                  onClick={() => update("q9_4_revenue_channel", opt)}
-                >
-                  {opt}
-                </Button>
-              ))}
+            {/* Banner understanding check */}
+            <div className="pt-4 border-t border-[#C9A84C]/10">
+              <LikertScale
+                name="q9_1_banner_understanding"
+                label="How clearly does the Operating Systems description convey the role of moral governance, peace, resilience, and inclusivity as the ecosystem's central OS?"
+                value={data.q9_1_banner_understanding}
+                onChange={(v) => update("q9_1_banner_understanding", v)}
+              />
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </motion.div>
 
-      {/* ── 6. Archetype: Fixes that Fail ────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2 text-[#022c22] dark:text-[#ecfdf5]">
-            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-            Archetype: Fixes That Fail
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src={BIRD_IMAGES.fixesThatFail.url}
-              alt={BIRD_IMAGES.fixesThatFail.alt}
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
-          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90 leading-relaxed">
-            The "Fixes That Fail" archetype illustrates how BARMM's reliance on short-term remedies
-            undermines long-term institutional reform. Ad-hoc tax incentives, fragmented subsidies,
-            and short-term security operations may create the illusion of progress: investment approvals
-            rise briefly, but institutional weaknesses persist. Procurement delays (12–18 months),
-            slow Halal certification (45–60 days vs. Malaysia's 15-day benchmark), and poor inter-agency
-            coordination continue to erode investor confidence. Each "quick fix" postpones systemic reform,
-            trapping the region in a recurring cycle of crisis management.
-          </p>
-          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
-            <strong>Balancing Loop 1 (B1):</strong> Short-term relief from incentives temporarily boosts investor attraction.
-            <br />
-            <strong>Reinforcing Loop 2 (R2):</strong> Institutional weakness persists and compounds over time.
-          </p>
+      {/* ═══════════════════════════════════════════════════════════════════════
+          ARCHETYPE 1: Fixes That Fail
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <motion.div variants={cardVariants}>
+        <Card className="bg-[#011a12]/80 border-amber-500/20">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold text-[#E5C560] flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-amber-400" />
+              Systems Archetype: Fixes That Fail
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {archetypes[0] && <ArchetypeCard archetype={archetypes[0]} />}
 
-          <div className="space-y-3">
-            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
-              How accurately does "Fixes that Fail" capture the unintended consequences of short-term industrial policy in BARMM?
-            </Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {archetypeOptions.map((opt) => (
-                <Button
-                  key={opt}
-                  type="button"
-                  variant="outline"
-                  className={cn(
-                    "justify-start h-auto py-3 text-sm text-left",
-                    data.q_s9_investment_loop === opt ? activeBtn : inactiveBtn
-                  )}
-                  onClick={() => update("q_s9_investment_loop", opt)}
-                >
-                  {opt}
-                </Button>
-              ))}
+            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-xl">
+              <ImageWithFallback
+                src={BIRD_IMAGES.fixesThatFail.url}
+                alt={BIRD_IMAGES.fixesThatFail.alt}
+                className="w-full h-48 sm:h-64"
+                imgClassName="object-cover object-center"
+              />
             </div>
-          </div>
 
-          {(data.q_s9_investment_loop === "Very accurately" ||
-            data.q_s9_investment_loop === "Somewhat accurately") && (
-            <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20 animate-in fade-in slide-in-from-top-2 duration-200">
-              <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
-                Which sectors best fit this archetype? Which have avoided this trap?
-              </Label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <p className="text-xs text-[#ecfdf5]/60 italic border-l-2 border-amber-500/30 pl-3">
+              The &quot;Fixes That Fail&quot; archetype illustrates how BARMM&apos;s reliance on short-term remedies
+              undermines long-term institutional reform. Ad-hoc tax incentives, fragmented subsidies, and
+              short-term security operations create the illusion of progress while institutional weaknesses persist.
+            </p>
+
+            <div className="pt-4 border-t border-[#C9A84C]/10 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
+                  How accurately does &quot;Fixes That Fail&quot; capture the unintended consequences of
+                  short-term industrial policy in BARMM?
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {ACCURACY_OPTIONS.map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => update("q_s9_investment_loop", opt)}
+                      className={cn(
+                        "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
+                        data.q_s9_investment_loop === opt
+                          ? "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]"
+                          : "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "w-3.5 h-3.5 rounded-full border flex-shrink-0",
+                          data.q_s9_investment_loop === opt
+                            ? "bg-[#C9A84C] border-[#C9A84C]"
+                            : "border-[#C9A84C]/40"
+                        )}
+                      />
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {fixesAgree && (
+                <div>
+                  <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
+                    Which sectors best fit this archetype? Which have avoided this trap?
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {[
+                      "Halal manufacturing",
+                      "Agro-processing",
+                      "Renewable energy",
+                      "Tourism",
+                      "Other (please specify)",
+                    ].map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => update("q_s9_investment_loop_followup", opt)}
+                        className={cn(
+                          "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
+                          data.q_s9_investment_loop_followup === opt
+                            ? "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]"
+                            : "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            "w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0",
+                            data.q_s9_investment_loop_followup === opt
+                              ? "bg-[#C9A84C] border-[#C9A84C]"
+                              : "border-[#C9A84C]/40"
+                          )}
+                        >
+                          {data.q_s9_investment_loop_followup === opt && (
+                            <svg className="w-2.5 h-2.5 text-[#011a12]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </div>
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Other (please specify)..."
+                    value={
+                      data.q_s9_investment_loop_followup &&
+                      !["Halal manufacturing", "Agro-processing", "Renewable energy", "Tourism"].includes(data.q_s9_investment_loop_followup)
+                        ? data.q_s9_investment_loop_followup
+                        : ""
+                    }
+                    onChange={(e) => update("q_s9_investment_loop_followup", e.target.value)}
+                    className={cn(
+                      "mt-3 w-full px-3 py-2 rounded-lg border text-sm placeholder:text-[#ecfdf5]/30",
+                      "bg-[#022c22]/60 border-[#C9A84C]/20 text-[#ecfdf5]",
+                      "focus:outline-none focus:border-[#C9A84C]"
+                    )}
+                  />
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          ARCHETYPE 2: Escalation
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <motion.div variants={cardVariants}>
+        <Card className="bg-[#011a12]/80 border-orange-500/20">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold text-[#E5C560] flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-orange-400" />
+              Systems Archetype: Escalation
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {archetypes[1] && <ArchetypeCard archetype={archetypes[1]} />}
+
+            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-xl">
+              <ImageWithFallback
+                src={BIRD_IMAGES.escalationArchetype.url}
+                alt={BIRD_IMAGES.escalationArchetype.alt}
+                className="w-full h-48 sm:h-64"
+                imgClassName="object-cover object-center"
+              />
+            </div>
+
+            <p className="text-xs text-[#ecfdf5]/60 italic border-l-2 border-orange-500/30 pl-3">
+              The &quot;Escalation&quot; archetype manifests when one group perceives a threat and mobilizes,
+              triggering counter-mobilization by others. The result is a reinforcing cycle of competitive
+              spirals that diverts resources from productive development to contestation.
+            </p>
+
+            <div className="pt-4 border-t border-[#C9A84C]/10 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
+                  How accurately does the &quot;Escalation&quot; archetype reflect competitive dynamics among
+                  clans, provinces, or agencies competing for trade corridors and connectivity investments?
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {ACCURACY_OPTIONS.map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => update("q_s9_governance_loop", opt)}
+                      className={cn(
+                        "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
+                        data.q_s9_governance_loop === opt
+                          ? "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]"
+                          : "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "w-3.5 h-3.5 rounded-full border flex-shrink-0",
+                          data.q_s9_governance_loop === opt
+                            ? "bg-[#C9A84C] border-[#C9A84C]"
+                            : "border-[#C9A84C]/40"
+                        )}
+                      />
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {escalationAgree && (
+                <div>
+                  <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
+                    In which domain do you see this escalation dynamic most clearly?
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {[
+                      "Clan rivalries (rido)",
+                      "Inter-provincial competition",
+                      "Inter-agency rivalry",
+                      "External market competition",
+                      "Other (please specify)",
+                    ].map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => update("q_s9_governance_loop_followup", opt)}
+                        className={cn(
+                          "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
+                          data.q_s9_governance_loop_followup === opt
+                            ? "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]"
+                            : "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            "w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0",
+                            data.q_s9_governance_loop_followup === opt
+                              ? "bg-[#C9A84C] border-[#C9A84C]"
+                              : "border-[#C9A84C]/40"
+                          )}
+                        >
+                          {data.q_s9_governance_loop_followup === opt && (
+                            <svg className="w-2.5 h-2.5 text-[#011a12]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </div>
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Other (please specify)..."
+                    value={
+                      data.q_s9_governance_loop_followup &&
+                      !["Clan rivalries (rido)", "Inter-provincial competition", "Inter-agency rivalry", "External market competition"].includes(data.q_s9_governance_loop_followup)
+                        ? data.q_s9_governance_loop_followup
+                        : ""
+                    }
+                    onChange={(e) => update("q_s9_governance_loop_followup", e.target.value)}
+                    className={cn(
+                      "mt-3 w-full px-3 py-2 rounded-lg border text-sm placeholder:text-[#ecfdf5]/30",
+                      "bg-[#022c22]/60 border-[#C9A84C]/20 text-[#ecfdf5]",
+                      "focus:outline-none focus:border-[#C9A84C]"
+                    )}
+                  />
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          ARCHETYPE 3: The Big Man
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <motion.div variants={cardVariants}>
+        <Card className="bg-[#011a12]/80 border-rose-500/20">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold text-[#E5C560] flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-rose-400" />
+              Systems Archetype: The Big Man
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {archetypes[2] && <ArchetypeCard archetype={archetypes[2]} />}
+
+            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-xl">
+              <ImageWithFallback
+                src={BIRD_IMAGES.bigManArchetype.url}
+                alt={BIRD_IMAGES.bigManArchetype.alt}
+                className="w-full h-48 sm:h-64"
+                imgClassName="object-cover object-center"
+              />
+            </div>
+
+            <p className="text-xs text-[#ecfdf5]/60 italic border-l-2 border-rose-500/30 pl-3">
+              The &quot;Big Man Archetype&quot; visualizes how concentrated political power around dominant clan leaders
+              creates a self-reinforcing system of instability and underdevelopment. Three reinforcing loops
+              form a vicious cycle: political dominance fuels conflict, conflict justifies dominance, and both
+              deplete resources needed for progress.
+            </p>
+
+            <div className="pt-4 border-t border-[#C9A84C]/10 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
+                  How accurately does the &quot;Big Man&quot; archetype reflect the political and clan dynamics
+                  affecting access to capital and financial services in BARMM?
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {ACCURACY_OPTIONS.map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => update("q9_arch_big_man_accuracy", opt)}
+                      className={cn(
+                        "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
+                        data.q9_arch_big_man_accuracy === opt
+                          ? "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]"
+                          : "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "w-3.5 h-3.5 rounded-full border flex-shrink-0",
+                          data.q9_arch_big_man_accuracy === opt
+                            ? "bg-[#C9A84C] border-[#C9A84C]"
+                            : "border-[#C9A84C]/40"
+                        )}
+                      />
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {bigManAgree && (
+                <div>
+                  <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
+                    Which of the three reinforcing loops is most active in BARMM today?
+                  </label>
+                  <div className="grid grid-cols-1 gap-2">
+                    {bigManLoops.map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => update("q9_arch_big_man_followup", opt)}
+                        className={cn(
+                          "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
+                          data.q9_arch_big_man_followup === opt
+                            ? "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]"
+                            : "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            "w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0",
+                            data.q9_arch_big_man_followup === opt
+                              ? "bg-[#C9A84C] border-[#C9A84C]"
+                              : "border-[#C9A84C]/40"
+                          )}
+                        >
+                          {data.q9_arch_big_man_followup === opt && (
+                            <svg className="w-2.5 h-2.5 text-[#011a12]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </div>
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Other (please specify)..."
+                    value={
+                      data.q9_arch_big_man_followup &&
+                      !bigManLoops.includes(data.q9_arch_big_man_followup)
+                        ? data.q9_arch_big_man_followup
+                        : ""
+                    }
+                    onChange={(e) => update("q9_arch_big_man_followup", e.target.value)}
+                    className={cn(
+                      "mt-3 w-full px-3 py-2 rounded-lg border text-sm placeholder:text-[#ecfdf5]/30",
+                      "bg-[#022c22]/60 border-[#C9A84C]/20 text-[#ecfdf5]",
+                      "focus:outline-none focus:border-[#C9A84C]"
+                    )}
+                  />
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* ── SWOT Assessment ── */}
+      <motion.div variants={cardVariants}>
+        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold text-[#E5C560] flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-[#C9A84C]" />
+              Risk & Resilience Assessment — Operating Systems
+            </CardTitle>
+            <p className="text-xs text-[#ecfdf5]/50 pt-1">
+              Rate each factor&apos;s <strong className="text-[#ecfdf5]">Impact</strong> (severity if realized)
+              and <strong className="text-[#ecfdf5]">Likelihood</strong> (probability of occurrence) on a 1–5 scale.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Strengths */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <TrendingUp className="w-4 h-4 text-emerald-400" />
+                <h3 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
+                  Strengths — Internal Resilience Drivers
+                </h3>
+              </div>
+              <div className="space-y-4">
+                {swotItems
+                  .filter((i) => i.category === "S")
+                  .map((item) => (
+                    <SWOTScalePair
+                      key={item.field}
+                      category={item.category}
+                      factorLabel={`${item.id} — ${item.label}`}
+                      factorDescription={item.factor}
+                      impact={data[`${item.field}_impact` as keyof Section9Data] as number | undefined}
+                      likelihood={data[`${item.field}_likelihood` as keyof Section9Data] as number | undefined}
+                      onImpactChange={(v) => update(`${item.field}_impact` as keyof Section9Data, v)}
+                      onLikelihoodChange={(v) => update(`${item.field}_likelihood` as keyof Section9Data, v)}
+                    />
+                  ))}
+              </div>
+            </div>
+
+            {/* Weaknesses */}
+            <div className="pt-6 border-t border-[#C9A84C]/10">
+              <div className="flex items-center gap-2 mb-4">
+                <TrendingDown className="w-4 h-4 text-rose-400" />
+                <h3 className="text-xs font-bold text-rose-400 uppercase tracking-wider">
+                  Weaknesses — Internal Risk Exposure
+                </h3>
+              </div>
+              <div className="space-y-4">
+                {swotItems
+                  .filter((i) => i.category === "W")
+                  .map((item) => (
+                    <SWOTScalePair
+                      key={item.field}
+                      category={item.category}
+                      factorLabel={`${item.id} — ${item.label}`}
+                      factorDescription={item.factor}
+                      impact={data[`${item.field}_impact` as keyof Section9Data] as number | undefined}
+                      likelihood={data[`${item.field}_likelihood` as keyof Section9Data] as number | undefined}
+                      onImpactChange={(v) => update(`${item.field}_impact` as keyof Section9Data, v)}
+                      onLikelihoodChange={(v) => update(`${item.field}_likelihood` as keyof Section9Data, v)}
+                    />
+                  ))}
+              </div>
+            </div>
+
+            {/* Opportunities */}
+            <div className="pt-6 border-t border-[#C9A84C]/10">
+              <div className="flex items-center gap-2 mb-4">
+                <Zap className="w-4 h-4 text-sky-400" />
+                <h3 className="text-xs font-bold text-sky-400 uppercase tracking-wider">
+                  Opportunities — External Resilience Drivers
+                </h3>
+              </div>
+              <div className="space-y-4">
+                {swotItems
+                  .filter((i) => i.category === "O")
+                  .map((item) => (
+                    <SWOTScalePair
+                      key={item.field}
+                      category={item.category}
+                      factorLabel={`${item.id} — ${item.label}`}
+                      factorDescription={item.factor}
+                      impact={data[`${item.field}_impact` as keyof Section9Data] as number | undefined}
+                      likelihood={data[`${item.field}_likelihood` as keyof Section9Data] as number | undefined}
+                      onImpactChange={(v) => update(`${item.field}_impact` as keyof Section9Data, v)}
+                      onLikelihoodChange={(v) => update(`${item.field}_likelihood` as keyof Section9Data, v)}
+                    />
+                  ))}
+              </div>
+            </div>
+
+            {/* Threats */}
+            <div className="pt-6 border-t border-[#C9A84C]/10">
+              <div className="flex items-center gap-2 mb-4">
+                <ShieldAlert className="w-4 h-4 text-amber-400" />
+                <h3 className="text-xs font-bold text-amber-400 uppercase tracking-wider">
+                  Threats — External Vulnerability Factors
+                </h3>
+              </div>
+              <div className="space-y-4">
+                {swotItems
+                  .filter((i) => i.category === "T")
+                  .map((item) => (
+                    <SWOTScalePair
+                      key={item.field}
+                      category={item.category}
+                      factorLabel={`${item.id} — ${item.label}`}
+                      factorDescription={item.factor}
+                      impact={data[`${item.field}_impact` as keyof Section9Data] as number | undefined}
+                      likelihood={data[`${item.field}_likelihood` as keyof Section9Data] as number | undefined}
+                      onImpactChange={(v) => update(`${item.field}_impact` as keyof Section9Data, v)}
+                      onLikelihoodChange={(v) => update(`${item.field}_likelihood` as keyof Section9Data, v)}
+                    />
+                  ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* ── Additional Deep-Dive: Moral Governance De-Risks Capital ── */}
+      <motion.div variants={cardVariants}>
+        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
+          <CardContent className="pt-6 space-y-4">
+            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-xl">
+              <ImageWithFallback
+                src={BIRD_IMAGES.moralGovernanceDeRisks.url}
+                alt={BIRD_IMAGES.moralGovernanceDeRisks.alt}
+                className="w-full h-48 sm:h-64"
+                imgClassName="object-cover object-center"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <p className="text-xs text-[#ecfdf5]/70 italic">
+                  {BIRD_IMAGES.moralGovernanceDeRisks.title}
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-[#ecfdf5]/70 leading-relaxed">
+              This reinforcing feedback loop demonstrates how moral governance reduces investment risk.
+              When government implements transparent systems (like BIFOSS), it lowers bureaucratic friction
+              and raises investor confidence, leading to increased FDI and stronger governance capacity.
+            </p>
+            <div className="pt-2">
+              <LikertScale
+                name="q9_1_moral_governance_derisk"
+                label="How effective is moral governance at de-risking capital investment in BARMM compared to traditional governance approaches?"
+                value={data.q9_1_moral_governance_derisk}
+                onChange={(v) => update("q9_1_moral_governance_derisk", v)}
+              />
+            </div>
+
+            {/* Critical loop / aspect question */}
+            <div className="pt-4 border-t border-[#C9A84C]/10">
+              <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
+                Which aspect of moral governance most reduces investment risk?
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {[
-                  "Halal manufacturing",
-                  "Agro-processing",
-                  "Renewable energy",
-                  "Tourism",
+                  "Transparency",
+                  "Accountability",
+                  "Efficiency",
+                  "Islamic ethics",
                   "Other (please specify)",
                 ].map((opt) => (
-                  <Button
+                  <button
                     key={opt}
                     type="button"
-                    variant="outline"
+                    onClick={() => update("q9_2_critical_loop", opt)}
                     className={cn(
-                      "justify-start h-auto py-3 text-sm text-left",
-                      data.q_s9_investment_loop_followup === opt ? activeBtn : inactiveBtn
+                      "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
+                      data.q9_2_critical_loop === opt
+                        ? "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]"
+                        : "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
                     )}
-                    onClick={() => update("q_s9_investment_loop_followup", opt)}
                   >
+                    <div
+                      className={cn(
+                        "w-3.5 h-3.5 rounded-full border flex-shrink-0",
+                        data.q9_2_critical_loop === opt
+                          ? "bg-[#C9A84C] border-[#C9A84C]"
+                          : "border-[#C9A84C]/40"
+                      )}
+                    />
                     {opt}
-                  </Button>
+                  </button>
                 ))}
               </div>
-              <Textarea
-                placeholder="Describe which sectors fit and which have avoided the trap..."
-                rows={3}
-                value={data.q_s9_investment_loop_followup || ""}
-                onChange={(e) => update("q_s9_investment_loop_followup", e.target.value)}
-                className="w-full rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 px-3 py-2 text-sm text-[#022c22] dark:text-[#ecfdf5] placeholder:text-[#64748b] focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/50 resize-y"
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* ── Additional Deep-Dive: Regulatory Architecture ── */}
+      <motion.div variants={cardVariants}>
+        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
+          <CardContent className="pt-6 space-y-4">
+            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-xl">
+              <ImageWithFallback
+                src={BIRD_IMAGES.regulatoryArchitecture.url}
+                alt={BIRD_IMAGES.regulatoryArchitecture.alt}
+                className="w-full h-48 sm:h-64"
+                imgClassName="object-cover object-center"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <p className="text-xs text-[#ecfdf5]/70 italic">
+                  {BIRD_IMAGES.regulatoryArchitecture.title}
+                </p>
+              </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* ── 7. Archetype: Escalation ─────────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2 text-[#022c22] dark:text-[#ecfdf5]">
-            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-            Archetype: Escalation
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src={BIRD_IMAGES.escalationArchetype.url}
-              alt={BIRD_IMAGES.escalationArchetype.alt}
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
-          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90 leading-relaxed">
-            The "Escalation" archetype manifests in both socio-political and economic domains in BARMM.
-            When one group (clan, province, or agency) perceives a threat or marginalization, it mobilizes
-            to protect its interests. Other groups perceive this mobilization as a threat to their own
-            interests, triggering counter-mobilization. The result is a reinforcing cycle of competitive spirals
-            that diverts resources from productive development to contestation, degrades the overall investment
-            climate, and creates a perception of instability that repels investors.
-          </p>
-
-          <div className="space-y-3">
-            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
-              How accurately does the "Escalation" archetype reflect competitive dynamics among clans, provinces, or agencies competing for trade corridors and connectivity investments in BARMM?
-            </Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {archetypeOptions.map((opt) => (
-                <Button
-                  key={opt}
-                  type="button"
-                  variant="outline"
-                  className={cn(
-                    "justify-start h-auto py-3 text-sm text-left",
-                    data.q_s9_governance_loop === opt ? activeBtn : inactiveBtn
-                  )}
-                  onClick={() => update("q_s9_governance_loop", opt)}
-                >
-                  {opt}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {(data.q_s9_governance_loop === "Very accurately" ||
-            data.q_s9_governance_loop === "Somewhat accurately") && (
-            <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20 animate-in fade-in slide-in-from-top-2 duration-200">
-              <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
-                In which domain do you see this escalation dynamic most clearly?
-              </Label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <p className="text-sm text-[#ecfdf5]/70 leading-relaxed">
+              At its core is the Bangsamoro Organic Law (RA 11054) — the constitutional mandate for
+              economic self-determination — supported by five pillars: 2nd BDP &amp; SIPP, BHIDP, BSEMP,
+              RA 11439 &amp; CREATE MORE Act, and the Pending Forestry Code.
+            </p>
+            <div className="pt-2">
+              <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
+                Which regulatory pillar should be the highest priority for strengthening investment security?
+              </label>
+              <div className="grid grid-cols-1 gap-2">
                 {[
-                  "Clan rivalries (rido)",
-                  "Inter-provincial competition",
-                  "Inter-agency rivalry",
-                  "External market competition",
-                  "Other (please specify)",
+                  "Bangsamoro Organic Law (RA 11054) enforcement",
+                  "2nd BDP & SIPP alignment",
+                  "BHIDP implementation",
+                  "BSEMP (Bangsamoro Spatial & Environmental Master Plan)",
+                  "RA 11439 Islamic Finance & CREATE MORE Act",
+                  "Pending Bangsamoro Forestry Code",
                 ].map((opt) => (
-                  <Button
+                  <button
                     key={opt}
                     type="button"
-                    variant="outline"
+                    onClick={() => update("q9_3_regulatory_priority", opt)}
                     className={cn(
-                      "justify-start h-auto py-3 text-sm text-left",
-                      data.q_s9_governance_loop_followup === opt ? activeBtn : inactiveBtn
+                      "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
+                      data.q9_3_regulatory_priority === opt
+                        ? "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]"
+                        : "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
                     )}
-                    onClick={() => update("q_s9_governance_loop_followup", opt)}
                   >
+                    <div
+                      className={cn(
+                        "w-3.5 h-3.5 rounded-full border flex-shrink-0",
+                        data.q9_3_regulatory_priority === opt
+                          ? "bg-[#C9A84C] border-[#C9A84C]"
+                          : "border-[#C9A84C]/40"
+                      )}
+                    />
                     {opt}
-                  </Button>
+                  </button>
                 ))}
               </div>
-              <Textarea
-                placeholder="Describe where you see escalation dynamics most clearly..."
-                rows={3}
-                value={data.q_s9_governance_loop_followup || ""}
-                onChange={(e) => update("q_s9_governance_loop_followup", e.target.value)}
-                className="w-full rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 px-3 py-2 text-sm text-[#022c22] dark:text-[#ecfdf5] placeholder:text-[#64748b] focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/50 resize-y"
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* ── Additional Deep-Dive: Draft JMC 2026-01 ── */}
+      <motion.div variants={cardVariants}>
+        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
+          <CardContent className="pt-6 space-y-4">
+            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-xl">
+              <ImageWithFallback
+                src={BIRD_IMAGES.draftJMC.url}
+                alt={BIRD_IMAGES.draftJMC.alt}
+                className="w-full h-48 sm:h-64"
+                imgClassName="object-cover object-center"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <p className="text-xs text-[#ecfdf5]/70 italic">
+                  {BIRD_IMAGES.draftJMC.title}
+                </p>
+              </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* ── 8. Archetype: The Big Man ────────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2 text-[#022c22] dark:text-[#ecfdf5]">
-            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-            Archetype: The Big Man
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src={BIRD_IMAGES.bigManArchetype.url}
-              alt={BIRD_IMAGES.bigManArchetype.alt}
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
-          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90 leading-relaxed">
-            The "Big Man Archetype" visualizes how concentrated political power around dominant clan leaders
-            creates a self-reinforcing system of instability and underdevelopment. It presents 3 reinforcing
-            loops forming a vicious cycle: political dominance fuels conflict, conflict justifies dominance,
-            and both deplete resources needed for progress.
-          </p>
-          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
-            <strong>R1: The Patronage–Governance Trade-off.</strong> Power concentration fosters a patron–client mindset where loyalty outweighs merit.
-            <br />
-            <strong>R2: Cycle of Exclusion, Resentment, and Conflict.</strong> Patronage politics marginalize rival clans, breeding resentment and rido.
-            <br />
-            <strong>R3: Resource Depletion and Development Failure.</strong> Patronage-based hiring fills posts with unqualified staff, draining budgets.
-          </p>
-
-          <div className="space-y-3">
-            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
-              How accurately does the "Big Man" archetype reflect the political and clan dynamics affecting access to capital and financial services in BARMM?
-            </Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {archetypeOptions.map((opt) => (
-                <Button
-                  key={opt}
-                  type="button"
-                  variant="outline"
-                  className={cn(
-                    "justify-start h-auto py-3 text-sm text-left",
-                    data.q_s9_governance_loop === opt ? activeBtn : inactiveBtn
-                  )}
-                  onClick={() => update("q_s9_governance_loop", opt)}
-                >
-                  {opt}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {(data.q_s9_governance_loop === "Very accurately" ||
-            data.q_s9_governance_loop === "Somewhat accurately") && (
-            <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20 animate-in fade-in slide-in-from-top-2 duration-200">
-              <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
-                Which of the three reinforcing loops is most active in BARMM today?
-              </Label>
-              <div className="grid grid-cols-1 gap-3">
-                {bigManLoops.map((opt) => (
-                  <Button
+            <p className="text-sm text-[#ecfdf5]/70 leading-relaxed">
+              Draft Joint Memorandum Circular 2026-01 transforms conservation into municipal revenue streams
+              through three flowing channels: Carbon Credits, Payment for Ecosystem Services (PES), and
+              Eco-Tourism User Fees — merging into a Revenue River that feeds Local Government Units.
+            </p>
+            <div className="pt-2">
+              <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
+                Which revenue channel from JMC 2026-01 should be prioritized for pilot implementation?
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {[
+                  "Carbon Credits (REDD+ monetization)",
+                  "Payment for Ecosystem Services (PES)",
+                  "Eco-Tourism User Fees",
+                  "All three simultaneously",
+                ].map((opt) => (
+                  <button
                     key={opt}
                     type="button"
-                    variant="outline"
+                    onClick={() => update("q9_4_revenue_channel", opt)}
                     className={cn(
-                      "justify-start h-auto py-3 text-sm text-left",
-                      data.q_s9_governance_loop_followup === opt ? activeBtn : inactiveBtn
+                      "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
+                      data.q9_4_revenue_channel === opt
+                        ? "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]"
+                        : "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
                     )}
-                    onClick={() => update("q_s9_governance_loop_followup", opt)}
                   >
+                    <div
+                      className={cn(
+                        "w-3.5 h-3.5 rounded-full border flex-shrink-0",
+                        data.q9_4_revenue_channel === opt
+                          ? "bg-[#C9A84C] border-[#C9A84C]"
+                          : "border-[#C9A84C]/40"
+                      )}
+                    />
                     {opt}
-                  </Button>
+                  </button>
                 ))}
               </div>
-              <Textarea
-                placeholder="Describe which loop is most active and provide examples..."
-                rows={3}
-                value={data.q_s9_governance_loop_followup || ""}
-                onChange={(e) => update("q_s9_governance_loop_followup", e.target.value)}
-                className="w-full rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 px-3 py-2 text-sm text-[#022c22] dark:text-[#ecfdf5] placeholder:text-[#64748b] focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/50 resize-y"
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* ── Additional Deep-Dive: Policy Recommendations — Synchronized Mandate ── */}
+      <motion.div variants={cardVariants}>
+        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
+          <CardContent className="pt-6 space-y-4">
+            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-xl">
+              <ImageWithFallback
+                src={BIRD_IMAGES.policyRecommendationsMakers.url}
+                alt={BIRD_IMAGES.policyRecommendationsMakers.alt}
+                className="w-full h-48 sm:h-64"
+                imgClassName="object-cover object-center"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <p className="text-xs text-[#ecfdf5]/70 italic">
+                  {BIRD_IMAGES.policyRecommendationsMakers.title}
+                </p>
+              </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* ── 9. Policy Recommendations: Synchronized Mandate ──────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
-            Policy Recommendations: A Synchronized Mandate
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src={BIRD_IMAGES.policyRecommendationsMakers.url}
-              alt={BIRD_IMAGES.policyRecommendationsMakers.alt}
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
-          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
-            Aligning government, planning, and private-sector actions creates synergy between
-            policy, planning, and investment to drive inclusive growth through collaborative governance.
-          </p>
-          <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20">
-            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
-              Which stakeholder group must take the lead in synchronizing the Bangsamoro investment mandate?
-            </Label>
-            <div className="grid grid-cols-1 gap-3">
-              {[
-                "Bangsamoro Government (BOI-MTIT, BBOI)",
-                "Local Government Units (LGUs)",
-                "Private Sector / Investors",
-                "Development Partners / Donor Agencies",
-                "Civil Society Organizations (CSOs)",
-                "All stakeholders equally through BIF-Net",
-              ].map((opt) => (
-                <Button
-                  key={opt}
-                  type="button"
-                  variant="outline"
-                  className={cn(
-                    "justify-start h-auto py-3 text-sm text-left",
-                    data.q9_5_stakeholder_alignment === opt ? activeBtn : inactiveBtn
-                  )}
-                  onClick={() => update("q9_5_stakeholder_alignment", opt)}
-                >
-                  {opt}
-                </Button>
-              ))}
+            <p className="text-sm text-[#ecfdf5]/70 leading-relaxed">
+              Aligning government, planning, and private-sector actions creates synergy between policy,
+              planning, and investment to drive inclusive growth through collaborative governance.
+            </p>
+            <div className="pt-2">
+              <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
+                Which stakeholder group must take the lead in synchronizing the Bangsamoro investment mandate?
+              </label>
+              <div className="grid grid-cols-1 gap-2">
+                {[
+                  "Bangsamoro Government (BOI-MTIT, BBOI)",
+                  "Local Government Units (LGUs)",
+                  "Private Sector / Investors",
+                  "Development Partners / Donor Agencies",
+                  "Civil Society Organizations (CSOs)",
+                  "All stakeholders equally through BIF-Net",
+                ].map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => update("q9_5_stakeholder_alignment", opt)}
+                    className={cn(
+                      "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
+                      data.q9_5_stakeholder_alignment === opt
+                        ? "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]"
+                        : "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "w-3.5 h-3.5 rounded-full border flex-shrink-0",
+                        data.q9_5_stakeholder_alignment === opt
+                          ? "bg-[#C9A84C] border-[#C9A84C]"
+                          : "border-[#C9A84C]/40"
+                      )}
+                    />
+                    {opt}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </motion.div>
 
-      {/* ── 10. Policy Recommendations: Three Reforms ────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
-            Policy Recommendations: Activating the Framework
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src={BIRD_IMAGES.policyRecommendationsActivating.url}
-              alt={BIRD_IMAGES.policyRecommendationsActivating.alt}
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
-          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90">
-            Three integrated reforms: <strong>Institutional</strong> (BIF-Net coordination),
-            <strong> Fiscal</strong> (SIPP & CREATE MORE harmonization), and
-            <strong> Regulatory</strong> (BEIE institutionalization) to strengthen investment coordination.
-          </p>
-          <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20">
-            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
-              Which of the three reforms (Institutional, Fiscal, Regulatory) should be prioritized first?
-            </Label>
-            <div className="grid grid-cols-1 gap-3">
-              {[
-                "Institutional (BIF-Net coordination, governance capacity)",
-                "Fiscal (SIPP & CREATE MORE harmonization, revenue mobilization)",
-                "Regulatory (BEIE institutionalization, ease of doing business)",
-                "All three must proceed in parallel",
-              ].map((opt) => (
-                <Button
-                  key={opt}
-                  type="button"
-                  variant="outline"
-                  className={cn(
-                    "justify-start h-auto py-3 text-sm text-left",
-                    data.q9_6_reform_priority === opt ? activeBtn : inactiveBtn
-                  )}
-                  onClick={() => update("q9_6_reform_priority", opt)}
-                >
-                  {opt}
-                </Button>
-              ))}
+      {/* ── Additional Deep-Dive: Policy Recommendations — Activating ── */}
+      <motion.div variants={cardVariants}>
+        <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
+          <CardContent className="pt-6 space-y-4">
+            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-xl">
+              <ImageWithFallback
+                src={BIRD_IMAGES.policyRecommendationsActivating.url}
+                alt={BIRD_IMAGES.policyRecommendationsActivating.alt}
+                className="w-full h-48 sm:h-64"
+                imgClassName="object-cover object-center"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <p className="text-xs text-[#ecfdf5]/70 italic">
+                  {BIRD_IMAGES.policyRecommendationsActivating.title}
+                </p>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+            <p className="text-sm text-[#ecfdf5]/70 leading-relaxed">
+              Three integrated reforms: <strong>Institutional</strong> (BIF-Net coordination),{" "}
+              <strong>Fiscal</strong> (SIPP &amp; CREATE MORE harmonization), and{" "}
+              <strong>Regulatory</strong> (BEIE institutionalization) to strengthen investment coordination.
+            </p>
+            <div className="pt-2">
+              <label className="block text-sm font-medium text-[#ecfdf5] mb-2">
+                Which of the three reforms should be prioritized first?
+              </label>
+              <div className="grid grid-cols-1 gap-2">
+                {[
+                  "Institutional (BIF-Net coordination, governance capacity)",
+                  "Fiscal (SIPP & CREATE MORE harmonization, revenue mobilization)",
+                  "Regulatory (BEIE institutionalization, ease of doing business)",
+                  "All three must proceed in parallel",
+                ].map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => update("q9_6_reform_priority", opt)}
+                    className={cn(
+                      "p-3 rounded-lg border text-xs text-left transition-all flex items-center gap-2",
+                      data.q9_6_reform_priority === opt
+                        ? "bg-[#C9A84C]/15 border-[#C9A84C] text-[#E5C560]"
+                        : "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "w-3.5 h-3.5 rounded-full border flex-shrink-0",
+                        data.q9_6_reform_priority === opt
+                          ? "bg-[#C9A84C] border-[#C9A84C]"
+                          : "border-[#C9A84C]/40"
+                      )}
+                    />
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
-      {/* ── 11. SWOT: Strengths ──────────────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2 text-[#022c22] dark:text-[#ecfdf5]">
-            <span className="px-2 py-1 rounded text-xs font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
-              STRENGTH
-            </span>
-            Operating Systems Strengths
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 italic">
-            Rate each factor: Impact (1 = very small, 5 = very large) × Likelihood (1 = very unlikely, 5 = very likely)
-          </p>
-          {renderSwotPair(
-            "S1 — Growing Policy Recognition",
-            "Institutional mandates via BOL, BIC, SIPP, and BHIDP creating stronger investment climate and governance framework.",
-            "q_s9_policy_recognition_impact",
-            "q_s9_policy_recognition_likelihood",
-            "strength"
-          )}
-          {renderSwotPair(
-            "S2 — Peace Dividend Momentum",
-            "Basilan ASG-free declaration (2024) and stabilized security in select zones creating space for investment.",
-            "q_s9_peace_dividend_impact",
-            "q_s9_peace_dividend_likelihood",
-            "strength"
-          )}
-          {renderSwotPair(
-            "S9 — Islamic Finance Legal Framework",
-            "RA 11439 enables Shariah-compliant banking and finance, opening ethical capital pathways.",
-            "q_s9_islamic_finance_impact",
-            "q_s9_islamic_finance_likelihood",
-            "strength"
-          )}
-          {renderSwotPair(
-            "S10 — Rich Cultural Heritage",
-            "Maranao, Yakan, and Tausug cultural traditions are assets for creative industries and tourism.",
-            "q_s9_cultural_heritage_impact",
-            "q_s9_cultural_heritage_likelihood",
-            "strength"
-          )}
-        </CardContent>
-      </Card>
-
-      {/* ── 12. SWOT: Weaknesses ─────────────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2 text-[#022c22] dark:text-[#ecfdf5]">
-            <span className="px-2 py-1 rounded text-xs font-semibold bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300">
-              WEAKNESS
-            </span>
-            Operating Systems Weaknesses
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 italic">
-            Rate each factor: Impact (1 = very small, 5 = very large) × Likelihood (1 = very unlikely, 5 = very likely)
-          </p>
-          {renderSwotPair(
-            "W1 — Fragmented Policy Frameworks",
-            "Governance coordination gaps and underspending in budget execution across agencies.",
-            "q_s9_fragmented_policy_impact",
-            "q_s9_fragmented_policy_likelihood",
-            "weakness"
-          )}
-          {renderSwotPair(
-            "W4 — Low Functional Literacy Rate",
-            "At 59.3%, BARMM has the lowest literacy rate in the country, creating severe human capital constraints.",
-            "q_s9_literacy_impact",
-            "q_s9_literacy_likelihood",
-            "weakness"
-          )}
-          {renderSwotPair(
-            "W11 — Underspending in Budget Execution",
-            "Delays in development program rollout; absorptive capacity challenge limits impact.",
-            "q_s9_underspending_impact",
-            "q_s9_underspending_likelihood",
-            "weakness"
-          )}
-        </CardContent>
-      </Card>
-
-      {/* ── 13. SWOT: Opportunities ────────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2 text-[#022c22] dark:text-[#ecfdf5]">
-            <span className="px-2 py-1 rounded text-xs font-semibold bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300">
-              OPPORTUNITY
-            </span>
-            Operating Systems Opportunities
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 italic">
-            Rate each factor: Impact (1 = very small, 5 = very large) × Likelihood (1 = very unlikely, 5 = very likely)
-          </p>
-          {renderSwotPair(
-            "O1 — Post-Conflict Reconstruction",
-            "Marawi MAA commercial redevelopment and normalization creating construction and service-sector demand.",
-            "q_s9_postconflict_impact",
-            "q_s9_postconflict_likelihood",
-            "opportunity"
-          )}
-          {renderSwotPair(
-            "O7 — Carbon Markets & REDD+",
-            "Monetizing forest endowments and carbon stocks through carbon credits for communities and LGUs.",
-            "q_s9_carbon_markets_impact",
-            "q_s9_carbon_markets_likelihood",
-            "opportunity"
-          )}
-          {renderSwotPair(
-            "O8 — Payment for Ecosystem Services (PES)",
-            "New revenue streams for LGUs via watershed, coastline, and mangrove conservation.",
-            "q_s9_pes_impact",
-            "q_s9_pes_likelihood",
-            "opportunity"
-          )}
-          {renderSwotPair(
-            "O10 — Bangsamoro Forestry Code",
-            "Pending legislation could open sustainable timber, NTFPs, and forest nursery investments.",
-            "q_s9_forestry_code_impact",
-            "q_s9_forestry_code_likelihood",
-            "opportunity"
-          )}
-        </CardContent>
-      </Card>
-
-      {/* ── 14. SWOT: Threats ──────────────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2 text-[#022c22] dark:text-[#ecfdf5]">
-            <span className="px-2 py-1 rounded text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
-              THREAT
-            </span>
-            Operating Systems Threats
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 italic">
-            Rate each factor: Impact (1 = very small, 5 = very large) × Likelihood (1 = very unlikely, 5 = very likely)
-          </p>
-          {renderSwotPair(
-            "T1 — Climate Change Vulnerabilities",
-            "El Niño, flooding, and shifting rainfall patterns (4.2% AFF contraction in 2024) threatening food security.",
-            "q_s9_security_incidents_impact",
-            "q_s9_security_incidents_likelihood",
-            "threat"
-          )}
-          {renderSwotPair(
-            "T3 — Residual Security Incidents",
-            "Rido, remnant armed groups, and investor perception risks varying by province.",
-            "q_s9_security_incidents_impact",
-            "q_s9_security_incidents_likelihood",
-            "threat"
-          )}
-          {renderSwotPair(
-            "T4 — Political Transition Uncertainties",
-            "First parliamentary elections and governance continuity risks may disrupt reform momentum.",
-            "q_s9_political_transition_impact",
-            "q_s9_political_transition_likelihood",
-            "threat"
-          )}
-          {renderSwotPair(
-            "T6 — Risk of Fragmented Mandates",
-            "Islamic banking, halal certification, and trade agencies operating in silos without coordination.",
-            "q_s9_fragmented_agency_impact",
-            "q_s9_fragmented_agency_likelihood",
-            "threat"
-          )}
-        </CardContent>
-      </Card>
-    </div>
+      {/* ── Live Score Summary ── */}
+      {scores.length > 0 && (
+        <motion.div variants={cardVariants}>
+          <Card className="bg-gradient-to-r from-[#022c22]/60 to-[#C9A84C]/5 border-[#C9A84C]/20">
+            <CardContent className="pt-5 pb-5">
+              <div className="flex items-center gap-2 mb-3">
+                <BookOpen className="w-4 h-4 text-[#C9A84C]" />
+                <span className="text-xs font-bold text-[#C9A84C] uppercase tracking-wider">
+                  Live SWOT Scores — Operating Systems
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {scores.map(({ label, score, suffix, color }) => (
+                  <div
+                    key={label}
+                    className="rounded-lg border border-[#C9A84C]/10 bg-[#011a12]/60 p-3 text-center"
+                  >
+                    <p className="text-[10px] text-[#ecfdf5]/40 font-medium mb-1">{label}</p>
+                    <p className={cn("text-lg font-bold", color)}>{score?.toFixed(1) ?? "—"}</p>
+                    <p className="text-[9px] text-[#ecfdf5]/30">{suffix}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+    </motion.div>
   );
 };
 
