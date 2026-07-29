@@ -81,16 +81,7 @@ const SurveyWizard: React.FC = () => {
   });
 
   // ── Section 2: Demographics ──
-    q2_name: s2.q2_name || undefined,
-    q2_email: s2.q2_email || undefined,
-    q2_organization: s2.q2_organization || undefined,
-    q2_position: s2.q2_position || undefined,
-    q2_province: s2.q2_province || undefined,
-    q2_category: s2.q2_category || undefined,
-    q2_expertise: s2.q2_expertise,
-    q2_network_accuracy: s2.q2_network_accuracy,
-
-    const [s2, setS2] = useState<Section2Data>({
+  const [s2, setS2] = useState<Section2Data>({
     q2_name: "",
     q2_email: "",
     q2_organization: "",
@@ -124,7 +115,6 @@ const SurveyWizard: React.FC = () => {
     q4_1_foundations_banner_understanding: undefined,
     q4_2_tragedy_commons_accuracy: "",
     q4_3_tragedy_followup: "",
-    // Strengths
     q4_s1_aff_base_impact: undefined,
     q4_s1_aff_base_likelihood: undefined,
     q4_s2_renewable_energy_impact: undefined,
@@ -133,10 +123,8 @@ const SurveyWizard: React.FC = () => {
     q4_s3_lake_lanao_likelihood: undefined,
     q4_s4_seaweed_dominance_impact: undefined,
     q4_s4_seaweed_dominance_likelihood: undefined,
-    // Weaknesses
     q4_w1_land_tenure_impact: undefined,
     q4_w1_land_tenure_likelihood: undefined,
-    // Opportunities
     q4_o1_renewable_invest_impact: undefined,
     q4_o1_renewable_invest_likelihood: undefined,
     q4_o2_carbon_markets_impact: undefined,
@@ -145,7 +133,6 @@ const SurveyWizard: React.FC = () => {
     q4_o3_pes_likelihood: undefined,
     q4_o4_forestry_code_impact: undefined,
     q4_o4_forestry_code_likelihood: undefined,
-    // Threats
     q4_t1_pestalotiopsis_impact: undefined,
     q4_t1_pestalotiopsis_likelihood: undefined,
   });
@@ -158,7 +145,6 @@ const SurveyWizard: React.FC = () => {
     q5_4_economic_zones_understanding: undefined,
     q5_5_growth_underinvestment_accuracy: "",
     q5_6_growth_underinvestment_followup: "",
-    // Strengths
     q5_s1_halal_legitimacy_impact: undefined,
     q5_s1_halal_legitimacy_likelihood: undefined,
     q5_s2_domestic_demand_impact: undefined,
@@ -167,14 +153,12 @@ const SurveyWizard: React.FC = () => {
     q5_s3_polloc_freeport_likelihood: undefined,
     q5_s4_cultural_heritage_impact: undefined,
     q5_s4_cultural_heritage_likelihood: undefined,
-    // Weaknesses
     q5_w1_halal_cert_impact: undefined,
     q5_w1_halal_cert_likelihood: undefined,
     q5_w2_cold_chain_impact: undefined,
     q5_w2_cold_chain_likelihood: undefined,
     q5_w3_market_linkages_impact: undefined,
     q5_w3_market_linkages_likelihood: undefined,
-    // Threats
     q5_t1_standards_recognition_impact: undefined,
     q5_t1_standards_recognition_likelihood: undefined,
   });
@@ -589,12 +573,6 @@ const SurveyWizard: React.FC = () => {
 
     setSubmitting(true);
     try {
-      // Typed as Record<string, unknown> rather than Partial<SurveySchemaType>:
-      // the SWOT/archetype fields in SurveySchemaType are generated from
-      // swot-content.ts via a Record-returning helper, which TypeScript can't
-      // statically narrow to literal keys. SurveySchemaType remains the
-      // authoritative reference for field names (see swot-content.ts); this
-      // object is still built to match it field-for-field.
       const payload: Record<string, unknown> = {
         q0_1_ready: s0.q0_1_ready || undefined,
         q0_2_ecosystem_understanding: s0.q0_2_ecosystem_understanding || undefined,
@@ -608,36 +586,27 @@ const SurveyWizard: React.FC = () => {
         q01_consent_email_copy: s1.consent_email_copy,
         q01_consent_voluntary: s1.consent_voluntary,
 
-        q02_demo_name: s2.demo_name || undefined,
-        q02_demo_email: s2.demo_email || undefined,
-        q02_demo_organization: s2.demo_organization || undefined,
-        q02_demo_position: s2.demo_position || undefined,
-        q02_demo_province: s2.demo_province || undefined,
-        q02_demo_category: s2.demo_category || undefined,
-        q02_demo_expertise: s2.demo_expertise,
-        // survey-submit's edge function reads demo_province/demo_category
-        // with a `|| payload.q02_demo_province` fallback, so the q02_-
-        // prefixed fields above are sufficient — no unprefixed duplicates needed.
-        q02_network_accuracy: s2.q2_network_accuracy || undefined,
+        // Section 2: Demographics (Aligned with survey-schema.ts)
+        q2_name: s2.q2_name || undefined,
+        q2_email: s2.q2_email || undefined,
+        q2_organization: s2.q2_organization || undefined,
+        q2_position: s2.q2_position || undefined,
+        q2_province: s2.q2_province || undefined,
+        q2_category: s2.q2_category || undefined,
+        q2_expertise: s2.q2_expertise,
+        q2_network_accuracy: s2.q2_network_accuracy,
 
-        // NOTE: field keys renamed to the q03_ / q3_cld{n}_ canonical
-        // prefixes (see src/lib/swot-content.ts). Section3Data itself (in
-        // Section3_BEIE_SystemsThinking.tsx) still exposes the old q3_1_.../
-        // q_s1_... names below — that component still needs to be updated to
-        // match this canonical mapping; tracked as follow-up work.
+        // Section 3: BEIE & Systems Thinking
         q03_beie_video_understanding: s3.q3_1_beie_video_understanding,
         q03_systems_reframing_accuracy: s3.q3_2_systems_reframing_accuracy,
         q03_sector_to_ecosystem_shift: s3.q3_3_sector_to_ecosystem_shift,
         q03_beie_framework_clarity: s3.q3_4_beie_framework_clarity,
         q03_operating_systems_understanding: s3.q3_5_operating_systems_understanding,
         q03_five_clusters_understanding: s3.q3_6_five_clusters_understanding,
-        // The two Causal Loop Diagram validation questions that DO belong to
-        // Section 3 (see ARCHETYPES_BY_SECTION[3] in swot-content.ts). Wired
-        // through the existing q3_7/q3_8 state fields until Section3's own
-        // component is updated to the q3_cld1_/q3_cld2_ field names directly.
         q3_cld1_investment_development_accuracy: s3.q3_7_investment_development_loop || undefined,
         q3_cld2_governance_confidence_accuracy: s3.q3_8_governance_investor_loop || undefined,
 
+        // Section 4: Cluster 1 — Foundations
         q4_1_foundations_banner_understanding: s4.q4_1_foundations_banner_understanding,
         q4_2_tragedy_commons_accuracy: s4.q4_2_tragedy_commons_accuracy || undefined,
         q4_3_tragedy_followup: s4.q4_3_tragedy_followup || undefined,
@@ -662,6 +631,7 @@ const SurveyWizard: React.FC = () => {
         q4_t1_pestalotiopsis_impact: s4.q4_t1_pestalotiopsis_impact,
         q4_t1_pestalotiopsis_likelihood: s4.q4_t1_pestalotiopsis_likelihood,
 
+        // Section 5: Cluster 2 — Transformers
         q5_1_transformers_banner_understanding: s5.q5_1_transformers_banner_understanding,
         q5_2_halal_advantage_understanding: s5.q5_2_halal_advantage_understanding,
         q5_3_farm_to_market_understanding: s5.q5_3_farm_to_market_understanding,
@@ -685,12 +655,13 @@ const SurveyWizard: React.FC = () => {
         q5_t1_standards_recognition_impact: s5.q5_t1_standards_recognition_impact,
         q5_t1_standards_recognition_likelihood: s5.q5_t1_standards_recognition_likelihood,
 
+        // Section 6: Cluster 3 — Enablers
         q06_halal_sector_rank: s6.q6_1_halal_sector_rank || undefined,
         q06_infra_sequencing_effectiveness: s6.q6_2_sequencing_effectiveness,
         q06_begmp_confidence: s6.q6_3_begmp_confidence,
         q06_tourism_confidence: s6.q6_4_tourism_confidence,
         q06_digital_tourism_rank: s6.q6_5_digital_tourism_rank,
-        q6_6_moral_governance_realistic: s6.q6_6_moral_governance_realistic || undefined,
+        q06_moral_governance_realistic: s6.q6_6_moral_governance_realistic || undefined,
         q6_s1_youth_pop_impact: s6.q6_s1_youth_pop_impact,
         q6_s1_youth_pop_likelihood: s6.q6_s1_youth_pop_likelihood,
         q6_s2_lanao_growth_impact: s6.q6_s2_lanao_growth_impact,
@@ -718,6 +689,7 @@ const SurveyWizard: React.FC = () => {
         q6_arch_limits_growth_accuracy: s6.q6_arch_limits_growth_accuracy || undefined,
         q6_arch_limits_growth_followup: s6.q6_arch_limits_growth_followup || undefined,
 
+        // Section 7: Cluster 4 — Connectors
         q7_1_connectivity_priority: s7.q7_1_connectivity_priority || undefined,
         q7_2_integration_challenge: s7.q7_2_integration_challenge || undefined,
         q7_3_priority_node: s7.q7_3_priority_node || undefined,
@@ -764,6 +736,7 @@ const SurveyWizard: React.FC = () => {
         q_s7_limits_growth: s7.q_s7_limits_growth || undefined,
         q_s7_limits_followup: s7.q_s7_limits_followup || undefined,
 
+        // Section 8: Cluster 5 — Financiers
         q8_1_finance_tier_priority: s8.q8_1_finance_tier_priority || undefined,
         q8_2_roadmap_achievable: s8.q8_2_roadmap_achievable,
         q8_3_priority_action: s8.q8_3_priority_action || undefined,
@@ -811,6 +784,7 @@ const SurveyWizard: React.FC = () => {
         q_s8_shifting_burden: s8.q_s8_shifting_burden || undefined,
         q_s8_shifting_followup: s8.q_s8_shifting_followup || undefined,
 
+        // Section 9: Operating Systems
         q9_1_moral_governance_derisk: s9.q9_1_moral_governance_derisk,
         q9_2_critical_loop: s9.q9_2_critical_loop || undefined,
         q9_3_regulatory_priority: s9.q9_3_regulatory_priority || undefined,
@@ -850,6 +824,7 @@ const SurveyWizard: React.FC = () => {
         q_s9_governance_loop: s9.q_s9_governance_loop || undefined,
         q_s9_governance_loop_followup: s9.q_s9_governance_loop_followup || undefined,
 
+        // Section 10: IEDS & Three-Phase Implementation
         q10_1_ieds_preference: s10.q10_1_ieds_preference || undefined,
         q10_2_sequence_a_priority: s10.q10_2_sequence_a_priority,
         q10_3_sequence_b_priority: s10.q10_3_sequence_b_priority,
@@ -865,6 +840,7 @@ const SurveyWizard: React.FC = () => {
         q10_collaborative_governance: s10.q10_collaborative_governance,
         q10_strategic_ranking: s10.q10_strategic_ranking || undefined,
 
+        // Section 11: Metrics Architecture & KPIs
         q11_1_calibration_appropriate: s11.q11_1_calibration_appropriate || undefined,
         q11_2_governance_kpi_importance: s11.q11_2_governance_kpi_importance,
         q11_3_resilience_kpi_importance: s11.q11_3_resilience_kpi_importance,
@@ -875,6 +851,7 @@ const SurveyWizard: React.FC = () => {
         q_s11_drifting_goals: s11.q_s11_drifting_goals || undefined,
         q_s11_drifting_goals_followup: s11.q_s11_drifting_goals_followup || undefined,
 
+        // Section 12: Balanced Scorecard
         q12_1_learning_growth_alignment: s12.q12_1_learning_growth_alignment,
         q12_2_internal_process_alignment: s12.q12_2_internal_process_alignment,
         q12_3_stakeholder_alignment: s12.q12_3_stakeholder_alignment,
@@ -886,6 +863,7 @@ const SurveyWizard: React.FC = () => {
         q12_9_bsc_useful: s12.q12_9_bsc_useful,
         q12_10_adaptive_frequency: s12.q12_10_adaptive_frequency || undefined,
 
+        // Section 13: Priority Actions & Budget
         q13_1_funding_mix_fair: s13.q13_1_funding_mix_fair,
         q13_2_targets_realistic: s13.q13_2_targets_realistic,
         q13_3_high_risk_concern: s13.q13_3_high_risk_concern,
@@ -895,12 +873,14 @@ const SurveyWizard: React.FC = () => {
         q13_7_budget_priority_cluster: s13.q13_7_budget_priority_cluster || undefined,
         q13_8_blended_finance_opinion: s13.q13_8_blended_finance_opinion || undefined,
 
+        // Section 14: Access to Resources & Engagements
         q14_1_engagement_type: s14.q14_1_engagement_type,
         q14_2_contact_method: s14.q14_2_contact_method || undefined,
         q14_3_timing: s14.q14_3_timing || undefined,
         q14_4_role_contribution: s14.q14_4_role_contribution || undefined,
         q14_5_additional_comments: s14.q14_5_additional_comments || undefined,
 
+        // Section 15: Review & Submit
         q15_1_confirm_accurate: s15.q15_1_confirm_accurate,
         q15_2_consent_anonymous_use: s15.q15_2_consent_anonymous_use,
         q15_3_consent_voluntary: s15.q15_3_consent_voluntary,
