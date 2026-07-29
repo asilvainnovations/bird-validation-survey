@@ -7,11 +7,19 @@ import { Toaster } from "sonner";
 import AppLayout from "@components/AppLayout";
 
 // ─── LAZY LOADED PAGE COMPONENTS ────────────────────────────────────────────
-// All page-level components are lazy-loaded to keep the initial bundle small.
-// The survey wizard itself is the heaviest component; it loads on demand.
 const Index = lazy(() => import("@pages/Index"));
 const NotFound = lazy(() => import("@pages/NotFound"));
 const SurveyDashboard = lazy(() => import("@components/dashboard/SurveyDashboard"));
+const SurveyWizard = lazy(() => import("@components/strategic/SurveyWizard"));
+
+// ─── AUTH GUARD ─────────────────────────────────────────────────────────────
+// If you have a real RequireAuth at @/components/auth/RequireAuth, swap this
+// import in. For the BIRD Validation Survey, the survey itself is PUBLIC;
+// auth is optional (for saving progress / personalized dashboards only).
+const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // TODO: wire to @/hooks/useAuth if you want protected admin routes later
+  return <>{children}</>;
+};
 
 // ─── LOADING FALLBACK ───────────────────────────────────────────────────────
 const AppLoadingFallback = React.memo(() => (
@@ -108,15 +116,21 @@ const App: React.FC = () => (
           <AppLayout>
             <Suspense fallback={<AppLoadingFallback />}>
               <Routes>
-                {/* Core SPA routes */}
+                {/* Landing / Orientation */}
                 <Route path="/" element={<Index />} />
-                <Route path="/validation-survey" element={<Index />} />
-                <Route path="/dashboard" element={<SurveyDashboard />} />
-                <Route path="/survey" element={<RequireAuth><SurveyWizard /></RequireAuth>} />
 
-                {/* Redirects: old static HTML pages → SPA equivalent */}
+                {/* Public survey — no auth required for stakeholder participation */}
+                <Route path="/validation-survey" element={<SurveyWizard />} />
+                <Route path="/survey" element={<Navigate to="/validation-survey" replace />} />
+
+                {/* Live Dashboard (public analytics) */}
+                <Route path="/dashboard" element={<SurveyDashboard />} />
+
+                {/* Redirects: old static HTML pages → SPA equivalents */}
                 <Route path="/survey-orientation" element={<Navigate to="/" replace />} />
                 <Route path="/survey-orientation.html" element={<Navigate to="/" replace />} />
+                <Route path="/validation-survey.html" element={<Navigate to="/validation-survey" replace />} />
+                <Route path="/survey-dashboard.html" element={<Navigate to="/dashboard" replace />} />
 
                 {/* Catch-all */}
                 <Route path="*" element={<NotFound />} />
