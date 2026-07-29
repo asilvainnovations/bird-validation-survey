@@ -1,15 +1,14 @@
 // src/components/strategic/Section15_Submission.tsx
 // BIRD 2026–2035 · Section 15: Review & Submit
-// Updated: 2026-07-30 · Strict alignment with reusable primitives and survey architecture
+// Updated: 2026-07-30 · Fixed import paths and primitive APIs
 
 import React from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Send, CheckCircle, ArrowDown, Mail, ShieldCheck, FileCheck } from "lucide-react";
+import { Send, CheckCircle, FileCheck, ShieldCheck } from "lucide-react";
 
 // ─── REUSABLE PRIMITIVES ─────────────────────────────────────────────────────
-import { SectionProgress } from "@/components/primitives/SectionProgress";
+import { SectionProgress } from "@/lib/primitives/SectionProgress";
 
 // ── Types (exact runtime contract with SurveyWizard.tsx s15 state) ──────────
 export interface Section15Data {
@@ -57,13 +56,15 @@ const Section15_Submission: React.FC<Section15Props> = ({ data, onChange }) => {
     onChange({ ...data, [field]: value });
   };
 
+  const allChecked = data.q15_1_confirm_accurate && data.q15_2_consent_anonymous_use && data.q15_3_consent_voluntary && data.q15_4_ready_to_submit;
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-4xl mx-auto px-4 py-6">
       {/* ── Section Progress ────────────────────────────────────── */}
-      <SectionProgress 
-        current={15} 
-        total={16} 
-        labels={SECTIONS_LIST.map((s) => s.name)} 
+      <SectionProgress
+        currentSection={15}
+        totalSections={16}
+        sectionLabel="Review & Submit"
       />
 
       {/* ── HEADER ──────────────────────────────────────────────── */}
@@ -149,4 +150,103 @@ const Section15_Submission: React.FC<Section15Props> = ({ data, onChange }) => {
                 type="checkbox"
                 checked={data.q15_1_confirm_accurate}
                 onChange={(e) => update("q15_1_confirm_accurate", e.target.checked)}
-                className="w-5 h-5 mt-0.5 rounded border-[#C9A84C] text-[#1B4D3E] accent-[#1B
+                className="w-5 h-5 mt-0.5 rounded border-[#C9A84C] text-[#1B4D3E] accent-[#1B4D3E] shrink-0"
+              />
+              <div>
+                <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
+                  I confirm that my responses are accurate and reflect my true assessment.
+                </p>
+              </div>
+            </label>
+
+            {/* Checkbox 2 */}
+            <label
+              htmlFor="consent-anonymous"
+              className={cn(
+                "flex items-start gap-3 p-4 rounded-lg border transition-all cursor-pointer",
+                data.q15_2_consent_anonymous_use
+                  ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-300 dark:border-emerald-700"
+                  : "bg-white dark:bg-[#022c22]/60 border-[#C9A84C]/20 hover:border-[#C9A84C]/40"
+              )}
+            >
+              <input
+                id="consent-anonymous"
+                type="checkbox"
+                checked={data.q15_2_consent_anonymous_use}
+                onChange={(e) => update("q15_2_consent_anonymous_use", e.target.checked)}
+                className="w-5 h-5 mt-0.5 rounded border-[#C9A84C] text-[#1B4D3E] accent-[#1B4D3E] shrink-0"
+              />
+              <div>
+                <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
+                  I consent to the anonymous use of my responses for research and planning purposes.
+                </p>
+              </div>
+            </label>
+
+            {/* Checkbox 3 */}
+            <label
+              htmlFor="consent-voluntary"
+              className={cn(
+                "flex items-start gap-3 p-4 rounded-lg border transition-all cursor-pointer",
+                data.q15_3_consent_voluntary
+                  ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-300 dark:border-emerald-700"
+                  : "bg-white dark:bg-[#022c22]/60 border-[#C9A84C]/20 hover:border-[#C9A84C]/40"
+              )}
+            >
+              <input
+                id="consent-voluntary"
+                type="checkbox"
+                checked={data.q15_3_consent_voluntary}
+                onChange={(e) => update("q15_3_consent_voluntary", e.target.checked)}
+                className="w-5 h-5 mt-0.5 rounded border-[#C9A84C] text-[#1B4D3E] accent-[#1B4D3E] shrink-0"
+              />
+              <div>
+                <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
+                  I understand that my participation is voluntary and I may withdraw at any time.
+                </p>
+              </div>
+            </label>
+
+            {/* Checkbox 4 */}
+            <label
+              htmlFor="ready-submit"
+              className={cn(
+                "flex items-start gap-3 p-4 rounded-lg border transition-all cursor-pointer",
+                data.q15_4_ready_to_submit
+                  ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-300 dark:border-emerald-700"
+                  : "bg-white dark:bg-[#022c22]/60 border-[#C9A84C]/20 hover:border-[#C9A84C]/40"
+              )}
+            >
+              <input
+                id="ready-submit"
+                type="checkbox"
+                checked={data.q15_4_ready_to_submit}
+                onChange={(e) => update("q15_4_ready_to_submit", e.target.checked)}
+                className="w-5 h-5 mt-0.5 rounded border-[#C9A84C] text-[#1B4D3E] accent-[#1B4D3E] shrink-0"
+              />
+              <div>
+                <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
+                  I am ready to submit my survey response.
+                </p>
+              </div>
+            </label>
+          </div>
+
+          {/* Status indicator */}
+          <div className={cn(
+            "rounded-lg px-4 py-3 text-center text-sm font-medium transition-all",
+            allChecked
+              ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700"
+              : "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700"
+          )}>
+            {allChecked
+              ? "✓ All declarations confirmed. You may now submit your survey."
+              : "⚠ Please tick all four declarations above to enable submission."}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default Section15_Submission;
