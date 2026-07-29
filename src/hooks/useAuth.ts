@@ -104,6 +104,41 @@ export const useAuth = () => {
     }
   }, []);
 
+  // ── Transactional email (best-effort, never blocks auth) ───────────────────
+  // Posts to the email-notifications Edge Function
+  // (EDGE_FUNCTIONS.EMAIL_NOTIFICATIONS resolves to
+  // https://lydsisparsmvextskevw.supabase.co/functions/v1/email-notifications
+  // when VITE_SUPABASE_URL is set to that project). The payload shape here
+  // — { type: 'welcome', email, name } — matches WelcomePayload in
+  // supabase/functions/email-notifications/index.ts exactly; the previous
+  // version of this function sent `{ to: email }`, which the Edge Function's
+  // `if (!payload.email)` check would have silently rejected every time.
+  const sendWelcomeEmail = useCallback(async (email: string, name?: string) => {
+    try {
+      await fetch(EDGE_FUNCTIONS.EMAIL_NOTIFICATIONS, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'welcome',
+          email,
+          name: name || email.split('@')[0],
+        }),
+      });
+    } catch {
+      // Silently fail — email is not critical for signup/login completion
+    }
+  }, []);
+
+  // Google OAuth's first SIGNED_IN event fires for both brand-new and
+  // returning users; profile.full_name is passed through for future use in
+  // distinguishing them (e.g. by created_at), but is not required today since
+  // a duplicate welcome email is a low-cost failure mode compared to missing
+  // one entirely.
+  const sendWelcomeEmailIfFirstSession = useCallback((email: string, fullName: string | null) => {
+    void fullName;
+    sendWelcomeEmail(email, fullName || undefined);
+  }, [sendWelcomeEmail]);
+
   useEffect(() => {
     const initAuth = async () => {
       try {
@@ -136,7 +171,7 @@ export const useAuth = () => {
     initAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (event, session) => {
         if (session?.user) {
           const profile = await fetchProfile(session.user.id, session.user.email!);
           const isAdmin = await checkAdmin(session.user.email!);
@@ -144,6 +179,12 @@ export const useAuth = () => {
             user: session.user, session, profile,
             isLoading: false, isAuthenticated: true, isAdmin,
           });
+          // A Google OAuth sign-in lands here (not in signUp()/signIn() below,
+          // since the redirect completes outside those functions), so this is
+          // also where a first-time Google login should get its welcome email.
+          if (event === 'SIGNED_IN' && profile) {
+            sendWelcomeEmailIfFirstSession(session.user.email!, profile.full_name);
+          }
         } else {
           setAuthState({
             user: null, session: null, profile: null,
@@ -154,7 +195,7 @@ export const useAuth = () => {
     );
 
     return () => { subscription.unsubscribe(); };
-  }, [fetchProfile, checkAdmin, logVisit]);
+  }, [fetchProfile, checkAdmin, logVisit, sendWelcomeEmailIfFirstSession]);
 
   const signUp = async (email: string, password: string, fullName: string) => {
     const { data, error } = await supabase.auth.signUp({
@@ -163,30 +204,8 @@ export const useAuth = () => {
     });
     if (error) throw error;
 
-    // Trigger welcome email via edge function (best-effort, non-blocking)
     if (data?.user) {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        await fetch(
-          EDGE_FUNCTIONS.EMAIL_NOTIFICATIONS,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(session?.access_token
-                ? { Authorization: `Bearer ${session.access_token}` }
-                : {}),
-            },
-            body: JSON.stringify({
-              type: 'welcome',
-              to: email,
-              name: fullName || email.split('@')[0],
-            }),
-          }
-        );
-      } catch {
-        // Silently fail — email is not critical for signup completion
-      }
+      sendWelcomeEmail(email, fullName);
     }
 
     return data;
@@ -203,6 +222,37 @@ export const useAuth = () => {
     const { data, error } = await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: `${window.location.origin}/` },
+    });
+    if (error) throw error;
+    return data;
+  };
+
+  // ── Google OAuth ─────────────────────────────────────────────────────────
+  // IMPORTANT: GOOGLE_OAUTH_CLIENT_ID / GOOGLE_OAUTH_CLIENT_SECRET /
+  // GOOGLE_REFRESH_TOKEN / CALLBACK_URL are NOT referenced anywhere in this
+  // file, or anywhere in frontend code, on purpose. Supabase Auth handles the
+  // entire Google OAuth handshake server-side:
+  //   Supabase Dashboard → Authentication → Providers → Google →
+  //     Client ID:     GOOGLE_OAUTH_CLIENT_ID
+  //     Client Secret: GOOGLE_OAUTH_CLIENT_SECRET
+  //   (GOOGLE_REFRESH_TOKEN is not a Supabase Auth provider field — that's
+  //   only needed if a server-side job calls Google APIs directly, e.g.
+  //   sending mail via the Gmail API. It has no place in a login flow and
+  //   must never be embedded in this repo or shipped to the browser.)
+  //   Redirect / callback URL (already provided by Supabase, matches yours):
+  //     https://lydsisparsmvextskevw.supabase.co/auth/v1/callback
+  //   That value also needs to be added to the "Authorized redirect URIs"
+  //   list in the Google Cloud Console OAuth client, not pasted into code.
+  // The client only needs to call signInWithOAuth() below; Supabase redirects
+  // to Google, Google redirects back to CALLBACK_URL, and Supabase completes
+  // the session — which fires the onAuthStateChange listener above.
+  const signInWithGoogle = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/`,
+        queryParams: { access_type: 'offline', prompt: 'consent' },
+      },
     });
     if (error) throw error;
     return data;
@@ -246,7 +296,7 @@ export const useAuth = () => {
 
   return {
     ...authState,
-    signUp, signIn, signInWithMagicLink, signOut,
+    signUp, signIn, signInWithMagicLink, signInWithGoogle, signOut,
     resetPassword, updatePassword, updateProfile, refreshProfile,
   };
 };
