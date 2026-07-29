@@ -1,29 +1,35 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from "react";
 
-interface AppContextType {
-  sidebarOpen: boolean;
-  toggleSidebar: () => void;
+interface AuthContextType {
+  user: { email: string } | null;
+  profile: { full_name?: string } | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  signOut: () => Promise<void>;
 }
 
-const defaultAppContext: AppContextType = {
-  sidebarOpen: false,
-  toggleSidebar: () => {},
-};
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  profile: null,
+  isAuthenticated: false,
+  isLoading: false,
+  signOut: async () => {},
+});
 
-const AppContext = createContext<AppContextType>(defaultAppContext);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user] = useState<AuthContextType["user"]>(null);
+  const [profile] = useState<AuthContextType["profile"]>(null);
+  const [isLoading] = useState(false);
 
-export const useAppContext = () => useContext(AppContext);
-
-export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    setSidebarOpen(prev => !prev);
+  const signOut = async () => {
+    // Wire to Supabase auth.signOut() when ready
   };
 
   return (
-    <AppContext.Provider value={{ sidebarOpen, toggleSidebar }}>
+    <AuthContext.Provider value={{ user, profile, isAuthenticated: !!user, isLoading, signOut }}>
       {children}
-    </AppContext.Provider>
+    </AuthContext.Provider>
   );
 };
+
+export const useAuthContext = () => useContext(AuthContext);
