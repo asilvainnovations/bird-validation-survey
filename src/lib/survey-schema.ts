@@ -60,7 +60,7 @@ const iedsMatrixSchema = z.object({
 
 // ── Main Survey Schema ──────────────────────────────────────────────────────
 export const surveySchema = z.object({
-  // ═══ Step 0: Welcome & Orientation ══
+  // ═══ Step 0: Welcome & Orientation ═══
   q0_1_ready: optionalString,
   q0_2_ecosystem_understanding: optionalString,
   q0_3_systems_thinking_value: optionalNumber,
@@ -82,9 +82,12 @@ export const surveySchema = z.object({
   q2_province: optionalString,
   q2_category: optionalString,
   q2_expertise: optionalStringArray,
+  
+  // SCHEMA CONFLICT RESOLUTION: 
+  // Converted plain text to a proper inline comment to prevent TS1005/TS1127 syntax errors.
+  // Note: q2_network_accuracy changed from optionalString → optionalNumber
+  // because it now uses LikertScale (1–5) instead of free-text options.
   q2_network_accuracy: optionalNumber,
-  Note: q2_network_accuracy changed from optionalString → optionalNumber
-  because it now uses LikertScale (1–5) instead of free-text options.
   
   // ═══ Step 3: BEIE & Systems Thinking ═══
   // No SWOT scale items belong here — SWOT_Scale_Questions.md maps them to
@@ -157,7 +160,7 @@ export const surveySchema = z.object({
   q10_leverage_points: optionalNumber,
   q10_ieds_execution: optionalNumber,
 
-  // ══ Step 11: Metrics Architecture & KPIs ═══
+  // ═══ Step 11: Metrics Architecture & KPIs ═══
   q11_calibration_appropriate: optionalString,
   q11_governance_kpi_importance: optionalNumber,
   q11_resilience_kpi_importance: optionalNumber,
