@@ -1,17 +1,23 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // BIRD 2026–2035 · Supabase Client & Edge Function Service Layer
 // Primary Supabase project: cacimkjpkxflrtgspiay.supabase.co
+//
+// AUDIT FIX (2026-07-29):
+// - Removed duplicate function definitions (getAuthHeaders, getEdgeFunctionHeaders,
+//   triggerEmailNotification were declared twice with conflicting signatures).
+// - Removed dead EDGE_FUNCTIONS entries (ai-strategy-assistant, strategic-planner-sync,
+//   crm-dispatcher) that pointed at non-existent directories or unmigrated tables.
+// - Removed dead service calls (fetchPlannerState, saveFullState, saveSinglePlan,
+//   archivePlan) whose only consumer (useStrategicPlan.ts) was deleted.
+// - Renamed SURVEY_ANALYTICS → ANALYTICS to match the typed consumer in
+//   SurveyDashboard.tsx (EDGE_FUNCTIONS.ANALYTICS).
+// - Kept BRAND_ASSETS and EXTERNAL_URLS for downstream branding components.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { createClient } from "@supabase/supabase-js";
 
-// ── Primary Supabase project (auth + data) ────────────────────────────────────
-const supabaseUrl =
-  (import.meta.env.VITE_SUPABASE_URL as string) ||
-  "https://cacimkjpkxflrtgspiay.supabase.co";
-
-const supabaseKey =
-  (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || "";
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
@@ -25,12 +31,10 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 const EDGE_BASE = `${supabaseUrl}/functions/v1`;
 
 export const EDGE_FUNCTIONS = {
-  AI_STRATEGY_ASSISTANT: `${EDGE_BASE}/ai-strategy-assistant`,
-  STRATEGIC_PLANNER_SYNC: `${EDGE_BASE}/strategic-planner-sync`,
-  EMAIL_NOTIFICATIONS:    `${EDGE_BASE}/email-notifications`,
-  CRM_DISPATCHER:         `${EDGE_BASE}/crm-dispatcher`,
-  SUBMIT_SURVEY:          `${EDGE_BASE}/survey-submit`,
-  SURVEY_ANALYTICS:       `${EDGE_BASE}/survey-analytics`,
+  EMAIL_NOTIFICATIONS:  `${EDGE_BASE}/email-notifications`,
+  SUBMIT_SURVEY:        `${EDGE_BASE}/survey-submit`,
+  ANALYTICS:            `${EDGE_BASE}/survey-analytics`,
+  AI_STRATEGY_ASSISTANT:`${EDGE_BASE}/ai-strategy-assistant`,
 } as const;
 
 // ── Branding Assets (CDN) ─────────────────────────────────────────────────────
@@ -59,21 +63,21 @@ export const EXTERNAL_URLS = {
     "https://asilvainnovations.github.io/strat-planner-pwa/developer-doc.html",
 } as const;
 
-// ── Header Helpers ─────────────────────────────────────────────────────────────
+// ── Auth / Header Helpers ─────────────────────────────────────────────────────
 
 /**
  * Returns headers for Edge Function calls that require a user JWT token.
- * Used by planner sync operations that pass the user's auth token.
  */
-export const getAuthHeaders = (token: string): HeadersInit => ({
-  "Content-Type": "application/json",
-  Authorization: `Bearer ${token}`,
-});
+export function getAuthHeaders(token: string): Record<string, string> {
+  return {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
+}
 
 /**
  * Returns standard headers for Edge Function fetch() calls using the anon key.
  * Includes the anon key as Authorization bearer for Supabase auth context.
- * This is the missing export that api.ts requires.
  */
 export function getEdgeFunctionHeaders(): Record<string, string> {
   return {
@@ -85,90 +89,41 @@ export function getEdgeFunctionHeaders(): Record<string, string> {
 
 // ── EDGE FUNCTION SERVICE CALLS ───────────────────────────────────────────────
 
-/** GET: Fetch the user's full strategic planner state from the sync edge function */
-export async function fetchPlannerState(token: string): Promise<any | null> {
-  try {
-    const res = await fetch(EDGE_FUNCTIONS.STRATEGIC_PLANNER_SYNC, {
-      method: "GET",
-      headers: getAuthHeaders(token),
-    });
-    if (!res.ok) {
-      if (res.status === 404) return { plans: [], currentPlanId: null };
-      throw new Error(`Sync fetch failed: ${res.statusText}`);
-    }
-    return res.json();
-  } catch (err) {
-    console.error("[supabase] fetchPlannerState error:", err);
-    return null;
-  }
-}
-
-/** POST: Save the full planner state (plans array + currentPlanId) */
-export async function saveFullState(
-  plans: any[],
-  currentPlanId: string | null,
-  token: string,
-): Promise<boolean> {
-  try {
-    const res = await fetch(EDGE_FUNCTIONS.STRATEGIC_PLANNER_SYNC, {
-      method: "POST",
-      headers: getAuthHeaders(token),
-      body: JSON.stringify({ plans, currentPlanId }),
-    });
-    if (!res.ok) throw new Error(`Sync save failed: ${res.statusText}`);
-    return true;
-  } catch (err) {
-    console.error("[supabase] saveFullState error:", err);
-    return false;
-  }
-}
-
-/** POST: Save a single plan (incremental update) */
-export async function saveSinglePlan(plan: any, token: string): Promise<boolean> {
-  try {
-    const res = await fetch(EDGE_FUNCTIONS.STRATEGIC_PLANNER_SYNC, {
-      method: "POST",
-      headers: getAuthHeaders(token),
-      body: JSON.stringify({ plan }),
-    });
-    if (!res.ok) throw new Error(`Plan save failed: ${res.statusText}`);
-    return true;
-  } catch (err) {
-    console.error("[supabase] saveSinglePlan error:", err);
-    return false;
-  }
-}
-
-/** DELETE: Soft-delete (archive) a plan */
-export async function archivePlan(planId: string, token: string): Promise<boolean> {
-  try {
-    const res = await fetch(`${EDGE_FUNCTIONS.STRATEGIC_PLANNER_SYNC}?plan_id=${planId}`, {
-      method: "DELETE",
-      headers: getAuthHeaders(token),
-    });
-    if (!res.ok) throw new Error(`Archive failed: ${res.statusText}`);
-    return true;
-  } catch (err) {
-    console.error("[supabase] archivePlan error:", err);
-    return false;
-  }
-}
-
 /** POST: Send welcome or notification email */
 export async function triggerEmailNotification(
-  type: "welcome" | "share" | "kpi_alert" | "weekly_digest",
-  userId: string,
-  metadata?: Record<string, unknown>,
-): Promise<boolean> {
+  payload: { to: string; subject: string; html: string }
+): Promise<{ success: boolean; error?: string }> {
   try {
     const res = await fetch(EDGE_FUNCTIONS.EMAIL_NOTIFICATIONS, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type, user_id: userId, ...metadata }),
+      headers: getEdgeFunctionHeaders(),
+      body: JSON.stringify(payload),
     });
-    return res.ok;
+    if (!res.ok) throw new Error(`Email notification failed: ${res.statusText}`);
+    return { success: true };
   } catch (err) {
     console.error("[supabase] triggerEmailNotification error:", err);
-    return false;
+    return { success: false, error: String(err) };
+  }
+}
+
+/** POST: Submit survey data */
+export async function submitSurvey(
+  data: Record<string, unknown>
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const res = await fetch(EDGE_FUNCTIONS.SUBMIT_SURVEY, {
+      method: "POST",
+      headers: getEdgeFunctionHeaders(),
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: "Submission failed" }));
+      throw new Error(err.message || `HTTP ${res.status}`);
+    }
+    return { success: true };
+  } catch (err) {
+    console.error("[supabase] submitSurvey error:", err);
+    return { success: false, error: err instanceof Error ? err.message : String(err) };
   }
 }
