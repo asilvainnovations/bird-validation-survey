@@ -19,11 +19,12 @@ export interface SubmissionResponse {
  * @param data — Flat survey data from SurveyWizard (extends SurveySchemaType)
  */
 export async function submitSurvey(data: Partial<SurveySchemaType>): Promise<SubmissionResponse> {
-  // Ensure required fields for Edge Function validation
+  // consent_final is derived — never trusted as a pre-set true — from the
+  // actual consent answer. If the respondent did not affirmatively consent,
+  // this must be false so the Edge Function rejects the submission.
   const payload = {
     ...data,
-    // The Edge Function checks these keys for consent validation
-    consent_final: data.consent_final ?? data.q1_1_consent_participate ?? true,
+    consent_final: data.q01_consent_participate === true,
     // Metadata for audit trail
     _meta: {
       timestamp: new Date().toISOString(),
