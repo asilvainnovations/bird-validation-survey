@@ -9,7 +9,7 @@
  *  - Survey Submissions: BackgroundSync + IndexedDB queue for offline resilience
  */
 
-const CACHE_VERSION = 'bird-survey-v1';
+const CACHE_VERSION = 'bird-survey-v2';  // BUMPED — forces cache refresh
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 const API_CACHE = `${CACHE_VERSION}-api`;
@@ -19,7 +19,6 @@ const PRECACHE_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  // Vite build chunks are hashed — we cache them dynamically via runtime
 ];
 
 // Routes that should never be cached (auth, admin, etc.)
@@ -43,10 +42,18 @@ const ASSET_PATTERNS = [
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
+// UTILITY: Check if a request is cacheable (only http/https schemes)
+// ─────────────────────────────────────────────────────────────────────────────
+function isCacheable(request) {
+  const url = new URL(request.url);
+  return url.protocol === 'http:' || url.protocol === 'https:';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // INSTALL — Pre-cache app shell
 // ─────────────────────────────────────────────────────────────────────────────
 self.addEventListener('install', (event) => {
-  console.log('[SW] Install');
+  console.log('[SW] Install v2');
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then((cache) => cache.addAll(PRECACHE_ASSETS))
@@ -64,7 +71,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) =>
       Promise.all(
         cacheNames
-          .filter((name) => name.startsWith('bird-survey-') && name !== CACHE_VERSION)
+          .filter((name) => name.startsWith('bird-survey-') && !name.includes(CACHE_VERSION))
           .map((name) => {
             console.log('[SW] Deleting old cache:', name);
             return caches.delete(name);
@@ -81,8 +88,13 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Skip non-GET requests (except for background sync submissions)
+  // SKIP non-GET requests (except background sync submissions)
   if (request.method !== 'GET' && !url.pathname.includes('survey-submit')) {
+    return;
+  }
+
+  // SKIP non-cacheable schemes (chrome-extension, blob, data, etc.)
+  if (!isCacheable(request)) {
     return;
   }
 
@@ -126,19 +138,23 @@ self.addEventListener('fetch', (event) => {
 
 /** Cache-First: Serve from cache; fetch & update cache on miss */
 async function cacheFirst(request, cacheName) {
+  // Guard: only cache http/https requests
+  if (!isCacheable(request)) {
+    return fetch(request);
+  }
+
   const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
   if (cached) return cached;
 
   try {
     const networkResponse = await fetch(request);
-    if (networkResponse.ok) {
+    if (networkResponse.ok && isCacheable(request)) {
       cache.put(request, networkResponse.clone());
     }
     return networkResponse;
   } catch (err) {
     console.error('[SW] Cache-first fetch failed:', err);
-    // Return a generic offline fallback if available
     const fallback = await cache.match('/index.html');
     if (fallback) return fallback;
     throw err;
@@ -147,12 +163,17 @@ async function cacheFirst(request, cacheName) {
 
 /** Network-First: Try network; fallback to cache after timeout */
 async function networkFirst(request, cacheName, timeoutMs = 5000) {
+  // Guard: only cache http/https requests
+  if (!isCacheable(request)) {
+    return fetch(request);
+  }
+
   const cache = await caches.open(cacheName);
 
   return Promise.race([
     fetch(request)
       .then((response) => {
-        if (response.ok) {
+        if (response.ok && isCacheable(request)) {
           cache.put(request, response.clone());
         }
         return response;
@@ -169,12 +190,17 @@ async function networkFirst(request, cacheName, timeoutMs = 5000) {
 
 /** Stale-While-Revalidate: Serve cache immediately; update in background */
 async function staleWhileRevalidate(request, cacheName) {
+  // Guard: only cache http/https requests
+  if (!isCacheable(request)) {
+    return fetch(request);
+  }
+
   const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
 
   const networkFetch = fetch(request)
     .then((response) => {
-      if (response.ok) {
+      if (response.ok && isCacheable(request)) {
         cache.put(request, response.clone());
       }
       return response;
@@ -197,12 +223,7 @@ self.addEventListener('sync', (event) => {
   }
 });
 
-/** Flush queued survey submissions from IndexedDB */
 async function flushSubmissionQueue() {
-  // This relies on the app storing failed submissions in IndexedDB
-  // The app should call: navigator.serviceWorker.ready.then(sw => sw.sync.register('survey-submit-sync'))
-  // Implementation note: The app layer (useStrategicPlan.ts or api.ts) should handle
-  // the actual queue logic. This SW just triggers the sync event.
   console.log('[SW] Flush queue — delegate to app layer via postMessage');
   const clients = await self.clients.matchAll({ type: 'window' });
   clients.forEach((client) =>
@@ -211,7 +232,7 @@ async function flushSubmissionQueue() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PUSH NOTIFICATIONS (Optional — ready for future use)
+// PUSH NOTIFICATIONS (Optional)
 // ─────────────────────────────────────────────────────────────────────────────
 self.addEventListener('push', (event) => {
   if (!event.data) return;
@@ -234,7 +255,7 @@ self.addEventListener('notificationclick', (event) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MESSAGE HANDLER — Allow app to communicate with SW
+// MESSAGE HANDLER
 // ─────────────────────────────────────────────────────────────────────────────
 self.addEventListener('message', (event) => {
   if (event.data?.type === 'SKIP_WAITING') {
