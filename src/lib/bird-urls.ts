@@ -442,6 +442,14 @@ export const BIRD_IMAGES = {
     alt: "Big Man",
     description: "Concentrated political power creates self-reinforcing system of instability: R1 (Patronage-Governance), R2 (Exclusion-Conflict), R3 (Resource Depletion).",
   },
+  escalationArchetype: {
+    title: "Escalation Archetype",
+    url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/Escalation.png",
+    category: "archetype",
+    section: "section9",
+    alt: "Escalation",
+    description: "Competitive spirals among clans, provinces, or agencies divert resources from productive development to contestation, degrading BARMM's investment climate.",
+  },
   policyRecommendationsMakers: {
     title: "Policy Recommendations: Policymakers-Planners-Investors",
     url: "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Policy%20Recommendations-Policy%20Makers-Planners-Investors.png",
@@ -697,9 +705,7 @@ export function getClusterImages(): BIRDImage[] {
 }
 
 export function getProvincialImages(): BIRDImage[] {
-  return Object.values(BIRD_IMAGES).filter(img =>
-    img.category === "provincial" || img.category === "provincial-outlook"
-  );
+  return Object.values(BIRD_IMAGES).filter(img => img.category === "provincial");
 }
 
 export function getConnectivityImages(): BIRDImage[] {
