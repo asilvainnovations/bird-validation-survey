@@ -653,12 +653,17 @@ const SurveyWizard: React.FC = () => {
         q4_t1_pestalotiopsis_impact: s4.q4_t1_pestalotiopsis_impact,
         q4_t1_pestalotiopsis_likelihood: s4.q4_t1_pestalotiopsis_likelihood,
 
-        q5_1_transformers_banner_understanding: s5.q5_1_transformers_banner_understanding,
-        q5_2_halal_advantage_understanding: s5.q5_2_halal_advantage_understanding,
-        q5_3_farm_to_market_understanding: s5.q5_3_farm_to_market_understanding,
-        q5_4_economic_zones_understanding: s5.q5_4_economic_zones_understanding,
-        q5_5_growth_underinvestment_accuracy: s5.q5_5_growth_underinvestment_accuracy || undefined,
-        q5_6_growth_underinvestment_followup: s5.q5_6_growth_underinvestment_followup || undefined,
+        // NOTE: field keys remapped to the canonical q05_ / q5_arch_growth_underinvest_
+        // prefixes (see src/lib/swot-content.ts + survey-schema.ts). Section5Data itself
+        // (in Section5_Transformers.tsx) still exposes the old q5_1_.../q5_5_/q5_6_ names
+        // below — that component still needs updating to match this canonical mapping
+        // directly; tracked as follow-up work (same pattern already applied to Section 3/4).
+        q05_transformers_banner_understanding: s5.q5_1_transformers_banner_understanding,
+        q05_halal_advantage_understanding: s5.q5_2_halal_advantage_understanding,
+        q05_farm_to_market_understanding: s5.q5_3_farm_to_market_understanding,
+        q05_economic_zones_understanding: s5.q5_4_economic_zones_understanding,
+        q5_arch_growth_underinvest_accuracy: s5.q5_5_growth_underinvestment_accuracy || undefined,
+        q5_arch_growth_underinvest_followup: s5.q5_6_growth_underinvestment_followup || undefined,
         q5_s1_halal_legitimacy_impact: s5.q5_s1_halal_legitimacy_impact,
         q5_s1_halal_legitimacy_likelihood: s5.q5_s1_halal_legitimacy_likelihood,
         q5_s2_domestic_demand_impact: s5.q5_s2_domestic_demand_impact,
@@ -681,7 +686,7 @@ const SurveyWizard: React.FC = () => {
         q06_begmp_confidence: s6.q6_3_begmp_confidence,
         q06_tourism_confidence: s6.q6_4_tourism_confidence,
         q06_digital_tourism_rank: s6.q6_5_digital_tourism_rank,
-        q6_6_moral_governance_realistic: s6.q6_6_moral_governance_realistic || undefined,
+        q06_moral_governance_realistic: s6.q6_6_moral_governance_realistic || undefined,
         q6_s1_youth_pop_impact: s6.q6_s1_youth_pop_impact,
         q6_s1_youth_pop_likelihood: s6.q6_s1_youth_pop_likelihood,
         q6_s2_lanao_growth_impact: s6.q6_s2_lanao_growth_impact,
