@@ -1,68 +1,117 @@
 // src/components/AppLayout.tsx
-// BIRD 2026–2035 · Main Application Layout Shell
-//
-// SCHEMA CONFLICT RESOLUTION (React 18+):
-// In React 18+, the `React.FC` type no longer implicitly includes the `children` 
-// prop in its type definition. Previously, passing children to <AppLayout> in 
-// App.tsx and Index.tsx triggered TS2559: "Type '{ children: Element; }' has 
-// no properties in common with type 'IntrinsicAttributes'".
-// 
-// FIX: We now explicitly define `interface AppLayoutProps { children?: React.ReactNode; }` 
-// and type the component as `React.FC<AppLayoutProps>`. This explicitly tells 
-// TypeScript that this component accepts children, resolving the TS2559 error 
-// while maintaining strict type safety across the survey lifecycle.
+// BIRD 2026–2035 · Validation Survey Shell
+// Contains ALL visual chrome: header, footer, nav, AuthModal, FloatingAIAssistant,
+// ContextPanel, and theme toggle. Renders {children} as the main page content.
 
-import React, { useState, useMemo, useCallback, lazy, Suspense } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { useTheme } from '@/components/theme-provider';
-import { BIRD_SITES } from '@/lib/bird-urls';
+import React, { useState, useMemo, useCallback, lazy, Suspense } from "react";
+import { useLocation } from "react-router-dom";
+import { useAuthContext } from "@/contexts/AuthContext";
+import { useTheme } from "@/components/theme-provider";
+import { BIRD_SITES } from "@/lib/bird-urls";
 
-import { StratLogo } from '@/components/branding/Logo';
-import { PlatformBadge } from '@/components/branding/PlatformBadge';
-import { Toggle } from '@/components/ui/toggle';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
+import { StratLogo } from "@/components/branding/Logo";
+import { PlatformBadge } from "@/components/branding/PlatformBadge";
+import { Toggle } from "@/components/ui/toggle";
+import { Button } from "@/components/ui/button";
+import { ContextPanel } from "@/components/strategic/ContextPanel";
+import FloatingAIAssistant from "@/components/strategic/FloatingAIAssistant";
 
-import { LogIn, Menu, Sun, Moon } from 'lucide-react';
+import {
+  LogIn,
+  LogOut,
+  Menu,
+  X,
+  Sun,
+  Moon,
+  PanelRightClose,
+  PanelRightOpen,
+} from "lucide-react";
 
-// Core survey components
-import SurveyWizard from './strategic/SurveyWizard';
-import ContextPanel from './strategic/ContextPanel';
+// ─── LAZY LOADED MODALS ─────────────────────────────────────────────────────
+// NOTE: this repo's actual auth surface is AuthModal (login/signup) +
+// UserProfileModal (account/sign-out), not separate Login/Logout/UserProfile
+// components — there are no such files under src/components/auth today.
+// Wiring against files that don't exist would just be new dead code, so this
+// layout uses what's actually there. If dedicated Login/Logout/UserProfile
+// components are added later, swap the two lazy imports below; useAuth()'s
+// return shape (user, profile, isAuthenticated, isLoading, signOut) already
+// supports either.
+const AuthModal = lazy(() => import("./auth/AuthModal").then((m) => ({ default: m.AuthModal })));
+const UserProfileModal = lazy(() => import("./auth/UserProfileModal").then((m) => ({ default: m.UserProfileModal })));
 
-// Lazy loaded modals for performance optimization
-const AuthModal = lazy(() => import('./auth/AuthModal').then((m) => ({ default: m.AuthModal })));
-const UserProfileModal = lazy(() => import('./auth/UserProfileModal').then((m) => ({ default: m.UserProfileModal })));
-
-// Static companion page links (Aligned with bird-urls.ts)
+// ─── NAVIGATION ─────────────────────────────────────────────────────────────
 const NAV_LINKS = [
-  { label: 'Orientation', href: BIRD_SITES.surveyBriefing.url },
-  { label: 'Live Dashboard', href: BIRD_SITES.surveyDashboard.url },
-  { label: 'Resources', href: BIRD_SITES.resources.url },
-  { label: 'Privacy', href: '/privacy-policy.html' },
+  { label: "Orientation", href: "/", external: false },
+  { label: "Live Dashboard", href: "/dashboard", external: false },
+  { label: "Resources", href: BIRD_SITES.resources.url, external: true },
+  { label: "Privacy", href: "/privacy-policy.html", external: true },
 ] as const;
 
-// SCHEMA CONFLICT RESOLUTION: Explicitly declare children in props interface
-interface AppLayoutProps {
-  children?: React.ReactNode;
-}
+// ─── RequireAuth ────────────────────────────────────────────────────────────
+// The BIRD Validation Survey is intentionally public — stakeholders must be
+// able to submit without creating an account (see survey-submit's anon RLS
+// policy). This guard exists for future admin-only routes (e.g. a raw
+// response review page) and currently passes children through unconditionally
+// while authentication is still loading or absent, redirecting nothing. It
+// reads real auth state from useAuth() rather than being a no-op stub, so
+// it's ready to gate a route the moment one needs it:
+//
+//   <RequireAuth><AdminReviewPage /></RequireAuth>
+//
+// To actually enforce it, uncomment the redirect below once an admin route
+// exists — left inert here to avoid rejecting real stakeholder respondents.
+export const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuthContext();
 
-const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
-  const { user, profile, isAuthenticated, isLoading: authLoading, signOut } = useAuth();
+  if (isLoading) {
+    return (
+      <div className="min-h-[40vh] flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    // return <Navigate to="/" replace />; // enable once an admin-only route exists
+    console.warn("[RequireAuth] Route reached without authentication — currently non-blocking.");
+  }
+
+  return <>{children}</>;
+};
+
+// ─── MAIN LAYOUT ────────────────────────────────────────────────────────────
+const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
+  const { user, profile, isAuthenticated, isLoading: authLoading, signOut } = useAuthContext();
   const { theme, setTheme } = useTheme();
+  const location = useLocation();
 
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [contextPanelOpen, setContextPanelOpen] = useState(false);
+
+  // Derive section ID for ContextPanel context-awareness
+  const sectionId = useMemo(() => {
+    const path = location.pathname;
+    if (path.includes("section") || path === "/" || path === "/validation-survey") {
+      const match = path.match(/section(\d+)/);
+      return match ? `section${match[1]}` : "section0";
+    }
+    return undefined;
+  }, [location.pathname]);
+
+  // Hide global header/footer on survey route to prevent duplication with SurveyWizard's own chrome
+  const isSurveyRoute = location.pathname === "/" || location.pathname === "/validation-survey";
 
   const userDisplayInfo = useMemo(() => {
-    const email = user?.email || '';
-    const name = profile?.full_name || email.split('@')[0] || 'Respondent';
+    const email = user?.email || "";
+    const name = profile?.full_name || email.split("@")[0] || "Respondent";
     const initials = (profile?.full_name || email)
       .split(/[\s@]+/)
       .filter(Boolean)
       .slice(0, 2)
       .map((p) => p[0]?.toUpperCase())
-      .join('') || 'R';
+      .join("") || "R";
     return { name, email, initials };
   }, [user, profile]);
 
@@ -71,167 +120,229 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     setShowProfileModal(false);
   }, [signOut]);
 
-  // Full-screen loader while auth session initializes
+  // ── Auth loading screen ──
   if (authLoading) {
     return (
       <div className="min-h-screen bg-[#011a12] flex flex-col items-center justify-center p-6">
         <div className="relative mb-6">
           <div className="w-20 h-20 rounded-full overflow-hidden ring-2 ring-[#C9A84C] shadow-2xl border border-white/20 animate-pulse bg-[#022c22] flex items-center justify-center">
-            <span className="text-[#C9A84C] font-serif font-bold text-lg">BIRD</span>
+            <StratLogo size="lg" variant="icon" />
           </div>
           <div className="absolute -bottom-2 -right-2 w-8 h-8 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
         </div>
-        <h2 className="text-[#ecfdf5] font-bold text-xl mb-2">
-          Loading BIRD Validation Survey
-        </h2>
-        <p className="text-[#64748b] text-sm">
-          Preparing the stakeholder validation instrument…
-        </p>
+        <h2 className="text-[#ecfdf5] font-bold text-xl mb-2">Loading BIRD Validation Survey</h2>
+        <p className="text-[#ecfdf5]/50 text-sm">Preparing the stakeholder validation instrument…</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#011a12] text-[#ecfdf5] flex flex-col">
-      {/* ── Header ── */}
-      <header className="sticky top-0 z-50 w-full border-b border-[#C9A84C]/20 bg-[#011a12]/95 backdrop-blur supports-[backdrop-filter]:bg-[#011a12]/60">
-        <div className="container flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-4">
-            <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden text-[#ecfdf5]">
-                  <Menu className="h-5 w-5" />
-                  <span className="sr-only">Toggle navigation menu</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="bg-[#011a12] border-[#C9A84C]/20 text-[#ecfdf5]">
-                <div className="flex flex-col gap-6 p-6">
-                  <div className="flex items-center gap-2">
-                    <StratLogo className="h-8 w-8" />
-                    <span className="font-bold text-lg text-[#C9A84C]">BIRD Survey</span>
-                  </div>
-                  <nav className="flex flex-col gap-4">
-                    {NAV_LINKS.map((link) => (
-                      <a
-                        key={link.label}
-                        href={link.href}
-                        className="text-sm font-medium text-[#ecfdf5]/80 hover:text-[#C9A84C] transition-colors"
-                        onClick={() => setMobileNavOpen(false)}
-                      >
-                        {link.label}
-a>
-                    ))}
-                  </nav>
-                </div>
-              </SheetContent>
-            </Sheet>
-            <a href="/" className="flex items-center gap-2">
-              <StratLogo className="h-8 w-8" />
-              <span className="font-bold text-lg text-[#C9A84C] hidden sm:inline-block">BIRD Validation Survey</span>
+    <div className="min-h-screen bg-[#011a12] text-[#ecfdf5] flex flex-col relative">
+      
+      {/* ═══════════════════════════════════════════════════════════════════════
+          HEADER (hidden on survey route)
+          ═══════════════════════════════════════════════════════════════════════ */}
+      {!isSurveyRoute && (
+        <header className="sticky top-0 z-40 border-b border-[#C9A84C]/15 bg-[#022c22]/85 backdrop-blur-md">
+          <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+            
+            {/* Logo */}
+            <a href={BIRD_SITES.home.url} className="flex items-center gap-3 min-w-0">
+              <StratLogo size="sm" variant="icon" />
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-[#E8C560] leading-tight truncate">BIRD 2026–2035</p>
+                <p className="text-[10px] uppercase tracking-widest text-[#ecfdf5]/50 leading-tight">Validation Survey</p>
+              </div>
             </a>
+
+            {/* Desktop Nav */}
+            <div className="hidden md:flex items-center gap-4">
+              <nav className="flex items-center gap-1">
+                {NAV_LINKS.map((l) => (
+                  <a key={l.label}
+                    href={l.href}
+                    {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    className="px-3 py-2 text-xs font-medium text-[#ecfdf5]/70 hover:text-[#E8C560] rounded-lg hover:bg-white/5 transition-colors"
+                  >
+                    {l.label}
+                  </a>
+                ))}
+              </nav>
+              
+              <div className="h-6 w-px bg-[#C9A84C]/20" />
+              
+              <div className="flex items-center gap-2">
+                {/* Context Panel Toggle */}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setContextPanelOpen((v) => !v)}
+                  className="text-[#ecfdf5]/60 hover:text-[#C9A84C] hover:bg-white/5 text-xs"
+                >
+                  {contextPanelOpen ? <PanelRightOpen className="w-4 h-4" /> : <PanelRightClose className="w-4 h-4" />}
+                  <span className="ml-1 hidden lg:inline">Context</span>
+                </Button>
+
+                {/* Theme Toggle */}
+                <Toggle
+                  pressed={theme === "dark"}
+                  onPressedChange={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="text-[#ecfdf5]/60 hover:text-[#C9A84C] hover:bg-white/5 data-[state=on]:text-[#C9A84C] data-[state=on]:bg-[#C9A84C]/10"
+                  aria-label="Toggle theme"
+                >
+                  {theme === "dark" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+                </Toggle>
+
+                {/* Auth — dynamic: shows Sign In when logged out, avatar + Sign Out when authenticated */}
+                {isAuthenticated ? (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setShowProfileModal(true)}
+                      className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
+                      title={userDisplayInfo.email}
+                    >
+                      <span className="w-7 h-7 rounded-full bg-gradient-to-br from-[#C9A84C] to-[#064e3b] flex items-center justify-center text-[10px] font-bold text-white">
+                        {userDisplayInfo.initials}
+                      </span>
+                      <span className="hidden sm:inline text-xs font-medium max-w-[120px] truncate">
+                        {userDisplayInfo.name}
+                      </span>
+                    </button>
+                    <button
+                      onClick={handleSignOut}
+                      className="p-2 rounded-lg text-[#ecfdf5]/60 hover:text-rose-400 hover:bg-white/5 transition-colors"
+                      title="Sign out"
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowAuthModal(true)}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#C9A84C]/10 hover:bg-[#C9A84C]/20 text-[#C9A84C] text-xs font-bold border border-[#C9A84C]/30 transition-colors"
+                  >
+                    <LogIn className="w-3.5 h-3.5" /> Sign In
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Mobile Toggle */}
+            <div className="flex md:hidden items-center gap-2">
+              <Toggle
+                pressed={theme === "dark"}
+                onPressedChange={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="text-[#ecfdf5]/60 hover:text-[#C9A84C] hover:bg-white/5 data-[state=on]:text-[#C9A84C] data-[state=on]:bg-[#C9A84C]/10"
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+              </Toggle>
+              <button
+                onClick={() => setMobileNavOpen((v) => !v)}
+                className="p-2 rounded-lg text-[#ecfdf5]/70 hover:bg-white/5 transition-colors"
+                aria-label="Toggle navigation"
+              >
+                {mobileNavOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <nav className="hidden md:flex items-center gap-4">
-              {NAV_LINKS.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  className="text-sm font-medium text-[#ecfdf5]/80 hover:text-[#C9A84C] transition-colors"
+          {/* Mobile Nav Dropdown */}
+          {mobileNavOpen && (
+            <nav className="md:hidden border-t border-white/5 px-4 py-2 flex flex-col bg-[#022c22]/95">
+              {NAV_LINKS.map((l) => (
+                <a key={l.label}
+                  href={l.href}
+                  {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  className="px-2 py-2.5 text-sm text-[#ecfdf5]/80 hover:text-[#E8C560] transition-colors"
+                  onClick={() => setMobileNavOpen(false)}
                 >
-                  {link.label}
+                  {l.label}
                 </a>
               ))}
+              <div className="border-t border-white/5 mt-2 pt-2">
+                {isAuthenticated ? (
+                  <button
+                    onClick={() => { handleSignOut(); setMobileNavOpen(false); }}
+                    className="w-full flex items-center gap-2 px-2 py-2.5 text-sm text-rose-400 hover:bg-white/5 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" /> Sign Out ({userDisplayInfo.name})
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => { setShowAuthModal(true); setMobileNavOpen(false); }}
+                    className="w-full flex items-center gap-2 px-2 py-2.5 text-sm text-[#C9A84C] hover:bg-white/5 transition-colors"
+                  >
+                    <LogIn className="w-4 h-4" /> Sign In
+                  </button>
+                )}
+              </div>
             </nav>
+          )}
+        </header>
+      )}
 
-            <Toggle
-              variant="outline"
-              size="sm"
-              className="border-[#C9A84C]/20 text-[#ecfdf5] data-[state=on]:bg-[#C9A84C]/20 data-[state=on]:text-[#C9A84C]"
-              onPressedChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            >
-              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">Toggle theme</span>
-            </Toggle>
+      {/* ── Main Content + Context Panel ── */}
+      <div className="flex-1 flex relative">
+        <main className="flex-1 min-w-0">{children}</main>
 
-            {isAuthenticated ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-[#ecfdf5] hover:bg-[#C9A84C]/20 hover:text-[#C9A84C]"
-                onClick={() => setShowProfileModal(true)}
-              >
-                <div className="mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#C9A84C] text-[#011a12] text-xs font-bold">
-                  {userDisplayInfo.initials}
+        {/* Context Panel Sidebar (desktop) */}
+        {contextPanelOpen && !isSurveyRoute && (
+          <>
+            <aside className="hidden lg:block w-80 xl:w-96 border-l border-[#C9A84C]/15 bg-[#011a12]/90 backdrop-blur-md overflow-y-auto">
+              <div className="p-4 sticky top-0">
+                <ContextPanel sectionId={sectionId} showAll={!sectionId} compact={false} />
+              </div>
+            </aside>
+            {/* Context Panel Drawer (mobile) */}
+            <div className="lg:hidden fixed inset-0 z-50 flex">
+              <div className="flex-1 bg-black/50 backdrop-blur-sm" onClick={() => setContextPanelOpen(false)} />
+              <div className="w-80 bg-[#011a12] border-l border-[#C9A84C]/15 overflow-y-auto">
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-[#C9A84C]">Context & References</h3>
+                    <button type="button" onClick={() => setContextPanelOpen(false)} className="p-1 rounded hover:bg-white/5">
+                      <X className="w-4 h-4 text-[#ecfdf5]/60" />
+                    </button>
+                  </div>
+                  <ContextPanel sectionId={sectionId} showAll={!sectionId} compact={true} />
                 </div>
-                <span className="hidden sm:inline">{userDisplayInfo.name}</span>
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-[#C9A84C]/50 text-[#C9A84C] hover:bg-[#C9A84C]/10"
-                onClick={() => setShowAuthModal(true)}
-              >
-                <LogIn className="mr-2 h-4 w-4" />
-                Sign In
-              </Button>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* ── Main Content Area ── */}
-      <main className="flex-1 container py-6">
-        {/* 
-          SCHEMA CONFLICT RESOLUTION: 
-          Render `children` if provided (e.g., <Routes> from App.tsx or <SurveyWizard> from Index.tsx). 
-          If no children are passed, fall back to the default dashboard layout. 
-          This dual-purpose design ensures the component satisfies both wrapper and standalone use cases.
-        */}
-        {children || (
-          <div className="grid gap-6 md:grid-cols-[1fr_300px]">
-            <SurveyWizard />
-            <ContextPanel />
-          </div>
+              </div>
+            </div>
+          </>
         )}
-      </main>
-
-      {/* ── Footer ── */}
-      <footer className="border-t border-[#C9A84C]/20 bg-[#011a12] py-6">
-        <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
-          <p className="text-center text-sm text-[#ecfdf5]/60 md:text-left">
-            © {new Date().getFullYear()} Bangsamoro Autonomous Region in Muslim Mindanao (BARMM). All rights reserved.
-          </p>
-          <div className="flex items-center gap-4">
-            <a href="/privacy-policy.html" className="text-sm text-[#ecfdf5]/60 hover:text-[#C9A84C] transition-colors">
-              Privacy Policy
-            </a>
-            <a href="/cookie-policy.html" className="text-sm text-[#ecfdf5]/60 hover:text-[#C9A84C] transition-colors">
-              Cookie Policy
-            </a>
-          </div>
-        </div>
-      </footer>
-
-      {/* ── Floating MTIT badge ── */}
-      <div className="fixed bottom-4 right-4 z-40">
-        <PlatformBadge />
       </div>
 
-      {/* ── Auth Modals (Lazy Loaded) ── */}
+      {/* ═══════════════════════════════════════════════════════════════════════
+          FOOTER (hidden on survey route)
+          ═══════════════════════════════════════════════════════════════════════ */}
+      {!isSurveyRoute && (
+        <footer className="border-t border-white/5 bg-[#011a12]">
+          <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#ecfdf5]/40">
+            <p>
+              © {new Date().getFullYear()} BOI-MTIT, BARMM · BIRD 2026–2035 Validation Survey · Developed by ASilva Innovations
+            </p>
+            <div className="flex items-center gap-4">
+              <a href="/privacy-policy.html" className="hover:text-[#E8C560] transition-colors">Privacy Policy</a>
+              <a href="/cookie-policy.html" className="hover:text-[#E8C560] transition-colors">Cookie Policy</a>
+              <a href="mailto:boi@bangsamoro.gov.ph" className="hover:text-[#E8C560] transition-colors">Contact</a>
+            </div>
+          </div>
+        </footer>
+      )}
+
+      {/* ── Floating Elements ── */}
+      <PlatformBadge />
+      <FloatingAIAssistant plan={null} activeView={isSurveyRoute ? "survey" : (sectionId || "survey")} compact={true} />
+
+      {/* ── Auth Modals ── */}
       <Suspense fallback={null}>
         {showAuthModal && (
-          <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
+          <AuthModal isOpen onClose={() => setShowAuthModal(false)} />
         )}
         {showProfileModal && (
-          <UserProfileModal 
-            open={showProfileModal} 
-            onOpenChange={setShowProfileModal} 
-            user={userDisplayInfo}
-            onSignOut={handleSignOut}
-          />
+          <UserProfileModal isOpen onClose={() => setShowProfileModal(false)} />
         )}
       </Suspense>
     </div>
