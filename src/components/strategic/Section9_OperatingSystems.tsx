@@ -270,14 +270,14 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
       {/* ── 1. Operating Systems Banner ──────────────────────────── */}
       <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
         <img
-          src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/OS.png"
-          alt="Moral Governance serves as the central operating system of the Bangsamoro ecosystem"
+          src={BIRD_IMAGES.operatingSystemsOS.url}
+          alt={BIRD_IMAGES.operatingSystemsOS.alt}
           className="w-full h-auto max-h-[500px] object-contain transition-transform duration-500 group-hover:scale-[1.02]"
           loading="lazy"
         />
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
           <p className="text-xs italic text-white/70">
-            {BIRD_IMAGES.operatingSystemsTrust.description}
+            {BIRD_IMAGES.operatingSystemsOS.description}
           </p>
         </div>
       </div>
@@ -333,8 +333,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
         <CardContent className="space-y-6">
           <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
             <img
-              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/How%20moral%20Governance%20De-Risks%20Capital.png"
-              alt="How Moral Governance De-Risks Capital"
+              src={BIRD_IMAGES.moralGovernanceDeRisks.url}
+              alt={BIRD_IMAGES.moralGovernanceDeRisks.alt}
               className="w-full h-auto object-contain"
               loading="lazy"
             />
@@ -392,8 +392,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
         <CardContent className="space-y-4">
           <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
             <img
-              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Regulatory%20Architecture.png"
-              alt="Regulatory Architecture"
+              src={BIRD_IMAGES.regulatoryArchitecture.url}
+              alt={BIRD_IMAGES.regulatoryArchitecture.alt}
               className="w-full h-auto object-contain"
               loading="lazy"
             />
@@ -444,8 +444,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
         <CardContent className="space-y-4">
           <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
             <img
-              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Draft%20JMC%202026-01.png"
-              alt="Draft JMC 2026-01"
+              src={BIRD_IMAGES.draftJMC.url}
+              alt={BIRD_IMAGES.draftJMC.alt}
               className="w-full h-auto object-contain"
               loading="lazy"
             />
@@ -495,8 +495,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
         <CardContent className="space-y-6">
           <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
             <img
-              src={BIRD_IMAGES.fixesFail.url}
-              alt={BIRD_IMAGES.fixesFail.alt}
+              src={BIRD_IMAGES.fixesThatFail.url}
+              alt={BIRD_IMAGES.fixesThatFail.alt}
               className="w-full h-auto object-contain"
               loading="lazy"
             />
@@ -589,8 +589,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
         <CardContent className="space-y-6">
           <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
             <img
-              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/Escalation.png"
-              alt="Escalation Archetype"
+              src={BIRD_IMAGES.escalation.url}
+              alt={BIRD_IMAGES.escalation.alt}
               className="w-full h-auto object-contain"
               loading="lazy"
             />
@@ -677,8 +677,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
         <CardContent className="space-y-6">
           <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
             <img
-              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/The%20Big%20Man%20Archetype.png"
-              alt="The Big Man Archetype"
+              src={BIRD_IMAGES.bigManArchetype.url}
+              alt={BIRD_IMAGES.bigManArchetype.alt}
               className="w-full h-auto object-contain"
               loading="lazy"
             />
@@ -709,9 +709,9 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
                   variant="outline"
                   className={cn(
                     "justify-start h-auto py-3 text-sm text-left",
-                    data.q9_3_regulatory_priority === opt ? activeBtn : inactiveBtn
+                    data.q_s9_governance_loop === opt ? activeBtn : inactiveBtn
                   )}
-                  onClick={() => update("q9_3_regulatory_priority", opt)}
+                  onClick={() => update("q_s9_governance_loop", opt)}
                 >
                   {opt}
                 </Button>
@@ -719,8 +719,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
             </div>
           </div>
 
-          {(data.q9_3_regulatory_priority === "Very accurately" ||
-            data.q9_3_regulatory_priority === "Somewhat accurately") && (
+          {(data.q_s9_governance_loop === "Very accurately" ||
+            data.q_s9_governance_loop === "Somewhat accurately") && (
             <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20 animate-in fade-in slide-in-from-top-2 duration-200">
               <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
                 Which of the three reinforcing loops is most active in BARMM today?
@@ -733,9 +733,9 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
                     variant="outline"
                     className={cn(
                       "justify-start h-auto py-3 text-sm text-left",
-                      data.q9_4_revenue_channel === opt ? activeBtn : inactiveBtn
+                      data.q_s9_governance_loop_followup === opt ? activeBtn : inactiveBtn
                     )}
-                    onClick={() => update("q9_4_revenue_channel", opt)}
+                    onClick={() => update("q_s9_governance_loop_followup", opt)}
                   >
                     {opt}
                   </Button>
@@ -744,8 +744,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
               <Textarea
                 placeholder="Describe which loop is most active and provide examples..."
                 rows={3}
-                value={data.q9_4_revenue_channel || ""}
-                onChange={(e) => update("q9_4_revenue_channel", e.target.value)}
+                value={data.q_s9_governance_loop_followup || ""}
+                onChange={(e) => update("q_s9_governance_loop_followup", e.target.value)}
                 className="w-full rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 px-3 py-2 text-sm text-[#022c22] dark:text-[#ecfdf5] placeholder:text-[#64748b] focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/50 resize-y"
               />
             </div>
@@ -763,8 +763,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
         <CardContent className="space-y-4">
           <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
             <img
-              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Policy%20Recommendations-Policy%20Makers-Planners-Investors.png"
-              alt="Policy Recommendations for Policymakers, Planners, Investors"
+              src={BIRD_IMAGES.policyRecommendationsMakers.url}
+              alt={BIRD_IMAGES.policyRecommendationsMakers.alt}
               className="w-full h-auto object-contain"
               loading="lazy"
             />
@@ -814,8 +814,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
         <CardContent className="space-y-4">
           <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
             <img
-              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Policy%20recommendations-Institutional-Fiscal-Regulatory.png"
-              alt="Policy Recommendations: Institutional, Fiscal, Regulatory"
+              src={BIRD_IMAGES.policyRecommendationsActivating.url}
+              alt={BIRD_IMAGES.policyRecommendationsActivating.alt}
               className="w-full h-auto object-contain"
               loading="lazy"
             />
