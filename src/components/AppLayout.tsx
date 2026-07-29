@@ -163,7 +163,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <div className="hidden md:flex items-center gap-4">
             <nav className="flex items-center gap-1">
               {NAV_LINKS.map((l) => (
-                <a key={l.label}
+                
+                  key={l.label}
                   href={navHref(l)}
                   {...navExternalProps(l)}
                   onClick={(e) => handleNavClick(l, e)}
@@ -258,7 +259,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         {mobileNavOpen && (
           <nav className="md:hidden border-t border-white/5 px-4 py-2 flex flex-col bg-[#022c22]/95">
             {NAV_LINKS.map((l) => (
-              <a key={l.label}
+              
+                key={l.label}
                 href={navHref(l)}
                 {...navExternalProps(l)}
                 onClick={(e) => handleNavClick(l, e)}
