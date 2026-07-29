@@ -1,6 +1,10 @@
+// src/components/AppLayout.tsx
+// BIRD 2026–2035 · Validation Survey Shell
+// Updated: 2026-07-29 · Resolved double footer, wired Live Dashboard to React route
+
 import React, { useState, useMemo, useCallback, lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
-import { useAuthContext } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/components/theme-provider";
 import { BIRD_SITES } from "@/lib/bird-urls";
 
@@ -18,19 +22,12 @@ import {
   X,
   Sun,
   Moon,
+  BookOpen,
   PanelRightClose,
   PanelRightOpen,
 } from "lucide-react";
 
 // ─── LAZY LOADED MODALS ─────────────────────────────────────────────────────
-// NOTE: this repo's actual auth surface is AuthModal (login/signup) +
-// UserProfileModal (account/sign-out), not separate Login/Logout/UserProfile
-// components — there are no such files under src/components/auth today.
-// Wiring against files that don't exist would just be new dead code, so this
-// layout uses what's actually there. If dedicated Login/Logout/UserProfile
-// components are added later, swap the two lazy imports below; useAuthContext()'s
-// return shape (user, profile, isAuthenticated, isLoading, signOut) already
-// supports either.
 const AuthModal = lazy(() => import("./auth/AuthModal").then((m) => ({ default: m.AuthModal })));
 const UserProfileModal = lazy(() => import("./auth/UserProfileModal").then((m) => ({ default: m.UserProfileModal })));
 
@@ -42,41 +39,9 @@ const NAV_LINKS = [
   { label: "Privacy", href: "/privacy-policy.html", external: true },
 ] as const;
 
-// ─── RequireAuth ────────────────────────────────────────────────────────────
-// The BIRD Validation Survey is intentionally public — stakeholders must be
-// able to submit without creating an account (see survey-submit's anon RLS
-// policy). This guard exists for future admin-only routes (e.g. a raw
-// response review page) and currently passes children through unconditionally
-// while authentication is still loading or absent, redirecting nothing. It
-// reads real auth state from useAuthContext() rather than being a no-op stub,
-// so it's ready to gate a route the moment one needs it:
-//
-//   <RequireAuth><AdminReviewPage /></RequireAuth>
-//
-// To actually enforce it, uncomment the redirect below once an admin route
-// exists — left inert here to avoid rejecting real stakeholder respondents.
-export const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuthContext();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-[40vh] flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    // return <Navigate to="/" replace />; // enable once an admin-only route exists
-    console.warn("[RequireAuth] Route reached without authentication — currently non-blocking.");
-  }
-
-  return <>{children}</>;
-};
-
 // ─── MAIN LAYOUT ────────────────────────────────────────────────────────────
 const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
-  const { user, profile, isAuthenticated, isLoading: authLoading, signOut } = useAuthContext();
+  const { user, profile, isAuthenticated, isLoading: authLoading, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   const location = useLocation();
 
@@ -154,7 +119,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
             <div className="hidden md:flex items-center gap-4">
               <nav className="flex items-center gap-1">
                 {NAV_LINKS.map((l) => (
-                  
+                  <a
                     key={l.label}
                     href={l.href}
                     {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
@@ -190,7 +155,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
                   {theme === "dark" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
                 </Toggle>
 
-                {/* Auth — dynamic: shows Sign In when logged out, avatar + Sign Out when authenticated */}
+                {/* Auth */}
                 {isAuthenticated ? (
                   <div className="flex items-center gap-2">
                     <button
@@ -248,7 +213,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
           {mobileNavOpen && (
             <nav className="md:hidden border-t border-white/5 px-4 py-2 flex flex-col bg-[#022c22]/95">
               {NAV_LINKS.map((l) => (
-                
+                <a
                   key={l.label}
                   href={l.href}
                   {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
