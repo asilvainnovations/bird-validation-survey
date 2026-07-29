@@ -180,7 +180,7 @@ export const ARCHETYPES_BY_SECTION: Record<number, ArchetypeQuestion[]> = {
   4: [
     {
       id: 3, slug: "tragedy_of_commons", name: "Tragedy of the Commons",
-      type: "swot-archetype", imageKey: "tragedyOfCommons", field: "q4_arch_tragedy_commons",
+      type: "swot-archetype", imageKey: "tragedyCommons", field: "q4_arch_tragedy_commons",
       description: "Uncoordinated exploitation of shared natural resources (agriculture, fisheries, forestry, energy, environment) leads to systemic collapse without governance intervention such as the Bangsamoro Forestry Code, carbon markets, and community co-management.",
       followupLabel: "If this archetype applies, which shared resource is most at risk of over-exploitation?",
       followupOptions: ["Watersheds", "Fishing grounds", "Forest reserves", "Agricultural land"],
@@ -198,7 +198,7 @@ export const ARCHETYPES_BY_SECTION: Record<number, ArchetypeQuestion[]> = {
   6: [
     {
       id: 5, slug: "limits_to_growth", name: "Limits to Growth",
-      type: "swot-archetype", imageKey: "limitsToGrowth", field: "q6_arch_limits_growth",
+      type: "swot-archetype", imageKey: "limitsGrowth", field: "q6_arch_limits_growth",
       description: "Rapid investment expansion eventually slows when structural ceilings — weak infrastructure, limited skills, environmental constraints — are reached, plateauing progress unless capacity-building measures are introduced.",
       followupLabel: "Which constraint most limits growth in your sector?",
       followupOptions: ["Infrastructure gaps", "Skills shortage", "Environmental constraints", "Funding limitations"],
@@ -207,7 +207,7 @@ export const ARCHETYPES_BY_SECTION: Record<number, ArchetypeQuestion[]> = {
   7: [
     {
       id: 6, slug: "success_to_the_successful", name: "Success to the Successful",
-      type: "swot-archetype", imageKey: "successToSuccessful", field: "q7_arch_success_successful",
+      type: "swot-archetype", imageKey: "successSuccessful", field: "q7_arch_success_successful",
       description: "Initial advantages reinforce uneven development between BARMM's mainland (infrastructure, administrative centrality) and island provinces (isolation, poor connectivity), widening the gap over time.",
       followupLabel: "Which island province has the greatest untapped potential, and what investment would unlock it?",
       followupOptions: ["Tawi-Tawi (seaweed, BIMP-EAGA)", "Basilan (rubber, ZBIP)", "Sulu (fisheries, tourism)"],
@@ -216,7 +216,7 @@ export const ARCHETYPES_BY_SECTION: Record<number, ArchetypeQuestion[]> = {
   8: [
     {
       id: 7, slug: "shifting_the_burden", name: "Shifting the Burden",
-      type: "swot-archetype", imageKey: "shiftingTheBurden", field: "q8_arch_shifting_burden",
+      type: "swot-archetype", imageKey: "shiftingBurden", field: "q8_arch_shifting_burden",
       description: "BARMM relies on conventional banking as a symptomatic fix for limited Shariah-compliant financing access, temporarily meeting capital needs without resolving the structural gap despite RA 11439's legal framework.",
       followupLabel: "Describe a case where a short-term capital fix either led to long-term reform or failed and the problem returned.",
       followupOptions: ["Led to long-term reform", "Failed and problem returned", "Mixed results"],
