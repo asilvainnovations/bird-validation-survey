@@ -1,10 +1,19 @@
+// src/components/strategic/Section10_IEDS.tsx
+// BIRD 2026–2035 · Section 10: Integrated Ecosystem Development Strategy (IEDS)
+// Updated: 2026-07-30 · Strict alignment with reusable primitives and survey architecture
+
 import React from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Rocket, CheckCircle2, TrendingUp } from "lucide-react";
+import { Rocket, CheckCircle2 } from "lucide-react";
+
+// ─── REUSABLE PRIMITIVES ─────────────────────────────────────────────────────
+import { ImageWithFallback } from "@/components/primitives/ImageWithFallback";
+import { LikertScale } from "@/components/primitives/LikertScale";
+import { SectionProgress } from "@/components/primitives/SectionProgress";
 
 // ── Data Interface (exact runtime contract with SurveyWizard.tsx s10 state) ──
 export interface Section10Data {
@@ -37,39 +46,13 @@ interface Section10Props {
 
 // ── Component ────────────────────────────────────────────────────────────────
 const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
-  const update = <K extends keyof Section10Data>(
-    field: K,
-    value: Section10Data[K]
-  ) => onChange({ ...data, [field]: value });
+  const update = <K extends keyof Section10Data>(field: K, value: Section10Data[K]) => 
+    onChange({ ...data, [field]: value });
 
   const activeBtnClass =
     "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90 dark:bg-[#1B4D3E] dark:text-white dark:border-[#1B4D3E]";
   const inactiveBtnClass =
     "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10";
-  const activeScaleClass =
-    "bg-[#C9A84C] text-white border-[#C9A84C] hover:bg-[#C9A84C]/90";
-  const inactiveScaleClass =
-    "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]";
-
-  const renderScale = (field: keyof Section10Data) => (
-    <div className="flex gap-2 flex-wrap">
-      {[1, 2, 3, 4, 5].map((v) => (
-        <Button
-          key={v}
-          type="button"
-          variant="outline"
-          size="icon"
-          className={cn(
-            "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
-            data[field] === v ? activeScaleClass : inactiveScaleClass
-          )}
-          onClick={() => update(field, v as any)}
-        >
-          {v}
-        </Button>
-      ))}
-    </div>
-  );
 
   const strategicOptions = [
     { code: "HEDS", name: "Halal Economy Dominance Strategy", score: "7.61/10", grdp: "₱150–200B" },
@@ -80,6 +63,18 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
 
   return (
     <div className="space-y-8">
+      {/* ── Section Progress ────────────────────────────────────── */}
+      <SectionProgress 
+        current={10} 
+        total={16} 
+        labels={[
+          "Welcome", "Privacy", "Profile", "Systems", "Foundations", 
+          "Transformers", "Enablers", "Connectors", "Financiers", 
+          "Operating Systems", "IEDS", "Metrics", "BSC", "Budget", 
+          "Resources", "Submit"
+        ]} 
+      />
+
       {/* ═══════════════════════════════════════════ HEADER */}
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-lg bg-[#022c22] dark:bg-[#011a12] flex items-center justify-center shadow-md">
@@ -129,29 +124,22 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/How%20to%20Identify%20Leverage%20Points.png"
-              alt="How to Identify Leverage Points"
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
-          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
-            Three-step process using Donella Meadows' Hierarchy of System Change (L1–L12):
-            <br />
-            <strong>1. Diagnostic Synthesis</strong> – identifying recurring patterns and limiting factors.
-            <br />
-            <strong>2. Mapping the Loops</strong> – visualizing reinforcing (R) and balancing (B) feedback loops.
-            <br />
-            <strong>3. Tiered Selection</strong> – categorizing interventions as Transformative (L1–L3),
-            Systemic (L4–L6), or Incremental (L10–L12).
-          </p>
+          <ImageWithFallback
+            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/How%20to%20Identify%20Leverage%20Points.png"
+            alt="How to Identify Leverage Points"
+            description="Three-step process using Donella Meadows' Hierarchy of System Change (L1–L12): Diagnostic Synthesis, Mapping the Loops, Tiered Selection."
+            className="w-full h-auto object-contain rounded-xl border border-[#C9A84C]/30"
+          />
           <div className="pt-4 border-t border-[#C9A84C]/20">
             <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
-              How clear is this methodology for identifying leverage points? (1-5)
+              How clear is this methodology for identifying leverage points?
             </Label>
-            {renderScale("q10_leverage_points_clarity")}
+            <LikertScale
+              value={data.q10_leverage_points_clarity}
+              onChange={(v) => update("q10_leverage_points_clarity", v)}
+              labels={["Not clear at all", "Slightly clear", "Moderately clear", "Clear", "Very clear"]}
+              name="leverage_points_clarity"
+            />
           </div>
         </CardContent>
       </Card>
@@ -164,28 +152,22 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/Activating%20Leverage%20Points.png"
-              alt="Activating Leverage Points"
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
-          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
-            Three tiers of interventions to dismantle structural constraints:
-            <br />
-            <strong>L3 (Goals & Operating System):</strong> Link political legitimacy to investment climate.
-            <br />
-            <strong>L5 (Rules & Incentives):</strong> Align investment incentives with institutional capacity.
-            <br />
-            <strong>L6 (Information Flows):</strong> Deploy digital traceability for halal supply chains.
-          </p>
+          <ImageWithFallback
+            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/Activating%20Leverage%20Points.png"
+            alt="Activating Leverage Points"
+            description="Three tiers of interventions to dismantle structural constraints: L3 (Goals & Operating System), L5 (Rules & Incentives), L6 (Information Flows)."
+            className="w-full h-auto object-contain rounded-xl border border-[#C9A84C]/30"
+          />
           <div className="pt-4 border-t border-[#C9A84C]/20">
             <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
-              How effective will these leverage points be in accelerating BARMM's growth? (1-5)
+              How effective will these leverage points be in accelerating BARMM's growth?
             </Label>
-            {renderScale("q10_activating_leverage")}
+            <LikertScale
+              value={data.q10_activating_leverage}
+              onChange={(v) => update("q10_activating_leverage", v)}
+              labels={["Not effective", "Slightly effective", "Moderately effective", "Effective", "Very effective"]}
+              name="activating_leverage"
+            />
           </div>
         </CardContent>
       </Card>
@@ -198,24 +180,22 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Leverage%20Points%20for%20Capacity%20Traps.png"
-              alt="Leverage Points for Capacity Traps"
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
-          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
-            <strong>Prescription: Front-Loading the Ecosystem Enablers</strong> — Leverage Point L10
-            (Stock-Flow Structure) expands system capacity ahead of market demand to break the
-            Limits to Growth and Growth and Underinvestment archetypes.
-          </p>
+          <ImageWithFallback
+            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Leverage%20Points%20for%20Capacity%20Traps.png"
+            alt="Leverage Points for Capacity Traps"
+            description="Prescription: Front-Loading the Ecosystem Enablers — Leverage Point L10 (Stock-Flow Structure) expands system capacity ahead of market demand to break Limits to Growth."
+            className="w-full h-auto object-contain rounded-xl border border-[#C9A84C]/30"
+          />
           <div className="pt-4 border-t border-[#C9A84C]/20">
             <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
-              How critical is front-loading enablers before scaling production? (1-5)
+              How critical is front-loading enablers before scaling production?
             </Label>
-            {renderScale("q10_capacity_traps")}
+            <LikertScale
+              value={data.q10_capacity_traps}
+              onChange={(v) => update("q10_capacity_traps", v)}
+              labels={["Not critical", "Slightly critical", "Moderately critical", "Critical", "Very critical"]}
+              name="capacity_traps"
+            />
           </div>
         </CardContent>
       </Card>
@@ -228,28 +208,22 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Iceberg%20Model%20Paradigm.png"
-              alt="Iceberg Model Paradigm"
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
-          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
-            Three layers of the system:
-            <br />
-            <strong>Events (Top 10%):</strong> Visible outcomes like investment approvals.
-            <br />
-            <strong>Structures (Body 40%):</strong> Systemic traps like fragmented plans.
-            <br />
-            <strong>Mental Models (Base 50%):</strong> Deep-rooted beliefs shaping policy behavior.
-          </p>
+          <ImageWithFallback
+            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Iceberg%20Model%20Paradigm.png"
+            alt="Iceberg Model Paradigm"
+            description="Three layers of the system: Events (Top 10%), Structures (Body 40%), Mental Models (Base 50%)."
+            className="w-full h-auto object-contain rounded-xl border border-[#C9A84C]/30"
+          />
           <div className="pt-4 border-t border-[#C9A84C]/20">
             <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
-              How important is addressing mental models and structures vs. just events? (1-5)
+              How important is addressing mental models and structures vs. just events?
             </Label>
-            {renderScale("q10_iceberg_model")}
+            <LikertScale
+              value={data.q10_iceberg_model}
+              onChange={(v) => update("q10_iceberg_model", v)}
+              labels={["Not important", "Slightly important", "Moderately important", "Important", "Very important"]}
+              name="iceberg_model"
+            />
           </div>
         </CardContent>
       </Card>
@@ -262,28 +236,22 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Leverage%20Points%20in%20Governance.png"
-              alt="Leverage Points in Governance"
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
-          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
-            Transition from disconnected, clashing nodes to a unified, synchronized network through:
-            <br />
-            <strong>L1 (Paradigm):</strong> Shift from Power Over to Power With.
-            <br />
-            <strong>L2 (Mindset):</strong> Institutionalize inter-provincial development compacts.
-            <br />
-            <strong>L5 (Rules):</strong> Establish transparent, formula-based resource allocation.
-          </p>
+          <ImageWithFallback
+            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Leverage%20Points%20in%20Governance.png"
+            alt="Leverage Points in Governance"
+            description="Transition from disconnected, clashing nodes to a unified, synchronized network through L1 (Paradigm), L2 (Mindset), L5 (Rules)."
+            className="w-full h-auto object-contain rounded-xl border border-[#C9A84C]/30"
+          />
           <div className="pt-4 border-t border-[#C9A84C]/20">
             <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
-              How transformative will collaborative governance be for BARMM? (1-5)
+              How transformative will collaborative governance be for BARMM?
             </Label>
-            {renderScale("q10_collaborative_governance")}
+            <LikertScale
+              value={data.q10_collaborative_governance}
+              onChange={(v) => update("q10_collaborative_governance", v)}
+              labels={["Not transformative", "Slightly transformative", "Moderately transformative", "Transformative", "Very transformative"]}
+              name="collaborative_governance"
+            />
           </div>
         </CardContent>
       </Card>
@@ -296,14 +264,12 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Archetypes%20&%20Leverage%20Points.png"
-              alt="Archetypes and Leverage Points"
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
+          <ImageWithFallback
+            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Archetypes%20&%20Leverage%20Points.png"
+            alt="Archetypes and Leverage Points"
+            description="Visual mapping of the 6 systems archetypes and their corresponding leverage points for intervention."
+            className="w-full h-auto object-contain rounded-xl border border-[#C9A84C]/30"
+          />
         </CardContent>
       </Card>
 
@@ -315,25 +281,12 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/Strategic%20Options.png"
-              alt="Strategic Options"
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
-          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
-            Four distinct pathways to scale regional value creation:
-            <br />
-            <strong>1. HEDS:</strong> Halal Economy Dominance — leverage cultural authenticity.
-            <br />
-            <strong>2. GEMS:</strong> Green Economy Monetization — convert environmental assets.
-            <br />
-            <strong>3. IFES:</strong> Infrastructure-First Enabling — remove energy and logistics constraints.
-            <br />
-            <strong>4. IEDS:</strong> Integrated Ecosystem Development — synchronize all three strategies.
-          </p>
+          <ImageWithFallback
+            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/Strategic%20Options.png"
+            alt="Strategic Options"
+            description="Four distinct pathways to scale regional value creation: HEDS, GEMS, IFES, IEDS."
+            className="w-full h-auto object-contain rounded-xl border border-[#C9A84C]/30"
+          />
         </CardContent>
       </Card>
 
@@ -345,19 +298,12 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/3.%20Strategic%20Options%20Ranking.png"
-              alt="Strategic Options Ranking"
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
-          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
-            Comparative evaluation across seven weighted criteria: Economic Impact (25%),
-            Systems Leverage (15%), Identity Alignment (15%), Inclusivity (10%),
-            Sustainability (5%), Feasibility (20%), and Risk-Return (10%).
-          </p>
+          <ImageWithFallback
+            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-strategic-options-roadmap/3.%20Strategic%20Options%20Ranking.png"
+            alt="Strategic Options Ranking"
+            description="Comparative evaluation across seven weighted criteria: Economic Impact, Systems Leverage, Identity Alignment, Inclusivity, Sustainability, Feasibility, and Risk-Return."
+            className="w-full h-auto object-contain rounded-xl border border-[#C9A84C]/30"
+          />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
             {strategicOptions.map((opt) => (
               <Button
@@ -376,10 +322,7 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <Badge
-                      variant={opt.highlight ? "default" : "outline"}
-                      className="text-xs"
-                    >
+                    <Badge variant={opt.highlight ? "default" : "outline"} className="text-xs">
                       {opt.code}
                     </Badge>
                     {opt.highlight && <CheckCircle2 className="w-4 h-4" />}
@@ -403,23 +346,12 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/The%20Execution%20Engine%20-IEDS.png"
-              alt="The Execution Engine - IEDS"
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
-          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
-            Three golden phases flowing forward:
-            <br />
-            <strong>Phase 1 (2026–2028): Activate Enablers & Governance</strong> — build enabling infrastructure.
-            <br />
-            <strong>Phase 2 (2029–2032): Scale Transformers</strong> — activate Bangsamoro Halal Park.
-            <br />
-            <strong>Phase 3 (2033–2035): Consolidate Connectors</strong> — distribute wealth through BIMP-EAGA corridors.
-          </p>
+          <ImageWithFallback
+            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/The%20Execution%20Engine%20-IEDS.png"
+            alt="The Execution Engine - IEDS"
+            description="Three golden phases flowing forward: Phase 1 (Activate Enablers), Phase 2 (Scale Transformers), Phase 3 (Consolidate Connectors)."
+            className="w-full h-auto object-contain rounded-xl border border-[#C9A84C]/30"
+          />
         </CardContent>
       </Card>
 
@@ -465,20 +397,34 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
             <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
               Rate the priority of Sequence A investments (2026-2028: Enablers & Governance)
             </Label>
-            {renderScale("q10_2_sequence_a_priority")}
-            <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">1 = Low priority, 5 = Critical priority</p>
+            <LikertScale
+              value={data.q10_2_sequence_a_priority}
+              onChange={(v) => update("q10_2_sequence_a_priority", v)}
+              labels={["Low priority", "Slightly low priority", "Moderate priority", "High priority", "Critical priority"]}
+              name="sequence_a_priority"
+            />
           </div>
           <div className="space-y-3">
             <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
               Rate the priority of Sequence B investments (2029-2032: Transformers)
             </Label>
-            {renderScale("q10_3_sequence_b_priority")}
+            <LikertScale
+              value={data.q10_3_sequence_b_priority}
+              onChange={(v) => update("q10_3_sequence_b_priority", v)}
+              labels={["Low priority", "Slightly low priority", "Moderate priority", "High priority", "Critical priority"]}
+              name="sequence_b_priority"
+            />
           </div>
           <div className="space-y-3">
             <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
               Rate the priority of Sequence C investments (2033-2035: Connectors)
             </Label>
-            {renderScale("q10_4_sequence_c_priority")}
+            <LikertScale
+              value={data.q10_4_sequence_c_priority}
+              onChange={(v) => update("q10_4_sequence_c_priority", v)}
+              labels={["Low priority", "Slightly low priority", "Moderate priority", "High priority", "Critical priority"]}
+              name="sequence_c_priority"
+            />
           </div>
         </CardContent>
       </Card>
@@ -559,8 +505,12 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
           <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
             How achievable are the IEDS 2035 targets (₱550B+ GRDP, {'<'}20% poverty, 100% electrification)?
           </Label>
-          {renderScale("q10_7_outcomes_achievable")}
-          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mt-2">1 = Unrealistic, 5 = Very achievable</p>
+          <LikertScale
+            value={data.q10_7_outcomes_achievable}
+            onChange={(v) => update("q10_7_outcomes_achievable", v)}
+            labels={["Unrealistic", "Slightly unrealistic", "Moderately achievable", "Achievable", "Very achievable"]}
+            name="outcomes_achievable"
+          />
         </CardContent>
       </Card>
     </div>
