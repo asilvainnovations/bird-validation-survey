@@ -75,14 +75,16 @@ export const surveySchema = z.object({
   q01_consent_voluntary: optionalBoolean,
 
   // ═══ Step 2: Respondent Profile ═══
-  q02_demo_category: optionalString,
-  q02_demo_province: optionalString,
-  q02_demo_expertise: optionalStringArray,
-  q02_demo_name: optionalString,
-  q02_demo_email: z.string().email("Invalid email format").optional().or(z.literal("")),
-  q02_demo_organization: optionalString,
-  q02_demo_position: optionalString,
-  q02_network_accuracy: optionalString,
+  q2_name: optionalString,
+  q2_email: z.string().email("Invalid email format").optional().or(z.literal("")),
+  q2_organization: optionalString,
+  q2_position: optionalString,
+  q2_province: optionalString,
+  q2_category: optionalString,
+  q2_expertise: optionalStringArray,
+  q2_network_accuracy: optionalNumber,
+  Note: q2_network_accuracy changed from optionalString → optionalNumber
+  because it now uses LikertScale (1–5) instead of free-text options.
   
   // ═══ Step 3: BEIE & Systems Thinking ═══
   // No SWOT scale items belong here — SWOT_Scale_Questions.md maps them to
