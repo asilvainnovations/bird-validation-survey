@@ -49,7 +49,7 @@ const AppLoadingFallback = React.memo(() => (
 AppLoadingFallback.displayName = "AppLoadingFallback";
 
 // ─── ERROR BOUNDARY ─────────────────────────────────────────────────────────
-class ErrorBoundary extends React.Component
+class ErrorBoundary extends React.Component<
   { children: React.ReactNode },
   { hasError: boolean; error?: Error }
 > {
