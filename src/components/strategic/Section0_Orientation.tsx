@@ -1,630 +1,674 @@
-// src/components/strategic/Section0_Orientation.tsx
-// BIRD 2026–2035 · Section 0: Welcome & Orientation
-//
-// SYSTEMS ARCHITECTURE:
-// ┌─────────────────────────────────────────────────────────────────────────────┐
-// │  BLOCK  │  CONTENT                              │  STATE      │  PERSISTED  │
-// ├─────────────────────────────────────────────────────────────────────────────┤
-// │  A      │  Welcome (banner, text, features)     │  —          │  ❌ No      │
-// │  B      │  Video + Q1 (practice Likert)         │  local      │  ❌ No      │
-// │  C      │  CLD Image + Q2 (practice quiz)       │  local      │  ❌ No      │
-// │  D      │  Feedback Loops + Q3+Q4 (practice)    │  local      │  ❌ No      │
-// │  E      │  Quick-Start readiness gate           │  s0 prop    │  ✅ Yes     │
-// └─────────────────────────────────────────────────────────────────────────────┘
-//
-// SCHEMA IMPACT: Only q0_1_ready is persisted. q0_2–q0_6 removed from schema.
-
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
+import {
+  Sparkles,
+  Play,
+  ArrowRight,
+  BookOpen,
+  BarChart3,
+  Users,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-
-// ── Primitives ───────────────────────────────────────────────────────────────
-import { ImageWithFallback } from "@/lib/primitives/ImageWithFallback";
-import { SectionProgress } from "@/lib/primitives/SectionProgress";
-import { LikertScale } from "@/lib/primitives/LikertScale";
-import { QuizCard } from "@/lib/primitives/QuizCard";
-
-// ── BIRD Assets ──────────────────────────────────────────────────────────────
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Badge } from "@/components/ui/badge";
 import { BIRD_IMAGES, BIRD_VIDEOS } from "@/lib/bird-urls";
 
-// ── shadcn/ui ────────────────────────────────────────────────────────────────
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-// ── Icons ────────────────────────────────────────────────────────────────────
-import {
-  Play,
-  BookOpen,
-  Users,
-  Network,
-  CheckCircle2,
-  AlertCircle,
-  ArrowRight,
-  Lightbulb,
-  GitBranch,
-  RefreshCw,
-  Target,
-  CheckCircle,
-  XCircle,
-  HelpCircle,
-  Sparkles,
-} from "lucide-react";
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// TYPES — CONTRACT WITH SURVEYWIZARD.TSX
-// ═══════════════════════════════════════════════════════════════════════════════
+// ── Types ────────────────────────────────────────────────────────────────────
 export interface Section0Data {
-  /** The ONLY field persisted to the survey database. */
   q0_1_ready: string;
+  q0_2_ecosystem_understanding: string;
+  q0_3_systems_thinking_value?: number;
+  q0_4_cld_understanding?: number;
+  q0_5_feedback_loops_understanding?: number;
+  q0_6_leverage_points_understanding?: number;
 }
 
-interface Section0OrientationProps {
+interface Section0Props {
   data: Section0Data;
-  onChange: (next: Section0Data) => void;
+  onChange: (data: Section0Data) => void;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// BLOCK A — WELCOME (Informational, no state)
-// ═══════════════════════════════════════════════════════════════════════════════
-const FEATURES = [
-  {
-    icon: <Network className="w-5 h-5" />,
-    title: "Data-Driven",
-    desc: "Every response feeds into real-time analytics shaping policy and investment priorities.",
-  },
-  {
-    icon: <Users className="w-5 h-5" />,
-    title: "Inclusive",
-    desc: "Designed for government, business, academe, civil society, and development partners.",
-  },
-  {
-    icon: <GitBranch className="w-5 h-5" />,
-    title: "Systems-Based",
-    desc: "Moving beyond checklists to understand feedback loops, archetypes, and leverage points.",
-  },
-] as const;
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// BLOCK B — VIDEO + PRACTICE Q1 (Local state only)
-// ═══════════════════════════════════════════════════════════════════════════════
-const Q1_LABELS: Record<number, string> = {
-  1: "Not valuable",
-  2: "Slightly valuable",
-  3: "Moderately valuable",
-  4: "Very valuable",
-  5: "Extremely valuable",
-};
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// BLOCK C — CLD IMAGE + PRACTICE Q2 (Local state only)
-// ═══════════════════════════════════════════════════════════════════════════════
-const Q2_OPTIONS = [
-  { key: "A", label: "Same direction change", correct: true },
-  { key: "B", label: "Opposite direction change", correct: false },
-  { key: "C", label: "Static variable", correct: false },
-  { key: "D", label: "Strength of connection", correct: false },
-] as const;
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// BLOCK D — FEEDBACK LOOPS + PRACTICE Q3+Q4 (Local state only)
-// ═══════════════════════════════════════════════════════════════════════════════
-const Q3_OPTIONS = [
-  { key: "A", label: "It balances and stabilizes the system", correct: false },
-  { key: "B", label: "It amplifies change and drives growth or decline", correct: true },
-  { key: "C", label: "It remains constant regardless of input", correct: false },
-  { key: "D", label: "It introduces time delays into the system", correct: false },
-] as const;
-
-const Q4_OPTIONS = [
-  { key: "A", label: "Changing parameters (numbers, constants)", correct: false },
-  { key: "B", label: "Changing information flows", correct: false },
-  { key: "C", label: "Changing the mindset or paradigm out of which the system arises", correct: true },
-  { key: "D", label: "Changing the rules of the system", correct: false },
-] as const;
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// BLOCK E — QUICK-START (The ONLY persisted field)
-// ═══════════════════════════════════════════════════════════════════════════════
-const READINESS_OPTIONS = [
-  { value: "Very ready", label: "Very ready", icon: <Sparkles className="w-4 h-4" /> },
-  { value: "Somewhat ready", label: "Somewhat ready", icon: <CheckCircle2 className="w-4 h-4" /> },
-  { value: "Curious but unsure", label: "Curious but unsure", icon: <HelpCircle className="w-4 h-4" /> },
-  { value: "Just exploring", label: "Just exploring", icon: <BookOpen className="w-4 h-4" /> },
-] as const;
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// COMPONENT
-// ═══════════════════════════════════════════════════════════════════════════════
-const Section0_Orientation: React.FC<Section0OrientationProps> = ({
+// ── Component ────────────────────────────────────────────────────────────────
+export const Section0_Orientation: React.FC<Section0Props> = ({
   data,
   onChange,
 }) => {
-  // ── Local practice state (never leaves this component) ──
-  const [practiceQ1, setPracticeQ1] = useState<number | undefined>(undefined);
-  const [practiceQ2, setPracticeQ2] = useState<string | null>(null);
-  const [practiceQ3, setPracticeQ3] = useState<string | null>(null);
-  const [practiceQ4, setPracticeQ4] = useState<string | null>(null);
+  // Local state for the interactive quiz (not part of the main survey schema)
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
+  const [showQuizResults, setShowQuizResults] = useState(false);
 
-  const isReady = data.q0_1_ready === "Very ready";
-  const isSomewhatReady = data.q0_1_ready === "Somewhat ready";
+  const update = <K extends keyof Section0Data>(
+    field: K,
+    value: Section0Data[K]
+  ) => {
+    onChange({ ...data, [field]: value });
+  };
 
-  // ── Sub-progress: which block are we in? ──
-  const currentBlock = useMemo(() => {
-    if (data.q0_1_ready) return 5;
-    if (practiceQ4 !== null) return 4;
-    if (practiceQ3 !== null) return 4;
-    if (practiceQ2 !== null) return 3;
-    if (practiceQ1 !== undefined) return 2;
-    return 1;
-  }, [data.q0_1_ready, practiceQ1, practiceQ2, practiceQ3, practiceQ4]);
+  const handleQuizAnswer = (questionId: number, answer: string) => {
+    setQuizAnswers((prev) => ({ ...prev, [questionId]: answer }));
+  };
 
-  const totalBlocks = 5;
-  const blockLabels = ["A", "B", "C", "D", "E"] as const;
+  const quizQuestions = [
+    {
+      id: 1,
+      question:
+        "In a Causal Loop Diagram, what does the 's' polarity marker indicate?",
+      options: [
+        "Same-direction relationship (both variables move together)",
+        "Opposite-direction relationship (variables move in opposite directions)",
+        "Static relationship (no change over time)",
+        "Secondary relationship (minor impact)",
+      ],
+      correct: 0,
+      explanation:
+        "The 's' (same) marker indicates that when one variable increases, the other also increases, or when one decreases, the other also decreases.",
+    },
+    {
+      id: 2,
+      question: "What is a Reinforcing Loop (R) in systems thinking?",
+      options: [
+        "A loop that stabilizes the system",
+        "A loop that amplifies change in the same direction",
+        "A loop that has no impact on the system",
+        "A loop that only affects external factors",
+      ],
+      correct: 1,
+      explanation:
+        "A Reinforcing Loop (R) amplifies change — growth leads to more growth, or decline leads to more decline, creating exponential patterns.",
+    },
+    {
+      id: 3,
+      question:
+        "Which leverage point is considered MOST transformative according to Meadows' hierarchy?",
+      options: [
+        "Changing parameters (numbers, subsidies)",
+        "Adjusting feedback loops",
+        "Transforming the paradigm or mindset",
+        "Adding buffers or stocks",
+      ],
+      correct: 2,
+      explanation:
+        "Transforming the paradigm (L1) is the highest leverage point — changing the fundamental mindset from which the system emerges.",
+    },
+  ];
 
-  // Questions answered within current block
-  const questionsInBlock = useMemo(() => {
-    if (currentBlock === 2) return practiceQ1 !== undefined ? 1 : 0;
-    if (currentBlock === 3) return practiceQ2 !== null ? 1 : 0;
-    if (currentBlock === 4) {
-      let count = 0;
-      if (practiceQ3 !== null) count++;
-      if (practiceQ4 !== null) count++;
-      return count;
-    }
-    if (currentBlock === 5) return data.q0_1_ready ? 1 : 0;
-    return 0;
-  }, [currentBlock, practiceQ1, practiceQ2, practiceQ3, practiceQ4, data.q0_1_ready]);
+  const calculateQuizScore = () => {
+    let correct = 0;
+    quizQuestions.forEach((q) => {
+      if (quizAnswers[q.id] === q.options[q.correct]) {
+        correct++;
+      }
+    });
+    return correct;
+  };
 
-  const totalQuestionsInBlock = useMemo(() => {
-    if (currentBlock === 2) return 1;
-    if (currentBlock === 3) return 1;
-    if (currentBlock === 4) return 2;
-    if (currentBlock === 5) return 1;
-    return 0;
-  }, [currentBlock]);
+  const activeBtnClass =
+    "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90";
+  const inactiveBtnClass =
+    "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10";
+
+  const scaleLabels = ["Not at all", "Slightly", "Moderately", "Very well", "Completely"];
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto px-4 py-6">
-      {/* ── Progress Header ── */}
-      <SectionProgress
-        currentSection={0}
-        totalSections={16}
-        sectionLabel="Welcome & Orientation"
-      />
-
-      {/* ── Sub-Progress Indicator ── */}
-      <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#022c22]/40 border border-[#C9A84C]/10">
-        <span className="text-[11px] text-[#ecfdf5]/40 uppercase tracking-wider">
-          Block {blockLabels[currentBlock - 1]} of {blockLabels[totalBlocks - 1]}
-        </span>
-        {totalQuestionsInBlock > 0 && (
-          <span className="text-[11px] text-[#C9A84C]/70">
-            Question {questionsInBlock} of {totalQuestionsInBlock}
-          </span>
-        )}
+    <div className="space-y-8">
+      {/* ── Section Header ─────────────────────────────────────────────── */}
+      <div className="flex items-center gap-3 mb-4">
+        <Sparkles className="w-6 h-6 text-[#C9A84C]" />
+        <h2 className="text-xl font-bold text-[#022c22] dark:text-[#ecfdf5]">
+          Section 0: Welcome & Orientation
+        </h2>
       </div>
+      <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 mb-4 -mt-5">
+        Your voice shapes the future of the Bangsamoro Autonomous Region
+      </p>
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* BLOCK A — WELCOME                                                  */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* Hero Banner */}
-      <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-2xl">
-        <ImageWithFallback
+      {/* ── 1. Hero Banner Image ───────────────────────────────────────── */}
+      <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
+        <img
           src={BIRD_IMAGES.validationSurveyBanner.url}
           alt={BIRD_IMAGES.validationSurveyBanner.alt}
-          className="w-full h-48 sm:h-64 md:h-80"
-          imgClassName="object-cover object-center"
+          className="w-full h-auto max-h-[500px] object-contain transition-transform group-hover:scale-[1.02]"
+          loading="eager"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-[#011a12]/40 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#E5C560] leading-tight">
-            BIRD 2026–2035 Stakeholder Validation Survey
-          </h1>
-          <p className="text-sm text-[#ecfdf5]/70 mt-1 max-w-2xl">
-            Your voice shapes the future of the Bangsamoro Autonomous Region
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+          <p className="text-xs italic text-white/70">
+            BIRD 2026-2035 Stakeholder Validation Survey
           </p>
         </div>
       </div>
 
-      {/* Welcome Card */}
-      <Card className="bg-[#011a12]/80 border-[#C9A84C]/10">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-bold text-[#E5C560]">
-            Welcome to the Validation Process
+      {/* ── 2. Welcome Card ────────────────────────────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-lg font-bold text-[#022c22] dark:text-[#ecfdf5]">
+            Welcome to the BIRD 2026–2035 Validation Survey
           </CardTitle>
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+            Your voice shapes the future of the Bangsamoro Autonomous Region
+          </p>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-[#ecfdf5]/80 leading-relaxed">
-            The <strong className="text-[#C9A84C]">Bangsamoro Investment Roadmap Development (BIRD) 2026–2035</strong>{" "}
-            is a living strategic framework built on <em>systems thinking</em> — the discipline of seeing
-            wholes rather than parts, patterns of change rather than static snapshots.
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90 leading-relaxed">
+            The{" "}
+            <strong className="text-[#1B4D3E] dark:text-[#C9A84C]">
+              Bangsamoro Investment Roadmap Development (BIRD) 2026–2035
+            </strong>{" "}
+            is a living strategic framework built on systems thinking — the
+            discipline of seeing wholes rather than parts, patterns of change
+            rather than static snapshots.
           </p>
-          <p className="text-sm text-[#ecfdf5]/80 leading-relaxed">
-            This survey invites you to examine the <strong className="text-[#C9A84C]">interconnected ecosystem</strong>{" "}
-            of governance, infrastructure, enterprise, connectivity, and finance that determines whether Bangsamoro thrives.
+          <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90 leading-relaxed">
+            This survey invites you to examine the{" "}
+            <strong>interconnected ecosystem</strong> of governance,
+            infrastructure, enterprise, connectivity, and finance that determines
+            whether Bangsamoro thrives.
           </p>
 
-          {/* Feature Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-            {FEATURES.map((f) => (
-              <div
-                key={f.title}
-                className="p-3 rounded-xl bg-[#022c22]/60 border border-[#C9A84C]/10 hover:border-[#C9A84C]/30 transition-colors"
-              >
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-[#C9A84C]">{f.icon}</span>
-                  <span className="text-xs font-bold text-[#ecfdf5]">{f.title}</span>
-                </div>
-                <p className="text-[11px] text-[#ecfdf5]/50 leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
+          {/* Feature grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+            <div className="rounded-lg border border-[#C9A84C]/20 bg-emerald-50/60 dark:bg-[#1B4D3E]/20 p-4 text-center">
+              <BarChart3 className="w-6 h-6 text-[#1B4D3E] dark:text-[#C9A84C] mx-auto mb-2" />
+              <p className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5] mb-1">
+                Data-Driven
+              </p>
+              <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
+                Every response feeds into real-time analytics shaping policy and
+                investment priorities
+              </p>
+            </div>
+            <div className="rounded-lg border border-[#C9A84C]/20 bg-emerald-50/60 dark:bg-[#1B4D3E]/20 p-4 text-center">
+              <Users className="w-6 h-6 text-[#1B4D3E] dark:text-[#C9A84C] mx-auto mb-2" />
+              <p className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5] mb-1">
+                Inclusive
+              </p>
+              <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
+                Designed for government, business, academe, civil society, and
+                development partners
+              </p>
+            </div>
+            <div className="rounded-lg border border-[#C9A84C]/20 bg-emerald-50/60 dark:bg-[#1B4D3E]/20 p-4 text-center">
+              <BookOpen className="w-6 h-6 text-[#1B4D3E] dark:text-[#C9A84C] mx-auto mb-2" />
+              <p className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5] mb-1">
+                Systems-Based
+              </p>
+              <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
+                Moving beyond checklists to understand feedback loops,
+                archetypes, and leverage points
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-[#C9A84C]/5 border border-[#C9A84C]/10">
-            <BookOpen className="w-4 h-4 text-[#C9A84C] shrink-0" />
-            <p className="text-xs text-[#ecfdf5]/60">
-              This survey has <strong className="text-[#ecfdf5]">16 sections</strong> (0–15). Most use 1–5 scales.
-              All fields are optional except final consent. Estimated time: <strong className="text-[#ecfdf5]">20–30 minutes</strong>.
+          {/* Closing statement */}
+          <div className="pt-2">
+            <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90 leading-relaxed mb-3">
+              Your participation answers:{" "}
+              <em className="text-[#1B4D3E] dark:text-[#C9A84C]">
+                How do we turn fragmented efforts into a unified engine of
+                inclusive growth?
+              </em>
+            </p>
+            <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 italic">
+              The survey has 16 sections (0–15). Most use 1–5 scales. All fields
+              optional except final consent. Takes ~20–30 minutes.
             </p>
           </div>
         </CardContent>
       </Card>
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* BLOCK B — VIDEO + PRACTICE Q1                                      */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      <Card className="bg-[#011a12]/80 border-[#C9A84C]/10 overflow-hidden">
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <Play className="w-4 h-4 text-[#C9A84C]" />
-            <CardTitle className="text-sm font-bold text-[#E5C560]">
-              Orientation: Systems Thinking in Action
-            </CardTitle>
-          </div>
-          <p className="text-xs text-[#ecfdf5]/50 mt-1">
-            {BIRD_VIDEOS.systemsThinking.description}
-          </p>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="relative aspect-video bg-[#022c22]">
-            <iframe
-              src="https://www.youtube.com/embed/VBAHk0WYz_c?rel=0&modestbranding=1"
-              title={BIRD_VIDEOS.systemsThinking.title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="absolute inset-0 w-full h-full"
-            />
-          </div>
-
-          {/* Practice Q1 — NOT saved */}
-          <div className="p-4 sm:p-6 space-y-3 border-t border-[#C9A84C]/10">
-            <div className="flex items-center gap-2">
-              <Lightbulb className="w-4 h-4 text-[#C9A84C]" />
-              <span className="text-xs font-bold uppercase tracking-wider text-[#C9A84C]">
-                Practice Question
-              </span>
-              <span className="text-[10px] text-[#ecfdf5]/30 ml-auto">(not saved)</span>
-            </div>
-            <LikertScale
-              name="practice_q1_systems_thinking_value"
-              label="After watching the video, how valuable do you find systems thinking as an approach to strategic planning?"
-              value={practiceQ1}
-              onChange={setPracticeQ1}
-              labels={Q1_LABELS}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* BLOCK C — CLD IMAGE + PRACTICE Q2                                  */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      <Card className="bg-[#011a12]/80 border-[#C9A84C]/10 overflow-hidden">
-        <CardHeader className="pb-2">
-          <div className="flex items-center gap-2">
-            <GitBranch className="w-4 h-4 text-[#C9A84C]" />
-            <CardTitle className="text-sm font-bold text-[#E5C560]">
-              Reference: Anatomy of a Causal Loop Diagram
-            </CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <ImageWithFallback
-            src={BIRD_IMAGES.anatomyCLD.url}
-            alt={BIRD_IMAGES.anatomyCLD.alt}
-            className="w-full h-56 sm:h-72"
-            imgClassName="object-contain bg-[#022c22]"
-          />
-          <p className="px-4 pt-3 text-[11px] text-[#ecfdf5]/50 leading-relaxed">
-            {BIRD_IMAGES.anatomyCLD.description}
-          </p>
-
-          {/* Practice Q2 — NOT saved */}
-          <div className="p-4 sm:p-6 space-y-3 border-t border-[#C9A84C]/10">
-            <div className="flex items-center gap-2">
-              <Lightbulb className="w-4 h-4 text-[#C9A84C]" />
-              <span className="text-xs font-bold uppercase tracking-wider text-[#C9A84C]">
-                Practice Quiz
-              </span>
-              <span className="text-[10px] text-[#ecfdf5]/30 ml-auto">(not saved)</span>
-            </div>
-            <QuizCard
-              question="In a Causal Loop Diagram, what does the 's' polarity indicate?"
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {Q2_OPTIONS.map((opt) => {
-                  const selected = practiceQ2 === opt.key;
-                  const showResult = practiceQ2 !== null;
-                  return (
-                    <button
-                      key={opt.key}
-                      type="button"
-                      onClick={() => setPracticeQ2(opt.key)}
-                      className={cn(
-                        "flex items-center gap-2 p-3 rounded-lg border text-left text-xs transition-all",
-                        !showResult && selected
-                          ? "bg-[#C9A84C]/10 border-[#C9A84C] text-[#C9A84C]"
-                          : !showResult
-                          ? "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
-                          : opt.correct
-                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                          : selected
-                          ? "bg-rose-500/10 border-rose-500/30 text-rose-400"
-                          : "bg-[#022c22]/20 border-white/5 text-[#ecfdf5]/30"
-                      )}
-                    >
-                      <span className="font-bold text-sm w-5">{opt.key}</span>
-                      <span>{opt.label}</span>
-                      {showResult && opt.correct && (
-                        <CheckCircle className="w-4 h-4 ml-auto text-emerald-400 shrink-0" />
-                      )}
-                      {showResult && selected && !opt.correct && (
-                        <XCircle className="w-4 h-4 ml-auto text-rose-400 shrink-0" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-              {practiceQ2 !== null && (
-                <p className="text-xs text-[#ecfdf5]/60 pt-1">
-                  {Q2_OPTIONS.find((o) => o.key === practiceQ2)?.correct
-                    ? "✅ Correct! 's' means Same direction — when A increases, B increases (or both decrease)."
-                    : "❌ Not quite. 's' stands for Same direction. When variable A changes, variable B changes in the same direction."}
-                </p>
-              )}
-            </QuizCard>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* BLOCK D — FEEDBACK LOOPS + PRACTICE Q3 + Q4                        */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      <Card className="bg-[#011a12]/80 border-[#C9A84C]/10 overflow-hidden">
-        <CardHeader className="pb-2">
-          <div className="flex items-center gap-2">
-            <RefreshCw className="w-4 h-4 text-[#C9A84C]" />
-            <CardTitle className="text-sm font-bold text-[#E5C560]">
-              Reference: Feedback Loops & Leverage Points
-            </CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <ImageWithFallback
-            src={BIRD_IMAGES.feedbackLoops.url}
-            alt={BIRD_IMAGES.feedbackLoops.alt}
-            className="w-full h-56 sm:h-72"
-            imgClassName="object-contain bg-[#022c22]"
-          />
-          <p className="px-4 pt-3 text-[11px] text-[#ecfdf5]/50 leading-relaxed">
-            {BIRD_IMAGES.feedbackLoops.description}
-          </p>
-
-          {/* Practice Q3 — NOT saved */}
-          <div className="p-4 sm:p-6 space-y-4 border-t border-[#C9A84C]/10">
-            <div className="flex items-center gap-2">
-              <Lightbulb className="w-4 h-4 text-[#C9A84C]" />
-              <span className="text-xs font-bold uppercase tracking-wider text-[#C9A84C]">
-                Practice Quiz 1
-              </span>
-              <span className="text-[10px] text-[#ecfdf5]/30 ml-auto">(not saved)</span>
-            </div>
-            <QuizCard question="What characterizes a Reinforcing (R) feedback loop?">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {Q3_OPTIONS.map((opt) => {
-                  const selected = practiceQ3 === opt.key;
-                  const showResult = practiceQ3 !== null;
-                  return (
-                    <button
-                      key={opt.key}
-                      type="button"
-                      onClick={() => setPracticeQ3(opt.key)}
-                      className={cn(
-                        "flex items-center gap-2 p-3 rounded-lg border text-left text-xs transition-all",
-                        !showResult && selected
-                          ? "bg-[#C9A84C]/10 border-[#C9A84C] text-[#C9A84C]"
-                          : !showResult
-                          ? "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
-                          : opt.correct
-                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                          : selected
-                          ? "bg-rose-500/10 border-rose-500/30 text-rose-400"
-                          : "bg-[#022c22]/20 border-white/5 text-[#ecfdf5]/30"
-                      )}
-                    >
-                      <span className="font-bold text-sm w-5">{opt.key}</span>
-                      <span>{opt.label}</span>
-                      {showResult && opt.correct && (
-                        <CheckCircle className="w-4 h-4 ml-auto text-emerald-400 shrink-0" />
-                      )}
-                      {showResult && selected && !opt.correct && (
-                        <XCircle className="w-4 h-4 ml-auto text-rose-400 shrink-0" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-              {practiceQ3 !== null && (
-                <p className="text-xs text-[#ecfdf5]/60 pt-1">
-                  {Q3_OPTIONS.find((o) => o.key === practiceQ3)?.correct
-                    ? "✅ Correct! Reinforcing loops amplify change — they are the engines of growth or decline in any system."
-                    : "❌ Not quite. Reinforcing loops amplify change. Think of them as 'virtuous' or 'vicious' cycles that build on themselves."}
-                </p>
-              )}
-            </QuizCard>
-
-            {/* Practice Q4 — NOT saved */}
-            <div className="flex items-center gap-2 pt-2">
-              <Target className="w-4 h-4 text-[#C9A84C]" />
-              <span className="text-xs font-bold uppercase tracking-wider text-[#C9A84C]">
-                Practice Quiz 2
-              </span>
-              <span className="text-[10px] text-[#ecfdf5]/30 ml-auto">(not saved)</span>
-            </div>
-            <QuizCard question="According to Donella Meadows' hierarchy, which is considered the most transformative leverage point?">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {Q4_OPTIONS.map((opt) => {
-                  const selected = practiceQ4 === opt.key;
-                  const showResult = practiceQ4 !== null;
-                  return (
-                    <button
-                      key={opt.key}
-                      type="button"
-                      onClick={() => setPracticeQ4(opt.key)}
-                      className={cn(
-                        "flex items-center gap-2 p-3 rounded-lg border text-left text-xs transition-all",
-                        !showResult && selected
-                          ? "bg-[#C9A84C]/10 border-[#C9A84C] text-[#C9A84C]"
-                          : !showResult
-                          ? "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/70 hover:border-[#C9A84C]/30"
-                          : opt.correct
-                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                          : selected
-                          ? "bg-rose-500/10 border-rose-500/30 text-rose-400"
-                          : "bg-[#022c22]/20 border-white/5 text-[#ecfdf5]/30"
-                      )}
-                    >
-                      <span className="font-bold text-sm w-5">{opt.key}</span>
-                      <span>{opt.label}</span>
-                      {showResult && opt.correct && (
-                        <CheckCircle className="w-4 h-4 ml-auto text-emerald-400 shrink-0" />
-                      )}
-                      {showResult && selected && !opt.correct && (
-                        <XCircle className="w-4 h-4 ml-auto text-rose-400 shrink-0" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-              {practiceQ4 !== null && (
-                <p className="text-xs text-[#ecfdf5]/60 pt-1">
-                  {Q4_OPTIONS.find((o) => o.key === practiceQ4)?.correct
-                    ? "✅ Correct! Changing the paradigm (the mindset out of which the system arises) is the most powerful leverage point — but also the hardest to achieve."
-                    : "❌ Not quite. While changing parameters, rules, and information flows all matter, the most transformative leverage point is shifting the paradigm — the way we see and think about the system."}
-                </p>
-              )}
-            </QuizCard>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* BLOCK E — QUICK-START (The ONLY saved field)                       */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      <Card className={cn(
-        "border-2 transition-colors",
-        isReady
-          ? "bg-emerald-950/20 border-emerald-500/30"
-          : "bg-[#011a12]/80 border-[#C9A84C]/20"
-      )}>
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className={cn("w-5 h-5", isReady ? "text-emerald-400" : "text-[#C9A84C]")} />
-            <CardTitle className="text-sm font-bold text-[#E5C560]">
-              Quick-Start: Are You Ready?
-            </CardTitle>
-          </div>
-          <p className="text-xs text-[#ecfdf5]/50">
-            This is the only required response in Section 0. Your answer helps us understand stakeholder readiness.
-          </p>
+      {/* ── 3. Video Card ──────────────────────────────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
+            <Play className="w-5 h-5 text-[#C9A84C]" />
+            Systems Thinking: Moving from Checklists to Interconnected
+            Investment Ecosystem
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Select
-            value={data.q0_1_ready || undefined}
-            onValueChange={(v) => onChange({ q0_1_ready: v })}
-          >
-            <SelectTrigger className="w-full bg-[#022c22] border-[#C9A84C]/20 text-[#ecfdf5] focus:ring-[#C9A84C]/30">
-              <SelectValue placeholder="Select your readiness level…" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#022c22] border-[#C9A84C]/20">
-              {READINESS_OPTIONS.map((opt) => (
-                <SelectItem
-                  key={opt.value}
-                  value={opt.value}
-                  className="text-[#ecfdf5] focus:bg-[#C9A84C]/10 focus:text-[#C9A84C]"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-[#C9A84C]">{opt.icon}</span>
-                    <span>{opt.label}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {isReady && (
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 animate-in fade-in">
-              <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-              <p className="text-xs text-emerald-300/80">
-                Excellent! You are ready to proceed. Click <strong>Next</strong> to move to Section 1: Privacy & Consent.
-              </p>
-            </div>
-          )}
-
-          {isSomewhatReady && (
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-sky-500/10 border border-sky-500/20 animate-in fade-in">
-              <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-              <p className="text-xs text-sky-300/80">
-                Good to go! You can always revisit the orientation materials from the navigation menu.
-              </p>
-            </div>
-          )}
-
-          {data.q0_1_ready === "Curious but unsure" && (
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 animate-in fade-in">
-              <HelpCircle className="w-4 h-4 text-amber-400 shrink-0" />
-              <p className="text-xs text-amber-300/80">
-                That's perfectly fine. The survey is designed to guide you. Feel free to review the materials above before proceeding.
-              </p>
-            </div>
-          )}
-
-          {data.q0_1_ready === "Just exploring" && (
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-[#C9A84C]/10 border border-[#C9A84C]/20 animate-in fade-in">
-              <BookOpen className="w-4 h-4 text-[#C9A84C] shrink-0" />
-              <p className="text-xs text-[#ecfdf5]/70">
-                Welcome, explorer! Your progress is saved locally. You can return anytime using the same device and browser.
-              </p>
-            </div>
-          )}
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg aspect-video">
+            <iframe
+              src={BIRD_VIDEOS.systemsThinking.url.replace(
+                "youtu.be/",
+                "youtube.com/embed/"
+              )}
+              title={BIRD_VIDEOS.systemsThinking.title}
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge
+              variant="secondary"
+              className="bg-amber-100 text-amber-800 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-300"
+            >
+              <Play className="w-3 h-3 mr-1" />
+              {BIRD_VIDEOS.systemsThinking.duration}
+            </Badge>
+          </div>
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
+            {BIRD_VIDEOS.systemsThinking.description}
+          </p>
         </CardContent>
       </Card>
 
-      {/* ── Section Completion Indicator ── */}
-      <div className="flex items-center justify-between p-3 rounded-xl bg-[#022c22]/40 border border-[#C9A84C]/10">
-        <span className="text-xs text-[#ecfdf5]/50">Section 0 completion</span>
-        <span className={cn(
-          "text-xs font-bold",
-          data.q0_1_ready ? "text-emerald-400" : "text-[#C9A84C]"
-        )}>
-          {data.q0_1_ready ? "100%" : "0%"} (1/1 field)
-        </span>
-      </div>
+      {/* ── 4. Systems Thinking Learning Module ────────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-[#C9A84C]" />
+            Understanding Systems Thinking Tools
+          </CardTitle>
+          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 italic pt-1">
+            Interactive learning: Study the diagrams below, then test your
+            understanding.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Image 1: Anatomy of Causal Loop Diagram */}
+          <div className="space-y-3">
+            <h4 className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+              1. Anatomy of Causal Loop Diagrams (CLDs)
+            </h4>
+            <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg">
+              <img
+                src={BIRD_IMAGES.anatomyCLD.url}
+                alt={BIRD_IMAGES.anatomyCLD.alt}
+                className="w-full h-auto object-contain"
+                loading="lazy"
+              />
+            </div>
+            <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+              <strong>Key Elements:</strong> Variables (factors that change over
+              time), Links (arrows showing influence), Polarity marked as{" "}
+              <strong>&apos;s&apos;</strong> for same-direction effects and{" "}
+              <strong>&apos;o&apos;</strong> for opposite-direction effects.
+            </p>
+          </div>
+
+          {/* Image 2: Feedback Loops and Leverage Points */}
+          <div className="space-y-3">
+            <h4 className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+              2. Feedback Loops & Leverage Points
+            </h4>
+            <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg">
+              <img
+                src={BIRD_IMAGES.feedbackLoops.url}
+                alt={BIRD_IMAGES.feedbackLoops.alt}
+                className="w-full h-auto object-contain"
+                loading="lazy"
+              />
+            </div>
+            <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
+              <strong>Two Types of Loops:</strong> Reinforcing (R) loops amplify
+              change; Balancing (B) loops stabilize systems.
+              <strong> Leverage Hierarchy:</strong> Transformative (L1–L2),
+              Systemic (L5–L6), and Incremental (L10) intervention points.
+            </p>
+          </div>
+
+          {/* Interactive Quiz */}
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            <h4 className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5] mb-4 flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-[#C9A84C]" />
+              Quick Knowledge Check
+            </h4>
+            <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mb-4">
+              Test your understanding of systems thinking concepts. Select the
+              best answer for each question.
+            </p>
+            <div className="space-y-6">
+              {quizQuestions.map((q, index) => (
+                <div key={q.id} className="space-y-3">
+                  <p className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
+                    {index + 1}. {q.question}
+                  </p>
+                  <RadioGroup
+                    value={quizAnswers[q.id]}
+                    onValueChange={(val) => handleQuizAnswer(q.id, val)}
+                    className="grid grid-cols-1 gap-2"
+                  >
+                    {q.options.map((opt, optIndex) => {
+                      const isSelected = quizAnswers[q.id] === opt;
+                      const isCorrect = optIndex === q.correct;
+                      const showResult = showQuizResults && isSelected;
+                      return (
+                        <div
+                          key={opt}
+                          className="flex items-center space-x-2"
+                        >
+                          <RadioGroupItem
+                            value={opt}
+                            id={`q${q.id}-opt${optIndex}`}
+                            className="peer sr-only"
+                          />
+                          <Label
+                            htmlFor={`q${q.id}-opt${optIndex}`}
+                            className={cn(
+                              "flex items-center justify-between p-3 rounded-lg border text-sm text-left transition-all cursor-pointer w-full",
+                              showResult
+                                ? isCorrect
+                                  ? "bg-emerald-50 dark:bg-emerald-900/30 border-emerald-500 text-emerald-800 dark:text-emerald-300"
+                                  : "bg-red-50 dark:bg-red-900/30 border-red-500 text-red-800 dark:text-red-300"
+                                : isSelected
+                                ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
+                                : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                            )}
+                          >
+                            <span className="flex-1">{opt}</span>
+                            {showResult &&
+                              (isCorrect ? (
+                                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 ml-2" />
+                              ) : (
+                                <XCircle className="w-4 h-4 text-red-600 dark:text-red-400 ml-2" />
+                              ))}
+                          </Label>
+                        </div>
+                      );
+                    })}
+                  </RadioGroup>
+                  {showQuizResults && quizAnswers[q.id] && (
+                    <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/70 mt-2 pl-3 border-l-2 border-[#C9A84C]/30">
+                      <strong>Explanation:</strong> {q.explanation}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-3 mt-6">
+              <Button
+                type="button"
+                onClick={() => setShowQuizResults(true)}
+                className={cn(
+                  "bg-[#1B4D3E] hover:bg-[#1B4D3E]/90 text-white",
+                  Object.keys(quizAnswers).length < quizQuestions.length &&
+                    "opacity-50 cursor-not-allowed"
+                )}
+                disabled={Object.keys(quizAnswers).length < quizQuestions.length}
+              >
+                Check Answers
+              </Button>
+              {showQuizResults && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setQuizAnswers({});
+                    setShowQuizResults(false);
+                  }}
+                  className="border-[#C9A84C]/30 text-[#022c22] dark:text-[#ecfdf5] hover:border-[#C9A84C] dark:hover:bg-[#C9A84C]/10"
+                >
+                  Retake Quiz
+                </Button>
+              )}
+            </div>
+            {showQuizResults && (
+              <div className="mt-4 p-4 rounded-lg bg-[#C9A84C]/10 border border-[#C9A84C]/30">
+                <p className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+                  Your Score: {calculateQuizScore()} / {quizQuestions.length}
+                </p>
+                <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/70 mt-1">
+                  {calculateQuizScore() === quizQuestions.length
+                    ? "Excellent! You have a strong understanding of systems thinking."
+                    : calculateQuizScore() >= 2
+                    ? "Good job! Review the explanations to strengthen your understanding."
+                    : "Keep learning! Review the diagrams and try again."}
+                </p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── 5. Quick-Start Questions ───────────────────────────────────── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
+            <ArrowRight className="w-5 h-5 text-[#C9A84C]" />
+            Quick-Start Questions
+          </CardTitle>
+          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 italic pt-1">
+            Let&apos;s get started — a few quick questions to orient your
+            thinking.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-8">
+          {/* Q0.1: Readiness */}
+          <div className="pb-6 border-b border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How ready do you feel to contribute to shaping BARMM&apos;s
+              investment future?
+            </Label>
+            <RadioGroup
+              value={data.q0_1_ready}
+              onValueChange={(val) => update("q0_1_ready", val)}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+            >
+              {[
+                "Very ready",
+                "Somewhat ready",
+                "Curious but unsure",
+                "Just exploring",
+              ].map((opt) => (
+                <div key={opt} className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    value={opt}
+                    id={`ready-${opt}`}
+                    className="peer sr-only"
+                  />
+                  <Label
+                    htmlFor={`ready-${opt}`}
+                    className={cn(
+                      "flex items-center justify-center p-3 rounded-lg border text-sm text-left transition-all cursor-pointer w-full",
+                      data.q0_1_ready === opt
+                        ? activeBtnClass
+                        : inactiveBtnClass
+                    )}
+                  >
+                    {opt}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
+
+          {/* Q0.2: Ecosystem Understanding */}
+          <div className="pb-6 border-b border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How would you describe your understanding of an &quot;investment
+              ecosystem&quot; versus traditional sector-based planning?
+            </Label>
+            <RadioGroup
+              value={data.q0_2_ecosystem_understanding}
+              onValueChange={(val) => update("q0_2_ecosystem_understanding", val)}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+            >
+              {[
+                "I clearly see the difference",
+                "I somewhat understand",
+                "I mainly know sector-based",
+                "I'm not familiar with either",
+              ].map((opt) => (
+                <div key={opt} className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    value={opt}
+                    id={`understand-${opt}`}
+                    className="peer sr-only"
+                  />
+                  <Label
+                    htmlFor={`understand-${opt}`}
+                    className={cn(
+                      "flex items-center justify-center p-3 rounded-lg border text-sm text-left transition-all cursor-pointer w-full",
+                      data.q0_2_ecosystem_understanding === opt
+                        ? activeBtnClass
+                        : inactiveBtnClass
+                    )}
+                  >
+                    {opt}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
+
+          {/* Q0.3: Systems Thinking Value */}
+          <div className="pb-6 border-b border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              After watching the video, how valuable is systems thinking for
+              BARMM investment planning?
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 block mt-1 font-normal">
+                (1 = not valuable, 5 = extremely valuable)
+              </span>
+            </Label>
+            <div className="flex gap-2 flex-wrap">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
+                    data.q0_3_systems_thinking_value === v
+                      ? "bg-[#C9A84C] text-white border-[#C9A84C]"
+                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                  )}
+                  onClick={() => update("q0_3_systems_thinking_value", v)}
+                >
+                  {v}
+                </Button>
+              ))}
+            </div>
+            <div className="flex justify-between mt-2 max-w-[272px]">
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
+                Not valuable
+              </span>
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
+                Extremely valuable
+              </span>
+            </div>
+          </div>
+
+          {/* Q0.4: CLD Understanding */}
+          <div className="pb-6 border-b border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How well do you understand Causal Loop Diagrams (CLDs) after
+              reviewing the materials above?
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 block mt-1 font-normal">
+                (1 = not at all, 5 = completely)
+              </span>
+            </Label>
+            <div className="flex gap-2 flex-wrap">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
+                    data.q0_4_cld_understanding === v
+                      ? "bg-[#C9A84C] text-white border-[#C9A84C]"
+                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                  )}
+                  onClick={() => update("q0_4_cld_understanding", v)}
+                >
+                  {v}
+                </Button>
+              ))}
+            </div>
+            <div className="flex justify-between mt-2 max-w-[272px]">
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
+                {scaleLabels[0]}
+              </span>
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
+                {scaleLabels[4]}
+              </span>
+            </div>
+          </div>
+
+          {/* Q0.5: Feedback Loops Understanding */}
+          <div className="pb-6 border-b border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How well do you understand the difference between Reinforcing (R)
+              and Balancing (B) feedback loops?
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 block mt-1 font-normal">
+                (1 = not at all, 5 = completely)
+              </span>
+            </Label>
+            <div className="flex gap-2 flex-wrap">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
+                    data.q0_5_feedback_loops_understanding === v
+                      ? "bg-[#C9A84C] text-white border-[#C9A84C]"
+                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                  )}
+                  onClick={() => update("q0_5_feedback_loops_understanding", v)}
+                >
+                  {v}
+                </Button>
+              ))}
+            </div>
+            <div className="flex justify-between mt-2 max-w-[272px]">
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
+                {scaleLabels[0]}
+              </span>
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
+                {scaleLabels[4]}
+              </span>
+            </div>
+          </div>
+
+          {/* Q0.6: Leverage Points Understanding */}
+          <div>
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How well do you understand the concept of &quot;leverage
+              points&quot; — small interventions that produce large systemic
+              change?
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 block mt-1 font-normal">
+                (1 = not at all, 5 = completely)
+              </span>
+            </Label>
+            <div className="flex gap-2 flex-wrap">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className={cn(
+                    "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
+                    data.q0_6_leverage_points_understanding === v
+                      ? "bg-[#C9A84C] text-white border-[#C9A84C]"
+                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
+                  )}
+                  onClick={() => update("q0_6_leverage_points_understanding", v)}
+                >
+                  {v}
+                </Button>
+              ))}
+            </div>
+            <div className="flex justify-between mt-2 max-w-[272px]">
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
+                {scaleLabels[0]}
+              </span>
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
+                {scaleLabels[4]}
+              </span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
