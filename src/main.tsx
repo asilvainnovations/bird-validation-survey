@@ -1,64 +1,68 @@
+// src/main.tsx
+// BIRD 2026–2035 · Application Entry Point
+//
+// Side-effect setup (Sentry init, service-worker registration) lives here,
+// outside the React render tree, so they run once on page load.
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import App from "@/App";
-import "@/index.css";
+import App from "./App";
+import "./index.css";
 
-// ─── SENTRY ERROR TRACKING ──────────────────────────────────────────────────
-// Requirements:
-// 1. Set VITE_SENTRY_DSN in your deployment environment (Vercel/Netlify/Cloudflare)
-// 2. Format: https://<key>@o<org>.ingest.sentry.io/<project>
-// 3. If unset, Sentry is silently skipped — no runtime errors
-// 4. Never commit the DSN to source control; always use env vars
-//
-// Deployment check:
-// Vercel: Project Settings → Environment Variables → VITE_SENTRY_DSN
-// Netlify: Site Configuration → Environment → VITE_SENTRY_DSN
-// Manual: export VITE_SENTRY_DSN="https://..." before running "npm run build"
-//
-const sentryDsn = import.meta.env.VITE_SENTRY_DSN as string | undefined;
-
-if (sentryDsn && sentryDsn.startsWith("https://")) {
-  // Dynamic import keeps Sentry out of the main bundle when unused
-  import("@sentry/react").then((Sentry) => {
-    Sentry.init({
-      dsn: sentryDsn,
-      integrations: [
-        Sentry.browserTracingIntegration(),
-        Sentry.replayIntegration({
-          maskAllText: true,
-          blockAllMedia: true,
-        }),
-      ],
-      tracesSampleRate: 1.0,
-      replaysSessionSampleRate: 0.1,
-      replaysOnErrorSampleRate: 1.0,
+// ─── SERVICE WORKER REGISTRATION ────────────────────────────────────────────
+// Unregister any old service workers first, then register the new one.
+// This prevents stale caches from breaking the app after deployments.
+if ("serviceWorker" in navigator) {
+  // Force-unregister old SWs on first load (one-time cleanup)
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    registrations.forEach((registration) => {
+      if (registration.scope.includes(window.location.origin)) {
+        console.log("[Main] Unregistering old SW:", registration.scope);
+        registration.unregister();
+      }
     });
-  }).catch(() => {
-    // Silently fail if Sentry fails to load — survey must remain functional
+  }).then(() => {
+    // Register new SW after cleanup
+    navigator.serviceWorker
+      .register("/service-worker.js")
+      .then((registration) => {
+        console.log("[Main] SW registered:", registration.scope);
+      })
+      .catch((err) => {
+        console.error("[Main] SW registration failed:", err);
+      });
   });
 }
 
-// ─── STRICT MODE ──────────────────────────────────────────────────────────────
-// StrictMode is enabled in development to catch side-effects and unsafe lifecycles.
-// It is automatically stripped in production builds.
-ReactDOM.createRoot(document.getElementById("root")!).render(
+// ─── SENTRY INIT (optional) ───────────────────────────────────────────────
+// Only initialize if DSN is provided
+const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
+if (SENTRY_DSN && typeof SENTRY_DSN === "string") {
+  import("@sentry/react").then((Sentry) => {
+    Sentry.init({
+      dsn: SENTRY_DSN,
+      integrations: [
+        Sentry.browserTracingIntegration(),
+        Sentry.replayIntegration({
+          maskAllText: false,
+          blockAllMedia: false,
+        }),
+      ],
+      tracesSampleRate: 0.1,
+      replaysSessionSampleRate: 0.05,
+      replaysOnErrorSampleRate: 0.5,
+    });
+  });
+}
+
+// ─── REACT ROOT ─────────────────────────────────────────────────────────────
+const root = ReactDOM.createRoot(document.getElementById("root")!);
+
+root.render(
   <React.StrictMode>
     <BrowserRouter>
       <App />
     </BrowserRouter>
   </React.StrictMode>
 );
-
-// ─── SERVICE WORKER ───────────────────────────────────────────────────────────
-// public/service-worker.js implements app-shell caching, network-first API
-// calls, and an offline submission queue — but was never registered, so none
-// of it ran. Registered only in production builds, after the page has
-// finished loading, so it never competes with initial render.
-if ("serviceWorker" in navigator && import.meta.env.PROD) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/service-worker.js").catch((err) => {
-      console.warn("[SW] Registration failed (non-fatal):", err);
-    });
-  });
-}
