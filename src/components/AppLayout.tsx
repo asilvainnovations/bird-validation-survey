@@ -29,11 +29,11 @@ import {
 
 // ─── LAZY LOADED MODALS ─────────────────────────────────────────────────────
 // NOTE: this repo's actual auth surface is AuthModal (login/signup) +
-// UserProfileModal (account/sign-out), not separate Login/Logout/UserMenu
+// UserProfileModal (account/sign-out), not separate Login/Logout/UserProfile
 // components — there are no such files under src/components/auth today.
 // Wiring against files that don't exist would just be new dead code, so this
-// layout uses what's actually there. If dedicated Login/Logout/UserMenu
-// components are added later, swap the two lazy imports below; useAuthContext()'s
+// layout uses what's actually there. If dedicated Login/Logout/UserProfile
+// components are added later, swap the two lazy imports below; useAuth()'s
 // return shape (user, profile, isAuthenticated, isLoading, signOut) already
 // supports either.
 const AuthModal = lazy(() => import("./auth/AuthModal").then((m) => ({ default: m.AuthModal })));
@@ -53,8 +53,8 @@ const NAV_LINKS = [
 // policy). This guard exists for future admin-only routes (e.g. a raw
 // response review page) and currently passes children through unconditionally
 // while authentication is still loading or absent, redirecting nothing. It
-// reads real auth state from useAuthContext() rather than being a no-op stub,
-// so it's ready to gate a route the moment one needs it:
+// reads real auth state from useAuth() rather than being a no-op stub, so
+// it's ready to gate a route the moment one needs it:
 //
 //   <RequireAuth><AdminReviewPage /></RequireAuth>
 //
@@ -159,8 +159,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
             <div className="hidden md:flex items-center gap-4">
               <nav className="flex items-center gap-1">
                 {NAV_LINKS.map((l) => (
-                  
-                    key={l.label}
+                  <a key={l.label}
                     href={l.href}
                     {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                     className="px-3 py-2 text-xs font-medium text-[#ecfdf5]/70 hover:text-[#E8C560] rounded-lg hover:bg-white/5 transition-colors"
@@ -253,8 +252,7 @@ const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
           {mobileNavOpen && (
             <nav className="md:hidden border-t border-white/5 px-4 py-2 flex flex-col bg-[#022c22]/95">
               {NAV_LINKS.map((l) => (
-                
-                  key={l.label}
+                <a key={l.label}
                   href={l.href}
                   {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                   className="px-2 py-2.5 text-sm text-[#ecfdf5]/80 hover:text-[#E8C560] transition-colors"
