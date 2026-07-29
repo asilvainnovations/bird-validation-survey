@@ -48,12 +48,45 @@ serve(async (req) => {
 
     let sumS = 0, cntS = 0, sumO = 0, cntO = 0, sumW = 0, cntW = 0, sumT = 0, cntT = 0;
 
-    // Keys mapped directly from SurveyWizard.tsx computeBIRDScores logic
-    const strengthKeys = ['q_s1_halal_legitimacy', 'q_s1_bimpeaga', 'q_s1_aff_base', 'q_s6_youth_pop', 'q_s6_renewable_energy', 'q_s7_bimpeaga_loc', 'q_s7_domestic_halal', 'q_s8_islamic_finance_fw', 'q_s8_peace_dividend', 'q_s9_policy_recognition', 'q_s9_peace_dividend'];
-    const opportunityKeys = ['q_s5_global_halal', 'q_s6_renewable_invest', 'q_s7_asean_halal', 'q_s7_uae_corridor', 'q_s8_islamic_ecosystem', 'q_s8_uae_corridor', 'q_s9_carbon_markets', 'q_s9_postconflict'];
-    const weaknessKeys = ['q4_8_postharvest', 'q4_10_poverty', 'q5_7_halal_cert', 'q_s6_infra_deficits', 'q_s6_literacy', 'q_s7_infra_deficits', 'q_s7_market_linkages', 'q_s8_financial_penetration', 'q_s8_literacy', 'q_s9_literacy', 'q_s9_underspending'];
-    const threatKeys = ['q4_4_climate', 'q4_6_pestalotiopsis', 'q5_15_competition', 'q_s6_political_transition', 'q_s7_halal_competition', 'q_s8_halal_standards', 'q_s9_security_incidents', 'q_s9_political_transition'];
-    const archetypeKeys = ['q_s4_tragedy_commons', 'q_s5_growth_underinvest', 'q_s6_limits_growth', 'q_s7_escalation', 'q_s8_big_man', 'q_s9_investment_loop', 'q_s9_governance_loop', 'q_s11_drifting_goals'];
+    // Keys mirror src/lib/swot-content.ts exactly — this is a Deno edge function
+    // and cannot import the TS module directly, so this list MUST be kept in
+    // sync by hand whenever swot-content.ts changes (this file is the one
+    // documented exception to "single source of truth").
+    const strengthKeys = [
+      'q4_s1_aff_base', 'q4_s2_renewable_energy', 'q4_s3_lake_lanao', 'q4_s4_seaweed_dominance',
+      'q5_s1_halal_legitimacy', 'q5_s2_domestic_demand', 'q5_s3_polloc_freeport', 'q5_s4_cultural_heritage',
+      'q6_s1_youth_pop', 'q6_s2_lanao_growth',
+      'q7_s1_bimpeaga_location',
+      'q8_s1_islamic_finance_framework',
+      'q9_s1_policy_recognition', 'q9_s2_peace_dividend',
+    ];
+    const opportunityKeys = [
+      'q4_o1_renewable_invest', 'q4_o2_carbon_markets', 'q4_o3_pes', 'q4_o4_forestry_code',
+      'q6_o1_tourism_recovery', 'q6_o2_digital_leapfrog',
+      'q7_o1_global_halal', 'q7_o2_asean_halal', 'q7_o3_bimpeaga_integration', 'q7_o4_uae_corridor', 'q7_o5_landbridge',
+      'q8_o1_islamic_ecosystem',
+      'q9_o1_postconflict',
+    ];
+    const weaknessKeys = [
+      'q4_w1_land_tenure',
+      'q5_w1_halal_cert', 'q5_w2_cold_chain', 'q5_w3_market_linkages',
+      'q6_w1_infra_deficits', 'q6_w2_poverty', 'q6_w3_literacy', 'q6_w4_malnutrition', 'q6_w5_skills_mismatch', 'q6_w6_tech_adoption', 'q6_w7_underspending',
+      'q8_w1_financial_penetration',
+      'q9_w1_fragmented_policy',
+    ];
+    const threatKeys = [
+      'q4_t1_pestalotiopsis',
+      'q5_t1_standards_recognition',
+      'q6_t1_cyber_insecurity',
+      'q7_t1_halal_competition', 'q7_t2_economic_downturn', 'q7_t3_price_volatility',
+      'q9_t1_climate_change', 'q9_t2_drifting_goals', 'q9_t3_security_incidents', 'q9_t4_political_transition', 'q9_t5_natl_coordination', 'q9_t6_fragmented_mandates',
+    ];
+    const archetypeKeys = [
+      'q4_arch_tragedy_commons', 'q5_arch_growth_underinvest', 'q6_arch_limits_growth',
+      'q7_arch_success_successful', 'q8_arch_shifting_burden',
+      'q9_arch_fixes_fail', 'q9_arch_escalation', 'q9_arch_big_man',
+      'q11_arch_drifting_goals',
+    ];
 
     for (const row of responses || []) {
       const d = row.response_data || {};
@@ -75,7 +108,7 @@ serve(async (req) => {
 
       // Archetype Consensus
       for (const a of archetypeKeys) {
-        const val = d[a];
+        const val = d[`${a}_accuracy`];
         if (val) {
           if (!archetypes[a]) archetypes[a] = { accurate: 0, total: 0 };
           archetypes[a].total++;
