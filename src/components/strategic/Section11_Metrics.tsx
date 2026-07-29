@@ -530,14 +530,14 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
       {/* ── BLOCK 6: Metrics Framework Image ──────────────────────────────── */}
       <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
         <img
-          src={BIRD_IMAGES.metricsKPIs.url}
-          alt={BIRD_IMAGES.metricsKPIs.alt}
+          src={BIRD_IMAGES.metricsArchitecture.url}
+          alt={BIRD_IMAGES.metricsArchitecture.alt}
           className="w-full h-auto max-h-[500px] object-contain transition-transform duration-500 group-hover:scale-[1.02]"
           loading="lazy"
         />
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
           <p className="text-xs italic text-white/70">
-            {BIRD_IMAGES.metricsKPIs.description}
+            {BIRD_IMAGES.metricsArchitecture.description}
           </p>
         </div>
       </div>
