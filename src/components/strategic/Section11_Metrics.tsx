@@ -1,10 +1,13 @@
+// src/components/strategic/Section11_Metrics.tsx
+// BIRD 2026–2035 · Section 11: Metrics Architecture & Key Performance Indicators
+// Updated: 2026-07-30 · Strict alignment with reusable primitives and survey architecture
+
 import React from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import {
   BarChart3,
   Target,
@@ -13,11 +16,15 @@ import {
   Users,
   Zap,
   AlertTriangle,
-  BookOpen,
 } from "lucide-react";
 import { BIRD_IMAGES } from "@/lib/bird-urls";
 
-// ── Types (exact runtime contract with SurveyWizard.tsx s11 state + optional Drifting Goals) ──
+// ─── REUSABLE PRIMITIVES ─────────────────────────────────────────────────────
+import { ImageWithFallback } from "@/components/primitives/ImageWithFallback";
+import { LikertScale } from "@/components/primitives/LikertScale";
+import { SectionProgress } from "@/components/primitives/SectionProgress";
+
+// ── Types (exact runtime contract with SurveyWizard.tsx s11 state) ──────────
 export interface Section11Data {
   q11_1_calibration_appropriate: string;
   q11_2_governance_kpi_importance?: number;
@@ -26,7 +33,7 @@ export interface Section11Data {
   q11_5_peace_kpi_importance?: number;
   q11_6_cluster_kpi_sufficient: string;
   q11_7_benchmark_priority: string;
-  // Optional: Drifting Goals archetype (add to wizard state for full persistence)
+  // Optional: Drifting Goals archetype
   q_s11_drifting_goals?: string;
   q_s11_drifting_goals_followup?: string;
 }
@@ -37,10 +44,6 @@ interface Section11Props {
 }
 
 // ── Design tokens ────────────────────────────────────────────────────────────
-const activeScaleClass =
-  "bg-[#C9A84C] text-white border-[#C9A84C] hover:bg-[#C9A84C]/90";
-const inactiveScaleClass =
-  "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]";
 const activeBtnClass =
   "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90 dark:bg-[#1B4D3E] dark:text-white dark:border-[#1B4D3E]";
 const inactiveBtnClass =
@@ -55,34 +58,24 @@ const archetypeOptions = [
 
 // ═══════════════════════════════════════════════════════════════════════════════
 export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) => {
-  const update = <K extends keyof Section11Data>(
-    field: K,
-    value: Section11Data[K]
-  ) => onChange({ ...data, [field]: value });
-
-  const renderScale = (field: keyof Section11Data) => (
-    <div className="flex gap-2 flex-wrap">
-      {[1, 2, 3, 4, 5].map((v) => (
-        <Button
-          key={v}
-          type="button"
-          variant="outline"
-          size="icon"
-          className={cn(
-            "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
-            data[field] === v ? activeScaleClass : inactiveScaleClass
-          )}
-          onClick={() => update(field, v as any)}
-        >
-          {v}
-        </Button>
-      ))}
-    </div>
-  );
+  const update = <K extends keyof Section11Data>(field: K, value: Section11Data[K]) => 
+    onChange({ ...data, [field]: value });
 
   return (
     <div className="space-y-8">
-      {/* ── HEADER ────────────────────────────────────────────────────────── */}
+      {/* ── Section Progress ────────────────────────────────────── */}
+      <SectionProgress 
+        current={11} 
+        total={16} 
+        labels={[
+          "Welcome", "Privacy", "Profile", "Systems", "Foundations", 
+          "Transformers", "Enablers", "Connectors", "Financiers", 
+          "Operating Systems", "IEDS", "Metrics", "BSC", "Budget", 
+          "Resources", "Submit"
+        ]} 
+      />
+
+      {/* ── HEADER ──────────────────────────────────────────────── */}
       <div className="flex items-start gap-4">
         <div className="p-3 rounded-xl bg-[#022c22] dark:bg-[#011a12] text-[#C9A84C] shadow-md shrink-0">
           <BarChart3 className="w-8 h-8" />
@@ -99,7 +92,7 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
         </div>
       </div>
 
-      {/* ── BLOCK 1: KPI Calibration & Phasing Architecture ───────────────── */}
+      {/* ── BLOCK 1: KPI Calibration & Phasing Architecture ───── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm shadow-sm">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2 text-[#022c22] dark:text-[#ecfdf5]">
@@ -178,7 +171,7 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
         </CardContent>
       </Card>
 
-      {/* ── BLOCK 2: Cross-Cutting Operating Systems KPIs ─────────────────── */}
+      {/* ── BLOCK 2: Cross-Cutting Operating Systems KPIs ─────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm shadow-sm">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2 text-[#022c22] dark:text-[#ecfdf5]">
@@ -213,8 +206,13 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
               </div>
             </div>
             <div>
-              <Label className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mb-2 block">Rate importance of governance KPIs (1-5)</Label>
-              {renderScale("q11_2_governance_kpi_importance")}
+              <Label className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mb-2 block">Rate importance of governance KPIs</Label>
+              <LikertScale
+                value={data.q11_2_governance_kpi_importance}
+                onChange={(v) => update("q11_2_governance_kpi_importance", v)}
+                labels={["Not important", "Slightly important", "Moderately important", "Important", "Very important"]}
+                name="governance_kpi_importance"
+              />
             </div>
           </div>
 
@@ -235,8 +233,13 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
               </div>
             </div>
             <div>
-              <Label className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mb-2 block">Rate importance of resilience KPIs (1-5)</Label>
-              {renderScale("q11_3_resilience_kpi_importance")}
+              <Label className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mb-2 block">Rate importance of resilience KPIs</Label>
+              <LikertScale
+                value={data.q11_3_resilience_kpi_importance}
+                onChange={(v) => update("q11_3_resilience_kpi_importance", v)}
+                labels={["Not important", "Slightly important", "Moderately important", "Important", "Very important"]}
+                name="resilience_kpi_importance"
+              />
             </div>
           </div>
 
@@ -261,8 +264,13 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
               </div>
             </div>
             <div>
-              <Label className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mb-2 block">Rate importance of inclusivity KPIs (1-5)</Label>
-              {renderScale("q11_4_inclusivity_kpi_importance")}
+              <Label className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mb-2 block">Rate importance of inclusivity KPIs</Label>
+              <LikertScale
+                value={data.q11_4_inclusivity_kpi_importance}
+                onChange={(v) => update("q11_4_inclusivity_kpi_importance", v)}
+                labels={["Not important", "Slightly important", "Moderately important", "Important", "Very important"]}
+                name="inclusivity_kpi_importance"
+              />
             </div>
           </div>
 
@@ -287,14 +295,19 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
               </div>
             </div>
             <div>
-              <Label className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mb-2 block">Rate importance of peace & security KPIs (1-5)</Label>
-              {renderScale("q11_5_peace_kpi_importance")}
+              <Label className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mb-2 block">Rate importance of peace & security KPIs</Label>
+              <LikertScale
+                value={data.q11_5_peace_kpi_importance}
+                onChange={(v) => update("q11_5_peace_kpi_importance", v)}
+                labels={["Not important", "Slightly important", "Moderately important", "Important", "Very important"]}
+                name="peace_kpi_importance"
+              />
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* ── BLOCK 3: Cluster-Specific Performance Indicators ──────────────── */}
+      {/* ── BLOCK 3: Cluster-Specific Performance Indicators ──── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm shadow-sm">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2 text-[#022c22] dark:text-[#ecfdf5]">
@@ -360,7 +373,7 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
         </CardContent>
       </Card>
 
-      {/* ── BLOCK 4: Benchmark Alignment ──────────────────────────────────── */}
+      {/* ── BLOCK 4: Benchmark Alignment ──────────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm shadow-sm">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2 text-[#022c22] dark:text-[#ecfdf5]">
@@ -435,7 +448,7 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
         </CardContent>
       </Card>
 
-      {/* ── BLOCK 5: Archetype — Drifting Goals ───────────────────────────── */}
+      {/* ── BLOCK 5: Archetype — Drifting Goals ───────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm shadow-sm">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2 text-[#022c22] dark:text-[#ecfdf5]">
@@ -444,14 +457,12 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
-            <img
-              src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/Drifting%20Goals.png"
-              alt="Drifting Goals Archetype"
-              className="w-full h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
+          <ImageWithFallback
+            src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/images-swot-systems-maps/Drifting%20Goals.png"
+            alt="Drifting Goals Archetype"
+            description="The Drifting Goals archetype illustrates how BARMM's development ambitions weaken over time when persistent performance gaps lead institutions to lower standards instead of addressing root causes."
+            className="w-full h-auto object-contain rounded-xl border border-[#C9A84C]/30"
+          />
           <p className="text-sm text-[#022c22] dark:text-[#ecfdf5]/90 leading-relaxed">
             The &quot;Drifting Goals&quot; archetype illustrates how BARMM&apos;s development ambitions weaken over time
             when persistent performance gaps lead institutions to lower standards instead of addressing root causes.
@@ -527,20 +538,13 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
         </CardContent>
       </Card>
 
-      {/* ── BLOCK 6: Metrics Framework Image ──────────────────────────────── */}
-      <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
-        <img
-          src={BIRD_IMAGES.metricsArchitecture.url}
-          alt={BIRD_IMAGES.metricsArchitecture.alt}
-          className="w-full h-auto max-h-[500px] object-contain transition-transform duration-500 group-hover:scale-[1.02]"
-          loading="lazy"
-        />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
-          <p className="text-xs italic text-white/70">
-            {BIRD_IMAGES.metricsArchitecture.description}
-          </p>
-        </div>
-      </div>
+      {/* ── BLOCK 6: Metrics Framework Image ──────────────────── */}
+      <ImageWithFallback
+        src={BIRD_IMAGES.metricsArchitecture?.url || ""}
+        alt={BIRD_IMAGES.metricsArchitecture?.alt || "Metrics Architecture Framework"}
+        description={BIRD_IMAGES.metricsArchitecture?.description || "The comprehensive 5-tier calibration architecture and cross-cluster synchronization framework for BIRD 2026-2035."}
+        className="w-full h-auto max-h-[500px] object-contain rounded-xl border border-[#C9A84C]/30 shadow-lg"
+      />
     </div>
   );
 };
