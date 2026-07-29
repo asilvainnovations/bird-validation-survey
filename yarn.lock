@@ -1184,7 +1184,7 @@
     "@supabase/realtime-js" "2.111.0"
     "@supabase/storage-js" "2.111.0"
 
-"@tailwindcss/typography@^0.5.15":
+"@tailwindcss/typography@^0.5.20":
   version "0.5.20"
   resolved "https://registry.npmjs.org/@tailwindcss/typography/-/typography-0.5.20.tgz"
   integrity sha512-hwbzQuNUfcPvbegQFatVPl/MY/tcM9KLl963hQ5laJKPh81TEZ1+dNG9PirGvcaDBkp+BCshExAyKVPW91dozw==
@@ -1196,7 +1196,7 @@
   resolved "https://registry.npmjs.org/@tanstack/query-core/-/query-core-5.101.4.tgz"
   integrity sha512-gNwcvOJcRbLWPOLG/2OBm+zM+Yv+MKsXKEOWC57USuZDEsI71hEErQsiEGx5wX9rzWWkfwM0fVSPoiIFSsxfiw==
 
-"@tanstack/react-query@^5.51.0":
+"@tanstack/react-query@^5.101.4":
   version "5.101.4"
   resolved "https://registry.npmjs.org/@tanstack/react-query/-/react-query-5.101.4.tgz"
   integrity sha512-yRg2pfOCxIs4ZJW3XYYHU/WgtD04FHSnfHlpRT7h7pR77hwkdRG4wxbKe4aq6P0RvXUTBSQpQeadS1SUYUe+KA==
