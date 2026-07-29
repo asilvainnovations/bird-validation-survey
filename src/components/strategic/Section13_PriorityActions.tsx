@@ -1,3 +1,7 @@
+// src/components/strategic/Section13_PriorityActions.tsx
+// BIRD 2026–2035 · Section 13: Priority Actions & Budget Deployment
+// Updated: 2026-07-30 · Strict alignment with reusable primitives and survey architecture
+
 import React from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +23,12 @@ import {
 } from "lucide-react";
 import { BIRD_IMAGES } from "@/lib/bird-urls";
 
-// ── Types ────────────────────────────────────────────────────────────────────
+// ─── REUSABLE PRIMITIVES ─────────────────────────────────────────────────────
+import { ImageWithFallback } from "@/components/primitives/ImageWithFallback";
+import { LikertScale } from "@/components/primitives/LikertScale";
+import { SectionProgress } from "@/components/primitives/SectionProgress";
+
+// ── Types (exact runtime contract with SurveyWizard.tsx s13 state) ──────────
 export interface Section13Data {
   q13_1_funding_mix_fair?: number;
   q13_2_targets_realistic?: number;
@@ -37,67 +46,30 @@ interface Section13Props {
 }
 
 // ── Component ────────────────────────────────────────────────────────────────
-const Section13_PriorityActions: React.FC<Section13Props> = ({
-  data,
-  onChange,
-}) => {
-  const update = <K extends keyof Section13Data>(
-    field: K,
-    value: Section13Data[K]
-  ) => {
+const Section13_PriorityActions: React.FC<Section13Props> = ({ data, onChange }) => {
+  const update = <K extends keyof Section13Data>(field: K, value: Section13Data[K]) => 
     onChange({ ...data, [field]: value });
-  };
 
   const activeBtnClass =
-    "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90";
+    "bg-[#1B4D3E] text-white border-[#1B4D3E] hover:bg-[#1B4D3E]/90 dark:bg-[#1B4D3E] dark:text-white dark:border-[#1B4D3E]";
   const inactiveBtnClass =
     "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10";
-  const activeScaleClass =
-    "bg-[#C9A84C] text-white border-[#C9A84C] hover:bg-[#C9A84C]/90";
-  const inactiveScaleClass =
-    "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]";
-
-  const renderScale = (
-    field: keyof Section13Data,
-    label: string,
-    leftLabel: string,
-    rightLabel: string
-  ) => (
-    <div className="space-y-3">
-      <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
-        {label}
-      </Label>
-      <div className="flex gap-2 flex-wrap">
-        {[1, 2, 3, 4, 5].map((v) => (
-          <Button
-            key={v}
-            type="button"
-            variant="outline"
-            size="icon"
-            className={cn(
-              "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
-              data[field] === v ? activeScaleClass : inactiveScaleClass
-            )}
-            onClick={() => update(field, v)}
-          >
-            {v}
-          </Button>
-        ))}
-      </div>
-      <div className="flex justify-between mt-1 max-w-[272px]">
-        <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
-          {leftLabel}
-        </span>
-        <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
-          {rightLabel}
-        </span>
-      </div>
-    </div>
-  );
 
   return (
     <div className="space-y-8">
-      {/* ── HEADER ─────────────────────────────────────────────────────── */}
+      {/* ── Section Progress ────────────────────────────────────── */}
+      <SectionProgress 
+        current={13} 
+        total={16} 
+        labels={[
+          "Welcome", "Privacy", "Profile", "Systems", "Foundations", 
+          "Transformers", "Enablers", "Connectors", "Financiers", 
+          "Operating Systems", "IEDS", "Metrics", "BSC", "Budget", 
+          "Resources", "Submit"
+        ]} 
+      />
+
+      {/* ── HEADER ──────────────────────────────────────────────── */}
       <div className="flex items-start gap-4">
         <div className="p-3 rounded-xl bg-[#022c22] text-[#C9A84C] shadow-md shrink-0">
           <Wallet className="w-8 h-8" />
@@ -115,26 +87,15 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({
         </div>
       </div>
 
-      {/* ── BLOCK 1: Total Capital Deployment Image ────────────────────── */}
-      <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
-        <img
-          src={BIRD_IMAGES.totalCapitalDeployment.url}
-          alt={BIRD_IMAGES.totalCapitalDeployment.alt}
-          className="w-full h-auto max-h-[500px] object-contain transition-transform group-hover:scale-[1.02]"
-          loading="lazy"
-        />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
-          <p className="text-sm font-medium text-white">
-            Total Capital Deployment across Activate (₱35-45B), Scale
-            (₱50-65B), and Consolidate (₱35-50B) phases.
-          </p>
-          <p className="text-xs italic text-white/70">
-            {BIRD_IMAGES.totalCapitalDeployment.description}
-          </p>
-        </div>
-      </div>
+      {/* ── BLOCK 1: Total Capital Deployment Image ─────────────── */}
+      <ImageWithFallback
+        src={BIRD_IMAGES.totalCapitalDeployment?.url || ""}
+        alt={BIRD_IMAGES.totalCapitalDeployment?.alt || "Total Capital Deployment"}
+        description="Total Capital Deployment across Activate (₱35-45B), Scale (₱50-65B), and Consolidate (₱35-50B) phases."
+        className="w-full h-auto max-h-[500px] object-contain rounded-xl border border-[#C9A84C]/30 shadow-lg"
+      />
 
-      {/* ── BLOCK 2: Capital Phasing Table ─────────────────────────────── */}
+      {/* ── BLOCK 2: Capital Phasing Table ──────────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
@@ -226,17 +187,20 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({
 
           {/* q13_1_funding_mix_fair */}
           <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20">
-            {renderScale(
-              "q13_1_funding_mix_fair",
-              "Is this funding mix realistic? (1 = unrealistic, 5 = very realistic)",
-              "Unrealistic",
-              "Very realistic"
-            )}
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+              Is this funding mix realistic?
+            </Label>
+            <LikertScale
+              value={data.q13_1_funding_mix_fair}
+              onChange={(v) => update("q13_1_funding_mix_fair", v)}
+              labels={["Unrealistic", "Slightly unrealistic", "Moderately realistic", "Realistic", "Very realistic"]}
+              name="funding_mix_fair"
+            />
           </div>
         </CardContent>
       </Card>
 
-      {/* ── BLOCK 3: 2035 Targets Dashboard ────────────────────────────── */}
+      {/* ── BLOCK 3: 2035 Targets Dashboard ─────────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
@@ -379,17 +343,20 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({
 
           {/* q13_2_targets_realistic */}
           <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20">
-            {renderScale(
-              "q13_2_targets_realistic",
-              "How realistic are these 2035 targets overall? (1 = unrealistic, 5 = fully realistic)",
-              "Unrealistic",
-              "Fully realistic"
-            )}
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+              How realistic are these 2035 targets overall?
+            </Label>
+            <LikertScale
+              value={data.q13_2_targets_realistic}
+              onChange={(v) => update("q13_2_targets_realistic", v)}
+              labels={["Unrealistic", "Slightly unrealistic", "Moderately realistic", "Realistic", "Fully realistic"]}
+              name="targets_realistic"
+            />
           </div>
         </CardContent>
       </Card>
 
-      {/* ── BLOCK 4: Risk Assessment ───────────────────────────────────── */}
+      {/* ── BLOCK 4: Risk Assessment Matrix ─────────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
@@ -440,12 +407,15 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({
 
           {/* q13_3_high_risk_concern */}
           <div className="space-y-3 pb-6 border-b border-[#C9A84C]/20">
-            {renderScale(
-              "q13_3_high_risk_concern",
-              "How concerned are you about HIGH risks? (1 = not concerned, 5 = very concerned)",
-              "Not concerned",
-              "Very concerned"
-            )}
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+              How concerned are you about HIGH risks?
+            </Label>
+            <LikertScale
+              value={data.q13_3_high_risk_concern}
+              onChange={(v) => update("q13_3_high_risk_concern", v)}
+              labels={["Not concerned", "Slightly concerned", "Moderately concerned", "Concerned", "Very concerned"]}
+              name="high_risk_concern"
+            />
           </div>
 
           {/* MEDIUM RISKS */}
@@ -484,12 +454,15 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({
 
           {/* q13_4_medium_risk_concern */}
           <div className="space-y-3 pb-6 border-b border-[#C9A84C]/20">
-            {renderScale(
-              "q13_4_medium_risk_concern",
-              "How concerned are you about MEDIUM risks? (1 = not concerned, 5 = very concerned)",
-              "Not concerned",
-              "Very concerned"
-            )}
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+              How concerned are you about MEDIUM risks?
+            </Label>
+            <LikertScale
+              value={data.q13_4_medium_risk_concern}
+              onChange={(v) => update("q13_4_medium_risk_concern", v)}
+              labels={["Not concerned", "Slightly concerned", "Moderately concerned", "Concerned", "Very concerned"]}
+              name="medium_risk_concern"
+            />
           </div>
 
           {/* LOW RISKS */}
@@ -517,17 +490,20 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({
 
           {/* q13_5_low_risk_concern */}
           <div className="space-y-3">
-            {renderScale(
-              "q13_5_low_risk_concern",
-              "How concerned are you about LOW risks? (1 = not concerned, 5 = very concerned)",
-              "Not concerned",
-              "Very concerned"
-            )}
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
+              How concerned are you about LOW risks?
+            </Label>
+            <LikertScale
+              value={data.q13_5_low_risk_concern}
+              onChange={(v) => update("q13_5_low_risk_concern", v)}
+              labels={["Not concerned", "Slightly concerned", "Moderately concerned", "Concerned", "Very concerned"]}
+              name="low_risk_concern"
+            />
           </div>
         </CardContent>
       </Card>
 
-      {/* ── BLOCK 5: Respondent Budget Priority ──────────────────────── */}
+      {/* ── BLOCK 5: Respondent Budget Priority ─────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
@@ -578,14 +554,7 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({
               Which cluster deserves the LARGEST share?
             </Label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
-              {[
-                "Foundations",
-                "Transformers",
-                "Enablers",
-                "Connectors",
-                "Financiers",
-                "Operating Systems",
-              ].map((opt) => (
+              {["Foundations", "Transformers", "Enablers", "Connectors", "Financiers", "Operating Systems"].map((opt) => (
                 <Button
                   key={opt}
                   type="button"
