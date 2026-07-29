@@ -13,15 +13,13 @@ import {
   Loader2, LogIn, LogOut, Menu, X, Sun, Moon, BookOpen 
 } from 'lucide-react';
 
-// ─── CORE COMPONENTS ────────────────────────────────────────────────────────────
-import SurveyWizard from './strategic/SurveyWizard';
 import ContextPanel from './strategic/ContextPanel';
 
-// ─── LAZY LOADED MODALS ─────────────────────────────────────────────────────────
+// ─── LAZY LOADED MODALS ────────────────────────────────────────────────────────
 const AuthModal = lazy(() => import('./auth/AuthModal').then((m) => ({ default: m.AuthModal })));
 const UserProfileModal = lazy(() => import('./auth/UserProfileModal').then((m) => ({ default: m.UserProfileModal })));
 
-// ─── STATIC COMPANION PAGES (Aligned with bird-urls.ts) ─────────────────────────
+// ─── STATIC COMPANION PAGES (Aligned with bird-urls.ts) ────────────────────────
 const NAV_LINKS = [
   { label: 'Orientation', href: BIRD_SITES.surveyBriefing.url },
   { label: 'Live Dashboard', href: BIRD_SITES.surveyDashboard.url },
@@ -29,11 +27,16 @@ const NAV_LINKS = [
   { label: 'Privacy', href: '/privacy-policy.html' }, // Public static file
 ] as const;
 
-// ─── MAIN LAYOUT ────────────────────────────────────────────────────────────────
-const AppLayout: React.FC = () => {
+// ─── PROPS INTERFACE ───────────────────────────────────────────────────────────
+interface AppLayoutProps {
+  children: React.ReactNode;
+}
+
+// ─── MAIN LAYOUT ───────────────────────────────────────────────────────────────
+const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const { user, profile, isAuthenticated, isLoading: authLoading, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
-  
+
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -76,12 +79,12 @@ const AppLayout: React.FC = () => {
       {/* ── Header ── */}
       <header className="sticky top-0 z-40 border-b border-[#C9A84C]/15 bg-[#022c22]/85 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
-          
+
           {/* Logo */}
           <a href={BIRD_SITES.home.url} className="flex items-center gap-3 min-w-0">
             <StratLogo size="sm" variant="icon" />
             <div className="min-w-0">
-              <p className="text-sm font-bold text-[#E8C560] leading-tight truncate">BIRD 2026–2035</p>
+              <p className="text-sm font-bold text-[#E5C560] leading-tight truncate">BIRD 2026–2035</p>
               <p className="text-[10px] uppercase tracking-widest text-[#ecfdf5]/50 leading-tight">Validation Survey</p>
             </div>
           </a>
@@ -95,15 +98,15 @@ const AppLayout: React.FC = () => {
                   href={l.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-2 text-xs font-medium text-[#ecfdf5]/70 hover:text-[#E8C560] rounded-lg hover:bg-white/5 transition-colors"
+                  className="px-3 py-2 text-xs font-medium text-[#ecfdf5]/70 hover:text-[#E5C560] rounded-lg hover:bg-white/5 transition-colors"
                 >
                   {l.label}
                 </a>
               ))}
             </nav>
-            
+
             <div className="h-6 w-px bg-[#C9A84C]/20" />
-            
+
             <div className="flex items-center gap-2">
               {/* Theme Toggle */}
               <Toggle
@@ -190,7 +193,7 @@ const AppLayout: React.FC = () => {
                 href={l.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-2 py-2.5 text-sm text-[#ecfdf5]/80 hover:text-[#E8C560] transition-colors"
+                className="px-2 py-2.5 text-sm text-[#ecfdf5]/80 hover:text-[#E5C560] transition-colors"
                 onClick={() => setMobileNavOpen(false)}
               >
                 {l.label}
@@ -217,9 +220,9 @@ const AppLayout: React.FC = () => {
         )}
       </header>
 
-      {/* ── Survey Core ── */}
+      {/* ── Main Content Area ── */}
       <main className="flex-1">
-        <SurveyWizard />
+        {children}
       </main>
 
       {/* ── Footer ── */}
@@ -229,9 +232,9 @@ const AppLayout: React.FC = () => {
             © {new Date().getFullYear()} BOI-MTIT, BARMM · BIRD 2026–2035 Validation Survey · Developed by ASilva Innovations
           </p>
           <div className="flex items-center gap-4">
-            <a href="/privacy-policy.html" className="hover:text-[#E8C560] transition-colors">Privacy Policy</a>
-            <a href="/cookie-policy.html" className="hover:text-[#E8C560] transition-colors">Cookie Policy</a>
-            <a href="mailto:boi@bangsamoro.gov.ph" className="hover:text-[#E8C560] transition-colors">Contact</a>
+            <a href="/privacy-policy.html" className="hover:text-[#E5C560] transition-colors">Privacy Policy</a>
+            <a href="/cookie-policy.html" className="hover:text-[#E5C560] transition-colors">Cookie Policy</a>
+            <a href="mailto:boi@bangsamoro.gov.ph" className="hover:text-[#E5C560] transition-colors">Contact</a>
           </div>
         </div>
       </footer>
