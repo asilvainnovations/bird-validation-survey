@@ -34,34 +34,37 @@ export interface Section6Data {
   q6_4_tourism_confidence?: number;
   q6_5_digital_tourism_rank: string[];
   q6_6_moral_governance_realistic: string;
-  q_s6_youth_pop_impact?: number;
-  q_s6_youth_pop_likelihood?: number;
-  q_s6_renewable_energy_impact?: number;
-  q_s6_renewable_energy_likelihood?: number;
-  q_s6_polloc_impact?: number;
-  q_s6_polloc_likelihood?: number;
-  q_s6_infra_deficits_impact?: number;
-  q_s6_infra_deficits_likelihood?: number;
-  q_s6_literacy_impact?: number;
-  q_s6_literacy_likelihood?: number;
-  q_s6_skills_mismatch_impact?: number;
-  q_s6_skills_mismatch_likelihood?: number;
-  q_s6_tech_adoption_impact?: number;
-  q_s6_tech_adoption_likelihood?: number;
-  q_s6_renewable_invest_impact?: number;
-  q_s6_renewable_invest_likelihood?: number;
-  q_s6_tourism_potential_impact?: number;
-  q_s6_tourism_potential_likelihood?: number;
-  q_s6_political_transition_impact?: number;
-  q_s6_political_transition_likelihood?: number;
-  q_s6_cost_overruns_impact?: number;
-  q_s6_cost_overruns_likelihood?: number;
-  q_s6_natl_coord_impact?: number;
-  q_s6_natl_coord_likelihood?: number;
-  q_s6_shifting_burden: string;
-  q_s6_shifting_followup: string;
-  q_s6_growth_underinvest: string;
-  q_s6_growth_followup: string;
+  // SWOT — Strengths
+  q6_s1_youth_pop_impact?: number;
+  q6_s1_youth_pop_likelihood?: number;
+  q6_s2_lanao_growth_impact?: number;
+  q6_s2_lanao_growth_likelihood?: number;
+  // SWOT — Weaknesses
+  q6_w1_infra_deficits_impact?: number;
+  q6_w1_infra_deficits_likelihood?: number;
+  q6_w2_poverty_impact?: number;
+  q6_w2_poverty_likelihood?: number;
+  q6_w3_literacy_impact?: number;
+  q6_w3_literacy_likelihood?: number;
+  q6_w4_malnutrition_impact?: number;
+  q6_w4_malnutrition_likelihood?: number;
+  q6_w5_skills_mismatch_impact?: number;
+  q6_w5_skills_mismatch_likelihood?: number;
+  q6_w6_tech_adoption_impact?: number;
+  q6_w6_tech_adoption_likelihood?: number;
+  q6_w7_underspending_impact?: number;
+  q6_w7_underspending_likelihood?: number;
+  // SWOT — Opportunities
+  q6_o1_tourism_recovery_impact?: number;
+  q6_o1_tourism_recovery_likelihood?: number;
+  q6_o2_digital_leapfrog_impact?: number;
+  q6_o2_digital_leapfrog_likelihood?: number;
+  // SWOT — Threats
+  q6_t1_cyber_insecurity_impact?: number;
+  q6_t1_cyber_insecurity_likelihood?: number;
+  // Archetype: Limits to Growth (see swot-content.ts ARCHETYPES_BY_SECTION[6])
+  q6_arch_limits_growth_accuracy: string;
+  q6_arch_limits_growth_followup: string;
 }
 
 interface Section6Props {
@@ -154,7 +157,7 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
                 ? activeScale
                 : inactiveScale
             )}
-            onClick={() => update(field, v as any)}
+            onClick={() => update(field, v as never)}
           >
             {v}
           </Button>
@@ -245,7 +248,7 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
                       ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
                       : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
                   )}
-                  onClick={() => update(impactField, v as any)}
+                  onClick={() => update(impactField, v as never)}
                 >
                   {v}
                 </Button>
@@ -269,7 +272,7 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
                       ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
                       : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
                   )}
-                  onClick={() => update(likelihoodField, v as any)}
+                  onClick={() => update(likelihoodField, v as never)}
                 >
                   {v}
                 </Button>
@@ -355,22 +358,15 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
           {renderSwotPair(
             "S1 — Young, Growing Population",
             "BARMM's population grows at 3.43% per year (the highest in the Philippines), creating a large future workforce and consumer base.",
-            "q_s6_youth_pop_impact",
-            "q_s6_youth_pop_likelihood",
+            "q6_s1_youth_pop_impact",
+            "q6_s1_youth_pop_likelihood",
             "strength"
           )}
           {renderSwotPair(
-            "S2 — Renewable Energy Potential",
-            "Untapped hydro (Lake Lanao), solar, and biomass resources can attract clean energy investments and power industrial scaling.",
-            "q_s6_renewable_energy_impact",
-            "q_s6_renewable_energy_likelihood",
-            "strength"
-          )}
-          {renderSwotPair(
-            "S6 — Polloc Freeport & Economic Zone",
-            "Strategic logistics and trade hub in Maguindanao del Norte serving as a gateway for goods entering and leaving BARMM.",
-            "q_s6_polloc_impact",
-            "q_s6_polloc_likelihood",
+            "S2 — Lanao del Sur's Growth Momentum",
+            "Currently BARMM's fastest-growing provincial economy (5.02% in 2023).",
+            "q6_s2_lanao_growth_impact",
+            "q6_s2_lanao_growth_likelihood",
             "strength"
           )}
         </CardContent>
@@ -392,30 +388,51 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
           </p>
           {renderSwotPair(
             "W1 — Critical Infrastructure Deficits",
-            "Gaps in energy, roads, digital connectivity, and water supply make it hard for businesses to operate, especially in island provinces.",
-            "q_s6_infra_deficits_impact",
-            "q_s6_infra_deficits_likelihood",
+            "Energy, transport, digital, and water gaps.",
+            "q6_w1_infra_deficits_impact",
+            "q6_w1_infra_deficits_likelihood",
+            "weakness"
+          )}
+          {renderSwotPair(
+            "W2 — Highest Poverty Incidence",
+            "34.8% limiting domestic market depth and purchasing power.",
+            "q6_w2_poverty_impact",
+            "q6_w2_poverty_likelihood",
             "weakness"
           )}
           {renderSwotPair(
             "W3 — Lowest Functional Literacy Rate",
-            "At 59.3%, BARMM has the lowest literacy rate in the country, creating a serious shortage of skilled workers.",
-            "q_s6_literacy_impact",
-            "q_s6_literacy_likelihood",
+            "59.3%, creating a severe human capital constraint.",
+            "q6_w3_literacy_impact",
+            "q6_w3_literacy_likelihood",
+            "weakness"
+          )}
+          {renderSwotPair(
+            "W4 — Severe Child Malnutrition",
+            "45% stunting rate among children under five.",
+            "q6_w4_malnutrition_impact",
+            "q6_w4_malnutrition_likelihood",
             "weakness"
           )}
           {renderSwotPair(
             "W5 — Skills Mismatch",
             "Technical schools (TVIs) are not fully aligned with what industries need — especially in halal manufacturing and modern agriculture.",
-            "q_s6_skills_mismatch_impact",
-            "q_s6_skills_mismatch_likelihood",
+            "q6_w5_skills_mismatch_impact",
+            "q6_w5_skills_mismatch_likelihood",
             "weakness"
           )}
           {renderSwotPair(
             "W6 — Low Technology Adoption",
             "Many farms and businesses still use old methods, with slow uptake of modern tools for farming, processing, and online selling.",
-            "q_s6_tech_adoption_impact",
-            "q_s6_tech_adoption_likelihood",
+            "q6_w6_tech_adoption_impact",
+            "q6_w6_tech_adoption_likelihood",
+            "weakness"
+          )}
+          {renderSwotPair(
+            "W7 — Underspending in Budget Execution",
+            "Delays in development program rollout.",
+            "q6_w7_underspending_impact",
+            "q6_w7_underspending_likelihood",
             "weakness"
           )}
         </CardContent>
@@ -436,17 +453,17 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
             Rate each factor: Impact (1 = very small, 5 = very large) × Likelihood (1 = very unlikely, 5 = very likely)
           </p>
           {renderSwotPair(
-            "O1 — Renewable Energy Investments",
-            "Growing interest in solar farms, hydro rehabilitation, and biomass projects aligning with BARMM's clean energy potential.",
-            "q_s6_renewable_invest_impact",
-            "q_s6_renewable_invest_likelihood",
+            "O1 — Tourism Recovery",
+            "Isabela City Tourism Champion (2024) and Lake Lanao eco-tourism potential.",
+            "q6_o1_tourism_recovery_impact",
+            "q6_o1_tourism_recovery_likelihood",
             "opportunity"
           )}
           {renderSwotPair(
-            "O2 — Tourism Recovery",
-            "Isabela City Tourism Champion (2024) and Lake Lanao eco-tourism potential create new service-sector growth pathways.",
-            "q_s6_tourism_potential_impact",
-            "q_s6_tourism_potential_likelihood",
+            "O2 — Digital Leapfrogging (BIFOSS)",
+            "Implementing the Bangsamoro Investment Facilitation One-Stop Shop for 1-day business registration.",
+            "q6_o2_digital_leapfrog_impact",
+            "q6_o2_digital_leapfrog_likelihood",
             "opportunity"
           )}
         </CardContent>
@@ -467,24 +484,10 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
             Rate each factor: Impact (1 = very small, 5 = very large) × Likelihood (1 = very unlikely, 5 = very likely)
           </p>
           {renderSwotPair(
-            "T1 — Political Transition Uncertainties",
-            "First parliamentary elections and governance continuity risks may delay infrastructure and education investments.",
-            "q_s6_political_transition_impact",
-            "q_s6_political_transition_likelihood",
-            "threat"
-          )}
-          {renderSwotPair(
-            "T2 — Infrastructure Cost Overruns",
-            "Large-scale enabling projects face risk of budget overruns and procurement delays (12–18 months historically).",
-            "q_s6_cost_overruns_impact",
-            "q_s6_cost_overruns_likelihood",
-            "threat"
-          )}
-          {renderSwotPair(
-            "T3 — Limited National Coordination",
-            "Gaps in BARMM-specific infrastructure funding from the national government slow rollout of critical projects.",
-            "q_s6_natl_coord_impact",
-            "q_s6_natl_coord_likelihood",
+            "T1 — Cyber Insecurity & AI Risks",
+            "Emerging threats from misinformation, cyberattacks, and adverse AI outcomes disrupting digital governance.",
+            "q6_t1_cyber_insecurity_impact",
+            "q6_t1_cyber_insecurity_likelihood",
             "threat"
           )}
         </CardContent>
@@ -746,9 +749,9 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
                   variant="outline"
                   className={cn(
                     "justify-start h-auto py-3 text-sm text-left",
-                    data.q_s6_growth_underinvest === opt ? activeBtn : inactiveBtn
+                    data.q6_arch_limits_growth_accuracy === opt ? activeBtn : inactiveBtn
                   )}
-                  onClick={() => update("q_s6_growth_underinvest", opt)}
+                  onClick={() => update("q6_arch_limits_growth_accuracy", opt)}
                 >
                   {opt}
                 </Button>
@@ -756,8 +759,8 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
             </div>
           </div>
 
-          {(data.q_s6_growth_underinvest === "Very accurately" ||
-            data.q_s6_growth_underinvest === "Somewhat accurately") && (
+          {(data.q6_arch_limits_growth_accuracy === "Very accurately" ||
+            data.q6_arch_limits_growth_accuracy === "Somewhat accurately") && (
             <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20 animate-in fade-in slide-in-from-top-2 duration-200">
               <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
                 Which constraint most limits growth in your sector?
@@ -770,9 +773,9 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
                     variant="outline"
                     className={cn(
                       "justify-start h-auto py-3 text-sm text-left",
-                      data.q_s6_growth_followup === opt ? activeBtn : inactiveBtn
+                      data.q6_arch_limits_growth_followup === opt ? activeBtn : inactiveBtn
                     )}
-                    onClick={() => update("q_s6_growth_followup", opt)}
+                    onClick={() => update("q6_arch_limits_growth_followup", opt)}
                   >
                     {opt}
                   </Button>
@@ -781,8 +784,8 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
               <Textarea
                 placeholder="Or describe another constraint..."
                 rows={2}
-                value={data.q_s6_growth_followup || ""}
-                onChange={(e) => update("q_s6_growth_followup", e.target.value)}
+                value={data.q6_arch_limits_growth_followup || ""}
+                onChange={(e) => update("q6_arch_limits_growth_followup", e.target.value)}
                 className="w-full rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 px-3 py-2 text-sm text-[#022c22] dark:text-[#ecfdf5] placeholder:text-[#64748b] focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/50 resize-y"
               />
             </div>
