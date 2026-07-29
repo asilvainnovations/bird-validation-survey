@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { StratLogo } from "@/components/branding/Logo";
 import { PlatformBadge } from "@/components/branding/PlatformBadge";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { RequiredAuth } from "@/components/auth/RequiredAuth";
 import { useTheme } from "@/components/theme-provider";
 import { Toggle } from "@/components/ui/toggle";
 import { ContextPanel } from "@/components/strategic/ContextPanel";
