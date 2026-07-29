@@ -8,7 +8,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { StratLogo } from "@/components/branding/Logo";
 import { PlatformBadge } from "@/components/branding/PlatformBadge";
 import { AuthModal } from "@/components/auth/AuthModal";
-import { RequiredAuth } from "@/components/auth/RequiredAuth";
 import { useTheme } from "@/components/theme-provider";
 import { Toggle } from "@/components/ui/toggle";
 import { ContextPanel } from "@/components/strategic/ContextPanel";
@@ -28,8 +27,8 @@ import {
 
 // ─── STATIC COMPANION PAGES & REACT ROUTES ──────────────────────────────────
 const NAV_LINKS = [
-  { label: "Orientation", href: "/survey-orientation.html" },
-  { label: "Live Dashboard", href: "/dashboard" }, // Wired to React Route
+  { label: "Orientation", href: "/" },
+  { label: "Live Dashboard", href: "/dashboard" },
   { label: "Resources", href: "/resources.html" },
   { label: "Privacy", href: "/privacy-policy.html" },
 ] as const;
