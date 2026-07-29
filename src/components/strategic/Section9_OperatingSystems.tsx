@@ -136,7 +136,7 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
             "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
             data[field] === v ? activeScale : inactiveScale
           )}
-          onClick={() => update(field, v as any)}
+          onClick={() => update(field, v as never)}
         >
           {v}
         </Button>
@@ -215,7 +215,7 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
                       ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
                       : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
                   )}
-                  onClick={() => update(impactField, v as any)}
+                  onClick={() => update(impactField, v as never)}
                 >
                   {v}
                 </Button>
@@ -239,7 +239,7 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
                       ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
                       : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
                   )}
-                  onClick={() => update(likelihoodField, v as any)}
+                  onClick={() => update(likelihoodField, v as never)}
                 >
                   {v}
                 </Button>
@@ -589,8 +589,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
         <CardContent className="space-y-6">
           <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30">
             <img
-              src={BIRD_IMAGES.escalation.url}
-              alt={BIRD_IMAGES.escalation.alt}
+              src={BIRD_IMAGES.escalationArchetype.url}
+              alt={BIRD_IMAGES.escalationArchetype.alt}
               className="w-full h-auto object-contain"
               loading="lazy"
             />
