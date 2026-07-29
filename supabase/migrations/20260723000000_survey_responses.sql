@@ -73,9 +73,9 @@ select
   response_data->'demo_expertise' as demo_expertise,
   response_data->>'demo_position' as demo_position,
   
-  -- Extract consent status (aligned with survey-schema.ts: q1_1_consent_participate)
-  (response_data->>'q1_1_consent_participate')::boolean as consented_participate,
-  (response_data->>'q1_2_consent_anonymize')::boolean as consented_anonymize,
+  -- Extract consent status (aligned with survey-schema.ts: q01_consent_participate)
+  (response_data->>'q01_consent_participate')::boolean as consented_participate,
+  (response_data->>'q01_consent_anonymize')::boolean as consented_anonymize,
   
   -- Extract strategic matrices for dashboard visualization
   response_data->'q10_matrix' as ieds_matrix,
