@@ -1,8 +1,3 @@
-// src/components/AppLayout.tsx
-// BIRD 2026–2035 · Validation Survey Shell
-// Contains ALL visual chrome: header, footer, nav, AuthModal, FloatingAIAssistant,
-// ContextPanel, and theme toggle. Renders {children} as the main page content.
-
 import React, { useState, useMemo, useCallback, lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuthContext } from "@/contexts/AuthContext";
