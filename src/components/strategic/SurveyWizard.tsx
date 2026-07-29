@@ -63,13 +63,10 @@ const SurveyWizard: React.FC = () => {
   const mainRef = useRef<HTMLDivElement>(null);
 
   // ── Section 0: Welcome & Orientation ──
+  // RESOLVED: Simplified from 6 fields to 1. q0_2–q0_6 are now practice
+  // questions inside Section0_Orientation.tsx using local useState only.
   const [s0, setS0] = useState<Section0Data>({
     q0_1_ready: "",
-    q0_2_ecosystem_understanding: "",
-    q0_3_systems_thinking_value: undefined,
-    q0_4_cld_understanding: undefined,
-    q0_5_feedback_loops_understanding: undefined,
-    q0_6_leverage_points_understanding: undefined,
   });
 
   // ── Section 1: Privacy & Consent ──
@@ -580,19 +577,10 @@ const SurveyWizard: React.FC = () => {
 
     setSubmitting(true);
     try {
-      // Typed as Record<string, unknown> rather than Partial<SurveySchemaType>:
-      // the SWOT/archetype fields in SurveySchemaType are generated from
-      // swot-content.ts via a Record-returning helper, which TypeScript can't
-      // statically narrow to literal keys. SurveySchemaType remains the
-      // authoritative reference for field names (see swot-content.ts); this
-      // object is still built to match it field-for-field.
+      // RESOLVED: q0_2–q0_6 removed from payload. Only q0_1_ready is persisted.
+      // Practice questions in Section 0 use local useState and never reach here.
       const payload: Record<string, unknown> = {
         q0_1_ready: s0.q0_1_ready || undefined,
-        q0_2_ecosystem_understanding: s0.q0_2_ecosystem_understanding || undefined,
-        q0_3_systems_thinking_value: s0.q0_3_systems_thinking_value,
-        q0_4_cld_understanding: s0.q0_4_cld_understanding,
-        q0_5_feedback_loops_understanding: s0.q0_5_feedback_loops_understanding,
-        q0_6_leverage_points_understanding: s0.q0_6_leverage_points_understanding,
 
         q01_consent_participate: s1.consent_participate,
         q01_consent_anonymize: s1.consent_anonymize,
@@ -606,26 +594,14 @@ const SurveyWizard: React.FC = () => {
         q02_demo_province: s2.demo_province || undefined,
         q02_demo_category: s2.demo_category || undefined,
         q02_demo_expertise: s2.demo_expertise,
-        // survey-submit's edge function reads demo_province/demo_category
-        // with a `|| payload.q02_demo_province` fallback, so the q02_-
-        // prefixed fields above are sufficient — no unprefixed duplicates needed.
         q02_network_accuracy: s2.q2_network_accuracy || undefined,
 
-        // NOTE: field keys renamed to the q03_ / q3_cld{n}_ canonical
-        // prefixes (see src/lib/swot-content.ts). Section3Data itself (in
-        // Section3_BEIE_SystemsThinking.tsx) still exposes the old q3_1_.../
-        // q_s1_... names below — that component still needs to be updated to
-        // match this canonical mapping; tracked as follow-up work.
         q03_beie_video_understanding: s3.q3_1_beie_video_understanding,
         q03_systems_reframing_accuracy: s3.q3_2_systems_reframing_accuracy,
         q03_sector_to_ecosystem_shift: s3.q3_3_sector_to_ecosystem_shift,
         q03_beie_framework_clarity: s3.q3_4_beie_framework_clarity,
         q03_operating_systems_understanding: s3.q3_5_operating_systems_understanding,
         q03_five_clusters_understanding: s3.q3_6_five_clusters_understanding,
-        // The two Causal Loop Diagram validation questions that DO belong to
-        // Section 3 (see ARCHETYPES_BY_SECTION[3] in swot-content.ts). Wired
-        // through the existing q3_7/q3_8 state fields until Section3's own
-        // component is updated to the q3_cld1_/q3_cld2_ field names directly.
         q3_cld1_investment_development_accuracy: s3.q3_7_investment_development_loop || undefined,
         q3_cld2_governance_confidence_accuracy: s3.q3_8_governance_investor_loop || undefined,
 
@@ -897,11 +873,6 @@ const SurveyWizard: React.FC = () => {
         q15_3_consent_voluntary: s15.q15_3_consent_voluntary,
         q15_4_ready_to_submit: s15.q15_4_ready_to_submit,
 
-        // Reaching this line is only possible because of the guard at the top
-        // of handleSubmit(), which returns early unless
-        // s1.consent_participate === true. consent_final therefore always
-        // reflects a real, affirmative consent answer — it is never set
-        // unconditionally.
         consent_final: true as const,
       };
 
