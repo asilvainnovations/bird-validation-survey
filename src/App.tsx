@@ -2,14 +2,17 @@
 // BIRD 2026–2035 · Root Application Component
 //
 // Side-effect setup (Sentry init, service-worker registration) intentionally
-// stays in src/main.tsx, NOT here — confirmed already correctly in place there
-// (maskAllText/blockAllMedia: true, SW registered production-only, post-load).
-// main.tsx is the true entry point (ReactDOM.createRoot) and runs those once,
-// outside the React render tree; duplicating them in a component body would
-// either re-run them every render or need a redundant root useEffect. Canonical
-// domain / env vars are respected at the layer that needs them: index.html
-// (%VITE_CANONICAL_DOMAIN%), the generated public/manifest.json, and
-// src/lib/bird-urls.ts's BIRD_SITES registry that AppLayout's nav reads from.
+// stays in src/main.tsx, NOT here. main.tsx is the true entry point
+// (ReactDOM.createRoot) and runs those once, outside the React render tree.
+// Putting them inside this component would either run them on every re-render
+// (a component body isn't a good place for `Sentry.init`/`serviceWorker
+// .register`) or require a root-level `useEffect(() => {...}, [])` that
+// duplicates what main.tsx already does correctly — so App.tsx composes
+// providers and routes only, and relies on main.tsx for those two concerns.
+// Canonical domain / env vars are likewise already respected at the layer
+// that actually needs them: index.html (%VITE_CANONICAL_DOMAIN%), the
+// generated public/manifest.json, and src/lib/bird-urls.ts's BIRD_SITES
+// registry that NAV_LINKS and AppLayout's footer/logo links read from.
 
 import React, { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
@@ -46,10 +49,7 @@ const AppLoadingFallback = React.memo(() => (
 AppLoadingFallback.displayName = "AppLoadingFallback";
 
 // ─── ERROR BOUNDARY ─────────────────────────────────────────────────────────
-class ErrorBoundary extends React.Component
-  { children: React.ReactNode },
-  { hasError: boolean; error?: Error }
-> {
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error?: Error }> {
   constructor(props: { children: React.ReactNode }) {
     super(props);
     this.state = { hasError: false };
@@ -102,11 +102,13 @@ const queryClient = new QueryClient({
 });
 
 // ─── MAIN APP ───────────────────────────────────────────────────────────────
-// AuthProvider wraps AppLayout (and everything under it) so the single
-// useAuth() subscription set up inside it is available everywhere via
-// useAuthContext(), without each consumer re-subscribing to Supabase
-// separately. AppProvider (sidebar UI state) is independent of auth state —
-// order between the two doesn't matter functionally.
+// Provider order matters: QueryClientProvider and ThemeProvider have no
+// dependency on auth state, but AppProvider (sidebar UI state) and AuthProvider
+// are independent of each other too — order between those two doesn't matter
+// functionally. AuthProvider wraps AppLayout (and everything under it) so the
+// single useAuth() subscription set up inside AuthProvider is available to
+// AppLayout's header/nav AND to any future route or component via
+// useAuthContext(), without each one re-subscribing to Supabase separately.
 const App: React.FC = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
