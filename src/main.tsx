@@ -6,15 +6,15 @@ import "@/index.css";
 
 // ─── SENTRY ERROR TRACKING ──────────────────────────────────────────────────
 // Requirements:
-//   1. Set VITE_SENTRY_DSN in your deployment environment (Vercel/Netlify/Cloudflare)
-//   2. Format: https://<key>@o<org>.ingest.sentry.io/<project>
-//   3. If unset, Sentry is silently skipped — no runtime errors
-//   4. Never commit the DSN to source control; always use env vars
+// 1. Set VITE_SENTRY_DSN in your deployment environment (Vercel/Netlify/Cloudflare)
+// 2. Format: https://<key>@o<org>.ingest.sentry.io/<project>
+// 3. If unset, Sentry is silently skipped — no runtime errors
+// 4. Never commit the DSN to source control; always use env vars
 //
 // Deployment check:
-//   Vercel:  Project Settings → Environment Variables → VITE_SENTRY_DSN
-//   Netlify: Site Configuration → Environment → VITE_SENTRY_DSN
-//   Manual:  export VITE_SENTRY_DSN="https://..." before running "npm run build"
+// Vercel: Project Settings → Environment Variables → VITE_SENTRY_DSN
+// Netlify: Site Configuration → Environment → VITE_SENTRY_DSN
+// Manual: export VITE_SENTRY_DSN="https://..." before running "npm run build"
 //
 const sentryDsn = import.meta.env.VITE_SENTRY_DSN as string | undefined;
 

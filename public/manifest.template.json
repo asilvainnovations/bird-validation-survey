@@ -1,7 +1,7 @@
 {
-  "name": "BIRD 2026\u20132035 Validation Survey | Bangsamoro Investment Roadmap",
+  "name": "BIRD 2026–2035 Validation Survey | Bangsamoro Investment Roadmap",
   "short_name": "BIRD Survey",
-  "description": "Official 16-section stakeholder validation survey for the Bangsamoro Investment Roadmap Development (BIRD) 2026\u20132035. Built by ASilva Innovations for BOI-MTIT, BARMM.",
+  "description": "Official 16-section stakeholder validation survey for the Bangsamoro Investment Roadmap Development (BIRD) 2026–2035. Built by ASilva Innovations for BOI-MTIT, BARMM.",
   "start_url": "/",
   "display": "standalone",
   "scope": "/",
@@ -41,7 +41,7 @@
     {
       "name": "Take the Validation Survey",
       "short_name": "Survey",
-      "description": "BIRD 2026\u20132035 stakeholder validation survey \u2014 16 sections covering all BEIE clusters",
+      "description": "BIRD 2026–2035 stakeholder validation survey — 16 sections covering all BEIE clusters",
       "url": "/validation-survey.html",
       "icons": [{ "src": "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/MTIT%20Logo.png", "sizes": "96x96", "type": "image/png" }]
     },
@@ -62,7 +62,7 @@
     {
       "name": "User Manual",
       "short_name": "Manual",
-      "description": "Complete guide to taking the BIRD 2026\u20132035 validation survey",
+      "description": "Complete guide to taking the BIRD 2026–2035 validation survey",
       "url": "/user-manual.html",
       "icons": [{ "src": "https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/MTIT%20Logo.png", "sizes": "96x96", "type": "image/png" }]
     }
@@ -77,7 +77,7 @@
       "sizes": "1200x630",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "BIRD 2026\u20132035 Validation Survey"
+      "label": "BIRD 2026–2035 Validation Survey"
     }
   ]
 }
