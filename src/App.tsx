@@ -112,6 +112,7 @@ const App: React.FC = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/validation-survey" element={<Index />} />
                 <Route path="/dashboard" element={<SurveyDashboard />} />
+                <Route path="/survey" element={<RequireAuth><SurveyWizard /></RequireAuth>} />
 
                 {/* Redirects: old static HTML pages → SPA equivalent */}
                 <Route path="/survey-orientation" element={<Navigate to="/" replace />} />
