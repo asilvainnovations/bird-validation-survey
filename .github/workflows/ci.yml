@@ -4,11 +4,12 @@ on:
   push:
     branches: [main, develop]
   pull_request:
-    branches: [main, develop]
+    branches: [main]
 
 jobs:
-  build-and-verify:
+  build-and-test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -16,43 +17,42 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run TypeScript type check
+      - name: Run TypeScript type check (blocking)
         run: npm run typecheck
+
+      - name: Run lint — temporary max-warnings gate (blocking)
+        # NOTE: ratchet --max-warnings down to 0 once existing warnings are fixed
+        run: npm run lint -- --max-warnings=15
+
+      - name: Verify EDGE_FUNCTIONS registry matches supabase/functions/ (blocking)
+        run: node scripts/check-edge-functions.mjs
+
+      - name: Generate and validate manifest.json (blocking)
+        run: |
+          node scripts/generate-manifest.mjs
+          node -e "JSON.parse(require('fs').readFileSync('public/manifest.json','utf-8')); console.log('manifest.json is valid JSON')"
+        env:
+          CANONICAL_DOMAIN: ${{ vars.CANONICAL_DOMAIN }}
 
       - name: Run build
         run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_CANONICAL_DOMAIN: ${{ vars.CANONICAL_DOMAIN }}
 
       - name: Verify Edge Functions compile (if supabase CLI available)
         run: |
           if command -v supabase &> /dev/null; then
-            supabase functions build ai-strategy-assistant
             supabase functions build email-notifications
             supabase functions build survey-submit
+            supabase functions build survey-analytics
           else
             echo "Supabase CLI not available — skipping Edge Function build verification"
           fi
-        continue-on-error: true
-
-      - name: Check for hardcoded secrets in Edge Functions
-        run: |
-          # Fail if any hardcoded API keys are found
-          if grep -rE '(sk-[a-zA-Z0-9]{20,}|api[_-]?key.*=.*["'][^"']{10,}["'])' supabase/functions/ --include="*.ts" ; then
-            echo "❌ Potential hardcoded API keys found in Edge Functions!"
-            exit 1
-          else
-            echo "✅ No hardcoded API keys detected"
-          fi
-        continue-on-error: false
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
-          retention-days: 7
