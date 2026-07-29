@@ -1,6 +1,6 @@
 // src/components/strategic/Section14_AccessResources.tsx
 // BIRD 2026–2035 · Section 14: Access to Resources & Engagements
-// Updated: 2026-07-30 · Strict alignment with reusable primitives and survey architecture
+// Updated: 2026-07-30 · Fixed import paths and primitive APIs
 
 import React from "react";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 
 // ─── REUSABLE PRIMITIVES ─────────────────────────────────────────────────────
-import { SectionProgress } from "@/components/primitives/SectionProgress";
+import { SectionProgress } from "@/lib/primitives/SectionProgress";
 
 // ── Types (exact runtime contract with SurveyWizard.tsx s14 state) ──────────
 export interface Section14Data {
@@ -133,17 +133,12 @@ const Section14_AccessResources: React.FC<Section14Props> = ({ data, onChange })
     "w-full px-4 py-3 rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] text-sm placeholder:text-[#64748b] focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C]/30 transition-all resize-y";
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-4xl mx-auto px-4 py-6">
       {/* ── Section Progress ────────────────────────────────────── */}
-      <SectionProgress 
-        current={14} 
-        total={16} 
-        labels={[
-          "Welcome", "Privacy", "Profile", "Systems", "Foundations", 
-          "Transformers", "Enablers", "Connectors", "Financiers", 
-          "Operating Systems", "IEDS", "Metrics", "BSC", "Budget", 
-          "Resources", "Submit"
-        ]} 
+      <SectionProgress
+        currentSection={14}
+        totalSections={16}
+        sectionLabel="Resources & Engagements"
       />
 
       {/* ── Header ────────────────────────────────────────────── */}
