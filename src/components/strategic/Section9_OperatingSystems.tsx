@@ -270,8 +270,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
       {/* ── 1. Operating Systems Banner ──────────────────────────── */}
       <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
         <img
-          src={BIRD_IMAGES.operatingSystemsTrust.url}
-          alt={BIRD_IMAGES.operatingSystemsTrust.alt}
+          src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/OS.png"
+          alt="Moral Governance serves as the central operating system of the Bangsamoro ecosystem"
           className="w-full h-auto max-h-[500px] object-contain transition-transform duration-500 group-hover:scale-[1.02]"
           loading="lazy"
         />
@@ -286,7 +286,7 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
-            Three Foundational Pillars
+            The Operating Systems
           </CardTitle>
         </CardHeader>
         <CardContent>
