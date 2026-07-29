@@ -1,6 +1,6 @@
 // src/components/strategic/Section13_PriorityActions.tsx
 // BIRD 2026–2035 · Section 13: Priority Actions & Budget Deployment
-// Updated: 2026-07-30 · Strict alignment with reusable primitives and survey architecture
+// Updated: 2026-07-30 · Fixed import paths and primitive APIs
 
 import React from "react";
 import { cn } from "@/lib/utils";
@@ -24,9 +24,9 @@ import {
 import { BIRD_IMAGES } from "@/lib/bird-urls";
 
 // ─── REUSABLE PRIMITIVES ─────────────────────────────────────────────────────
-import { ImageWithFallback } from "@/components/primitives/ImageWithFallback";
-import { LikertScale } from "@/components/primitives/LikertScale";
-import { SectionProgress } from "@/components/primitives/SectionProgress";
+import { ImageWithFallback } from "@/lib/primitives/ImageWithFallback";
+import { LikertScale } from "@/lib/primitives/LikertScale";
+import { SectionProgress } from "@/lib/primitives/SectionProgress";
 
 // ── Types (exact runtime contract with SurveyWizard.tsx s13 state) ──────────
 export interface Section13Data {
@@ -47,7 +47,7 @@ interface Section13Props {
 
 // ── Component ────────────────────────────────────────────────────────────────
 const Section13_PriorityActions: React.FC<Section13Props> = ({ data, onChange }) => {
-  const update = <K extends keyof Section13Data>(field: K, value: Section13Data[K]) => 
+  const update = <K extends keyof Section13Data>(field: K, value: Section13Data[K]) =>
     onChange({ ...data, [field]: value });
 
   const activeBtnClass =
@@ -56,17 +56,12 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({ data, onChange })
     "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10";
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-4xl mx-auto px-4 py-6">
       {/* ── Section Progress ────────────────────────────────────── */}
-      <SectionProgress 
-        current={13} 
-        total={16} 
-        labels={[
-          "Welcome", "Privacy", "Profile", "Systems", "Foundations", 
-          "Transformers", "Enablers", "Connectors", "Financiers", 
-          "Operating Systems", "IEDS", "Metrics", "BSC", "Budget", 
-          "Resources", "Submit"
-        ]} 
+      <SectionProgress
+        currentSection={13}
+        totalSections={16}
+        sectionLabel="Priority Actions & Budget"
       />
 
       {/* ── HEADER ──────────────────────────────────────────────── */}
@@ -88,12 +83,20 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({ data, onChange })
       </div>
 
       {/* ── BLOCK 1: Total Capital Deployment Image ─────────────── */}
-      <ImageWithFallback
-        src={BIRD_IMAGES.totalCapitalDeployment?.url || ""}
-        alt={BIRD_IMAGES.totalCapitalDeployment?.alt || "Total Capital Deployment"}
-        description="Total Capital Deployment across Activate (₱35-45B), Scale (₱50-65B), and Consolidate (₱35-50B) phases."
-        className="w-full h-auto max-h-[500px] object-contain rounded-xl border border-[#C9A84C]/30 shadow-lg"
-      />
+      <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/20 shadow-2xl">
+        <ImageWithFallback
+          src={BIRD_IMAGES.totalCapitalDeployment?.url || ""}
+          alt={BIRD_IMAGES.totalCapitalDeployment?.alt || "Total Capital Deployment"}
+          className="w-full h-56 sm:h-72"
+          imgClassName="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#011a12] via-transparent to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <p className="text-xs text-[#ecfdf5]/70 italic">
+            Total Capital Deployment across Activate (₱35-45B), Scale (₱50-65B), and Consolidate (₱35-50B) phases.
+          </p>
+        </div>
+      </div>
 
       {/* ── BLOCK 2: Capital Phasing Table ──────────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
@@ -110,7 +113,7 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({ data, onChange })
             specific investment clusters and flagship deployments.
           </p>
 
-          <div className="overflow-x-auto mb-4">
+          <div className="overflow-x-auto mb-4 rounded-lg border border-[#C9A84C]/20">
             <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="bg-[#022c22] text-white">
@@ -121,8 +124,8 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({ data, onChange })
                   <th className="p-3 text-left font-semibold rounded-tr-lg">Key Deployments</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr className="border-b border-[#C9A84C]/20 bg-white dark:bg-[#022c22]/40 hover:bg-[#C9A84C]/5 dark:hover:bg-[#C9A84C]/10 transition-colors">
+              <tbody className="divide-y divide-[#C9A84C]/10">
+                <tr className="bg-white dark:bg-[#022c22]/40 hover:bg-[#C9A84C]/5 dark:hover:bg-[#C9A84C]/10 transition-colors">
                   <td className="p-3 font-bold text-[#022c22] dark:text-[#ecfdf5]">ACTIVATE</td>
                   <td className="p-3 text-[#022c22] dark:text-[#ecfdf5]/90">2026-2028</td>
                   <td className="p-3 font-semibold text-[#1B4D3E] dark:text-[#C9A84C]">₱35-45B</td>
@@ -131,7 +134,7 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({ data, onChange })
                     ZBIP (₱6.67B), 800km roads, digital backbone, BHB, Forestry Code, Islamic finance sandbox
                   </td>
                 </tr>
-                <tr className="border-b border-[#C9A84C]/20 bg-white dark:bg-[#022c22]/40 hover:bg-[#C9A84C]/5 dark:hover:bg-[#C9A84C]/10 transition-colors">
+                <tr className="bg-white dark:bg-[#022c22]/40 hover:bg-[#C9A84C]/5 dark:hover:bg-[#C9A84C]/10 transition-colors">
                   <td className="p-3 font-bold text-[#022c22] dark:text-[#ecfdf5]">SCALE</td>
                   <td className="p-3 text-[#022c22] dark:text-[#ecfdf5]/90">2029-2031</td>
                   <td className="p-3 font-semibold text-[#1B4D3E] dark:text-[#C9A84C]">₱50-65B</td>
@@ -191,10 +194,10 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({ data, onChange })
               Is this funding mix realistic?
             </Label>
             <LikertScale
+              name="funding_mix_fair"
+              label="Rate the realism of the proposed funding mix"
               value={data.q13_1_funding_mix_fair}
               onChange={(v) => update("q13_1_funding_mix_fair", v)}
-              labels={["Unrealistic", "Slightly unrealistic", "Moderately realistic", "Realistic", "Very realistic"]}
-              name="funding_mix_fair"
             />
           </div>
         </CardContent>
@@ -251,7 +254,7 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({ data, onChange })
                 </li>
                 <li className="flex justify-between">
                   <span className="text-[#065f46] dark:text-[#ecfdf5]/70">Poverty incidence</span>
-                  <span className="font-semibold">{'<'}20%</span>
+                  <span className="font-semibold">&lt;20%</span>
                 </li>
               </ul>
             </div>
@@ -347,10 +350,10 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({ data, onChange })
               How realistic are these 2035 targets overall?
             </Label>
             <LikertScale
+              name="targets_realistic"
+              label="Rate the overall realism of the 2035 targets"
               value={data.q13_2_targets_realistic}
               onChange={(v) => update("q13_2_targets_realistic", v)}
-              labels={["Unrealistic", "Slightly unrealistic", "Moderately realistic", "Realistic", "Fully realistic"]}
-              name="targets_realistic"
             />
           </div>
         </CardContent>
@@ -411,10 +414,10 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({ data, onChange })
               How concerned are you about HIGH risks?
             </Label>
             <LikertScale
+              name="high_risk_concern"
+              label="Rate your concern about high risks"
               value={data.q13_3_high_risk_concern}
               onChange={(v) => update("q13_3_high_risk_concern", v)}
-              labels={["Not concerned", "Slightly concerned", "Moderately concerned", "Concerned", "Very concerned"]}
-              name="high_risk_concern"
             />
           </div>
 
@@ -458,10 +461,10 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({ data, onChange })
               How concerned are you about MEDIUM risks?
             </Label>
             <LikertScale
+              name="medium_risk_concern"
+              label="Rate your concern about medium risks"
               value={data.q13_4_medium_risk_concern}
               onChange={(v) => update("q13_4_medium_risk_concern", v)}
-              labels={["Not concerned", "Slightly concerned", "Moderately concerned", "Concerned", "Very concerned"]}
-              name="medium_risk_concern"
             />
           </div>
 
@@ -494,10 +497,10 @@ const Section13_PriorityActions: React.FC<Section13Props> = ({ data, onChange })
               How concerned are you about LOW risks?
             </Label>
             <LikertScale
+              name="low_risk_concern"
+              label="Rate your concern about low risks"
               value={data.q13_5_low_risk_concern}
               onChange={(v) => update("q13_5_low_risk_concern", v)}
-              labels={["Not concerned", "Slightly concerned", "Moderately concerned", "Concerned", "Very concerned"]}
-              name="low_risk_concern"
             />
           </div>
         </CardContent>
