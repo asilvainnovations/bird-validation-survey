@@ -53,7 +53,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:linear-gradient(160de
   .nav-links a{font-size:0.75rem;}
 }
 @media(max-width:768px){
-  .nav-links{display:none;} /* Hidden on mobile for clean UI, can be expanded to hamburger later */
+  .nav-links{display:none;} 
   .nav-inner{justify-content:space-between;}
 }
 
@@ -98,6 +98,22 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:linear-gradient(160de
   font-style: normal;
 }
 
+/* ── Flourish Embedded Network Map ── */
+.flourish-banner {
+  width: 100%;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+  background: rgba(6,78,59,0.08);
+  border-bottom: 2px solid var(--gold-border);
+  overflow: hidden;
+  position: relative;
+}
+.flourish-banner .flourish-embed {
+  width: 100% !important;
+  min-height: 70vh;
+}
+
 /* ── Hero ── */
 .hero{text-align:center;padding:3rem 1rem 2rem;position:relative;max-width:900px;margin:0 auto;}
 .hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:200px;height:3px;background:var(--gold-grad);border-radius:2px;}
@@ -115,7 +131,7 @@ h1{font-family:'Cinzel',serif;font-size:clamp(1.5rem,4vw,2.4rem);font-weight:700
 .legend-item{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:rgba(236,253,245,.6);font-family:'DM Sans',sans-serif;}
 .legend-dot{width:10px;height:10px;border-radius:50%;}
 
-/* ── Network Container ── */
+/* ── Network Container (D3) ── */
 .network-wrap{max-width:1400px;margin:0 auto;padding:0 1rem 2rem;position:relative;}
 #network-container{background:rgba(6,78,59,.08);border:1px solid var(--gold-border);border-radius:1.25rem;overflow:hidden;position:relative;}
 #network-container::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold-grad);z-index:5;}
@@ -235,7 +251,7 @@ footer{border-top:1px solid var(--gold-border);background:rgba(2,44,34,.7);backd
 <nav class="site-nav">
   <div class="nav-inner">
     <a href="https://bangsamoro-investment-roadmap.asilvainnovations.com" class="nav-logo-wrap">
-      <img src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/MTIT%20Logo.png" alt="BIRD 2026-2035">
+      <img src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/18.%20Vision.png" alt="BIRD 2026-2035">
       <span class="nav-title">BIRD 2026&ndash;2035<br><span style="font-size:.6rem;color:rgba(236,253,245,.5);">Actors Mapping</span></span>
     </a>
     <div class="nav-links">
@@ -260,10 +276,21 @@ footer{border-top:1px solid var(--gold-border);background:rgba(2,44,34,.7);backd
   </div>
 </div>
 
+<!-- ── Embedded Interactive Network Map (Flourish) ── -->
+<!-- This retains all native Flourish icons, logos, hover popups, and animations -->
+<div class="flourish-banner">
+  <div class="flourish-embed flourish-network" data-src="visualisation/10095720">
+    <script src="https://public.flourish.studio/resources/embed.js"></script>
+    <noscript>
+      <img src="https://public.flourish.studio/visualisation/10095720/thumbnail" width="100%" alt="Interactive Network Visualization" />
+    </noscript>
+  </div>
+</div>
+
 <!-- ── Hero ── -->
 <header class="hero">
   <span class="kicker">BEIE Framework &middot; Stakeholder Analysis</span>
-  <h1>Multiple-Actors. One Ecosystem.<br>Shaping the Future of Emerging Bangsamoro?</h1>
+  <h1>34 Actors. One Ecosystem.<br>Who Shapes the Emerging Bangsamoro?</h1>
   <p class="subtitle">Every investment decision ripples through a web of governance, tradition, security, and community. Explore the relationships that will make or break the BIRD 2026&ndash;2035 roadmap.</p>
 </header>
 
@@ -292,7 +319,7 @@ footer{border-top:1px solid var(--gold-border);background:rgba(2,44,34,.7);backd
   </div>
 </div>
 
-<!-- ── D3.js Network Diagram ── -->
+<!-- ── D3.js Network Diagram (Custom Interactive Layer) ── -->
 <div class="network-wrap">
   <div id="network-container">
     <svg id="network-svg" width="100%" height="700"></svg>
@@ -619,40 +646,4 @@ function renderCards(filter) {
 // ═══════════════════════════════════════════════════════════════════════════════
 function openPopup(id) {
   const actor = ACTORS.find(a => a.id === id);
-  if(!actor) return;
-  const connected = RELATIONSHIPS.filter(r => r.source===id||r.target===id).length;
-  document.getElementById('popupBody').innerHTML = `
-    <div class="popup-header">
-      <div class="popup-img" style="color:${actor.color};">${actor.name.charAt(0)}</div>
-      <div><div class="popup-name">${actor.name}</div><div class="popup-category">${actor.category}</div></div>
-    </div>
-    <div style="margin-bottom:1.25rem;"><div class="influence-bar"><div class="influence-fill ${actor.catClass}" style="width:${actor.influence}%"></div></div><div class="influence-label"><span>Influence Score</span><span class="influence-score">${actor.influence}/100</span></div></div>
-    <div class="popup-desc">${actor.desc}</div>
-    <div class="popup-meta">
-      <div class="meta-item"><div class="meta-label">Category</div><div class="meta-value" style="font-size:.85rem;text-transform:capitalize;">${actor.category.split('/')[0].trim()}</div></div>
-      <div class="meta-item"><div class="meta-label">Connections</div><div class="meta-value">${connected}</div></div>
-    </div>`;
-  document.getElementById('popupOverlay').classList.add('active');
-}
-function closePopup(e) {
-  if(!e || e.target === document.getElementById('popupOverlay') || e.target.closest('.popup-close')) {
-    document.getElementById('popupOverlay').classList.remove('active');
-  }
-}
-  
-// ═══════════════════════════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════════════════════════
-document.querySelectorAll('.filter-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
-    renderCards(this.dataset.filter);
-  });
-});
-
-renderCards('all');
-initNetwork();
-</script>
-</body>
-</html>
+  if
