@@ -1,7 +1,7 @@
 /**
  * BIRD Validation Survey — Service Worker
  * Location: public/service-worker.js (copied as-is to build root)
- *
+ 
  * Strategy:
  *  - HTML shell (navigation): Network-first (see fix below) — never cache-first,
  *    since index.html points to the current build's hashed JS/CSS filenames.
