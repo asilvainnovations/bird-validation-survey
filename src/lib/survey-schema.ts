@@ -17,6 +17,12 @@
 
 import { z } from "zod";
 import { SWOT_BY_SECTION, ARCHETYPES_BY_SECTION } from "./swot-content";
+import { REQUIRED_FIELD_KEYS, FIELD_METADATA } from "./requiredFields";
+import {
+  UNIVERSAL_QUESTIONS,
+  UNIVERSAL_QUESTION_SECTIONS,
+  universalFieldName,
+} from "./universalQuestions";
 
 const optionalString = z.string().optional();
 const optionalNumber = z.number().min(0).max(5).optional();
@@ -46,6 +52,19 @@ function archetypeFieldsFor(sectionNumbers: number[]): Record<string, z.ZodTypeA
   return shape;
 }
 
+/** Generates the 3 universal Likert fields (confidence/readiness/urgency)
+ * for each section in UNIVERSAL_QUESTION_SECTIONS — 18 fields total, all
+ * derived from universalQuestions.ts rather than hand-typed per section. */
+function universalFieldsFor(sectionNumbers: number[]): Record<string, z.ZodTypeAny> {
+  const shape: Record<string, z.ZodTypeAny> = {};
+  for (const n of sectionNumbers) {
+    for (const q of UNIVERSAL_QUESTIONS) {
+      shape[universalFieldName(n, q.id)] = optionalNumber;
+    }
+  }
+  return shape;
+}
+
 const matrixRowSchema = z.object({
   economic_impact: z.number().min(0).max(10).default(5),
   feasibility: z.number().min(0).max(10).default(5),
@@ -70,7 +89,6 @@ export const surveySchema = z.object({
   q0_4_cld_understanding: optionalString,
   q0_5_feedback_loops_understanding: optionalString,
   q0_6_leverage_points_understanding: optionalString,
-
   // Step 1 — only required fields
   q1_consent_participate: requiredBoolean.describe("Consent to participate"),
   q1_consent_anonymize: optionalBoolean,
@@ -99,6 +117,7 @@ export const surveySchema = z.object({
   // Step 4
   q4_1_foundations_banner_understanding: optionalNumber,
   ...swotFieldsFor([4]),
+  ...universalFieldsFor([4]),
   ...archetypeFieldsFor([4]), // q4_arch_tragedy_commons_…
 
   // Step 5
@@ -107,6 +126,7 @@ export const surveySchema = z.object({
   q5_3_farm_to_market_understanding: optionalNumber,
   q5_4_economic_zones_understanding: optionalNumber,
   ...swotFieldsFor([5]),
+  ...universalFieldsFor([5]),
   ...archetypeFieldsFor([5]), // q5_arch_growth_underinvest_…
 
   // Step 6
@@ -117,6 +137,7 @@ export const surveySchema = z.object({
   q6_5_digital_tourism_rank: optionalStringArray,
   q6_6_moral_governance_realistic: optionalString,
   ...swotFieldsFor([6]),
+  ...universalFieldsFor([6]),
   ...archetypeFieldsFor([6]), // q6_arch_limits_growth_…
 
   // Step 7
@@ -130,6 +151,7 @@ export const surveySchema = z.object({
   q7_8_uae_feasibility: optionalNumber,
   q7_9_bimpeaga_leverage: optionalNumber,
   ...swotFieldsFor([7]),
+  ...universalFieldsFor([7]),
   ...archetypeFieldsFor([7]), // q7_arch_success_successful_…
 
   // Step 8
@@ -138,6 +160,7 @@ export const surveySchema = z.object({
   q8_3_priority_action: optionalString,
   q8_4_islamic_authority: optionalString,
   ...swotFieldsFor([8]),
+  ...universalFieldsFor([8]),
   ...archetypeFieldsFor([8]), // q8_arch_shifting_burden_…
 
   // Step 9 — NOTE: added q9_1 / q9_2 which existed in wizard but were missing
@@ -148,6 +171,7 @@ export const surveySchema = z.object({
   q9_5_stakeholder_alignment: optionalString,
   q9_6_reform_priority: optionalString,
   ...swotFieldsFor([9]),
+  ...universalFieldsFor([9]),
   ...archetypeFieldsFor([9]), // q9_arch_moral_governance_derisk_…, fixes_fail, escalation, big_man
 
   // Step 10 — expanded to match all wizard fields
@@ -214,9 +238,35 @@ export const surveySchema = z.object({
   consent_final: z.literal(true, {
     errorMap: () => ({ message: "You must confirm accuracy and consent to submit" }),
   }),
+}).superRefine((data, ctx) => {
+  // Single enforcement point for REQUIRED_FIELD_KEYS (see requiredFields.ts).
+  // Every individual field above stays typed as optional — this is what lets
+  // "making a field required" be a one-line addition to that list instead of
+  // a change to this schema, every SectionN_*.tsx component, and the
+  // submission payload. "Present" means: not undefined, not an empty string,
+  // and not an empty array (covers the string[] fields like q2_demo_expertise).
+  for (const key of REQUIRED_FIELD_KEYS) {
+    const value = (data as Record<string, unknown>)[key];
+    const isMissing =
+      typeof value === "boolean"
+        ? value !== true // a required boolean (e.g. consent) must be affirmatively true —
+                          // false is a real, present answer, but it does not satisfy "required"
+        : value === undefined ||
+          value === null ||
+          value === "" ||
+          (Array.isArray(value) && value.length === 0);
+    if (isMissing) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [key],
+        message: `${FIELD_METADATA[key]?.label ?? key} is required.`,
+      });
+    }
+  }
 });
 
 export type SurveySchemaType = z.infer<typeof surveySchema>;
 
 export { SWOT_BY_SECTION, ARCHETYPES_BY_SECTION } from "./swot-content";
 export type { SwotItem, ArchetypeQuestion, SwotCategory } from "./swot-content";
+export { REQUIRED_FIELD_KEYS, FIELD_METADATA, isFieldRequired } from "./requiredFields";
