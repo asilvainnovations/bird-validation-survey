@@ -35,20 +35,30 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:linear-gradient(160de
 
 /* ── Navigation ── */
 .site-nav{background:rgba(2,44,34,.97);backdrop-filter:blur(18px);position:sticky;top:0;width:100%;z-index:200;border-bottom:2px solid var(--gold-border);}
-.nav-inner{max-width:1400px;margin:0 auto;padding:.65rem 1rem;display:flex;align-items:center;gap:.75rem;min-height:44px;}
+.nav-inner{max-width:1400px;margin:0 auto;padding:.65rem 1.5rem;display:flex;align-items:center;gap:1rem;min-height:56px;}
 .nav-logo-wrap{display:flex;align-items:center;gap:.75rem;text-decoration:none;flex-shrink:0;}
 .nav-logo-wrap img{height:40px;width:auto;object-fit:contain;}
 .nav-title{display:none;font-family:'Cinzel',serif;font-size:.72rem;color:#C9A84C;font-weight:700;letter-spacing:.06em;line-height:1.3;}
-.nav-right{margin-left:auto;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;}
-.nav-back{color:#6ee7b7;text-decoration:none;font-size:.82rem;font-weight:500;display:flex;align-items:center;gap:.4rem;transition:color .2s;padding:.4rem .6rem;border-radius:.5rem;border:1px solid var(--gold-border);font-family:'DM Sans',sans-serif;white-space:nowrap;}
-.nav-back:hover{color:#C9A84C;border-color:var(--gold-border-strong);}
+.nav-links{display:flex;align-items:center;gap:1.25rem;margin-left:auto;flex-wrap:wrap;}
+.nav-links a{color:rgba(236,253,245,.85);text-decoration:none;font-size:.82rem;font-weight:500;font-family:'DM Sans',sans-serif;transition:color .2s,border-color .2s;white-space:nowrap;padding:.25rem 0;border-bottom:1px solid transparent;}
+.nav-links a:hover{color:#C9A84C;border-bottom-color:#C9A84C;}
+.nav-right{display:flex;align-items:center;gap:.75rem;flex-shrink:0;}
 .live-badge{display:flex;align-items:center;gap:.4rem;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);border-radius:2rem;padding:.3rem .8rem;font-size:.72rem;font-weight:700;color:#10b981;letter-spacing:.04em;text-transform:uppercase;font-family:'DM Sans',sans-serif;}
 .live-dot{width:7px;height:7px;background:#10b981;border-radius:50%;animation:livePulse 2s infinite;}
 @keyframes livePulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.3);}}
-@media(min-width:768px){.nav-title{display:block;}.nav-inner{padding:.55rem 2rem;}}
 
-/* ── Flourish Banner ── */
-.flourish-banner {
+@media(min-width:768px){.nav-title{display:block;}.nav-inner{padding:.55rem 2rem;}}
+@media(max-width:1024px){
+  .nav-links{gap:0.75rem;}
+  .nav-links a{font-size:0.75rem;}
+}
+@media(max-width:768px){
+  .nav-links{display:none;} /* Hidden on mobile for clean UI, can be expanded to hamburger later */
+  .nav-inner{justify-content:space-between;}
+}
+
+/* ── Connectivity Banner ── */
+.connectivity-banner {
   width: 100%;
   max-width: 100vw;
   margin: 0;
@@ -59,9 +69,33 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:linear-gradient(160de
   overflow: hidden;
   position: relative;
 }
-.flourish-banner .flourish-embed {
-  width: 100% !important;
-  min-height: 60vh;
+.banner-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  max-height: 80vh;
+}
+.banner-caption {
+  background: rgba(2, 44, 34, 0.95);
+  border-top: 1px solid var(--gold-border);
+  padding: 1.5rem 2rem;
+  text-align: center;
+}
+.banner-caption p {
+  color: rgba(236, 253, 245, 0.85);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  max-width: 1000px;
+  margin: 0 auto;
+  font-style: italic;
+}
+.banner-caption p::first-letter {
+  color: #C9A84C;
+  font-size: 1.2em;
+  font-weight: 700;
+  font-style: normal;
 }
 
 /* ── Hero ── */
@@ -147,8 +181,25 @@ h1{font-family:'Cinzel',serif;font-size:clamp(1.5rem,4vw,2.4rem);font-weight:700
 .cta-btn{display:inline-flex;align-items:center;gap:.5rem;background:var(--gold-grad);color:#022c22;font-weight:700;padding:1rem 2.5rem;border-radius:2rem;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.9rem;text-decoration:none;transition:transform .3s,box-shadow .3s;}
 .cta-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,168,76,.4);}
 
+/* ── Invest Banner ── */
+.invest-banner {
+  width: 100%;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: rgba(6,78,59,0.08);
+  border-top: 2px solid var(--gold-border);
+}
+.invest-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
 /* ── Footer ── */
-footer{border-top:1px solid var(--gold-border);background:rgba(2,44,34,.7);backdrop-filter:blur(8px);padding:2rem 1rem;margin-top:2rem;text-align:center;}
+footer{border-top:1px solid var(--gold-border);background:rgba(2,44,34,.7);backdrop-filter:blur(8px);padding:2rem 1rem;margin-top:0;text-align:center;}
 .footer-text{font-size:.72rem;color:rgba(236,253,245,.45);font-family:'DM Sans',sans-serif;line-height:1.5;}
 
 /* ── Category colors ── */
@@ -183,24 +234,29 @@ footer{border-top:1px solid var(--gold-border);background:rgba(2,44,34,.7);backd
 <!-- ── Navigation ── -->
 <nav class="site-nav">
   <div class="nav-inner">
-    <a href="https://asilvainnovations.github.io/BIRD-2026-2035/" class="nav-logo-wrap">
+    <a href="https://bangsamoro-investment-roadmap.asilvainnovations.com" class="nav-logo-wrap">
       <img src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/18.%20Vision.png" alt="BIRD 2026-2035">
       <span class="nav-title">BIRD 2026&ndash;2035<br><span style="font-size:.6rem;color:rgba(236,253,245,.5);">Actors Mapping</span></span>
     </a>
+    <div class="nav-links">
+      <a href="https://bangsamoro-investment-roadmap.asilvainnovations.com">Home</a>
+      <a href="https://bird-roadmap.asilvainnovations.com">Roadmap</a>
+      <a href="https://bird-resources.asilvainnovations.com">Resources</a>
+      <a href="https://bird-app.asilvainnovations.com">BIRD App</a>
+      <a href="https://bird-survey.asilvainnovations.com">Validation Survey</a>
+      <a href="https://bird-contact.asilvainnovations.com">Contact</a>
+    </div>
     <div class="nav-right">
-      <a href="https://asilvainnovations.github.io/BIRD-2026-2035/" class="nav-back">BIRD Portal</a>
       <div class="live-badge"><span class="live-dot"></span>Live</div>
     </div>
   </div>
 </nav>
 
-<!-- ── Flourish Network Banner ── -->
-<div class="flourish-banner">
-  <div class="flourish-embed flourish-network" data-src="visualisation/10095720">
-    <script src="https://public.flourish.studio/resources/embed.js"></script>
-    <noscript>
-      <img src="https://public.flourish.studio/visualisation/10095720/thumbnail" width="100%" alt="network visualization" />
-    </noscript>
+<!-- ── Connectivity Banner ── -->
+<div class="connectivity-banner">
+  <img src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/BEIE-images/BARMM%20Connectivity-BIMP-EAGA.png" alt="BARMM Connectivity BIMP-EAGA Map" class="banner-image">
+  <div class="banner-caption">
+    <p>Each illuminated hub is more than a point on the map — it represents a vital actor in Bangsamoro’s emerging value network. From Basilan’s archipelagic logistics gateway to Maguindanao’s agri‑industrial breadbasket, these nodes embody the diverse strengths of the region. Together, they weave the connective tissue of inclusive growth, linking communities, industries, and partners across the BARMM strategic connectivity map reaching beyond BIMP‑EAGA & UAE-GCC corridors and projecting BARMM as a resilient, interdependent system of opportunity.</p>
   </div>
 </div>
 
@@ -268,7 +324,12 @@ footer{border-top:1px solid var(--gold-border);background:rgba(2,44,34,.7);backd
 <div class="cta-section">
   <h3 class="cta-title">See Where Your Organization Fits</h3>
   <p class="cta-text">The BIRD roadmap needs every actor at the table. Validate the framework, contribute your expertise, and help shape a roadmap that works for all 34 stakeholders.</p>
-  <a href="https://asilvainnovations.github.io/BIRD-2026-2035/public/validation-survey.html" class="cta-btn">Take the Validation Survey &rarr;</a>
+  <a href="https://bird-survey.asilvainnovations.com" class="cta-btn">Take the Validation Survey &rarr;</a>
+</div>
+
+<!-- ── Invest in Bangsamoro Banner ── -->
+<div class="invest-banner">
+  <img src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/validation-survey-images/Invest%20in%20Bangsamoro.png" alt="Invest in Bangsamoro" class="invest-image">
 </div>
 
 <!-- ── Footer ── -->
