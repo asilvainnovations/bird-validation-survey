@@ -52,8 +52,8 @@ export interface Section6Data {
   q6_w5_skills_mismatch_likelihood?: number;
   q6_w6_tech_adoption_impact?: number;
   q6_w6_tech_adoption_likelihood?: number;
-  q6_w7_underspending_impact?: number;
-  q6_w7_underspending_likelihood?: number;
+  q6_w7_fragmented_data_impact?: number;
+  q6_w7_fragmented_data_likelihood?: number;
   // SWOT — Opportunities
   q6_o1_tourism_recovery_impact?: number;
   q6_o1_tourism_recovery_likelihood?: number;
@@ -62,6 +62,8 @@ export interface Section6Data {
   // SWOT — Threats
   q6_t1_cyber_insecurity_impact?: number;
   q6_t1_cyber_insecurity_likelihood?: number;
+  q6_t2_infra_cost_overruns_impact?: number;
+  q6_t2_infra_cost_overruns_likelihood?: number;
   // Archetype: Limits to Growth (see swot-content.ts ARCHETYPES_BY_SECTION[6])
   q6_arch_limits_growth_accuracy: string;
   q6_arch_limits_growth_followup: string;
@@ -429,10 +431,10 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
             "weakness"
           )}
           {renderSwotPair(
-            "W7 — Underspending in Budget Execution",
-            "Delays in development program rollout.",
-            "q6_w7_underspending_impact",
-            "q6_w7_underspending_likelihood",
+            "W7 — Fragmented Data Systems",
+            "Agencies often use incompatible databases, leading to a siloed view that causes delayed procurement and slow certification cycles.",
+            "q6_w7_fragmented_data_impact",
+            "q6_w7_fragmented_data_likelihood",
             "weakness"
           )}
         </CardContent>
@@ -488,6 +490,13 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
             "Emerging threats from misinformation, cyberattacks, and adverse AI outcomes disrupting digital governance.",
             "q6_t1_cyber_insecurity_impact",
             "q6_t1_cyber_insecurity_likelihood",
+            "threat"
+          )}
+          {renderSwotPair(
+            "T2 — Infrastructure Cost Overruns",
+            "Delays and budget escalations in critical infrastructure projects can discourage investors and slow the build-out of roads, power, and ports.",
+            "q6_t2_infra_cost_overruns_impact",
+            "q6_t2_infra_cost_overruns_likelihood",
             "threat"
           )}
         </CardContent>

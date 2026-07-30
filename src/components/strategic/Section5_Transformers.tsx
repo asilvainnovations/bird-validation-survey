@@ -34,8 +34,8 @@ export interface Section5Data {
   q5_2_halal_advantage_understanding?: number;
   q5_3_farm_to_market_understanding?: number;
   q5_4_economic_zones_understanding?: number;
-  q5_5_growth_underinvestment_accuracy?: string;
-  q5_6_growth_underinvestment_followup?: string;
+  q5_arch_growth_underinvest_accuracy?: string;
+  q5_arch_growth_underinvest_followup?: string;
   q5_s1_halal_legitimacy_impact?: number;
   q5_s1_halal_legitimacy_likelihood?: number;
   q5_s2_domestic_demand_impact?: number;
@@ -202,28 +202,9 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
   const inactiveBtn =
     "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10";
 
-  const understandingQuestions = [
-    {
-      field: "q5_1_transformers_banner_understanding" as keyof Section5Data,
-      label: "How well do you understand the Transformers cluster as the engine of value creation in BARMM?",
-    },
-    {
-      field: "q5_2_halal_advantage_understanding" as keyof Section5Data,
-      label: "How well do you understand Bangsamoro's cultural and geographic advantage in the ASEAN halal market?",
-    },
-    {
-      field: "q5_3_farm_to_market_understanding" as keyof Section5Data,
-      label: "How well do you understand the MAFAR halal farm-to-market pipeline and its value chain stages?",
-    },
-    {
-      field: "q5_4_economic_zones_understanding" as keyof Section5Data,
-      label: "How well do you understand the role of Pollock Freeport and WOW Matanog SEZ in industrial scaling?",
-    },
-  ];
-
   const growthAgree =
-    data.q5_5_growth_underinvestment_accuracy === "Very accurately" ||
-    data.q5_5_growth_underinvestment_accuracy === "Somewhat accurately";
+    data.q5_arch_growth_underinvest_accuracy === "Very accurately" ||
+    data.q5_arch_growth_underinvest_accuracy === "Somewhat accurately";
 
   return (
     <div className="space-y-8">
@@ -238,55 +219,39 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
         Engines of Value Creation — converting raw materials into higher-value halal products and premium exports
       </p>
 
-      {/* Banner Image */}
-      <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
-        <img
-          src={BIRD_IMAGES.cluster2Transformers?.url || BIRD_IMAGES.validationSurveyBanner?.url}
-          alt={BIRD_IMAGES.cluster2Transformers?.alt || "Transformers Cluster"}
-          className="w-full h-auto max-h-[420px] object-contain transition-transform group-hover:scale-[1.02]"
-          loading="lazy"
-        />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5">
-          <p className="text-xs italic text-white/70">
-            {BIRD_IMAGES.cluster2Transformers?.title || "Cluster 2: Transformers"}
-          </p>
-        </div>
-      </div>
-
-      {/* Understanding Questions */}
+      {/* Banner Image + Q1 (merged) */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
-            Framework Understanding
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {understandingQuestions.map((q, idx) => (
-            <div
-              key={q.field}
-              className={cn(
-                "space-y-3",
-                idx < understandingQuestions.length - 1 &&
-                  "pb-6 border-b border-[#C9A84C]/20"
-              )}
-            >
-              <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
-                {q.label}
-                <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 block mt-1 font-normal">
-                  (1 = not at all, 5 = completely)
-                </span>
-              </Label>
-              <ScaleSelector
-                value={data[q.field] as number | undefined}
-                onSelect={(v) => update(q.field, v)}
-                labels={["Not at all", "Completely"]}
-              />
+        <CardContent className="pt-6 space-y-4">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
+            <img
+              src={BIRD_IMAGES.cluster2Transformers?.url || BIRD_IMAGES.validationSurveyBanner?.url}
+              alt={BIRD_IMAGES.cluster2Transformers?.alt || "Transformers Cluster"}
+              className="w-full h-auto max-h-[420px] object-contain transition-transform group-hover:scale-[1.02]"
+              loading="lazy"
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5">
+              <p className="text-xs italic text-white/70">
+                {BIRD_IMAGES.cluster2Transformers?.title || "Cluster 2: Transformers"}
+              </p>
             </div>
-          ))}
+          </div>
+          <div className="pt-2 border-t border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How well do you understand the Transformers cluster as the engine of value creation in BARMM?
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 block mt-1 font-normal">
+                (1 = not at all, 5 = completely)
+              </span>
+            </Label>
+            <ScaleSelector
+              value={data.q5_1_transformers_banner_understanding}
+              onSelect={(v) => update("q5_1_transformers_banner_understanding", v)}
+              labels={["Not at all", "Completely"]}
+            />
+          </div>
         </CardContent>
       </Card>
 
-      {/* Halal Industry Advantage */}
+      {/* Halal Industry Advantage + Q2 (merged) */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardContent className="pt-6 space-y-4">
           <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
@@ -307,10 +272,23 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
             Halal Cosmetics (beauty for Muslim consumers), Halal Pharmaceuticals (compliant medicine).{" "}
             The BIMP-EAGA trade corridor connects Bangsamoro to a large regional Muslim population.
           </p>
+          <div className="pt-2 border-t border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How well do you understand Bangsamoro&apos;s cultural and geographic advantage in the ASEAN halal market?
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 block mt-1 font-normal">
+                (1 = not at all, 5 = completely)
+              </span>
+            </Label>
+            <ScaleSelector
+              value={data.q5_2_halal_advantage_understanding}
+              onSelect={(v) => update("q5_2_halal_advantage_understanding", v)}
+              labels={["Not at all", "Completely"]}
+            />
+          </div>
         </CardContent>
       </Card>
 
-      {/* Farm-to-Market Pipeline */}
+      {/* Farm-to-Market Pipeline + Q3 (merged) */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardContent className="pt-6 space-y-4">
           <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
@@ -331,6 +309,19 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
             (roads, ice plants, cold storage) → Processing (halal livestock, poultry, seaweed) →{" "}
             Market Linkage (halal pasalubong centers, BIMP-EAGA export).
           </p>
+          <div className="pt-2 border-t border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How well do you understand the MAFAR halal farm-to-market pipeline and its value chain stages?
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 block mt-1 font-normal">
+                (1 = not at all, 5 = completely)
+              </span>
+            </Label>
+            <ScaleSelector
+              value={data.q5_3_farm_to_market_understanding}
+              onSelect={(v) => update("q5_3_farm_to_market_understanding", v)}
+              labels={["Not at all", "Completely"]}
+            />
+          </div>
         </CardContent>
       </Card>
 
@@ -347,6 +338,7 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* Strengths */}
           {/* Strengths */}
           <div>
             <div className="flex items-center gap-2 mb-4">
@@ -471,7 +463,8 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
         </CardContent>
       </Card>
 
-      {/* Industrial & Economic Zones */}
+
+      {/* Industrial & Economic Zones + Q4 (merged) */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardContent className="pt-6 space-y-4">
           <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
@@ -491,6 +484,19 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
             <strong>Pollock Freeport & EcoZone</strong> (119-hectare agro-industrial hub in Parang, ADB-funded) and{" "}
             <strong>WOW Matanog Special Economic Zone</strong> (upcoming Bangsamoro Halal Park).
           </p>
+          <div className="pt-2 border-t border-[#C9A84C]/20">
+            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-3 block">
+              How well do you understand the role of Pollock Freeport and WOW Matanog SEZ in industrial scaling?
+              <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 block mt-1 font-normal">
+                (1 = not at all, 5 = completely)
+              </span>
+            </Label>
+            <ScaleSelector
+              value={data.q5_4_economic_zones_understanding}
+              onSelect={(v) => update("q5_4_economic_zones_understanding", v)}
+              labels={["Not at all", "Completely"]}
+            />
+          </div>
         </CardContent>
       </Card>
 
@@ -537,9 +543,9 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
                 variant="outline"
                 className={cn(
                   "justify-start h-auto py-3 text-sm text-left transition-all",
-                  data.q5_5_growth_underinvestment_accuracy === opt ? activeBtn : inactiveBtn
+                  data.q5_arch_growth_underinvest_accuracy === opt ? activeBtn : inactiveBtn
                 )}
-                onClick={() => update("q5_5_growth_underinvestment_accuracy", opt)}
+                onClick={() => update("q5_arch_growth_underinvest_accuracy", opt)}
               >
                 {opt}
               </Button>
@@ -564,9 +570,9 @@ const Section5_Transformers: React.FC<Section5Props> = ({ data, onChange }) => {
                     variant="outline"
                     className={cn(
                       "justify-start h-auto py-3 text-sm text-left transition-all",
-                      data.q5_6_growth_underinvestment_followup === opt ? activeBtn : inactiveBtn
+                      data.q5_arch_growth_underinvest_followup === opt ? activeBtn : inactiveBtn
                     )}
-                    onClick={() => update("q5_6_growth_underinvestment_followup", opt)}
+                    onClick={() => update("q5_arch_growth_underinvest_followup", opt)}
                   >
                     {opt}
                   </Button>

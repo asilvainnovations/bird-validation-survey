@@ -44,8 +44,8 @@ export interface Section4Data {
   q4_1_foundations_banner_understanding?: number;
 
   // Archetype: Tragedy of the Commons
-  q4_2_tragedy_commons_accuracy?: string;
-  q4_3_tragedy_followup?: string;
+  q4_arch_tragedy_commons_accuracy?: string;
+  q4_arch_tragedy_commons_followup?: string;
 
   // ── Strengths ──
   q4_s1_aff_base_impact?: number;
@@ -401,9 +401,9 @@ const Section4_Foundations: React.FC<Section4Props> = ({ data, onChange }) => {
                     size="sm"
                     className={cn(
                       "text-xs px-3 py-2 rounded-lg border transition-all",
-                      data.q4_2_tragedy_commons_accuracy === opt ? activeBtn : inactiveBtn
+                      data.q4_arch_tragedy_commons_accuracy === opt ? activeBtn : inactiveBtn
                     )}
-                    onClick={() => update("q4_2_tragedy_commons_accuracy", opt)}
+                    onClick={() => update("q4_arch_tragedy_commons_accuracy", opt)}
                   >
                     {opt}
                   </Button>
@@ -428,9 +428,9 @@ const Section4_Foundations: React.FC<Section4Props> = ({ data, onChange }) => {
                     variant="outline"
                     className={cn(
                       "justify-start h-auto py-3 text-sm text-left gap-2 transition-all",
-                      data.q4_3_tragedy_followup === label ? activeBtn : inactiveBtn
+                      data.q4_arch_tragedy_commons_followup === label ? activeBtn : inactiveBtn
                     )}
-                    onClick={() => update("q4_3_tragedy_followup", label)}
+                    onClick={() => update("q4_arch_tragedy_commons_followup", label)}
                   >
                     {icon} {label}
                   </Button>
@@ -438,12 +438,12 @@ const Section4_Foundations: React.FC<Section4Props> = ({ data, onChange }) => {
               </div>
               <Textarea
                 value={
-                  data.q4_3_tragedy_followup &&
-                  !["Watersheds", "Fishing grounds", "Forest reserves", "Agricultural land"].includes(data.q4_3_tragedy_followup)
-                    ? data.q4_3_tragedy_followup
+                  data.q4_arch_tragedy_commons_followup &&
+                  !["Watersheds", "Fishing grounds", "Forest reserves", "Agricultural land"].includes(data.q4_arch_tragedy_commons_followup)
+                    ? data.q4_arch_tragedy_commons_followup
                     : ""
                 }
-                onChange={(e) => update("q4_3_tragedy_followup", e.target.value)}
+                onChange={(e) => update("q4_arch_tragedy_commons_followup", e.target.value)}
                 placeholder="Other (please specify)..."
                 className="mt-3 min-h-[60px] text-sm border-[#C9A84C]/30 dark:border-[#C9A84C]/20 focus:border-[#C9A84C] dark:bg-[#022c22]/50 dark:text-[#ecfdf5]"
                 rows={2}
