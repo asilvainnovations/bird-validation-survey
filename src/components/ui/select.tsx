@@ -85,8 +85,14 @@ const SelectContent = React.forwardRef<
       <SelectPrimitive.Viewport
         className={cn(
           "p-1",
+          // BUG FIX (re-applied 2026-07-31 — reverted by an external upload):
+          // previously included `h-[var(--radix-select-trigger-height)]` here,
+          // which forces the scrollable viewport to the TRIGGER BUTTON's
+          // height (~40px) in popper position mode — collapsing every
+          // dropdown in the app to showing roughly one item at a time. See
+          // MANIFEST.md history for the full explanation.
           position === "popper" &&
-            "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
+            "w-full min-w-[var(--radix-select-trigger-width)]"
         )}
       >
         {children}
