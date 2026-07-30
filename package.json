@@ -4,8 +4,8 @@
   "type": "module",
   "description": "BIRD 2026–2035 Validation Survey — standalone 16-section stakeholder validation instrument for the Bangsamoro Investment Roadmap Development (BOI-MTIT, BARMM).",
   "scripts": {
-    "prebuild": "node scripts/generate-manifest.mjs",
-    "dev": "node scripts/generate-manifest.mjs && vite",
+    "prebuild": "node scripts/generate-manifest.mjs && node scripts/generate-service-worker-version.mjs",
+    "dev": "node scripts/generate-manifest.mjs && node scripts/generate-service-worker-version.mjs && vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
