@@ -66,11 +66,10 @@ const iedsMatrixSchema = z.object({
 export const surveySchema = z.object({
   // Step 0
   q0_1_ready: optionalString,
-  q0_2_ecosystem_understanding: optionalString,
   q0_3_systems_thinking_value: optionalNumber,
-  q0_4_cld_understanding: optionalNumber,
-  q0_5_feedback_loops_understanding: optionalNumber,
-  q0_6_leverage_points_understanding: optionalNumber,
+  q0_4_cld_understanding: optionalString,
+  q0_5_feedback_loops_understanding: optionalString,
+  q0_6_leverage_points_understanding: optionalString,
 
   // Step 1 — only required fields
   q1_consent_participate: requiredBoolean.describe("Consent to participate"),
