@@ -12,8 +12,6 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { BIRD_IMAGES } from "@/lib/bird-urls";
-import { UNIVERSAL_QUESTIONS, universalFieldName } from "@/lib/universalQuestions";
-import { LikertScale } from "@/lib/primitives/LikertScale";
 import {
   calculateStrengthRI,
   calculateWeaknessRisk,
@@ -27,21 +25,48 @@ export interface Section8Data {
   q8_2_roadmap_achievable?: number;
   q8_3_priority_action: string;
   q8_4_islamic_authority: string;
-  q8_arch_shifting_burden_accuracy: string;
-  q8_arch_shifting_burden_followup: string;
-  // Strengths
-  q8_s1_islamic_finance_framework_impact?: number;
-  q8_s1_islamic_finance_framework_likelihood?: number;
-  // Weaknesses
-  q8_w1_financial_penetration_impact?: number;
-  q8_w1_financial_penetration_likelihood?: number;
-  // Opportunities
-  q8_o1_islamic_ecosystem_impact?: number;
-  q8_o1_islamic_ecosystem_likelihood?: number;
-  // Universal cross-cluster questions (see src/lib/universalQuestions.ts)
-  q8_universal_confidence?: number;
-  q8_universal_readiness?: number;
-  q8_universal_urgency?: number;
+  q_s8_domestic_halal_impact?: number;
+  q_s8_domestic_halal_likelihood?: number;
+  q_s8_youth_pop_impact?: number;
+  q_s8_youth_pop_likelihood?: number;
+  q_s8_policy_recognition_impact?: number;
+  q_s8_policy_recognition_likelihood?: number;
+  q_s8_islamic_finance_fw_impact?: number;
+  q_s8_islamic_finance_fw_likelihood?: number;
+  q_s8_peace_dividend_impact?: number;
+  q_s8_peace_dividend_likelihood?: number;
+  q_s8_infra_deficits_impact?: number;
+  q_s8_infra_deficits_likelihood?: number;
+  q_s8_literacy_impact?: number;
+  q_s8_literacy_likelihood?: number;
+  q_s8_financial_penetration_impact?: number;
+  q_s8_financial_penetration_likelihood?: number;
+  q_s8_fragmented_policy_impact?: number;
+  q_s8_fragmented_policy_likelihood?: number;
+  q_s8_skills_mismatch_impact?: number;
+  q_s8_skills_mismatch_likelihood?: number;
+  q_s8_global_halal_impact?: number;
+  q_s8_global_halal_likelihood?: number;
+  q_s8_renewable_invest_impact?: number;
+  q_s8_renewable_invest_likelihood?: number;
+  q_s8_asean_halal_impact?: number;
+  q_s8_asean_halal_likelihood?: number;
+  q_s8_islamic_ecosystem_impact?: number;
+  q_s8_islamic_ecosystem_likelihood?: number;
+  q_s8_uae_corridor_impact?: number;
+  q_s8_uae_corridor_likelihood?: number;
+  q_s8_halal_competition_impact?: number;
+  q_s8_halal_competition_likelihood?: number;
+  q_s8_halal_standards_impact?: number;
+  q_s8_halal_standards_likelihood?: number;
+  q_s8_security_incidents_impact?: number;
+  q_s8_security_incidents_likelihood?: number;
+  q_s8_political_transition_impact?: number;
+  q_s8_political_transition_likelihood?: number;
+  q_s8_big_man: string;
+  q_s8_big_man_followup: string;
+  q_s8_shifting_burden: string;
+  q_s8_shifting_followup: string;
 }
 
 interface Section8Props {
@@ -368,29 +393,143 @@ export const Section8_Financiers: React.FC<Section8Props> = ({ data, onChange })
 
           {/* Strengths */}
           {renderSwotPair(
-            "S1 — Islamic Finance Legal Framework",
-            "RA 11439 enabling Shariah-compliant capital mobilization through institutions like Al-Amanah and CARD Islamic.",
-            "q8_s1_islamic_finance_framework_impact",
-            "q8_s1_islamic_finance_framework_likelihood",
+            "S4 — Large Domestic Halal Market",
+            "5.69 million Muslim consumers create strong built-in demand for Shariah-compliant financial products.",
+            "q_s8_domestic_halal_impact",
+            "q_s8_domestic_halal_likelihood",
+            "strength"
+          )}
+          {renderSwotPair(
+            "S5 — Young and Growing Population",
+            "3.43% annual growth creates a large future workforce and consumer base needing financial services.",
+            "q_s8_youth_pop_impact",
+            "q_s8_youth_pop_likelihood",
+            "strength"
+          )}
+          {renderSwotPair(
+            "S7 — Growing Policy Recognition",
+            "BOL, BIC, and SIPP creating stronger institutional mandate and investment climate for Islamic finance.",
+            "q_s8_policy_recognition_impact",
+            "q_s8_policy_recognition_likelihood",
+            "strength"
+          )}
+          {renderSwotPair(
+            "S9 — Islamic Finance Legal Framework",
+            "RA 11439 allows Shariah-compliant banking and finance through Al-Amanah and CARD Islamic.",
+            "q_s8_islamic_finance_fw_impact",
+            "q_s8_islamic_finance_fw_likelihood",
+            "strength"
+          )}
+          {renderSwotPair(
+            "S12 — Peace Dividend Momentum",
+            "Improved security in select zones creates space for financial institutions to expand into rural and island areas.",
+            "q_s8_peace_dividend_impact",
+            "q_s8_peace_dividend_likelihood",
             "strength"
           )}
 
           {/* Weaknesses */}
           {renderSwotPair(
-            "W1 — Minimal Formal Financial Penetration",
-            "Capital access barriers for MSMEs, especially in rural/island areas.",
-            "q8_w1_financial_penetration_impact",
-            "q8_w1_financial_penetration_likelihood",
+            "W1 — Critical Infrastructure Deficits",
+            "Limited digital connectivity restricts mobile banking and fintech reach in island provinces.",
+            "q_s8_infra_deficits_impact",
+            "q_s8_infra_deficits_likelihood",
+            "weakness"
+          )}
+          {renderSwotPair(
+            "W4 — Low Functional Literacy Rate",
+            "59.3% literacy rate limits financial literacy and capacity to use formal banking services.",
+            "q_s8_literacy_impact",
+            "q_s8_literacy_likelihood",
+            "weakness"
+          )}
+          {renderSwotPair(
+            "W5 — Minimal Formal Financial Penetration",
+            "Many people and MSMEs cannot access formal banking or credit services, especially in rural/island areas.",
+            "q_s8_financial_penetration_impact",
+            "q_s8_financial_penetration_likelihood",
+            "weakness"
+          )}
+          {renderSwotPair(
+            "W6 — Fragmented Policy Frameworks",
+            "Islamic banking, halal certification, and trade agencies operate in silos without coordinated strategy.",
+            "q_s8_fragmented_policy_impact",
+            "q_s8_fragmented_policy_likelihood",
+            "weakness"
+          )}
+          {renderSwotPair(
+            "W8 — Skills Mismatch",
+            "TVIs not aligned with Islamic finance and fintech industry needs, slowing workforce readiness.",
+            "q_s8_skills_mismatch_impact",
+            "q_s8_skills_mismatch_likelihood",
             "weakness"
           )}
 
           {/* Opportunities */}
           {renderSwotPair(
-            "O1 — Islamic Finance Ecosystem",
-            "Growing global Shariah-compliant capital pool seeking ethical investments.",
-            "q8_o1_islamic_ecosystem_impact",
-            "q8_o1_islamic_ecosystem_likelihood",
+            "O1 — Global Halal Market Growth",
+            "USD 2.3 trillion market creating demand for Shariah-compliant trade finance and investment products.",
+            "q_s8_global_halal_impact",
+            "q_s8_global_halal_likelihood",
             "opportunity"
+          )}
+          {renderSwotPair(
+            "O2 — Renewable Energy Investment Opportunities",
+            "Growing interest in solar, hydro, and biomass projects needing Islamic project finance structures.",
+            "q_s8_renewable_invest_impact",
+            "q_s8_renewable_invest_likelihood",
+            "opportunity"
+          )}
+          {renderSwotPair(
+            "O3 — ASEAN Halal Economy",
+            "USD 1.38 trillion market. BARMM can position as an Islamic finance hub for BIMP-EAGA.",
+            "q_s8_asean_halal_impact",
+            "q_s8_asean_halal_likelihood",
+            "opportunity"
+          )}
+          {renderSwotPair(
+            "O4 — Islamic Finance Ecosystem Growth",
+            "Global Shariah-compliant funds seeking ethical destinations — BARMM can be a hub.",
+            "q_s8_islamic_ecosystem_impact",
+            "q_s8_islamic_ecosystem_likelihood",
+            "opportunity"
+          )}
+          {renderSwotPair(
+            "O6 — UAE/GCC Halal Export Corridor",
+            "Partnerships connecting BARMM to Middle Eastern Islamic finance centers and investors.",
+            "q_s8_uae_corridor_impact",
+            "q_s8_uae_corridor_likelihood",
+            "opportunity"
+          )}
+
+          {/* Threats */}
+          {renderSwotPair(
+            "T2 — Competition from Established Halal Hubs",
+            "Malaysia's Islamic finance ecosystem is decades ahead — BARMM must differentiate quickly.",
+            "q_s8_halal_competition_impact",
+            "q_s8_halal_competition_likelihood",
+            "threat"
+          )}
+          {renderSwotPair(
+            "T3 — Halal Standards Recognition Risk",
+            "BARMM's Islamic finance products not yet aligned with OIC/SMIIC international standards.",
+            "q_s8_halal_standards_impact",
+            "q_s8_halal_standards_likelihood",
+            "threat"
+          )}
+          {renderSwotPair(
+            "T4 — Residual Security Incidents",
+            "Security concerns limit willingness of financial institutions to establish presence in remote areas.",
+            "q_s8_security_incidents_impact",
+            "q_s8_security_incidents_likelihood",
+            "threat"
+          )}
+          {renderSwotPair(
+            "T5 — Political Transition Uncertainties",
+            "Elections and leadership changes may disrupt Islamic finance policy continuity and investor confidence.",
+            "q_s8_political_transition_impact",
+            "q_s8_political_transition_likelihood",
+            "threat"
           )}
         </CardContent>
       </Card>
@@ -428,9 +567,9 @@ export const Section8_Financiers: React.FC<Section8Props> = ({ data, onChange })
                   variant="outline"
                   className={cn(
                     "justify-start h-auto py-3 text-sm text-left",
-                    data.q8_arch_shifting_burden_accuracy === opt ? activeBtn : inactiveBtn
+                    data.q_s8_shifting_burden === opt ? activeBtn : inactiveBtn
                   )}
-                  onClick={() => update("q8_arch_shifting_burden_accuracy", opt)}
+                  onClick={() => update("q_s8_shifting_burden", opt)}
                 >
                   {opt}
                 </Button>
@@ -438,8 +577,8 @@ export const Section8_Financiers: React.FC<Section8Props> = ({ data, onChange })
             </div>
           </div>
 
-          {(data.q8_arch_shifting_burden_accuracy === "Very accurately" ||
-            data.q8_arch_shifting_burden_accuracy === "Somewhat accurately") && (
+          {(data.q_s8_shifting_burden === "Very accurately" ||
+            data.q_s8_shifting_burden === "Somewhat accurately") && (
             <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20 animate-in fade-in slide-in-from-top-2 duration-200">
               <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
                 Describe a case where a short-term capital fix either led to long-term reform or failed and the problem returned.
@@ -456,9 +595,9 @@ export const Section8_Financiers: React.FC<Section8Props> = ({ data, onChange })
                     variant="outline"
                     className={cn(
                       "justify-start h-auto py-3 text-sm text-left",
-                      data.q8_arch_shifting_burden_followup === opt ? activeBtn : inactiveBtn
+                      data.q_s8_shifting_followup === opt ? activeBtn : inactiveBtn
                     )}
-                    onClick={() => update("q8_arch_shifting_burden_followup", opt)}
+                    onClick={() => update("q_s8_shifting_followup", opt)}
                   >
                     {opt}
                   </Button>
@@ -467,40 +606,12 @@ export const Section8_Financiers: React.FC<Section8Props> = ({ data, onChange })
               <Textarea
                 placeholder="Describe the case in more detail..."
                 rows={3}
-                value={data.q8_arch_shifting_burden_followup || ""}
-                onChange={(e) => update("q8_arch_shifting_burden_followup", e.target.value)}
+                value={data.q_s8_shifting_followup || ""}
+                onChange={(e) => update("q_s8_shifting_followup", e.target.value)}
                 className="w-full rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 px-3 py-2 text-sm text-[#022c22] dark:text-[#ecfdf5] placeholder:text-[#64748b] focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/50 resize-y"
               />
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      {/* ── Cross-Cluster Assessment (universal, same 3 questions every cluster) ── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
-            Cross-Cluster Assessment
-          </CardTitle>
-          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 pt-1">
-            These three questions are asked identically in every cluster section, so your
-            answers can be compared across all of BARMM&apos;s investment priorities.
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {UNIVERSAL_QUESTIONS.map((q) => {
-            const fieldName = universalFieldName(8, q.id);
-            return (
-              <LikertScale
-                key={q.id}
-                name={fieldName}
-                label={q.label}
-                scale={q.scale}
-                value={(data as never as Record<string, number | undefined>)[fieldName]}
-                onChange={(v) => update(fieldName as never, v as never)}
-              />
-            );
-          })}
         </CardContent>
       </Card>
     </div>

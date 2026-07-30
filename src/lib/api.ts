@@ -24,7 +24,7 @@ export async function submitSurvey(data: Partial<SurveySchemaType>): Promise<Sub
   // this must be false so the Edge Function rejects the submission.
   const payload = {
     ...data,
-    consent_final: data.q1_consent_participate === true,
+    consent_final: data.q01_consent_participate === true,
     // Metadata for audit trail
     _meta: {
       timestamp: new Date().toISOString(),

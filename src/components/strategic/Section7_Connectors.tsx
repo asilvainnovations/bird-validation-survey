@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { MAGNITUDE_SCALE, LIKELIHOOD_SCALE } from "@/lib/scaleLabels";
 import { Badge } from "@/components/ui/badge";
 import {
   Globe,
@@ -17,8 +16,6 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { BIRD_IMAGES } from "@/lib/bird-urls";
-import { UNIVERSAL_QUESTIONS, universalFieldName } from "@/lib/universalQuestions";
-import { LikertScale } from "@/lib/primitives/LikertScale";
 import {
   calculateStrengthRI,
   calculateWeaknessRisk,
@@ -37,33 +34,42 @@ export interface Section7Data {
   q7_7_priority_vector: string;
   q7_8_uae_feasibility?: number;
   q7_9_bimpeaga_leverage?: number;
-  q7_arch_success_successful_accuracy: string;
-  q7_arch_success_successful_followup: string;
-  // Strengths
-  q7_s1_bimpeaga_location_impact?: number;
-  q7_s1_bimpeaga_location_likelihood?: number;
-  // Opportunities
-  q7_o1_global_halal_impact?: number;
-  q7_o1_global_halal_likelihood?: number;
-  q7_o2_asean_halal_impact?: number;
-  q7_o2_asean_halal_likelihood?: number;
-  q7_o3_bimpeaga_integration_impact?: number;
-  q7_o3_bimpeaga_integration_likelihood?: number;
-  q7_o4_uae_corridor_impact?: number;
-  q7_o4_uae_corridor_likelihood?: number;
-  q7_o5_landbridge_impact?: number;
-  q7_o5_landbridge_likelihood?: number;
-  // Threats
-  q7_t1_halal_competition_impact?: number;
-  q7_t1_halal_competition_likelihood?: number;
-  q7_t2_economic_downturn_impact?: number;
-  q7_t2_economic_downturn_likelihood?: number;
-  q7_t3_price_volatility_impact?: number;
-  q7_t3_price_volatility_likelihood?: number;
-  // Universal cross-cluster questions (see src/lib/universalQuestions.ts)
-  q7_universal_confidence?: number;
-  q7_universal_readiness?: number;
-  q7_universal_urgency?: number;
+  q_s7_bimpeaga_loc_impact?: number;
+  q_s7_bimpeaga_loc_likelihood?: number;
+  q_s7_domestic_halal_impact?: number;
+  q_s7_domestic_halal_likelihood?: number;
+  q_s7_polloc_impact?: number;
+  q_s7_polloc_likelihood?: number;
+  q_s7_islamic_finance_impact?: number;
+  q_s7_islamic_finance_likelihood?: number;
+  q_s7_infra_deficits_impact?: number;
+  q_s7_infra_deficits_likelihood?: number;
+  q_s7_fragmented_policy_impact?: number;
+  q_s7_fragmented_policy_likelihood?: number;
+  q_s7_market_linkages_impact?: number;
+  q_s7_market_linkages_likelihood?: number;
+  q_s7_tech_adoption_impact?: number;
+  q_s7_tech_adoption_likelihood?: number;
+  q_s7_asean_halal_impact?: number;
+  q_s7_asean_halal_likelihood?: number;
+  q_s7_bimpeaga_integration_impact?: number;
+  q_s7_bimpeaga_integration_likelihood?: number;
+  q_s7_uae_corridor_impact?: number;
+  q_s7_uae_corridor_likelihood?: number;
+  q_s7_tourism_potential_impact?: number;
+  q_s7_tourism_potential_likelihood?: number;
+  q_s7_halal_competition_impact?: number;
+  q_s7_halal_competition_likelihood?: number;
+  q_s7_security_incidents_impact?: number;
+  q_s7_security_incidents_likelihood?: number;
+  q_s7_price_volatility_impact?: number;
+  q_s7_price_volatility_likelihood?: number;
+  q_s7_natl_coord_impact?: number;
+  q_s7_natl_coord_likelihood?: number;
+  q_s7_escalation: string;
+  q_s7_escalation_followup: string;
+  q_s7_limits_growth: string;
+  q_s7_limits_followup: string;
 }
 
 interface Section7Props {
@@ -171,48 +177,48 @@ export const Section7_Connectors: React.FC<Section7Props> = ({ data, onChange })
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <Label className="text-xs font-medium text-[#065f46] dark:text-[#ecfdf5]/70 mb-2 block">
-              Impact
+              Impact (1–5)
             </Label>
-            <div className="grid grid-cols-5 gap-1">
+            <div className="flex gap-2">
               {[1, 2, 3, 4, 5].map((v) => (
                 <Button
                   key={v}
                   type="button"
                   variant="outline"
+                  size="icon"
                   className={cn(
-                    "h-auto flex-col gap-0.5 py-1.5 px-1 rounded-lg border text-xs font-semibold transition-all",
+                    "w-10 h-10 rounded-lg border text-sm font-semibold transition-all",
                     impact === v
                       ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
                       : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
                   )}
                   onClick={() => update(impactField, v as any)}
                 >
-                  <span>{v}</span>
-                  <span className="text-[8px] font-normal leading-tight text-center">{MAGNITUDE_SCALE[v - 1].label}</span>
+                  {v}
                 </Button>
               ))}
             </div>
           </div>
           <div>
             <Label className="text-xs font-medium text-[#065f46] dark:text-[#ecfdf5]/70 mb-2 block">
-              Likelihood
+              Likelihood (1–5)
             </Label>
-            <div className="grid grid-cols-5 gap-1">
+            <div className="flex gap-2">
               {[1, 2, 3, 4, 5].map((v) => (
                 <Button
                   key={v}
                   type="button"
                   variant="outline"
+                  size="icon"
                   className={cn(
-                    "h-auto flex-col gap-0.5 py-1.5 px-1 rounded-lg border text-xs font-semibold transition-all",
+                    "w-10 h-10 rounded-lg border text-sm font-semibold transition-all",
                     likelihood === v
                       ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
                       : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
                   )}
                   onClick={() => update(likelihoodField, v as any)}
                 >
-                  <span>{v}</span>
-                  <span className="text-[8px] font-normal leading-tight text-center">{LIKELIHOOD_SCALE[v - 1].label}</span>
+                  {v}
                 </Button>
               ))}
             </div>
@@ -631,69 +637,113 @@ export const Section7_Connectors: React.FC<Section7Props> = ({ data, onChange })
           {/* Strengths */}
           {renderSwotPair(
             "S1 — Strategic BIMP-EAGA Location",
-            "Proximity to Sabah and ASEAN trade corridors.",
-            "q7_s1_bimpeaga_location_impact",
-            "q7_s1_bimpeaga_location_likelihood",
+            "BARMM is close to Sabah and ASEAN trade routes, making it a natural gateway for regional trade.",
+            "q_s7_bimpeaga_loc_impact",
+            "q_s7_bimpeaga_loc_likelihood",
             "strength"
+          )}
+          {renderSwotPair(
+            "S4 — Large Domestic Halal Market",
+            "5.69 million Muslim consumers create strong built-in local demand for halal products and services.",
+            "q_s7_domestic_halal_impact",
+            "q_s7_domestic_halal_likelihood",
+            "strength"
+          )}
+          {renderSwotPair(
+            "S6 — Polloc Freeport & Economic Zone",
+            "Strategic logistics and trade hub serving as a gateway for goods entering and leaving BARMM.",
+            "q_s7_polloc_impact",
+            "q_s7_polloc_likelihood",
+            "strength"
+          )}
+
+          {/* Weaknesses */}
+          {renderSwotPair(
+            "W1 — Critical Infrastructure Deficits",
+            "Gaps in energy, roads, digital connectivity, and water supply — especially in island provinces.",
+            "q_s7_infra_deficits_impact",
+            "q_s7_infra_deficits_likelihood",
+            "weakness"
+          )}
+          {renderSwotPair(
+            "W6 — Fragmented Policy Frameworks",
+            "Different ministries lack coordination, causing delays and underspending in connectivity projects.",
+            "q_s7_fragmented_policy_impact",
+            "q_s7_fragmented_policy_likelihood",
+            "weakness"
+          )}
+          {renderSwotPair(
+            "W9 — Weak Market Linkages",
+            "Farmers and producers struggle to find buyers and get fair price information for exports.",
+            "q_s7_market_linkages_impact",
+            "q_s7_market_linkages_likelihood",
+            "weakness"
+          )}
+          {renderSwotPair(
+            "W10 — Low Technology Adoption",
+            "Slow uptake of modern tools for farming, processing, and online selling across the trade corridor.",
+            "q_s7_tech_adoption_impact",
+            "q_s7_tech_adoption_likelihood",
+            "weakness"
           )}
 
           {/* Opportunities */}
           {renderSwotPair(
-            "O1 — Global Halal Market",
-            "USD 2.3 trillion market with growing demand.",
-            "q7_o1_global_halal_impact",
-            "q7_o1_global_halal_likelihood",
-            "opportunity"
-          )}
-          {renderSwotPair(
             "O2 — ASEAN Halal Economy",
-            "USD 1.38 trillion addressable market; target to capture 30% share.",
-            "q7_o2_asean_halal_impact",
-            "q7_o2_asean_halal_likelihood",
+            "USD 1.38 trillion addressable market; BARMM can target a share through BIMP-EAGA corridor and halal parks.",
+            "q_s7_asean_halal_impact",
+            "q_s7_asean_halal_likelihood",
             "opportunity"
           )}
           {renderSwotPair(
             "O3 — BIMP-EAGA Regional Integration",
-            "Cross-border trade facilitation and eco-corridors.",
-            "q7_o3_bimpeaga_integration_impact",
-            "q7_o3_bimpeaga_integration_likelihood",
+            "Cross-border trade agreements and eco-corridors with Sabah can open new markets for Bangsamoro producers.",
+            "q_s7_bimpeaga_integration_impact",
+            "q_s7_bimpeaga_integration_likelihood",
             "opportunity"
           )}
           {renderSwotPair(
             "O4 — UAE/GCC Halal Export Corridor",
-            "MAFAR-Prime Group partnership opening Middle Eastern markets.",
-            "q7_o4_uae_corridor_impact",
-            "q7_o4_uae_corridor_likelihood",
+            "Partnerships like MAFAR-Prime Group connect BARMM producers directly to Middle East buyers.",
+            "q_s7_uae_corridor_impact",
+            "q_s7_uae_corridor_likelihood",
             "opportunity"
           )}
           {renderSwotPair(
             "O5 — Mindanao Central Logistics Land-Bridge",
             "SGA serves as the primary land bridge connecting Polloc Freeport to General Santos and Davao export gateways.",
-            "q7_o5_landbridge_impact",
-            "q7_o5_landbridge_likelihood",
+            "q_s7_tourism_potential_impact",
+            "q_s7_tourism_potential_likelihood",
             "opportunity"
           )}
 
           {/* Threats */}
           {renderSwotPair(
             "T1 — Competition from Halal Hubs",
-            "Malaysia, Indonesia, and Thailand holding established market share.",
-            "q7_t1_halal_competition_impact",
-            "q7_t1_halal_competition_likelihood",
+            "Malaysia, Indonesia, and Thailand already dominate the halal market with established certification and logistics.",
+            "q_s7_halal_competition_impact",
+            "q_s7_halal_competition_likelihood",
             "threat"
           )}
           {renderSwotPair(
-            "T2 — Global Economic Downturn",
-            "Perceived as a top global risk, weakening demand for BARMM's key exports like Halal and rubber.",
-            "q7_t2_economic_downturn_impact",
-            "q7_t2_economic_downturn_likelihood",
+            "T3 — Residual Security Incidents",
+            "Clan conflicts and armed groups create fear among investors and tourists along trade corridors.",
+            "q_s7_security_incidents_impact",
+            "q_s7_security_incidents_likelihood",
             "threat"
           )}
           {renderSwotPair(
-            "T3 — Market Price Volatility",
-            "Global commodity fluctuations for rubber, coconut, and seaweed.",
-            "q7_t3_price_volatility_impact",
-            "q7_t3_price_volatility_likelihood",
+            "T4 — Global Market Price Volatility",
+            "World prices for rubber, coconut, and seaweed fluctuate often, affecting producer incomes.",
+            "q_s7_price_volatility_impact",
+            "q_s7_price_volatility_likelihood",
+            "threat"
+          )}
+          {renderSwotPair(
+            "T5 — Limited National Government Coordination",
+            "Gaps in funding and alignment with national programs leave BARMM connectivity projects behind schedule.",
+            "q_s7_natl_coord_impact",
+            "q_s7_natl_coord_likelihood",
             "threat"
           )}
         </CardContent>
@@ -732,9 +782,9 @@ export const Section7_Connectors: React.FC<Section7Props> = ({ data, onChange })
                   variant="outline"
                   className={cn(
                     "justify-start h-auto py-3 text-sm text-left",
-                    data.q7_arch_success_successful_accuracy === opt ? activeBtn : inactiveBtn
+                    data.q_s7_escalation === opt ? activeBtn : inactiveBtn
                   )}
-                  onClick={() => update("q7_arch_success_successful_accuracy", opt)}
+                  onClick={() => update("q_s7_escalation", opt)}
                 >
                   {opt}
                 </Button>
@@ -742,8 +792,8 @@ export const Section7_Connectors: React.FC<Section7Props> = ({ data, onChange })
             </div>
           </div>
 
-          {(data.q7_arch_success_successful_accuracy === "Very accurately" ||
-            data.q7_arch_success_successful_accuracy === "Somewhat accurately") && (
+          {(data.q_s7_escalation === "Very accurately" ||
+            data.q_s7_escalation === "Somewhat accurately") && (
             <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20 animate-in fade-in slide-in-from-top-2 duration-200">
               <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
                 Which island province has the greatest untapped potential, and what investment would unlock it?
@@ -760,9 +810,9 @@ export const Section7_Connectors: React.FC<Section7Props> = ({ data, onChange })
                     variant="outline"
                     className={cn(
                       "justify-start h-auto py-3 text-sm text-left",
-                      data.q7_arch_success_successful_followup === opt ? activeBtn : inactiveBtn
+                      data.q_s7_escalation_followup === opt ? activeBtn : inactiveBtn
                     )}
-                    onClick={() => update("q7_arch_success_successful_followup", opt)}
+                    onClick={() => update("q_s7_escalation_followup", opt)}
                   >
                     {opt}
                   </Button>
@@ -771,40 +821,12 @@ export const Section7_Connectors: React.FC<Section7Props> = ({ data, onChange })
               <Textarea
                 placeholder="Or describe another province and investment..."
                 rows={2}
-                value={data.q7_arch_success_successful_followup || ""}
-                onChange={(e) => update("q7_arch_success_successful_followup", e.target.value)}
+                value={data.q_s7_escalation_followup || ""}
+                onChange={(e) => update("q_s7_escalation_followup", e.target.value)}
                 className="w-full rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 px-3 py-2 text-sm text-[#022c22] dark:text-[#ecfdf5] placeholder:text-[#64748b] focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/50 resize-y"
               />
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      {/* ── Cross-Cluster Assessment (universal, same 3 questions every cluster) ── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
-            Cross-Cluster Assessment
-          </CardTitle>
-          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 pt-1">
-            These three questions are asked identically in every cluster section, so your
-            answers can be compared across all of BARMM&apos;s investment priorities.
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {UNIVERSAL_QUESTIONS.map((q) => {
-            const fieldName = universalFieldName(7, q.id);
-            return (
-              <LikertScale
-                key={q.id}
-                name={fieldName}
-                label={q.label}
-                scale={q.scale}
-                value={(data as never as Record<string, number | undefined>)[fieldName]}
-                onChange={(v) => update(fieldName as never, v as never)}
-              />
-            );
-          })}
         </CardContent>
       </Card>
     </div>

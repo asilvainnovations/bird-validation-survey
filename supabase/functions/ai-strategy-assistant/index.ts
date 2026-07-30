@@ -7,44 +7,11 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
-// SECURITY FIX (2026-07-30 audit): this was `'Access-Control-Allow-Origin': '*'`
-// — a wildcard — on an UNAUTHENTICATED endpoint that forwards every request to
-// a paid OpenAI API key (OPENAI_API_KEY). Combined with no rate limiting or
-// auth check of any kind (confirmed: no getUser()/JWT check, no per-IP/per-user
-// throttle anywhere in this file), any website could embed a call to this
-// function and run up unbounded OpenAI billing on this project's account —
-// a direct financial cost-abuse / DoS vector, not just a CORS hygiene issue.
-// Restricting Access-Control-Allow-Origin stops arbitrary *browser-based*
-// cross-origin abuse, but does NOT stop direct server-to-server calls (curl,
-// bots) since CORS is a browser-enforced mechanism only. That gap is real and
-// still open — see the FOLLOW-UP note below; a full fix needs a product
-// decision (require login? per-IP token bucket? both?) beyond what a CORS
-// header change can provide, so this fix is necessary but not sufficient.
-const ALLOWED_ORIGINS = [
-  "http://localhost:5173",
-  "http://localhost:8080",
-  "https://bird-validation-survey.bolt.host",
-  "https://asilvainnovations.com",
-];
-
-function buildCorsHeaders(origin: string | null): Record<string, string> {
-  const headers: Record<string, string> = {
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-  };
-  if (origin && ALLOWED_ORIGINS.includes(origin)) {
-    headers["Access-Control-Allow-Origin"] = origin;
-  }
-  return headers;
-}
-
-// FOLLOW-UP (not fixed in this pass — needs a product decision, tracked
-// separately from this audit's scoped deliverables): add real request-level
-// rate limiting (e.g. a submitter_ip_hash + rolling-window count against a
-// dedicated table, same pattern as supabase/functions/survey-submit/index.ts)
-// and/or require an authenticated Supabase session before allowing a call,
-// since CORS restriction alone does not stop non-browser callers.
-export const corsHeaders = buildCorsHeaders(null);
+export const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
 
 // ─── SUPABASE (primary data project) ─────────────────────────────────────────
 // NOTE: This edge function is hosted on project rgvteytgkugdqdodedxq but writes
@@ -510,21 +477,7 @@ const VALID_ACTIONS = new Set([
 
 // ─── Main Handler ─────────────────────────────────────────────────────────────
 Deno.serve(async (req: Request) => {
-  // Computed once per request from the actual Origin header, rather than the
-  // module-level static corsHeaders (which is only a safe `null`-origin
-  // fallback so the module compiles/exports cleanly — see the audit note above
-  // buildCorsHeaders). Shadows the module-level jsonResponse/errorResponse for
-  // the remainder of this request so every response reflects the real caller.
-  const requestCorsHeaders = buildCorsHeaders(req.headers.get('Origin'));
-  const jsonResponse = (data: unknown, status = 200) =>
-    new Response(JSON.stringify(data), {
-      status,
-      headers: { 'Content-Type': 'application/json', ...requestCorsHeaders },
-    });
-  const errorResponse = (error: string, status = 400) =>
-    jsonResponse({ success: false, error }, status);
-
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: requestCorsHeaders });
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return errorResponse('Method not allowed. Use POST.', 405);
 
   try {
