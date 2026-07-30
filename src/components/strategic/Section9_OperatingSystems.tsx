@@ -783,7 +783,7 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
             </Label>
             <div className="grid grid-cols-1 gap-3">
               {[
-                "Bangsamoro Government (BOI-MTIT, BBOI)",
+                "Bangsamoro Government (BOI-MTIT)",
                 "Local Government Units (LGUs)",
                 "Private Sector / Investors",
                 "Development Partners / Donor Agencies",

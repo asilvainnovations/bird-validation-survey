@@ -163,7 +163,7 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
                   <td className="px-4 py-3 font-semibold text-[#022c22] dark:text-[#ecfdf5]">Interim 2</td>
                   <td className="px-4 py-3 text-[#065f46] dark:text-[#ecfdf5]/70">2030</td>
                   <td className="px-4 py-3 text-[#065f46] dark:text-[#ecfdf5]/70">Value-chain acceleration</td>
-                  <td className="px-4 py-3 text-[#065f46] dark:text-[#ecfdf5]/70">BBOI tracking, MTIT registry</td>
+                  <td className="px-4 py-3 text-[#065f46] dark:text-[#ecfdf5]/70">BOI tracking, MTIT registry</td>
                 </tr>
                 <tr className="bg-white dark:bg-[#022c22]/40 hover:bg-[#C9A84C]/5 dark:hover:bg-[#C9A84C]/10">
                   <td className="px-4 py-3 font-semibold text-[#022c22] dark:text-[#ecfdf5]">Terminal</td>
