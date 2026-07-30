@@ -3,10 +3,16 @@
 // BIRD 2026–2035 · Canonical SWOT & Systems-Archetype Content Registry
 //
 // SINGLE SOURCE OF TRUTH. Every SWOT scale item and every CLD/Archetype
-// validation question the survey asks is defined exactly ONCE, here —
-// generated directly from:
-//   • SWOT_Scale_Questions.md            (BEIE Attribution per cluster)
-//   • CLDs_Systems_Archetypes_Questions.md (Summary Table: All Systems Archetypes)
+// validation question the survey asks is defined exactly ONCE, here.
+//
+// AUTHORITATIVE SOURCE (2026-07-30): "Copy_of_SWOT_Analysis_for_Validation_
+// Survey.pdf" — the official BIRD SWOT Analysis chapter, Tables 3-1 through
+// 3-4, which includes an explicit "BEIE Attribution" column per factor. This
+// supersedes SWOT_Scale_Questions.md and CLDs_Systems_Archetypes_Questions.md
+// wherever they conflict — the PDF is more current and more complete (55
+// factors vs. 44 in the earlier markdown export). "OS: Moral Governance",
+// "OS: Peace", and "OS: Resilience" in the PDF's attribution column all map
+// to Section 9 (Operating Systems) here — that section covers all three.
 //
 // survey-schema.ts, SurveyWizard.tsx, and every SectionN_*.tsx component MUST
 // read field names from this file rather than re-typing them. This is the fix
@@ -99,10 +105,11 @@ export const SECTION6_SWOT: SwotItem[] = [
   { id: "W4", category: "W", field: "q6_w4_malnutrition", label: "Severe Child Malnutrition", factor: "45% stunting rate among children under five." },
   { id: "W5", category: "W", field: "q6_w5_skills_mismatch", label: "Skills Mismatch", factor: "TVIs not fully aligned with emerging industry needs (e.g., halal manufacturing)." },
   { id: "W6", category: "W", field: "q6_w6_tech_adoption", label: "Low Technology Adoption", factor: "Slow uptake of modern farming and processing technologies." },
-  { id: "W7", category: "W", field: "q6_w7_underspending", label: "Underspending in Budget Execution", factor: "Delays in development program rollout." },
+  { id: "W7", category: "W", field: "q6_w7_fragmented_data", label: "Fragmented Data Systems", factor: "Agencies often use incompatible databases, leading to a siloed view that causes delayed procurement and slow certification cycles." },
   { id: "O1", category: "O", field: "q6_o1_tourism_recovery", label: "Tourism Recovery", factor: "Isabela City Tourism Champion (2024) and Lake Lanao eco-tourism potential." },
   { id: "O2", category: "O", field: "q6_o2_digital_leapfrog", label: "Digital Leapfrogging (BIFOSS)", factor: "Implementing the Bangsamoro Investment Facilitation One-Stop Shop for 1-day business registration." },
   { id: "T1", category: "T", field: "q6_t1_cyber_insecurity", label: "Cyber Insecurity & AI Risks", factor: "Emerging threats from misinformation, cyberattacks, and adverse AI outcomes disrupting digital governance." },
+  { id: "T2", category: "T", field: "q6_t2_infra_cost_overruns", label: "Infrastructure Cost Overruns", factor: "Delays and budget escalations in critical infrastructure projects can discourage investors and slow the build-out of roads, power, and ports." },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -136,7 +143,9 @@ export const SECTION9_SWOT: SwotItem[] = [
   { id: "S1", category: "S", field: "q9_s1_policy_recognition", label: "Growing Policy Recognition", factor: "Institutional mandates via BOL, BIC, SIPP, and BHIDP." },
   { id: "S2", category: "S", field: "q9_s2_peace_dividend", label: "Peace Dividend Momentum", factor: "Basilan ASG-free declaration (2024) and stabilized security in select zones." },
   { id: "W1", category: "W", field: "q9_w1_fragmented_policy", label: "Fragmented Policy Frameworks", factor: "Governance coordination gaps and underspending in budget execution." },
+  { id: "W2", category: "W", field: "q9_w2_underspending", label: "Underspending in Budget Execution", factor: "Delays in development program rollout; absorptive capacity challenge. (Moved here from Enablers — official BEIE Attribution is OS: Moral Governance, not Enablers.)" },
   { id: "O1", category: "O", field: "q9_o1_postconflict", label: "Post-Conflict Reconstruction", factor: "Marawi MAA commercial redevelopment and normalization." },
+  { id: "O2", category: "O", field: "q9_o2_climate_adaptation_finance", label: "Climate Adaptation Finance", factor: "Tawi-Tawi can leverage a $10 million Adaptation Fund synergy to boost the climate resiliency of coastal communities." },
   { id: "T1", category: "T", field: "q9_t1_climate_change", label: "Climate Change Vulnerabilities", factor: "El Niño, flooding, and shifting rainfall patterns (4.2% AFF contraction in 2024)." },
   { id: "T2", category: "T", field: "q9_t2_drifting_goals", label: '"Drifting Goals" Syndrome', factor: "Political/institutional pressure leading to lowering standards rather than fixing root infrastructure problems." },
   { id: "T3", category: "T", field: "q9_t3_security_incidents", label: "Residual Security Incidents", factor: "Rido, remnant armed groups, and investor perception risks." },
@@ -180,7 +189,7 @@ export const ARCHETYPES_BY_SECTION: Record<number, ArchetypeQuestion[]> = {
   4: [
     {
       id: 3, slug: "tragedy_of_commons", name: "Tragedy of the Commons",
-      type: "swot-archetype", imageKey: "tragedyOfCommons", field: "q4_arch_tragedy_commons",
+      type: "swot-archetype", imageKey: "tragedyCommons", field: "q4_arch_tragedy_commons",
       description: "Uncoordinated exploitation of shared natural resources (agriculture, fisheries, forestry, energy, environment) leads to systemic collapse without governance intervention such as the Bangsamoro Forestry Code, carbon markets, and community co-management.",
       followupLabel: "If this archetype applies, which shared resource is most at risk of over-exploitation?",
       followupOptions: ["Watersheds", "Fishing grounds", "Forest reserves", "Agricultural land"],
@@ -198,7 +207,7 @@ export const ARCHETYPES_BY_SECTION: Record<number, ArchetypeQuestion[]> = {
   6: [
     {
       id: 5, slug: "limits_to_growth", name: "Limits to Growth",
-      type: "swot-archetype", imageKey: "limitsToGrowth", field: "q6_arch_limits_growth",
+      type: "swot-archetype", imageKey: "limitsGrowth", field: "q6_arch_limits_growth",
       description: "Rapid investment expansion eventually slows when structural ceilings — weak infrastructure, limited skills, environmental constraints — are reached, plateauing progress unless capacity-building measures are introduced.",
       followupLabel: "Which constraint most limits growth in your sector?",
       followupOptions: ["Infrastructure gaps", "Skills shortage", "Environmental constraints", "Funding limitations"],
@@ -207,7 +216,7 @@ export const ARCHETYPES_BY_SECTION: Record<number, ArchetypeQuestion[]> = {
   7: [
     {
       id: 6, slug: "success_to_the_successful", name: "Success to the Successful",
-      type: "swot-archetype", imageKey: "successToSuccessful", field: "q7_arch_success_successful",
+      type: "swot-archetype", imageKey: "successSuccessful", field: "q7_arch_success_successful",
       description: "Initial advantages reinforce uneven development between BARMM's mainland (infrastructure, administrative centrality) and island provinces (isolation, poor connectivity), widening the gap over time.",
       followupLabel: "Which island province has the greatest untapped potential, and what investment would unlock it?",
       followupOptions: ["Tawi-Tawi (seaweed, BIMP-EAGA)", "Basilan (rubber, ZBIP)", "Sulu (fisheries, tourism)"],
@@ -216,7 +225,7 @@ export const ARCHETYPES_BY_SECTION: Record<number, ArchetypeQuestion[]> = {
   8: [
     {
       id: 7, slug: "shifting_the_burden", name: "Shifting the Burden",
-      type: "swot-archetype", imageKey: "shiftingTheBurden", field: "q8_arch_shifting_burden",
+      type: "swot-archetype", imageKey: "shiftingBurden", field: "q8_arch_shifting_burden",
       description: "BARMM relies on conventional banking as a symptomatic fix for limited Shariah-compliant financing access, temporarily meeting capital needs without resolving the structural gap despite RA 11439's legal framework.",
       followupLabel: "Describe a case where a short-term capital fix either led to long-term reform or failed and the problem returned.",
       followupOptions: ["Led to long-term reform", "Failed and problem returned", "Mixed results"],
