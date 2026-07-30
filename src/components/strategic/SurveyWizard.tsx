@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { submitSurvey } from "@/lib/api";
 import { surveySchema, type SurveySchemaType } from "@/lib/survey-schema";
+import { FIELD_METADATA, type MissingField } from "@/lib/requiredFields";
 import { Toaster, toast } from "sonner";
 import { BarChart3 } from "lucide-react";
 
@@ -59,13 +60,13 @@ const SurveyWizard: React.FC = () => {
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [birdScores, setBirdScores] = useState<Record<string, number>>({});
+  const [missingRequiredFields, setMissingRequiredFields] = useState<MissingField[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const mainRef = useRef<HTMLDivElement>(null);
 
   // ── Section 0: Welcome & Orientation ──
   const [s0, setS0] = useState<Section0Data>({
     q0_1_ready: "",
-    q0_2_ecosystem_understanding: "",
     q0_3_systems_thinking_value: undefined,
     q0_4_cld_understanding: undefined,
     q0_5_feedback_loops_understanding: undefined,
@@ -73,22 +74,26 @@ const SurveyWizard: React.FC = () => {
   });
 
   // ── Section 1: Privacy & Consent ──
+  // NOTE: Section1Data uses bare field names (no q1_ prefix) — the q1_
+  // prefix is applied only at submission time, in the payload below.
   const [s1, setS1] = useState<Section1Data>({
-    q1_consent_participate: false,
-    q1_consent_anonymize: false,
-    q1_consent_email_copy: false,
-    q1_consent_voluntary: false,
+    consent_participate: false,
+    consent_anonymize: false,
+    consent_email_copy: false,
+    consent_voluntary: false,
   });
 
   // ── Section 2: Demographics ──
+  // NOTE: Section2Data uses bare field names (no q2_ prefix) — same pattern
+  // as Section 1, translated at submission time.
   const [s2, setS2] = useState<Section2Data>({
-    q2_demo_name: "",
-    q2_demo_email: "",
-    q2_demo_organization: "",
-    q2_demo_position: "",
-    q2_demo_province: "",
-    q2_demo_category: "",
-    q2_demo_expertise: [],
+    demo_name: "",
+    demo_email: "",
+    demo_organization: "",
+    demo_position: "",
+    demo_province: "",
+    demo_category: "",
+    demo_expertise: [],
     q2_network_accuracy: "",
   });
 
@@ -138,6 +143,9 @@ const SurveyWizard: React.FC = () => {
     // Threats
     q4_t1_pestalotiopsis_impact: undefined,
     q4_t1_pestalotiopsis_likelihood: undefined,
+    q4_universal_confidence: undefined,
+    q4_universal_readiness: undefined,
+    q4_universal_urgency: undefined,
   });
 
   // ── Section 5: Cluster 2 — Transformers ──
@@ -167,6 +175,9 @@ const SurveyWizard: React.FC = () => {
     // Threats
     q5_t1_standards_recognition_impact: undefined,
     q5_t1_standards_recognition_likelihood: undefined,
+    q5_universal_confidence: undefined,
+    q5_universal_readiness: undefined,
+    q5_universal_urgency: undefined,
   });
 
   // ── Section 6: Cluster 3 — Enablers ──
@@ -211,6 +222,9 @@ const SurveyWizard: React.FC = () => {
     q6_t1_cyber_insecurity_likelihood: undefined,
     q6_t2_infra_cost_overruns_impact: undefined,
     q6_t2_infra_cost_overruns_likelihood: undefined,
+    q6_universal_confidence: undefined,
+    q6_universal_readiness: undefined,
+    q6_universal_urgency: undefined,
   });
 
   // ── Section 7: Cluster 4 — Connectors ──
@@ -247,6 +261,9 @@ const SurveyWizard: React.FC = () => {
     q7_t2_economic_downturn_likelihood: undefined,
     q7_t3_price_volatility_impact: undefined,
     q7_t3_price_volatility_likelihood: undefined,
+    q7_universal_confidence: undefined,
+    q7_universal_readiness: undefined,
+    q7_universal_urgency: undefined,
   });
 
   // ── Section 8: Cluster 5 — Financiers ──
@@ -266,6 +283,9 @@ const SurveyWizard: React.FC = () => {
     // Opportunities
     q8_o1_islamic_ecosystem_impact: undefined,
     q8_o1_islamic_ecosystem_likelihood: undefined,
+    q8_universal_confidence: undefined,
+    q8_universal_readiness: undefined,
+    q8_universal_urgency: undefined,
   });
 
   // ── Section 9: Operating Systems ──
@@ -281,8 +301,6 @@ const SurveyWizard: React.FC = () => {
     q9_5_stakeholder_alignment: "",
     q9_6_reform_priority: "",
     // Archetypes
-    q9_arch_moral_governance_derisk_accuracy: undefined,
-    q9_arch_moral_governance_derisk_followup: "",
     q9_arch_fixes_fail_accuracy: "",
     q9_arch_fixes_fail_followup: "",
     q9_arch_escalation_accuracy: "",
@@ -302,13 +320,16 @@ const SurveyWizard: React.FC = () => {
     // Opportunities
     q9_o1_postconflict_impact: undefined,
     q9_o1_postconflict_likelihood: undefined,
-    q9_o2_climate_adaptation_impact: undefined,
-    q9_o2_climate_adaptation_likelihood: undefined,
+    q9_o2_climate_adaptation_finance_impact: undefined,
+    q9_o2_climate_adaptation_finance_likelihood: undefined,
     // Threats
     q9_t1_climate_change_impact: undefined,
     q9_t1_climate_change_likelihood: undefined,
     q9_t2_drifting_goals_impact: undefined,
     q9_t2_drifting_goals_likelihood: undefined,
+    q9_universal_confidence: undefined,
+    q9_universal_readiness: undefined,
+    q9_universal_urgency: undefined,
     q9_t3_security_incidents_impact: undefined,
     q9_t3_security_incidents_likelihood: undefined,
     q9_t4_political_transition_impact: undefined,
@@ -528,7 +549,7 @@ const SurveyWizard: React.FC = () => {
     if (s9.q9_w1_fragmented_policy_impact && s9.q9_w1_fragmented_policy_likelihood) scores.s9_fragmented_risk = calculateWeaknessRisk(s9.q9_w1_fragmented_policy_impact, s9.q9_w1_fragmented_policy_likelihood);
     if (s9.q9_w2_underspending_impact && s9.q9_w2_underspending_likelihood) scores.s9_underspend_risk = calculateWeaknessRisk(s9.q9_w2_underspending_impact, s9.q9_w2_underspending_likelihood);
     if (s9.q9_o1_postconflict_impact && s9.q9_o1_postconflict_likelihood) scores.s9_recon_ri = calculateOpportunityRI(s9.q9_o1_postconflict_impact, s9.q9_o1_postconflict_likelihood);
-    if (s9.q9_o2_climate_adaptation_impact && s9.q9_o2_climate_adaptation_likelihood) scores.s9_climate_adapt_ri = calculateOpportunityRI(s9.q9_o2_climate_adaptation_impact, s9.q9_o2_climate_adaptation_likelihood);
+    if (s9.q9_o2_climate_adaptation_finance_impact && s9.q9_o2_climate_adaptation_finance_likelihood) scores.s9_climate_adapt_ri = calculateOpportunityRI(s9.q9_o2_climate_adaptation_finance_impact, s9.q9_o2_climate_adaptation_finance_likelihood);
     if (s9.q9_t1_climate_change_impact && s9.q9_t1_climate_change_likelihood) scores.s9_climate_vi = calculateThreatVI(s9.q9_t1_climate_change_impact, s9.q9_t1_climate_change_likelihood);
     if (s9.q9_t2_drifting_goals_impact && s9.q9_t2_drifting_goals_likelihood) scores.s9_drifting_vi = calculateThreatVI(s9.q9_t2_drifting_goals_impact, s9.q9_t2_drifting_goals_likelihood);
     if (s9.q9_t3_security_incidents_impact && s9.q9_t3_security_incidents_likelihood) scores.s9_security_vi = calculateThreatVI(s9.q9_t3_security_incidents_impact, s9.q9_t3_security_incidents_likelihood);
@@ -559,7 +580,7 @@ const SurveyWizard: React.FC = () => {
       toast.error("Please confirm you are ready to submit.");
       return;
     }
-    if (s1.q1_consent_participate !== true) {
+    if (s1.consent_participate !== true) {
       toast.error("You must consent to participate in Section 1 before submitting.");
       setStep(1);
       return;
@@ -570,26 +591,25 @@ const SurveyWizard: React.FC = () => {
       const payload: Record<string, unknown> = {
         // ═══ Section 0 ═══
         q0_1_ready: s0.q0_1_ready || undefined,
-        q0_2_ecosystem_understanding: s0.q0_2_ecosystem_understanding || undefined,
         q0_3_systems_thinking_value: s0.q0_3_systems_thinking_value,
         q0_4_cld_understanding: s0.q0_4_cld_understanding,
         q0_5_feedback_loops_understanding: s0.q0_5_feedback_loops_understanding,
         q0_6_leverage_points_understanding: s0.q0_6_leverage_points_understanding,
 
-        // ═══ Section 1 ═══
-        q1_consent_participate: s1.q1_consent_participate,
-        q1_consent_anonymize: s1.q1_consent_anonymize,
-        q1_consent_email_copy: s1.q1_consent_email_copy,
-        q1_consent_voluntary: s1.q1_consent_voluntary,
+        // ═══ Section 1 (translated: Section1Data has no q1_ prefix internally) ═══
+        q1_consent_participate: s1.consent_participate,
+        q1_consent_anonymize: s1.consent_anonymize,
+        q1_consent_email_copy: s1.consent_email_copy,
+        q1_consent_voluntary: s1.consent_voluntary,
 
-        // ═══ Section 2 ═══
-        q2_demo_name: s2.q2_demo_name || undefined,
-        q2_demo_email: s2.q2_demo_email || undefined,
-        q2_demo_organization: s2.q2_demo_organization || undefined,
-        q2_demo_position: s2.q2_demo_position || undefined,
-        q2_demo_province: s2.q2_demo_province || undefined,
-        q2_demo_category: s2.q2_demo_category || undefined,
-        q2_demo_expertise: s2.q2_demo_expertise,
+        // ═══ Section 2 (translated: Section2Data has no q2_ prefix internally) ═══
+        q2_demo_name: s2.demo_name || undefined,
+        q2_demo_email: s2.demo_email || undefined,
+        q2_demo_organization: s2.demo_organization || undefined,
+        q2_demo_position: s2.demo_position || undefined,
+        q2_demo_province: s2.demo_province || undefined,
+        q2_demo_category: s2.demo_category || undefined,
+        q2_demo_expertise: s2.demo_expertise,
         q2_network_accuracy: s2.q2_network_accuracy || undefined,
 
         // ═══ Section 3 ═══
@@ -628,6 +648,9 @@ const SurveyWizard: React.FC = () => {
         q4_o4_forestry_code_likelihood: s4.q4_o4_forestry_code_likelihood,
         q4_t1_pestalotiopsis_impact: s4.q4_t1_pestalotiopsis_impact,
         q4_t1_pestalotiopsis_likelihood: s4.q4_t1_pestalotiopsis_likelihood,
+        q4_universal_confidence: s4.q4_universal_confidence,
+        q4_universal_readiness: s4.q4_universal_readiness,
+        q4_universal_urgency: s4.q4_universal_urgency,
 
         // ═══ Section 5 ═══
         q5_1_transformers_banner_understanding: s5.q5_1_transformers_banner_understanding,
@@ -652,6 +675,9 @@ const SurveyWizard: React.FC = () => {
         q5_w3_market_linkages_likelihood: s5.q5_w3_market_linkages_likelihood,
         q5_t1_standards_recognition_impact: s5.q5_t1_standards_recognition_impact,
         q5_t1_standards_recognition_likelihood: s5.q5_t1_standards_recognition_likelihood,
+        q5_universal_confidence: s5.q5_universal_confidence,
+        q5_universal_readiness: s5.q5_universal_readiness,
+        q5_universal_urgency: s5.q5_universal_urgency,
 
         // ═══ Section 6 ═══
         q6_1_halal_sector_rank: s6.q6_1_halal_sector_rank || undefined,
@@ -688,6 +714,9 @@ const SurveyWizard: React.FC = () => {
         q6_t1_cyber_insecurity_likelihood: s6.q6_t1_cyber_insecurity_likelihood,
         q6_t2_infra_cost_overruns_impact: s6.q6_t2_infra_cost_overruns_impact,
         q6_t2_infra_cost_overruns_likelihood: s6.q6_t2_infra_cost_overruns_likelihood,
+        q6_universal_confidence: s6.q6_universal_confidence,
+        q6_universal_readiness: s6.q6_universal_readiness,
+        q6_universal_urgency: s6.q6_universal_urgency,
 
         // ═══ Section 7 ═══
         q7_1_connectivity_priority: s7.q7_1_connectivity_priority || undefined,
@@ -719,6 +748,9 @@ const SurveyWizard: React.FC = () => {
         q7_t2_economic_downturn_likelihood: s7.q7_t2_economic_downturn_likelihood,
         q7_t3_price_volatility_impact: s7.q7_t3_price_volatility_impact,
         q7_t3_price_volatility_likelihood: s7.q7_t3_price_volatility_likelihood,
+        q7_universal_confidence: s7.q7_universal_confidence,
+        q7_universal_readiness: s7.q7_universal_readiness,
+        q7_universal_urgency: s7.q7_universal_urgency,
 
         // ═══ Section 8 ═══
         q8_1_finance_tier_priority: s8.q8_1_finance_tier_priority || undefined,
@@ -733,6 +765,9 @@ const SurveyWizard: React.FC = () => {
         q8_w1_financial_penetration_likelihood: s8.q8_w1_financial_penetration_likelihood,
         q8_o1_islamic_ecosystem_impact: s8.q8_o1_islamic_ecosystem_impact,
         q8_o1_islamic_ecosystem_likelihood: s8.q8_o1_islamic_ecosystem_likelihood,
+        q8_universal_confidence: s8.q8_universal_confidence,
+        q8_universal_readiness: s8.q8_universal_readiness,
+        q8_universal_urgency: s8.q8_universal_urgency,
 
         // ═══ Section 9 ═══
         q9_1_moral_governance_derisk: s9.q9_1_moral_governance_derisk,
@@ -741,8 +776,6 @@ const SurveyWizard: React.FC = () => {
         q9_4_revenue_channel: s9.q9_4_revenue_channel || undefined,
         q9_5_stakeholder_alignment: s9.q9_5_stakeholder_alignment || undefined,
         q9_6_reform_priority: s9.q9_6_reform_priority || undefined,
-        q9_arch_moral_governance_derisk_accuracy: s9.q9_arch_moral_governance_derisk_accuracy,
-        q9_arch_moral_governance_derisk_followup: s9.q9_arch_moral_governance_derisk_followup || undefined,
         q9_arch_fixes_fail_accuracy: s9.q9_arch_fixes_fail_accuracy || undefined,
         q9_arch_fixes_fail_followup: s9.q9_arch_fixes_fail_followup || undefined,
         q9_arch_escalation_accuracy: s9.q9_arch_escalation_accuracy || undefined,
@@ -759,12 +792,15 @@ const SurveyWizard: React.FC = () => {
         q9_w2_underspending_likelihood: s9.q9_w2_underspending_likelihood,
         q9_o1_postconflict_impact: s9.q9_o1_postconflict_impact,
         q9_o1_postconflict_likelihood: s9.q9_o1_postconflict_likelihood,
-        q9_o2_climate_adaptation_impact: s9.q9_o2_climate_adaptation_impact,
-        q9_o2_climate_adaptation_likelihood: s9.q9_o2_climate_adaptation_likelihood,
+        q9_o2_climate_adaptation_finance_impact: s9.q9_o2_climate_adaptation_finance_impact,
+        q9_o2_climate_adaptation_finance_likelihood: s9.q9_o2_climate_adaptation_finance_likelihood,
         q9_t1_climate_change_impact: s9.q9_t1_climate_change_impact,
         q9_t1_climate_change_likelihood: s9.q9_t1_climate_change_likelihood,
         q9_t2_drifting_goals_impact: s9.q9_t2_drifting_goals_impact,
         q9_t2_drifting_goals_likelihood: s9.q9_t2_drifting_goals_likelihood,
+        q9_universal_confidence: s9.q9_universal_confidence,
+        q9_universal_readiness: s9.q9_universal_readiness,
+        q9_universal_urgency: s9.q9_universal_urgency,
         q9_t3_security_incidents_impact: s9.q9_t3_security_incidents_impact,
         q9_t3_security_incidents_likelihood: s9.q9_t3_security_incidents_likelihood,
         q9_t4_political_transition_impact: s9.q9_t4_political_transition_impact,
@@ -840,6 +876,34 @@ const SurveyWizard: React.FC = () => {
         consent_final: true as const,
       };
 
+      // Enforce REQUIRED_FIELD_KEYS (src/lib/requiredFields.ts) — the single
+      // list controlling which questions currently block submission. Today
+      // this only re-confirms consent (already checked above as a fast,
+      // clearly-worded early exit); once fields are added to that list after
+      // testing, this is what actually stops submission and tells the
+      // respondent what's missing, without needing any further code changes.
+      const validation = surveySchema.safeParse(payload);
+      if (!validation.success) {
+        const missing = validation.error.issues
+          .map((issue) => String(issue.path[0]))
+          .filter((key, i, arr) => arr.indexOf(key) === i) // de-dupe
+          .map((key) => ({
+            key,
+            label: FIELD_METADATA[key]?.label ?? key,
+            step: FIELD_METADATA[key]?.step ?? 0,
+          }));
+        setMissingRequiredFields(missing);
+        toast.error(
+          missing.length === 1
+            ? `Please answer: ${missing[0].label}`
+            : `Please answer ${missing.length} required questions before submitting.`
+        );
+        setSubmitting(false);
+        setStep(15); // surface the summary on the Review & Submit step
+        return;
+      }
+      setMissingRequiredFields([]);
+
       await submitSurvey(payload);
       toast.success("Survey submitted successfully! Your input shapes the Emerging Bangsamoro.");
       localStorage.removeItem(LOCALSTORAGE_KEY);
@@ -870,7 +934,7 @@ const SurveyWizard: React.FC = () => {
       case 12: return <Section12_BalancedScorecard data={s12} onChange={setS12} />;
       case 13: return <Section13_PriorityActions data={s13} onChange={setS13} />;
       case 14: return <Section14_AccessResources data={s14} onChange={setS14} />;
-      case 15: return <Section15_Submission data={s15} onChange={setS15} />;
+      case 15: return <Section15_Submission data={s15} onChange={setS15} missingRequiredFields={missingRequiredFields} onJumpToStep={setStep} />;
       default: return null;
     }
   };

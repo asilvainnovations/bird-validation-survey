@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { MAGNITUDE_SCALE, LIKELIHOOD_SCALE } from "@/lib/scaleLabels";
 import {
   Zap,
   Wifi,
@@ -19,6 +20,8 @@ import {
   BookOpen,
 } from "lucide-react";
 import { BIRD_IMAGES } from "@/lib/bird-urls";
+import { UNIVERSAL_QUESTIONS, universalFieldName } from "@/lib/universalQuestions";
+import { LikertScale } from "@/lib/primitives/LikertScale";
 import {
   calculateStrengthRI,
   calculateWeaknessRisk,
@@ -67,6 +70,10 @@ export interface Section6Data {
   // Archetype: Limits to Growth (see swot-content.ts ARCHETYPES_BY_SECTION[6])
   q6_arch_limits_growth_accuracy: string;
   q6_arch_limits_growth_followup: string;
+  // Universal cross-cluster questions (see src/lib/universalQuestions.ts)
+  q6_universal_confidence?: number;
+  q6_universal_readiness?: number;
+  q6_universal_urgency?: number;
 }
 
 interface Section6Props {
@@ -235,48 +242,48 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <Label className="text-xs font-medium text-[#065f46] dark:text-[#ecfdf5]/70 mb-2 block">
-              Impact (1 = minimal, 5 = transformative)
+              Impact
             </Label>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-5 gap-1">
               {[1, 2, 3, 4, 5].map((v) => (
                 <Button
                   key={v}
                   type="button"
                   variant="outline"
-                  size="icon"
                   className={cn(
-                    "w-10 h-10 rounded-lg border text-sm font-semibold transition-all",
+                    "h-auto flex-col gap-0.5 py-1.5 px-1 rounded-lg border text-xs font-semibold transition-all",
                     impact === v
                       ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
                       : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
                   )}
                   onClick={() => update(impactField, v as never)}
                 >
-                  {v}
+                  <span>{v}</span>
+                  <span className="text-[8px] font-normal leading-tight text-center">{MAGNITUDE_SCALE[v - 1].label}</span>
                 </Button>
               ))}
             </div>
           </div>
           <div>
             <Label className="text-xs font-medium text-[#065f46] dark:text-[#ecfdf5]/70 mb-2 block">
-              Likelihood (1 = unlikely, 5 = almost certain)
+              Likelihood
             </Label>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-5 gap-1">
               {[1, 2, 3, 4, 5].map((v) => (
                 <Button
                   key={v}
                   type="button"
                   variant="outline"
-                  size="icon"
                   className={cn(
-                    "w-10 h-10 rounded-lg border text-sm font-semibold transition-all",
+                    "h-auto flex-col gap-0.5 py-1.5 px-1 rounded-lg border text-xs font-semibold transition-all",
                     likelihood === v
                       ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
                       : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
                   )}
                   onClick={() => update(likelihoodField, v as never)}
                 >
-                  {v}
+                  <span>{v}</span>
+                  <span className="text-[8px] font-normal leading-tight text-center">{LIKELIHOOD_SCALE[v - 1].label}</span>
                 </Button>
               ))}
             </div>
@@ -799,6 +806,34 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
               />
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* ── Cross-Cluster Assessment (universal, same 3 questions every cluster) ── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Cross-Cluster Assessment
+          </CardTitle>
+          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 pt-1">
+            These three questions are asked identically in every cluster section, so your
+            answers can be compared across all of BARMM&apos;s investment priorities.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {UNIVERSAL_QUESTIONS.map((q) => {
+            const fieldName = universalFieldName(6, q.id);
+            return (
+              <LikertScale
+                key={q.id}
+                name={fieldName}
+                label={q.label}
+                scale={q.scale}
+                value={(data as never as Record<string, number | undefined>)[fieldName]}
+                onChange={(v) => update(fieldName as never, v as never)}
+              />
+            );
+          })}
         </CardContent>
       </Card>
     </div>

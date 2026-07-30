@@ -2,7 +2,8 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Send, CheckCircle, ArrowDown, Mail, ShieldCheck, FileCheck } from "lucide-react";
+import { Send, CheckCircle, ArrowDown, Mail, ShieldCheck, FileCheck, AlertTriangle } from "lucide-react";
+import type { MissingField } from "@/lib/requiredFields";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 export interface Section15Data {
@@ -22,6 +23,12 @@ export const initialSection15Data: Section15Data = {
 interface Section15Props {
   data: Section15Data;
   onChange: (data: Section15Data) => void;
+  /** Populated by SurveyWizard after a failed submission attempt (see
+   * requiredFields.ts) — empty in normal use, and always empty in today's
+   * pilot configuration unless someone hasn't consented. */
+  missingRequiredFields?: MissingField[];
+  /** Lets the "Go to Section X" buttons below actually navigate there. */
+  onJumpToStep?: (step: number) => void;
 }
 
 const SECTIONS_LIST = [
@@ -43,13 +50,60 @@ const SECTIONS_LIST = [
 ];
 
 // ── Component ────────────────────────────────────────────────────────────────
-const Section15_Submission: React.FC<Section15Props> = ({ data, onChange }) => {
+const Section15_Submission: React.FC<Section15Props> = ({
+  data,
+  onChange,
+  missingRequiredFields = [],
+  onJumpToStep,
+}) => {
   const update = <K extends keyof Section15Data>(field: K, value: Section15Data[K]) => {
     onChange({ ...data, [field]: value });
   };
 
   return (
     <div className="space-y-8">
+      {/* ── MISSING REQUIRED ANSWERS (only shown after a blocked submit) ── */}
+      {missingRequiredFields.length > 0 && (
+        <Card className="border-2 border-red-400 dark:border-red-600 bg-red-50 dark:bg-red-900/20">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold text-red-700 dark:text-red-300 flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
+              {missingRequiredFields.length === 1
+                ? "1 Required Question Needs an Answer"
+                : `${missingRequiredFields.length} Required Questions Need Answers`}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-red-700 dark:text-red-300/90 mb-4">
+              Please answer the following before submitting:
+            </p>
+            <div className="space-y-2">
+              {missingRequiredFields.map((field) => (
+                <div
+                  key={field.key}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-red-300 dark:border-red-700 bg-white dark:bg-[#022c22]/60 px-4 py-3"
+                >
+                  <span className="text-sm text-[#022c22] dark:text-[#ecfdf5]">
+                    {field.label}
+                  </span>
+                  {onJumpToStep && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="shrink-0 border-red-400 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/40"
+                      onClick={() => onJumpToStep(field.step)}
+                    >
+                      Go to Section {field.step}
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* ── HEADER ─────────────────────────────────────────── */}
       <div className="flex items-start gap-4">
         <div className="rounded-lg bg-[#C9A84C]/10 dark:bg-[#C9A84C]/20 p-3">

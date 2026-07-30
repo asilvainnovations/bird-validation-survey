@@ -17,6 +17,8 @@ import {
   BookOpen,
 } from "lucide-react";
 import { BIRD_IMAGES } from "@/lib/bird-urls";
+import { UNIVERSAL_QUESTIONS, universalFieldName } from "@/lib/universalQuestions";
+import { LikertScale } from "@/lib/primitives/LikertScale";
 import {
   calculateStrengthRI,
   calculateWeaknessRisk,
@@ -79,6 +81,10 @@ export interface Section9Data {
   // archetype validation question of the same name — see swot-content.ts header).
   q9_t2_drifting_goals_impact?: number;
   q9_t2_drifting_goals_likelihood?: number;
+  // Universal cross-cluster questions (see src/lib/universalQuestions.ts)
+  q9_universal_confidence?: number;
+  q9_universal_readiness?: number;
+  q9_universal_urgency?: number;
 }
 
 interface Section9Props {
@@ -1007,6 +1013,34 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
             "q9_t6_fragmented_mandates_likelihood",
             "threat"
           )}
+        </CardContent>
+      </Card>
+
+      {/* ── Cross-Cluster Assessment (universal, same 3 questions every cluster) ── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Cross-Cluster Assessment
+          </CardTitle>
+          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 pt-1">
+            These three questions are asked identically in every cluster section, so your
+            answers can be compared across all of BARMM&apos;s investment priorities.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {UNIVERSAL_QUESTIONS.map((q) => {
+            const fieldName = universalFieldName(9, q.id);
+            return (
+              <LikertScale
+                key={q.id}
+                name={fieldName}
+                label={q.label}
+                scale={q.scale}
+                value={(data as never as Record<string, number | undefined>)[fieldName]}
+                onChange={(v) => update(fieldName as never, v as never)}
+              />
+            );
+          })}
         </CardContent>
       </Card>
     </div>
