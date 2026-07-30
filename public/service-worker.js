@@ -1,15 +1,24 @@
 /**
  * BIRD Validation Survey — Service Worker
  * Location: public/service-worker.js (copied as-is to build root)
- * 
+ *
  * Strategy:
- *  - App Shell: Cache-first for HTML/JS/CSS bundles (offline-capable SPA)
+ *  - HTML shell (navigation): Network-first (see fix below) — never cache-first,
+ *    since index.html points to the current build's hashed JS/CSS filenames.
+ *  - JS/CSS bundles: Cache-first (safe — Vite content-hashes these filenames,
+ *    so a changed file gets a new URL; the old cached URL is simply unused)
  *  - API Calls: Network-first with timeout fallback for Supabase/Edge Functions
  *  - Images/Assets: Stale-while-revalidate for static resources
  *  - Survey Submissions: BackgroundSync + IndexedDB queue for offline resilience
+ *
+ * CACHE_VERSION below is auto-generated on every build by
+ * scripts/generate-service-worker-version.mjs — do not hand-edit it. A stale,
+ * manually-bumped version string was previously the only thing that busted
+ * old caches, meaning a forgotten bump made an entire deploy invisible to
+ * returning visitors. See that script's header comment for the full history.
  */
 
-const CACHE_VERSION = 'bird-survey-v2';  // BUMPED — forces cache refresh
+const CACHE_VERSION = 'bird-survey-1785454321185-zvri0w';  // auto-generated at build time — do not hand-edit, see scripts/generate-service-worker-version.mjs
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 const API_CACHE = `${CACHE_VERSION}-api`;
@@ -116,9 +125,17 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 4. NAVIGATION / HTML — Cache-first with network fallback
+  // 4. NAVIGATION / HTML — Network-first with cache fallback.
+  // FIX (2026-07-31): this was cache-first, which is wrong for the HTML
+  // shell specifically. index.html is what points to the current build's
+  // hashed JS/CSS filenames — cache-first means a returning visitor's
+  // browser never even checks the network once index.html is cached, so
+  // they'd stay frozen on whatever version they first loaded no matter how
+  // many real deploys happened after that. Network-first with a short
+  // timeout gets the current build on every visit when online, while still
+  // falling back to the cached shell if the network is genuinely down.
   if (request.mode === 'navigate') {
-    event.respondWith(cacheFirst(request, STATIC_CACHE));
+    event.respondWith(networkFirst(request, STATIC_CACHE, 3000));
     return;
   }
 
