@@ -23,7 +23,7 @@
 
 ## Overview
 
-This repository contains the **standalone BIRD Validation Survey** — separated from the main [BIRD 2026–2035 platform](https://github.com/asilvainnovations/BIRD-2026-2035) so it can be deployed, iterated, and analyzed independently.
+This repository contains the **BIRD Validation Survey** — separated from the main [BIRD 2026–2035 platform](https://github.com/asilvainnovations/BIRD-2026-2035) so it can be deployed, iterated, and analyzed independently.
 
 The survey validates the Bangsamoro Economic and Investment Ecosystem (BEIE) Framework with stakeholders across government, private sector, academe, civil society, and development partners: SWOT factor ratings (Impact × Likelihood), systems-archetype/causal-loop validation, an IEDS strategy matrix, KPI and Balanced Scorecard alignment, and budget/priority-action feedback. Responses feed a live, PII-stripped analytics dashboard and the wider investment-planning pipeline on the main platform.
 
