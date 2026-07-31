@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { MAGNITUDE_SCALE, LIKELIHOOD_SCALE } from "@/lib/scaleLabels";
+import { MAGNITUDE_SCALE, LIKELIHOOD_SCALE, REALISM_SCALE, EFFECTIVENESS_SCALE, type ScaleLabelSet } from "@/lib/scaleLabels";
 import { Badge } from "@/components/ui/badge";
 import {
   Globe,
@@ -95,21 +95,23 @@ export const Section7_Connectors: React.FC<Section7Props> = ({ data, onChange })
     value: Section7Data[K]
   ) => onChange({ ...data, [field]: value });
 
-  const renderScale = (field: keyof Section7Data) => (
-    <div className="flex gap-2">
+  const renderScale = (field: keyof Section7Data, scale: ScaleLabelSet = REALISM_SCALE) => (
+    <div className="grid grid-cols-5 gap-1.5 max-w-md">
       {[1, 2, 3, 4, 5].map((v) => (
         <Button
           key={v}
           type="button"
           variant="outline"
-          size="icon"
           className={cn(
-            "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
+            "h-auto flex-col gap-1 py-2 px-1 rounded-lg border text-xs font-semibold transition-all",
             data[field] === v ? activeScale : inactiveScale
           )}
           onClick={() => update(field, v as any)}
         >
-          {v}
+          <span>{v}</span>
+          <span className="text-[9px] font-normal leading-tight text-center">
+            {scale[v - 1].label}
+          </span>
         </Button>
       ))}
     </div>
@@ -182,7 +184,7 @@ export const Section7_Connectors: React.FC<Section7Props> = ({ data, onChange })
                   className={cn(
                     "h-auto flex-col gap-0.5 py-1.5 px-1 rounded-lg border text-xs font-semibold transition-all",
                     impact === v
-                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
+                      ? "bg-[#C9A84C] text-white border-[#C9A84C]"
                       : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
                   )}
                   onClick={() => update(impactField, v as any)}
@@ -206,7 +208,7 @@ export const Section7_Connectors: React.FC<Section7Props> = ({ data, onChange })
                   className={cn(
                     "h-auto flex-col gap-0.5 py-1.5 px-1 rounded-lg border text-xs font-semibold transition-all",
                     likelihood === v
-                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
+                      ? "bg-[#C9A84C] text-white border-[#C9A84C]"
                       : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
                   )}
                   onClick={() => update(likelihoodField, v as any)}
@@ -608,7 +610,7 @@ export const Section7_Connectors: React.FC<Section7Props> = ({ data, onChange })
           <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
             How effectively is Bangsamoro leveraging the BIMP-EAGA corridor for regional trade?
           </Label>
-          {renderScale("q7_9_bimpeaga_leverage")}
+          {renderScale("q7_9_bimpeaga_leverage", EFFECTIVENESS_SCALE)}
           <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">1 = Not effectively, 5 = Very effectively</p>
         </CardContent>
       </Card>
