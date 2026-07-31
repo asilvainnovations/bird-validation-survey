@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { CLARITY_SCALE, MAGNITUDE_SCALE, LIKELIHOOD_SCALE, toLabelTuple } from "@/lib/scaleLabels";
 import {
   TreePine,
   AlertTriangle,
@@ -28,6 +29,8 @@ import {
   Droplets,
 } from "lucide-react";
 import { BIRD_IMAGES } from "@/lib/bird-urls";
+import { UNIVERSAL_QUESTIONS, universalFieldName } from "@/lib/universalQuestions";
+import { LikertScale } from "@/lib/primitives/LikertScale";
 import {
   calculateStrengthRI,
   calculateWeaknessRisk,
@@ -44,8 +47,8 @@ export interface Section4Data {
   q4_1_foundations_banner_understanding?: number;
 
   // Archetype: Tragedy of the Commons
-  q4_2_tragedy_commons_accuracy?: string;
-  q4_3_tragedy_followup?: string;
+  q4_arch_tragedy_commons_accuracy?: string;
+  q4_arch_tragedy_commons_followup?: string;
 
   // ── Strengths ──
   q4_s1_aff_base_impact?: number;
@@ -74,6 +77,10 @@ export interface Section4Data {
   // ── Threats ──
   q4_t1_pestalotiopsis_impact?: number;
   q4_t1_pestalotiopsis_likelihood?: number;
+  // Universal cross-cluster questions (see src/lib/universalQuestions.ts)
+  q4_universal_confidence?: number;
+  q4_universal_readiness?: number;
+  q4_universal_urgency?: number;
 }
 
 interface Section4Props {
@@ -88,31 +95,27 @@ interface Section4Props {
 const ScaleSelector: React.FC<{
   value?: number;
   onSelect: (v: number) => void;
-  labels?: [string, string];
-}> = ({ value, onSelect, labels = ["Low", "High"] }) => (
+  labels?: [string, string, string, string, string];
+}> = ({ value, onSelect, labels = ["Low", "Below avg.", "Moderate", "Above avg.", "High"] }) => (
   <div className="flex flex-col gap-2">
-    <div className="flex gap-2 flex-wrap">
+    <div className="grid grid-cols-5 gap-1.5 max-w-md">
       {[1, 2, 3, 4, 5].map((v) => (
         <Button
           key={v}
           type="button"
           variant="outline"
-          size="icon"
           className={cn(
-            "w-11 h-11 rounded-lg border text-sm font-semibold transition-all",
+            "h-auto flex-col gap-1 py-2 px-1 rounded-lg border text-xs font-semibold transition-all",
             value === v
               ? "bg-[#C9A84C] text-white border-[#C9A84C] shadow-md"
               : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
           )}
           onClick={() => onSelect(v)}
         >
-          {v}
+          <span>{v}</span>
+          <span className="text-[9px] font-normal leading-tight text-center">{labels[v - 1]}</span>
         </Button>
       ))}
-    </div>
-    <div className="flex justify-between text-[10px] text-[#64748b] dark:text-[#ecfdf5]/50 px-1">
-      <span>{labels[0]}</span>
-      <span>{labels[1]}</span>
     </div>
   </div>
 );
@@ -203,7 +206,7 @@ const SwotFactor: React.FC<SwotFactorProps> = ({
           <ScaleSelector
             value={impact}
             onSelect={onImpact}
-            labels={["Minimal", "Transformative"]}
+            labels={toLabelTuple(MAGNITUDE_SCALE)}
           />
         </div>
         <div>
@@ -213,7 +216,7 @@ const SwotFactor: React.FC<SwotFactorProps> = ({
           <ScaleSelector
             value={likelihood}
             onSelect={onLikelihood}
-            labels={["Very Unlikely", "Almost Certain"]}
+            labels={toLabelTuple(LIKELIHOOD_SCALE)}
           />
         </div>
       </div>
@@ -326,7 +329,7 @@ const Section4_Foundations: React.FC<Section4Props> = ({ data, onChange }) => {
             <ScaleSelector
               value={data.q4_1_foundations_banner_understanding}
               onSelect={(v) => update("q4_1_foundations_banner_understanding", v)}
-              labels={["Unclear", "Very Clear"]}
+              labels={toLabelTuple(CLARITY_SCALE)}
             />
           </div>
         </CardContent>
@@ -401,9 +404,9 @@ const Section4_Foundations: React.FC<Section4Props> = ({ data, onChange }) => {
                     size="sm"
                     className={cn(
                       "text-xs px-3 py-2 rounded-lg border transition-all",
-                      data.q4_2_tragedy_commons_accuracy === opt ? activeBtn : inactiveBtn
+                      data.q4_arch_tragedy_commons_accuracy === opt ? activeBtn : inactiveBtn
                     )}
-                    onClick={() => update("q4_2_tragedy_commons_accuracy", opt)}
+                    onClick={() => update("q4_arch_tragedy_commons_accuracy", opt)}
                   >
                     {opt}
                   </Button>
@@ -428,9 +431,9 @@ const Section4_Foundations: React.FC<Section4Props> = ({ data, onChange }) => {
                     variant="outline"
                     className={cn(
                       "justify-start h-auto py-3 text-sm text-left gap-2 transition-all",
-                      data.q4_3_tragedy_followup === label ? activeBtn : inactiveBtn
+                      data.q4_arch_tragedy_commons_followup === label ? activeBtn : inactiveBtn
                     )}
-                    onClick={() => update("q4_3_tragedy_followup", label)}
+                    onClick={() => update("q4_arch_tragedy_commons_followup", label)}
                   >
                     {icon} {label}
                   </Button>
@@ -438,12 +441,12 @@ const Section4_Foundations: React.FC<Section4Props> = ({ data, onChange }) => {
               </div>
               <Textarea
                 value={
-                  data.q4_3_tragedy_followup &&
-                  !["Watersheds", "Fishing grounds", "Forest reserves", "Agricultural land"].includes(data.q4_3_tragedy_followup)
-                    ? data.q4_3_tragedy_followup
+                  data.q4_arch_tragedy_commons_followup &&
+                  !["Watersheds", "Fishing grounds", "Forest reserves", "Agricultural land"].includes(data.q4_arch_tragedy_commons_followup)
+                    ? data.q4_arch_tragedy_commons_followup
                     : ""
                 }
-                onChange={(e) => update("q4_3_tragedy_followup", e.target.value)}
+                onChange={(e) => update("q4_arch_tragedy_commons_followup", e.target.value)}
                 placeholder="Other (please specify)..."
                 className="mt-3 min-h-[60px] text-sm border-[#C9A84C]/30 dark:border-[#C9A84C]/20 focus:border-[#C9A84C] dark:bg-[#022c22]/50 dark:text-[#ecfdf5]"
                 rows={2}
@@ -668,6 +671,34 @@ const Section4_Foundations: React.FC<Section4Props> = ({ data, onChange }) => {
           </CardContent>
         </Card>
       )}
+
+      {/* ── Cross-Cluster Assessment (universal, same 3 questions every cluster) ── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Cross-Cluster Assessment
+          </CardTitle>
+          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 pt-1">
+            These three questions are asked identically in every cluster section, so your
+            answers can be compared across all of BARMM&apos;s investment priorities.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {UNIVERSAL_QUESTIONS.map((q) => {
+            const fieldName = universalFieldName(4, q.id);
+            return (
+              <LikertScale
+                key={q.id}
+                name={fieldName}
+                label={q.label}
+                scale={q.scale}
+                value={(data as never as Record<string, number | undefined>)[fieldName]}
+                onChange={(v) => update(fieldName as never, v as never)}
+              />
+            );
+          })}
+        </CardContent>
+      </Card>
     </div>
   );
 };

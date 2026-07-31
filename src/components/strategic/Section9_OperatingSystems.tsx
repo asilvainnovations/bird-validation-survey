@@ -17,6 +17,8 @@ import {
   BookOpen,
 } from "lucide-react";
 import { BIRD_IMAGES } from "@/lib/bird-urls";
+import { UNIVERSAL_QUESTIONS, universalFieldName } from "@/lib/universalQuestions";
+import { LikertScale } from "@/lib/primitives/LikertScale";
 import {
   calculateStrengthRI,
   calculateWeaknessRisk,
@@ -27,40 +29,34 @@ import {
 // ── Types (exact runtime contract with SurveyWizard.tsx s9 state) ────────────
 export interface Section9Data {
   // SWOT — Strengths
-  q_s9_policy_recognition_impact?: number;
-  q_s9_policy_recognition_likelihood?: number;
-  q_s9_islamic_finance_impact?: number;
-  q_s9_islamic_finance_likelihood?: number;
-  q_s9_cultural_heritage_impact?: number;
-  q_s9_cultural_heritage_likelihood?: number;
-  q_s9_peace_dividend_impact?: number;
-  q_s9_peace_dividend_likelihood?: number;
+  q9_s1_policy_recognition_impact?: number;
+  q9_s1_policy_recognition_likelihood?: number;
+  q9_s2_peace_dividend_impact?: number;
+  q9_s2_peace_dividend_likelihood?: number;
 
   // SWOT — Weaknesses
-  q_s9_literacy_impact?: number;
-  q_s9_literacy_likelihood?: number;
-  q_s9_fragmented_policy_impact?: number;
-  q_s9_fragmented_policy_likelihood?: number;
-  q_s9_underspending_impact?: number;
-  q_s9_underspending_likelihood?: number;
+  q9_w1_fragmented_policy_impact?: number;
+  q9_w1_fragmented_policy_likelihood?: number;
+  q9_w2_underspending_impact?: number;
+  q9_w2_underspending_likelihood?: number;
 
   // SWOT — Opportunities
-  q_s9_carbon_markets_impact?: number;
-  q_s9_carbon_markets_likelihood?: number;
-  q_s9_pes_impact?: number;
-  q_s9_pes_likelihood?: number;
-  q_s9_postconflict_impact?: number;
-  q_s9_postconflict_likelihood?: number;
-  q_s9_forestry_code_impact?: number;
-  q_s9_forestry_code_likelihood?: number;
+  q9_o1_postconflict_impact?: number;
+  q9_o1_postconflict_likelihood?: number;
+  q9_o2_climate_adaptation_finance_impact?: number;
+  q9_o2_climate_adaptation_finance_likelihood?: number;
 
   // SWOT — Threats
-  q_s9_security_incidents_impact?: number;
-  q_s9_security_incidents_likelihood?: number;
-  q_s9_political_transition_impact?: number;
-  q_s9_political_transition_likelihood?: number;
-  q_s9_fragmented_agency_impact?: number;
-  q_s9_fragmented_agency_likelihood?: number;
+  q9_t1_climate_change_impact?: number;
+  q9_t1_climate_change_likelihood?: number;
+  q9_t3_security_incidents_impact?: number;
+  q9_t3_security_incidents_likelihood?: number;
+  q9_t4_political_transition_impact?: number;
+  q9_t4_political_transition_likelihood?: number;
+  q9_t5_natl_coordination_impact?: number;
+  q9_t5_natl_coordination_likelihood?: number;
+  q9_t6_fragmented_mandates_impact?: number;
+  q9_t6_fragmented_mandates_likelihood?: number;
 
   // Archetype / CLD fields (mapped per .md spec)
   q9_1_moral_governance_derisk?: number;
@@ -70,11 +66,25 @@ export interface Section9Data {
   q9_5_stakeholder_alignment: string;
   q9_6_reform_priority: string;
 
-  // Causal loop reflection fields (repurposed for archetype accuracy + followup)
-  q_s9_investment_loop: string;
-  q_s9_investment_loop_followup: string;
-  q_s9_governance_loop: string;
-  q_s9_governance_loop_followup: string;
+  // Archetype validations (see swot-content.ts ARCHETYPES_BY_SECTION[9]) —
+  // each is its own field now; these three used to all collide on the same
+  // two fields (q_s9_governance_loop / _followup), so answering one silently
+  // overwrote another.
+  q9_arch_fixes_fail_accuracy: string;
+  q9_arch_fixes_fail_followup: string;
+  q9_arch_escalation_accuracy: string;
+  q9_arch_escalation_followup: string;
+  q9_arch_big_man_accuracy: string;
+  q9_arch_big_man_followup: string;
+
+  // T2 — "Drifting Goals" as a scored SWOT threat (distinct from the Section 11
+  // archetype validation question of the same name — see swot-content.ts header).
+  q9_t2_drifting_goals_impact?: number;
+  q9_t2_drifting_goals_likelihood?: number;
+  // Universal cross-cluster questions (see src/lib/universalQuestions.ts)
+  q9_universal_confidence?: number;
+  q9_universal_readiness?: number;
+  q9_universal_urgency?: number;
 }
 
 interface Section9Props {
@@ -528,9 +538,9 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
                   variant="outline"
                   className={cn(
                     "justify-start h-auto py-3 text-sm text-left",
-                    data.q_s9_investment_loop === opt ? activeBtn : inactiveBtn
+                    data.q9_arch_fixes_fail_accuracy === opt ? activeBtn : inactiveBtn
                   )}
-                  onClick={() => update("q_s9_investment_loop", opt)}
+                  onClick={() => update("q9_arch_fixes_fail_accuracy", opt)}
                 >
                   {opt}
                 </Button>
@@ -538,8 +548,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
             </div>
           </div>
 
-          {(data.q_s9_investment_loop === "Very accurately" ||
-            data.q_s9_investment_loop === "Somewhat accurately") && (
+          {(data.q9_arch_fixes_fail_accuracy === "Very accurately" ||
+            data.q9_arch_fixes_fail_accuracy === "Somewhat accurately") && (
             <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20 animate-in fade-in slide-in-from-top-2 duration-200">
               <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
                 Which sectors best fit this archetype? Which have avoided this trap?
@@ -558,9 +568,9 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
                     variant="outline"
                     className={cn(
                       "justify-start h-auto py-3 text-sm text-left",
-                      data.q_s9_investment_loop_followup === opt ? activeBtn : inactiveBtn
+                      data.q9_arch_fixes_fail_followup === opt ? activeBtn : inactiveBtn
                     )}
-                    onClick={() => update("q_s9_investment_loop_followup", opt)}
+                    onClick={() => update("q9_arch_fixes_fail_followup", opt)}
                   >
                     {opt}
                   </Button>
@@ -569,8 +579,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
               <Textarea
                 placeholder="Describe which sectors fit and which have avoided the trap..."
                 rows={3}
-                value={data.q_s9_investment_loop_followup || ""}
-                onChange={(e) => update("q_s9_investment_loop_followup", e.target.value)}
+                value={data.q9_arch_fixes_fail_followup || ""}
+                onChange={(e) => update("q9_arch_fixes_fail_followup", e.target.value)}
                 className="w-full rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 px-3 py-2 text-sm text-[#022c22] dark:text-[#ecfdf5] placeholder:text-[#64748b] focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/50 resize-y"
               />
             </div>
@@ -616,9 +626,9 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
                   variant="outline"
                   className={cn(
                     "justify-start h-auto py-3 text-sm text-left",
-                    data.q_s9_governance_loop === opt ? activeBtn : inactiveBtn
+                    data.q9_arch_escalation_accuracy === opt ? activeBtn : inactiveBtn
                   )}
-                  onClick={() => update("q_s9_governance_loop", opt)}
+                  onClick={() => update("q9_arch_escalation_accuracy", opt)}
                 >
                   {opt}
                 </Button>
@@ -626,8 +636,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
             </div>
           </div>
 
-          {(data.q_s9_governance_loop === "Very accurately" ||
-            data.q_s9_governance_loop === "Somewhat accurately") && (
+          {(data.q9_arch_escalation_accuracy === "Very accurately" ||
+            data.q9_arch_escalation_accuracy === "Somewhat accurately") && (
             <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20 animate-in fade-in slide-in-from-top-2 duration-200">
               <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
                 In which domain do you see this escalation dynamic most clearly?
@@ -646,9 +656,9 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
                     variant="outline"
                     className={cn(
                       "justify-start h-auto py-3 text-sm text-left",
-                      data.q_s9_governance_loop_followup === opt ? activeBtn : inactiveBtn
+                      data.q9_arch_escalation_followup === opt ? activeBtn : inactiveBtn
                     )}
-                    onClick={() => update("q_s9_governance_loop_followup", opt)}
+                    onClick={() => update("q9_arch_escalation_followup", opt)}
                   >
                     {opt}
                   </Button>
@@ -657,8 +667,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
               <Textarea
                 placeholder="Describe where you see escalation dynamics most clearly..."
                 rows={3}
-                value={data.q_s9_governance_loop_followup || ""}
-                onChange={(e) => update("q_s9_governance_loop_followup", e.target.value)}
+                value={data.q9_arch_escalation_followup || ""}
+                onChange={(e) => update("q9_arch_escalation_followup", e.target.value)}
                 className="w-full rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 px-3 py-2 text-sm text-[#022c22] dark:text-[#ecfdf5] placeholder:text-[#64748b] focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/50 resize-y"
               />
             </div>
@@ -709,9 +719,9 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
                   variant="outline"
                   className={cn(
                     "justify-start h-auto py-3 text-sm text-left",
-                    data.q_s9_governance_loop === opt ? activeBtn : inactiveBtn
+                    data.q9_arch_big_man_accuracy === opt ? activeBtn : inactiveBtn
                   )}
-                  onClick={() => update("q_s9_governance_loop", opt)}
+                  onClick={() => update("q9_arch_big_man_accuracy", opt)}
                 >
                   {opt}
                 </Button>
@@ -719,8 +729,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
             </div>
           </div>
 
-          {(data.q_s9_governance_loop === "Very accurately" ||
-            data.q_s9_governance_loop === "Somewhat accurately") && (
+          {(data.q9_arch_big_man_accuracy === "Very accurately" ||
+            data.q9_arch_big_man_accuracy === "Somewhat accurately") && (
             <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20 animate-in fade-in slide-in-from-top-2 duration-200">
               <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
                 Which of the three reinforcing loops is most active in BARMM today?
@@ -733,9 +743,9 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
                     variant="outline"
                     className={cn(
                       "justify-start h-auto py-3 text-sm text-left",
-                      data.q_s9_governance_loop_followup === opt ? activeBtn : inactiveBtn
+                      data.q9_arch_big_man_followup === opt ? activeBtn : inactiveBtn
                     )}
-                    onClick={() => update("q_s9_governance_loop_followup", opt)}
+                    onClick={() => update("q9_arch_big_man_followup", opt)}
                   >
                     {opt}
                   </Button>
@@ -744,8 +754,8 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
               <Textarea
                 placeholder="Describe which loop is most active and provide examples..."
                 rows={3}
-                value={data.q_s9_governance_loop_followup || ""}
-                onChange={(e) => update("q_s9_governance_loop_followup", e.target.value)}
+                value={data.q9_arch_big_man_followup || ""}
+                onChange={(e) => update("q9_arch_big_man_followup", e.target.value)}
                 className="w-full rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 px-3 py-2 text-sm text-[#022c22] dark:text-[#ecfdf5] placeholder:text-[#64748b] focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/50 resize-y"
               />
             </div>
@@ -779,7 +789,7 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
             </Label>
             <div className="grid grid-cols-1 gap-3">
               {[
-                "Bangsamoro Government (BOI-MTIT, BBOI)",
+                "Bangsamoro Government (BOI-MTIT)",
                 "Local Government Units (LGUs)",
                 "Private Sector / Investors",
                 "Development Partners / Donor Agencies",
@@ -871,29 +881,15 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
           {renderSwotPair(
             "S1 — Growing Policy Recognition",
             "Institutional mandates via BOL, BIC, SIPP, and BHIDP creating stronger investment climate and governance framework.",
-            "q_s9_policy_recognition_impact",
-            "q_s9_policy_recognition_likelihood",
+            "q9_s1_policy_recognition_impact",
+            "q9_s1_policy_recognition_likelihood",
             "strength"
           )}
           {renderSwotPair(
             "S2 — Peace Dividend Momentum",
             "Basilan ASG-free declaration (2024) and stabilized security in select zones creating space for investment.",
-            "q_s9_peace_dividend_impact",
-            "q_s9_peace_dividend_likelihood",
-            "strength"
-          )}
-          {renderSwotPair(
-            "S9 — Islamic Finance Legal Framework",
-            "RA 11439 enables Shariah-compliant banking and finance, opening ethical capital pathways.",
-            "q_s9_islamic_finance_impact",
-            "q_s9_islamic_finance_likelihood",
-            "strength"
-          )}
-          {renderSwotPair(
-            "S10 — Rich Cultural Heritage",
-            "Maranao, Yakan, and Tausug cultural traditions are assets for creative industries and tourism.",
-            "q_s9_cultural_heritage_impact",
-            "q_s9_cultural_heritage_likelihood",
+            "q9_s2_peace_dividend_impact",
+            "q9_s2_peace_dividend_likelihood",
             "strength"
           )}
         </CardContent>
@@ -916,22 +912,15 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
           {renderSwotPair(
             "W1 — Fragmented Policy Frameworks",
             "Governance coordination gaps and underspending in budget execution across agencies.",
-            "q_s9_fragmented_policy_impact",
-            "q_s9_fragmented_policy_likelihood",
+            "q9_w1_fragmented_policy_impact",
+            "q9_w1_fragmented_policy_likelihood",
             "weakness"
           )}
           {renderSwotPair(
-            "W4 — Low Functional Literacy Rate",
-            "At 59.3%, BARMM has the lowest literacy rate in the country, creating severe human capital constraints.",
-            "q_s9_literacy_impact",
-            "q_s9_literacy_likelihood",
-            "weakness"
-          )}
-          {renderSwotPair(
-            "W11 — Underspending in Budget Execution",
+            "W2 — Underspending in Budget Execution",
             "Delays in development program rollout; absorptive capacity challenge limits impact.",
-            "q_s9_underspending_impact",
-            "q_s9_underspending_likelihood",
+            "q9_w2_underspending_impact",
+            "q9_w2_underspending_likelihood",
             "weakness"
           )}
         </CardContent>
@@ -954,29 +943,15 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
           {renderSwotPair(
             "O1 — Post-Conflict Reconstruction",
             "Marawi MAA commercial redevelopment and normalization creating construction and service-sector demand.",
-            "q_s9_postconflict_impact",
-            "q_s9_postconflict_likelihood",
+            "q9_o1_postconflict_impact",
+            "q9_o1_postconflict_likelihood",
             "opportunity"
           )}
           {renderSwotPair(
-            "O7 — Carbon Markets & REDD+",
-            "Monetizing forest endowments and carbon stocks through carbon credits for communities and LGUs.",
-            "q_s9_carbon_markets_impact",
-            "q_s9_carbon_markets_likelihood",
-            "opportunity"
-          )}
-          {renderSwotPair(
-            "O8 — Payment for Ecosystem Services (PES)",
-            "New revenue streams for LGUs via watershed, coastline, and mangrove conservation.",
-            "q_s9_pes_impact",
-            "q_s9_pes_likelihood",
-            "opportunity"
-          )}
-          {renderSwotPair(
-            "O10 — Bangsamoro Forestry Code",
-            "Pending legislation could open sustainable timber, NTFPs, and forest nursery investments.",
-            "q_s9_forestry_code_impact",
-            "q_s9_forestry_code_likelihood",
+            "O2 — Climate Adaptation Finance",
+            "Tawi-Tawi can leverage a $10 million Adaptation Fund synergy to boost the climate resiliency of coastal communities.",
+            "q9_o2_climate_adaptation_finance_impact",
+            "q9_o2_climate_adaptation_finance_likelihood",
             "opportunity"
           )}
         </CardContent>
@@ -999,31 +974,73 @@ export const Section9_OperatingSystems: React.FC<Section9Props> = ({
           {renderSwotPair(
             "T1 — Climate Change Vulnerabilities",
             "El Niño, flooding, and shifting rainfall patterns (4.2% AFF contraction in 2024) threatening food security.",
-            "q_s9_security_incidents_impact",
-            "q_s9_security_incidents_likelihood",
+            "q9_t1_climate_change_impact",
+            "q9_t1_climate_change_likelihood",
+            "threat"
+          )}
+          {renderSwotPair(
+            "T2 — \"Drifting Goals\" Syndrome",
+            "Political and institutional pressure may lead to lowering standards (e.g., accepting 60% electrification as \"success\") rather than fixing root infrastructure problems.",
+            "q9_t2_drifting_goals_impact",
+            "q9_t2_drifting_goals_likelihood",
             "threat"
           )}
           {renderSwotPair(
             "T3 — Residual Security Incidents",
             "Rido, remnant armed groups, and investor perception risks varying by province.",
-            "q_s9_security_incidents_impact",
-            "q_s9_security_incidents_likelihood",
+            "q9_t3_security_incidents_impact",
+            "q9_t3_security_incidents_likelihood",
             "threat"
           )}
           {renderSwotPair(
             "T4 — Political Transition Uncertainties",
             "First parliamentary elections and governance continuity risks may disrupt reform momentum.",
-            "q_s9_political_transition_impact",
-            "q_s9_political_transition_likelihood",
+            "q9_t4_political_transition_impact",
+            "q9_t4_political_transition_likelihood",
+            "threat"
+          )}
+          {renderSwotPair(
+            "T5 — Limited National Coordination",
+            "Gaps in BARMM-specific infrastructure funding from the national government.",
+            "q9_t5_natl_coordination_impact",
+            "q9_t5_natl_coordination_likelihood",
             "threat"
           )}
           {renderSwotPair(
             "T6 — Risk of Fragmented Mandates",
             "Islamic banking, halal certification, and trade agencies operating in silos without coordination.",
-            "q_s9_fragmented_agency_impact",
-            "q_s9_fragmented_agency_likelihood",
+            "q9_t6_fragmented_mandates_impact",
+            "q9_t6_fragmented_mandates_likelihood",
             "threat"
           )}
+        </CardContent>
+      </Card>
+
+      {/* ── Cross-Cluster Assessment (universal, same 3 questions every cluster) ── */}
+      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5]">
+            Cross-Cluster Assessment
+          </CardTitle>
+          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 pt-1">
+            These three questions are asked identically in every cluster section, so your
+            answers can be compared across all of BARMM&apos;s investment priorities.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {UNIVERSAL_QUESTIONS.map((q) => {
+            const fieldName = universalFieldName(9, q.id);
+            return (
+              <LikertScale
+                key={q.id}
+                name={fieldName}
+                label={q.label}
+                scale={q.scale}
+                value={(data as never as Record<string, number | undefined>)[fieldName]}
+                onChange={(v) => update(fieldName as never, v as never)}
+              />
+            );
+          })}
         </CardContent>
       </Card>
     </div>

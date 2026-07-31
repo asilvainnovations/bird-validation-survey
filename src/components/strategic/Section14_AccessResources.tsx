@@ -46,17 +46,17 @@ const RESOURCE_CHAPTERS = [
   {
     title: "Chapter 4: Strategic Options & Roadmap Strategy",
     description: "TOWS matrix, 7-criteria evaluation, and IEDS selection",
-    url: "#BIRD_RESOURCES.ch4",
+    url: "https://bird-resources.asilvainnovations.com",
   },
   {
     title: "Chapter 5: Metrics & KPI Benchmarking Framework",
     description: "4-tier calibration architecture with cross-cluster KPIs",
-    url: "#BIRD_RESOURCES.ch5",
+    url: "https://bird-resources.asilvainnovations.com",
   },
   {
     title: "Chapter 6: Balanced Scorecard",
     description: "4-perspective strategy map with causal linkages",
-    url: "#BIRD_RESOURCES.ch6",
+    url: "https://bird-resources.asilvainnovations.com",
   },
   {
     title: "Chapter 7: Priority Actions & Budget",
@@ -179,7 +179,7 @@ const Section14_AccessResources: React.FC<Section14Props> = ({
                       type="button"
                       onClick={() => {
                         if (chapter.url) {
-                          window.open(chapter.url, "_blank");
+                          window.open(chapter.url, "_blank", "noopener,noreferrer");
                         }
                       }}
                       className={cn(

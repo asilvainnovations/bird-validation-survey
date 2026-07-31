@@ -26,9 +26,9 @@ export interface Section11Data {
   q11_5_peace_kpi_importance?: number;
   q11_6_cluster_kpi_sufficient: string;
   q11_7_benchmark_priority: string;
-  // Optional: Drifting Goals archetype (add to wizard state for full persistence)
-  q_s11_drifting_goals?: string;
-  q_s11_drifting_goals_followup?: string;
+  // Archetype validation — see swot-content.ts ARCHETYPES_BY_SECTION[11].
+  q11_arch_drifting_goals_accuracy?: string;
+  q11_arch_drifting_goals_followup?: string;
 }
 
 interface Section11Props {
@@ -108,6 +108,29 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
+          <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
+            <img
+              src={BIRD_IMAGES.metricsArchitecture.url}
+              alt={BIRD_IMAGES.metricsArchitecture.alt}
+              className="w-full h-auto max-h-[500px] object-contain transition-transform group-hover:scale-[1.02]"
+              loading="lazy"
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+              <p className="text-xs italic text-white/70">
+                {BIRD_IMAGES.metricsArchitecture.title}
+              </p>
+            </div>
+          </div>
+          <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
+            A four-tier measurement framework showing how the IEDS aligns performance from global
+            to local levels: <strong>Tier 1 — Global Standards</strong> (OIC/SMIIC Halal
+            Benchmarks and international ESG standards), <strong>Tier 2 — National Alignment</strong>{" "}
+            (Philippine Development Plan 2023–2028), <strong>Tier 3 — Regional Execution</strong>{" "}
+            (BARMM strategic priorities), and <strong>Tier 4 — Local Impact</strong>{" "}
+            (socio-economic transformation at provincial and municipal levels). Success is measured
+            by alignment with global standards, so international benchmarks cascade all the way
+            down to local outcomes.
+          </p>
           <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
             The calibration framework synchronizes evaluation with the IEDS synchronization cycle,
             progressing from diagnostic anchoring through governance activation, value-chain acceleration,
@@ -140,7 +163,7 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
                   <td className="px-4 py-3 font-semibold text-[#022c22] dark:text-[#ecfdf5]">Interim 2</td>
                   <td className="px-4 py-3 text-[#065f46] dark:text-[#ecfdf5]/70">2030</td>
                   <td className="px-4 py-3 text-[#065f46] dark:text-[#ecfdf5]/70">Value-chain acceleration</td>
-                  <td className="px-4 py-3 text-[#065f46] dark:text-[#ecfdf5]/70">BBOI tracking, MTIT registry</td>
+                  <td className="px-4 py-3 text-[#065f46] dark:text-[#ecfdf5]/70">BOI tracking, MTIT registry</td>
                 </tr>
                 <tr className="bg-white dark:bg-[#022c22]/40 hover:bg-[#C9A84C]/5 dark:hover:bg-[#C9A84C]/10">
                   <td className="px-4 py-3 font-semibold text-[#022c22] dark:text-[#ecfdf5]">Terminal</td>
@@ -478,9 +501,9 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
                   variant="outline"
                   className={cn(
                     "justify-start h-auto py-3 text-sm text-left",
-                    data.q_s11_drifting_goals === opt ? activeBtnClass : inactiveBtnClass
+                    data.q11_arch_drifting_goals_accuracy === opt ? activeBtnClass : inactiveBtnClass
                   )}
-                  onClick={() => update("q_s11_drifting_goals", opt)}
+                  onClick={() => update("q11_arch_drifting_goals_accuracy", opt)}
                 >
                   {opt}
                 </Button>
@@ -488,8 +511,8 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
             </div>
           </div>
 
-          {(data.q_s11_drifting_goals === "Very accurately" ||
-            data.q_s11_drifting_goals === "Somewhat accurately") && (
+          {(data.q11_arch_drifting_goals_accuracy === "Very accurately" ||
+            data.q11_arch_drifting_goals_accuracy === "Somewhat accurately") && (
             <div className="space-y-3 pt-4 border-t border-[#C9A84C]/20 animate-in fade-in slide-in-from-top-2 duration-200">
               <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
                 Which of the balancing loops is most observable in BARMM today?
@@ -507,9 +530,9 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
                     variant="outline"
                     className={cn(
                       "justify-start h-auto py-3 text-sm text-left",
-                      data.q_s11_drifting_goals_followup === opt ? activeBtnClass : inactiveBtnClass
+                      data.q11_arch_drifting_goals_followup === opt ? activeBtnClass : inactiveBtnClass
                     )}
-                    onClick={() => update("q_s11_drifting_goals_followup", opt)}
+                    onClick={() => update("q11_arch_drifting_goals_followup", opt)}
                   >
                     {opt}
                   </Button>
@@ -518,8 +541,8 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
               <Textarea
                 placeholder="Describe your observation of drifting goals in BARMM..."
                 rows={3}
-                value={data.q_s11_drifting_goals_followup || ""}
-                onChange={(e) => update("q_s11_drifting_goals_followup", e.target.value)}
+                value={data.q11_arch_drifting_goals_followup || ""}
+                onChange={(e) => update("q11_arch_drifting_goals_followup", e.target.value)}
                 className="w-full rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 px-3 py-2 text-sm text-[#022c22] dark:text-[#ecfdf5] placeholder:text-[#64748b] focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/50 resize-y"
               />
             </div>
@@ -527,20 +550,6 @@ export const Section11_Metrics: React.FC<Section11Props> = ({ data, onChange }) 
         </CardContent>
       </Card>
 
-      {/* ── BLOCK 6: Metrics Framework Image ──────────────────────────────── */}
-      <div className="relative w-full overflow-hidden rounded-xl border border-[#C9A84C]/30 shadow-lg group">
-        <img
-          src={BIRD_IMAGES.metricsArchitecture.url}
-          alt={BIRD_IMAGES.metricsArchitecture.alt}
-          className="w-full h-auto max-h-[500px] object-contain transition-transform duration-500 group-hover:scale-[1.02]"
-          loading="lazy"
-        />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
-          <p className="text-xs italic text-white/70">
-            {BIRD_IMAGES.metricsArchitecture.description}
-          </p>
-        </div>
-      </div>
     </div>
   );
 };

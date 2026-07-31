@@ -3,11 +3,10 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { Network, BookOpen, Play, Target, TrendingUp } from "lucide-react";
 import { BIRD_IMAGES, BIRD_VIDEOS } from "@/lib/bird-urls";
-import { calculateStrengthRI } from "@/lib/formulas";
+import { UNDERSTANDING_SCALE } from "@/lib/scaleLabels";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 export interface Section3Data {
@@ -17,14 +16,10 @@ export interface Section3Data {
   q3_4_beie_framework_clarity?: number;
   q3_5_operating_systems_understanding?: number;
   q3_6_five_clusters_understanding?: number;
-  q3_7_investment_development_loop?: string;
-  q3_8_governance_investor_loop?: string;
-  q_s1_halal_legitimacy_impact?: number;
-  q_s1_halal_legitimacy_likelihood?: number;
-  q_s1_bimpeaga_impact?: number;
-  q_s1_bimpeaga_likelihood?: number;
-  q_s1_aff_base_impact?: number;
-  q_s1_aff_base_likelihood?: number;
+  q3_cld1_investment_development_accuracy?: string;
+  q3_cld1_investment_development_followup?: string;
+  q3_cld2_governance_confidence_accuracy?: string;
+  q3_cld2_governance_confidence_followup?: string;
 }
 
 interface Section3Props {
@@ -49,8 +44,6 @@ export const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({
   const inactiveBtnClass =
     "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10";
 
-  const scaleLabels = ["Not at all", "Slightly", "Moderately", "Very well", "Completely"];
-
   const renderScaleQuestion = (
     label: string,
     field: keyof Section3Data,
@@ -65,115 +58,71 @@ export const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({
           </span>
         )}
       </Label>
-      <div className="flex gap-2 flex-wrap">
+      <div className="grid grid-cols-5 gap-1.5 max-w-md">
         {[1, 2, 3, 4, 5].map((v) => (
           <Button
             key={v}
             type="button"
             variant="outline"
-            size="icon"
+            title={UNDERSTANDING_SCALE[v - 1].hint}
             className={cn(
-              "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
+              "h-auto flex-col gap-1 py-2 px-1 rounded-lg border text-xs font-semibold transition-all",
               data[field] === v
                 ? "bg-[#C9A84C] text-white border-[#C9A84C]"
                 : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
             )}
             onClick={() => update(field, v as any)}
           >
-            {v}
+            <span>{v}</span>
+            <span className="text-[9px] font-normal leading-tight text-center">
+              {UNDERSTANDING_SCALE[v - 1].label}
+            </span>
           </Button>
         ))}
-      </div>
-      <div className="flex justify-between mt-1 max-w-[272px]">
-        <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
-          {scaleLabels[0]}
-        </span>
-        <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
-          {scaleLabels[4]}
-        </span>
       </div>
     </div>
   );
 
-  const renderSwotPair = (
-    label: string,
-    impactField: keyof Section3Data,
-    likelihoodField: keyof Section3Data,
-    riLabel: string
-  ) => {
-    const impact = data[impactField] as number | undefined;
-    const likelihood = data[likelihoodField] as number | undefined;
-    const ri =
-      impact && likelihood ? calculateStrengthRI(impact, likelihood) : null;
+  const archetypeOptions = ["Very accurately", "Somewhat accurately", "Needs revision", "Not accurate"];
 
+  const renderArchetypeQuestion = (
+    label: string,
+    accuracyField: keyof Section3Data,
+    followupField: keyof Section3Data
+  ) => {
+    const accuracy = data[accuracyField] as string | undefined;
+    const agree = accuracy === "Very accurately" || accuracy === "Somewhat accurately";
     return (
       <div className="space-y-4 p-4 rounded-lg border border-[#C9A84C]/20 bg-emerald-50/40 dark:bg-[#1B4D3E]/10">
         <div className="flex items-center gap-2">
           <Target className="w-4 h-4 text-[#C9A84C]" />
-          <p className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5]">
-            {label}
-          </p>
-          {ri !== null && (
-            <Badge
-              variant="secondary"
-              className="ml-auto bg-[#C9A84C]/10 text-[#022c22] dark:text-[#ecfdf5] border border-[#C9A84C]/20"
+          <p className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5]">{label}</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {archetypeOptions.map((opt) => (
+            <Button
+              key={opt}
+              type="button"
+              variant="outline"
+              className={cn(
+                "justify-start h-auto py-3 text-sm text-left",
+                accuracy === opt ? activeBtnClass : inactiveBtnClass
+              )}
+              onClick={() => update(accuracyField, opt as never)}
             >
-              <TrendingUp className="w-3 h-3 mr-1" />
-              {riLabel}: {ri.toFixed(2)}
-            </Badge>
-          )}
+              {opt}
+            </Button>
+          ))}
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <Label className="text-xs font-medium text-[#065f46] dark:text-[#ecfdf5]/70 mb-2 block">
-              Impact (1 = minimal, 5 = transformative)
-            </Label>
-            <div className="flex gap-2">
-              {[1, 2, 3, 4, 5].map((v) => (
-                <Button
-                  key={v}
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className={cn(
-                    "w-10 h-10 rounded-lg border text-sm font-semibold transition-all",
-                    impact === v
-                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
-                  )}
-                  onClick={() => update(impactField, v as any)}
-                >
-                  {v}
-                </Button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <Label className="text-xs font-medium text-[#065f46] dark:text-[#ecfdf5]/70 mb-2 block">
-              Likelihood (1 = unlikely, 5 = almost certain)
-            </Label>
-            <div className="flex gap-2">
-              {[1, 2, 3, 4, 5].map((v) => (
-                <Button
-                  key={v}
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className={cn(
-                    "w-10 h-10 rounded-lg border text-sm font-semibold transition-all",
-                    likelihood === v
-                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
-                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
-                  )}
-                  onClick={() => update(likelihoodField, v as any)}
-                >
-                  {v}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </div>
+        {agree && (
+          <textarea
+            value={(data[followupField] as string) || ""}
+            onChange={(e) => update(followupField, e.target.value as never)}
+            placeholder="Optional: add any nuance or a specific example..."
+            rows={3}
+            className="w-full rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 px-3 py-2 text-sm text-[#022c22] dark:text-[#ecfdf5] placeholder:text-[#64748b] focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/50 resize-y"
+          />
+        )}
       </div>
     );
   };
@@ -197,8 +146,7 @@ export const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({
           </p>
         </div>
       </div>
-
-      {/* ── BEIE Framework Video ───────────────────────────────────────── */}
+      {/* ── BEIE Framework Video + Q1 (merged) ───────────────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
@@ -231,10 +179,16 @@ export const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({
           <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
             {BIRD_VIDEOS.beieFramework.description}
           </p>
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            {renderScaleQuestion(
+              "How well did the BEIE Framework video explain the ecosystem approach?",
+              "q3_1_beie_video_understanding"
+            )}
+          </div>
         </CardContent>
       </Card>
 
-      {/* ── Systems-Based Reframing ────────────────────────────────────── */}
+      {/* ── Systems-Based Reframing + Q2 (merged) ────────────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
@@ -257,12 +211,22 @@ export const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({
             </div>
           </div>
           <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
-            {BIRD_IMAGES.systemsBasedReframing.description}
+            This conveys the shift from traditional, siloed approaches to investment planning
+            toward a more integrated, systems-oriented perspective. It contrasts the limitations
+            of treating sectors as isolated entities — which leads to fragmented planning and
+            missed synergies — with the benefits of viewing agriculture, industry, infrastructure,
+            trade, and finance as interdependent parts of one ecosystem.
           </p>
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            {renderScaleQuestion(
+              "How accurately does 'systems-based reframing' describe the shift BARMM needs?",
+              "q3_2_systems_reframing_accuracy"
+            )}
+          </div>
         </CardContent>
       </Card>
 
-      {/* ── Sector to Ecosystem Shift ──────────────────────────────────── */}
+      {/* ── Sector to Ecosystem Shift + Q3 (merged) ──────────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
@@ -285,12 +249,23 @@ export const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({
             </div>
           </div>
           <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
-            {BIRD_IMAGES.sectorToEcosystem.description}
+            On the left, sector-based planning is reactive and fragmented — infrastructure
+            follows production, capital is allocated by single-sector grants, and market access
+            stays limited to raw exports. On the right, the BEIE approach integrates systems
+            thinking: infrastructure is primed first, equity extends across island provinces,
+            financing is synchronized through Shariah-compliant instruments, and market access
+            connects to the global halal and green economies.
           </p>
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            {renderScaleQuestion(
+              "How clear is the mental model shift from sector-based planning to the BEIE approach?",
+              "q3_3_sector_to_ecosystem_shift"
+            )}
+          </div>
         </CardContent>
       </Card>
 
-      {/* ── BEIE Framework Diagram ─────────────────────────────────────── */}
+      {/* ── BEIE Framework Diagram + Q4 (merged) ─────────────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
@@ -313,12 +288,26 @@ export const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({
             </div>
           </div>
           <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
-            {BIRD_IMAGES.beieFramework.description}
+            The Bangsamoro Economic and Investment Ecosystem is a circular system powered by
+            Moral Governance at its center — ethical leadership as the engine of development.
+            Around it sit five interconnected clusters: <strong>Foundations</strong> (agriculture,
+            forestry, and energy as the resource base), <strong>Transformers</strong> (industries
+            and halal manufacturing that create value), <strong>Financiers</strong> (Islamic
+            banking, waqf, sukuk, takaful, and microfinance that empower expansion),{" "}
+            <strong>Connectors</strong> (trade, tourism, and regional links like BIMP-EAGA that
+            open markets), and <strong>Enablers</strong> (infrastructure, health, and education
+            providing support systems).
           </p>
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            {renderScaleQuestion(
+              "How clear is the overall BEIE Framework diagram (5 clusters + Moral Governance OS)?",
+              "q3_4_beie_framework_clarity"
+            )}
+          </div>
         </CardContent>
       </Card>
 
-      {/* ── Operating Systems: Moral Governance ────────────────────────── */}
+      {/* ── Operating Systems: Moral Governance + Q5 (merged) ────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
@@ -341,12 +330,23 @@ export const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({
             </div>
           </div>
           <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
-            {BIRD_IMAGES.operatingSystems.description}
+            Moral Governance is the central operating system of the Bangsamoro ecosystem, ensuring
+            justice, transparency, accountability, and Islamic ethics (khalifa stewardship).
+            Surrounding it are three foundational pillars: <strong>Peace</strong> — long-term
+            stability for investment; <strong>Resilience</strong> — adaptive, climate-smart
+            planning to withstand external shocks; and <strong>Inclusivity</strong> — broadening
+            participation so marginalized communities share in value creation.
           </p>
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            {renderScaleQuestion(
+              "How well do you understand Moral Governance as the 'operating system' of the ecosystem?",
+              "q3_5_operating_systems_understanding"
+            )}
+          </div>
         </CardContent>
       </Card>
 
-      {/* ── Five Interconnected Clusters ───────────────────────────────── */}
+      {/* ── Five Interconnected Clusters + Q6 (merged) ───────────────────── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
@@ -369,12 +369,25 @@ export const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({
             </div>
           </div>
           <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
-            {BIRD_IMAGES.fiveClusters.description}
+            &quot;The Parts of the Engine&quot; shows how the Bangsamoro economy functions as an
+            interconnected system driven by Moral Governance at its core: <strong>Foundations</strong>{" "}
+            supply natural and energy resources (agriculture, fisheries, forestry);{" "}
+            <strong>Financiers</strong> supply capital through Islamic banking, waqf, and
+            microfinance; <strong>Transformers</strong> create value via industry and halal
+            manufacturing; <strong>Enablers</strong> support movement through infrastructure,
+            health, education, and connectivity; and <strong>Connectors</strong> open markets
+            through exports, trade, and tourism.
           </p>
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            {renderScaleQuestion(
+              "How well do you understand the role of each of the five interconnected clusters?",
+              "q3_6_five_clusters_understanding"
+            )}
+          </div>
         </CardContent>
       </Card>
 
-      {/* ── Investment-Development Virtuous Cycle ──────────────────────── */}
+      {/* ── Investment-Development Virtuous Cycle + CLD1 archetype (merged) ── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
@@ -397,12 +410,25 @@ export const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({
             </div>
           </div>
           <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
-            {BIRD_IMAGES.investmentVirtuousCycle.description}
+            This reinforcing loop captures how strategic investment triggers a self-sustaining
+            cycle of growth across BARMM&apos;s economy. Investments stimulate employment, leading
+            to higher income and stronger domestic market growth; as purchasing power expands,
+            the business climate improves, attracting more investment — completing a loop that
+            continuously amplifies development. Front-loading investment into halal certification
+            infrastructure and agro-processing acts as a catalytic flywheel that spins this cycle
+            faster than standard agricultural investment.
           </p>
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            {renderArchetypeQuestion(
+              "R1 — How accurately does this describe how strategic investment triggers self-sustaining growth?",
+              "q3_cld1_investment_development_accuracy",
+              "q3_cld1_investment_development_followup"
+            )}
+          </div>
         </CardContent>
       </Card>
 
-      {/* ── Investment and Governance Cycles ───────────────────────────── */}
+      {/* ── Investment and Governance Cycles + CLD2 archetype (merged) ──── */}
       <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
@@ -425,137 +451,22 @@ export const Section3_BEIE_SystemsThinking: React.FC<Section3Props> = ({
             </div>
           </div>
           <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
-            {BIRD_IMAGES.investmentGovernanceCycles.description}
+            Two interconnected reinforcing loops drive BARMM&apos;s sustained development.{" "}
+            <strong>R1 — Investment-Development Cycle:</strong> strategic investments in halal,
+            agro-industry, and tourism stimulate employment and income growth, expanding the
+            domestic market and attracting further investment. <strong>R2 — Governance-Investor
+            Confidence Cycle:</strong> moral governance and transparency expand the tax base and
+            public funding, enabling better infrastructure that boosts investor confidence and
+            further strengthens governance capacity. Operating in sync, the two loops form a
+            compound growth engine for inclusive regional prosperity.
           </p>
-        </CardContent>
-      </Card>
-
-      {/* ── Framework Understanding Checks ─────────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-[#C9A84C]" />
-            Framework Understanding & Validation
-          </CardTitle>
-          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 italic pt-1">
-            Rate your understanding of each concept after reviewing the
-            materials. (1 = not at all, 5 = completely)
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-8">
-          {renderScaleQuestion(
-            "How well did the BEIE Framework video explain the ecosystem approach?",
-            "q3_1_beie_video_understanding"
-          )}
-
-          {renderScaleQuestion(
-            "How accurately does 'systems-based reframing' describe the shift BARMM needs?",
-            "q3_2_systems_reframing_accuracy"
-          )}
-
-          {renderScaleQuestion(
-            "How clear is the mental model shift from sector-based planning to the BEIE approach?",
-            "q3_3_sector_to_ecosystem_shift"
-          )}
-
-          {renderScaleQuestion(
-            "How clear is the overall BEIE Framework diagram (5 clusters + Moral Governance OS)?",
-            "q3_4_beie_framework_clarity"
-          )}
-
-          {renderScaleQuestion(
-            "How well do you understand Moral Governance as the 'operating system' of the ecosystem?",
-            "q3_5_operating_systems_understanding"
-          )}
-
-          {renderScaleQuestion(
-            "How well do you understand the role of each of the five interconnected clusters?",
-            "q3_6_five_clusters_understanding"
-          )}
-        </CardContent>
-      </Card>
-
-      {/* ── Causal Loop Reflection ─────────────────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
-            <Target className="w-5 h-5 text-[#C9A84C]" />
-            Causal Loop Reflection
-          </CardTitle>
-          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 italic pt-1">
-            In your own words, describe the reinforcing loops that drive
-            Bangsamoro&apos;s investment ecosystem.
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-3">
-            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
-              Describe the <strong>Investment-Development Virtuous Cycle</strong>{" "}
-              (R1): How does strategic investment trigger self-sustaining growth?
-            </Label>
-            <textarea
-              value={data.q3_7_investment_development_loop || ""}
-              onChange={(e) =>
-                update("q3_7_investment_development_loop", e.target.value)
-              }
-              placeholder="e.g., Infrastructure investment → productivity gains → revenue growth → reinvestment..."
-              rows={4}
-              className="w-full rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 px-3 py-2 text-sm text-[#022c22] dark:text-[#ecfdf5] placeholder:text-[#64748b] focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/50 resize-y"
-            />
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            {renderArchetypeQuestion(
+              "R2 — How accurately does this describe how moral governance de-risks capital?",
+              "q3_cld2_governance_confidence_accuracy",
+              "q3_cld2_governance_confidence_followup"
+            )}
           </div>
-
-          <div className="space-y-3">
-            <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] block">
-              Describe the <strong>Governance-Investor Confidence Cycle</strong>{" "}
-              (R2): How does moral governance de-risk capital?
-            </Label>
-            <textarea
-              value={data.q3_8_governance_investor_loop || ""}
-              onChange={(e) =>
-                update("q3_8_governance_investor_loop", e.target.value)
-              }
-              placeholder="e.g., Transparent governance → investor trust → FDI inflows → revenue → governance capacity..."
-              rows={4}
-              className="w-full rounded-lg border border-[#C9A84C]/30 bg-white dark:bg-[#022c22]/50 px-3 py-2 text-sm text-[#022c22] dark:text-[#ecfdf5] placeholder:text-[#64748b] focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/50 resize-y"
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* ── SWOT Strengths Scoring ─────────────────────────────────────── */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-[#C9A84C]" />
-            SWOT Strengths Scoring — Transformers Cluster
-          </CardTitle>
-          <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 italic pt-1">
-            Rate each strength by <strong>Impact</strong> and{" "}
-            <strong>Likelihood</strong>. Resilience Index (RI) computes
-            automatically: RI = (Impact × Likelihood) / 5.
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {renderSwotPair(
-            "S1 — Halal Industry Legitimacy: BARMM's cultural & geographic advantage in ASEAN halal markets",
-            "q_s1_halal_legitimacy_impact",
-            "q_s1_halal_legitimacy_likelihood",
-            "RI"
-          )}
-
-          {renderSwotPair(
-            "S1 — BIMP-EAGA Integration: Cross-border trade corridors and regional economic cooperation",
-            "q_s1_bimpeaga_impact",
-            "q_s1_bimpeaga_likelihood",
-            "RI"
-          )}
-
-          {renderSwotPair(
-            "S1 — Agri-Fisheries Base: Productive land & marine resources as foundational economic assets",
-            "q_s1_aff_base_impact",
-            "q_s1_aff_base_likelihood",
-            "RI"
-          )}
         </CardContent>
       </Card>
     </div>

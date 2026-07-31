@@ -97,7 +97,7 @@ const Section1_Privacy: React.FC<Section1Props> = ({ data, onChange }) => {
                 "Individual responses are never shared publicly or with third parties",
                 "Your email is used only to send a copy of your submission",
                 "Data is stored securely on encrypted servers with access controls",
-                "You may request data deletion at any time by contacting bird@barmm.gov.ph",
+                "You may request data deletion at any time by contacting boi@bangsamoro.gov.ph",
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
                   <Check className="w-4 h-4 text-[#C9A84C] mt-0.5 flex-shrink-0" />
@@ -190,7 +190,7 @@ const Section1_Privacy: React.FC<Section1Props> = ({ data, onChange }) => {
               Privacy Policy
             </a>
             <a
-              href="https://asilvainnovations.github.io/BIRD-2026-2035/public/cookies-policy.html"
+              href="https://asilvainnovations.github.io/BIRD-2026-2035/public/cookie-policy.html"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#022c22]/5 dark:bg-[#C9A84C]/10 hover:bg-[#C9A84C]/10 dark:hover:bg-[#C9A84C]/20 border border-[#C9A84C]/20 text-[#022c22] dark:text-[#ecfdf5] text-sm px-4 py-3 rounded-lg inline-flex items-center gap-2 transition-all"
@@ -202,12 +202,12 @@ const Section1_Privacy: React.FC<Section1Props> = ({ data, onChange }) => {
           <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
             Questions about data privacy? Contact us at{" "}
             <a
-              href="mailto:bird2035@asilvainnovations.com"
+              href="mailto:boi@bangsamoro.gov.ph"
               className="text-[#C9A84C] hover:underline font-medium"
             >
-              bird2035@asilvainnovations.com
+              boi@bangsamoro.gov.ph
             </a>{" "}
-            or the BOI-MTIT BARMM office.
+            (BOI-MTIT BARMM).
           </p>
         </CardContent>
       </Card>
