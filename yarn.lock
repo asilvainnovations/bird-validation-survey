@@ -1183,6 +1183,16 @@
   dependencies:
     tslib "2.8.1"
 
+"@supabase/cli-linux-x64-musl@2.111.1-beta.2":
+  version "2.111.1-beta.2"
+  resolved "https://registry.npmjs.org/@supabase/cli-linux-x64-musl/-/cli-linux-x64-musl-2.111.1-beta.2.tgz"
+  integrity sha512-gdsEgQS3RlT8vsXiNVlc1FZJtmuoF2FdNKwOHIw0+o03ebsLtyhKfD2KYoVLaEQUsfkKQABcQ+MxoDEIyh77yA==
+
+"@supabase/cli-linux-x64@2.111.1-beta.2":
+  version "2.111.1-beta.2"
+  resolved "https://registry.npmjs.org/@supabase/cli-linux-x64/-/cli-linux-x64-2.111.1-beta.2.tgz"
+  integrity sha512-z9Edp6rwPpRwKFYXsWUYEViAFGw9j+9Tnpx6LlP3VxszXdJH2K52Yp/zQY9OvEYT7TH8CtKM2J7s1iYb1YIwdQ==
+
 "@supabase/functions-js@2.111.0":
   version "2.111.0"
   resolved "https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.111.0.tgz"
