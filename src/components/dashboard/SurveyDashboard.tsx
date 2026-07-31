@@ -21,15 +21,22 @@ interface AnalyticsData {
   iedsPreferences: Record<string, number>;
 }
 
+// Keys must exactly match the archetype field names survey-analytics/index.ts
+// actually returns (see archetypeKeys/governanceScaleKeys there, generated
+// from src/lib/swot-content.ts's ARCHETYPES_BY_SECTION) — these previously
+// referenced old, non-canonical field names that never matched anything the
+// API returned, so every card silently fell back to showing the raw key.
 const ARCHETYPE_LABELS: Record<string, string> = {
-  q_s4_tragedy_commons: "Tragedy of the Commons",
-  q_s5_growth_underinvest: "Growth & Underinvestment",
-  q_s6_limits_growth: "Limits to Growth",
-  q_s7_escalation: "Escalation",
-  q_s8_big_man: "The Big Man",
-  q_s9_investment_loop: "Investment Loop",
-  q_s9_governance_loop: "Governance Loop",
-  q_s11_drifting_goals: "Drifting Goals",
+  q4_arch_tragedy_commons: "Tragedy of the Commons",
+  q5_arch_growth_underinvest: "Growth & Underinvestment",
+  q6_arch_limits_growth: "Limits to Growth",
+  q7_arch_success_successful: "Success to the Successful",
+  q8_arch_shifting_burden: "Shifting the Burden",
+  q9_arch_moral_governance_derisk: "Moral Governance De-Risks Capital",
+  q9_arch_fixes_fail: "Fixes That Fail",
+  q9_arch_escalation: "Escalation",
+  q9_arch_big_man: "The Big Man",
+  q11_arch_drifting_goals: "Drifting Goals",
 };
 
 export const SurveyDashboard: React.FC = () => {
