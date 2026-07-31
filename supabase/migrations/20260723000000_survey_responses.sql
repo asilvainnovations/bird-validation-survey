@@ -127,9 +127,9 @@ select
   -- Extract key non-PII segmentation fields
   response_data->'demo_expertise' as demo_expertise,
   
-  -- Extract consent status (aligned with survey-schema.ts: q01_consent_participate)
-  (response_data->>'q01_consent_participate')::boolean as consented_participate,
-  (response_data->>'q01_consent_anonymize')::boolean as consented_anonymize,
+  -- Extract consent status (aligned with survey-schema.ts: q1_consent_participate)
+  (response_data->>'q1_consent_participate')::boolean as consented_participate,
+  (response_data->>'q1_consent_anonymize')::boolean as consented_anonymize,
   
   -- Extract strategic matrices for dashboard visualization
   response_data->'q10_matrix' as ieds_matrix,
@@ -142,7 +142,13 @@ select
 
 from public.survey_responses
 where consent_final = true
-  and (response_data->>'q01_consent_anonymize')::boolean is true;
+  -- BUG FIX (2026-07-31): was q01_consent_anonymize (old padded field name).
+  -- Since consent_final's own gate + api.ts store this under q1_consent_anonymize
+  -- (no leading zero), this WHERE clause was silently excluding every real
+  -- submission from the current submission flow — response_data->>'q01_...'
+  -- is always NULL for data actually keyed under q1_..., and NULL::boolean
+  -- is true evaluates to false, not NULL, so every row got filtered out.
+  and (response_data->>'q1_consent_anonymize')::boolean is true;
 
 -- 9. Grant read access to the public view for anon users (Live Dashboard)
 grant select on public.survey_response_stats to anon;
