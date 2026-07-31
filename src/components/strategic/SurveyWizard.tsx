@@ -938,7 +938,8 @@ const SurveyWizard: React.FC = () => {
       localStorage.removeItem(LOCALSTORAGE_KEY);
       setHasUnsavedChanges(false);
     } catch (err) {
-      toast.error("Submission failed. Please try again or contact support.");
+      const message = err instanceof Error ? err.message : "Submission failed. Please try again or contact support.";
+      toast.error(message);
       console.error("Survey submission error:", err);
     } finally {
       setSubmitting(false);
