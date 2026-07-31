@@ -455,10 +455,26 @@ const SurveyWizard: React.FC = () => {
   // ═══════════════════════════════════════════════════════════════════════════
   // LOCALSTORAGE PERSISTENCE (SAVE)
   // ═══════════════════════════════════════════════════════════════════════════
+  // BUG FIX (2026-07-31): useEffect always runs once immediately after the
+  // component's first mount — before any respondent has typed or clicked
+  // anything. Without the isFirstSave guard below, that first run
+  // immediately set hasUnsavedChanges to true, arming the beforeunload
+  // warning (see below) the instant the page loaded, with nothing actually
+  // unsaved yet. In a live browser this meant a real respondent who loaded
+  // the survey and immediately decided to leave got an unnecessary "are you
+  // sure?" dialog; in a dev/preview context (e.g. Bolt hot-reloading the
+  // preview after a code change) it meant *every single reload* threw up a
+  // blocking native "Leave site?" dialog that only a human click could
+  // dismiss — which is what made reloads appear to hang.
+  const isFirstSave = useRef(true);
   useEffect(() => {
     const draft = { step, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, birdScores };
     localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(draft));
-    setHasUnsavedChanges(true);
+    if (isFirstSave.current) {
+      isFirstSave.current = false;
+    } else {
+      setHasUnsavedChanges(true);
+    }
   }, [step, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, birdScores]);
 
   // ═══════════════════════════════════════════════════════════════════════════
