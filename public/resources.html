@@ -42,7 +42,12 @@
         }
         
         .logo {
-            height: 60px;
+            height: 80px;
+            width: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #667eea;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         
         .header-text h1 {
@@ -73,6 +78,7 @@
             display: flex;
             gap: 30px;
             flex-wrap: wrap;
+            justify-content: center;
         }
         
         nav a {
@@ -80,6 +86,7 @@
             text-decoration: none;
             font-weight: 600;
             transition: color 0.3s;
+            padding: 5px 10px;
         }
         
         nav a:hover {
@@ -166,6 +173,8 @@
             padding: 25px;
             border-left: 4px solid #667eea;
             transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
         }
         
         .resource-card:hover {
@@ -183,6 +192,7 @@
             color: #666;
             font-size: 14px;
             margin-bottom: 15px;
+            flex-grow: 1;
         }
         
         .btn {
@@ -194,6 +204,8 @@
             text-decoration: none;
             font-weight: 600;
             transition: transform 0.3s;
+            text-align: center;
+            margin-top: auto;
         }
         
         .btn:hover {
@@ -206,10 +218,12 @@
             padding: 20px;
             margin: 30px 0;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            width: 100%;
         }
         
         .flourish-embed {
             min-height: 600px;
+            width: 100%;
         }
         
         footer {
@@ -224,6 +238,17 @@
             color: #666;
         }
         
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        footer a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
@@ -232,6 +257,7 @@
             
             .nav-content {
                 justify-content: center;
+                gap: 15px;
             }
             
             .hero h2 {
@@ -247,7 +273,7 @@
 <body>
     <header>
         <div class="header-content">
-            <img src="https://mtit.bangsamoro.gov.ph/wp-content/uploads/2024/04/MTIT-HEADER-2024.png" alt="MTIT BARMM Logo" class="logo">
+            <img src="https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/MTIT%20Logo.png" alt="MTIT BARMM Logo" class="logo">
             <div class="header-text">
                 <h1>BIRD 2026–2035</h1>
                 <p>Resource Library</p>
@@ -257,11 +283,11 @@
     
     <nav>
         <div class="nav-content">
-            <a href="home.html">Home</a>
-            <a href="dashboard.html">Dashboard</a>
-            <a href="roadmap.html">Roadmap</a>
-            <a href="resources.html">Resources</a>
-            <a href="contact.html">Contact</a>
+            <a href="https://asilvainnovations.github.io/BIRD-2026-2035/public/index.html">Home</a>
+            <a href="https://bird-validation-survey.bolt.host/dashboard">Dashboard</a>
+            <a href="https://asilvainnovations.github.io/BIRD-2026-2035/public/roadmap.html">Roadmap</a>
+            <a href="https://bird-validation-survey.bolt.host">Validation Survey</a>
+            <a href="https://asilvainnovations.github.io/BIRD-2026-2035/public/contact.html">Contact</a>
         </div>
     </nav>
     
@@ -280,7 +306,7 @@
                     <p>Strategic Resources</p>
                 </div>
                 <div class="stat-card">
-                    <h3>4</h3>
+                    <h3>6</h3>
                     <p>Video Guides</p>
                 </div>
                 <div class="stat-card">
@@ -344,7 +370,7 @@
             <p>Interactive data visualizations showcasing the Bangsamoro Investment Roadmap's 10-year trajectory and stakeholder ecosystem networks.</p>
             
             <div class="flourish-container">
-                <h3>Bangsamoro Investment Roadmap 10-Year Data Simulation</h3>
+                <h3>10-Year Roadmap Simulation</h3>
                 <p>Dynamic bar chart race visualization showing the evolution of key economic indicators and investment priorities across BARMM provinces from 2026 to 2035.</p>
                 <div class="flourish-embed flourish-bar-chart-race" data-src="visualisation/8201382">
                     <script src="https://public.flourish.studio/resources/embed.js"></script>
@@ -372,21 +398,70 @@
             
             <div class="resource-grid">
                 <div class="resource-card">
-                    <h3>BIRD 2026–2035 Landing Page</h3>
-                    <p>Your gateway to the Bangsamoro Investment Roadmap. The official landing page for the BIRD 2026–2035 initiative, providing an overview of the decade-long strategic vision, key statistics, and quick access to all platform resources.</p>
-                    <a href="https://asilvainnovations.github.io/BIRD-2026-2035/public/index.html" class="btn">Access Landing Page</a>
+                    <h3>Home</h3>
+                    <p>Your gateway to the Bangsamoro Investment Roadmap. The official home page for the BIRD 2026–2035 initiative, providing an overview of the decade-long strategic vision, key statistics, and quick access to all platform resources.</p>
+                    <a href="https://asilvainnovations.github.io/BIRD-2026-2035/public/index.html" class="btn">Access Home</a>
                 </div>
                 
                 <div class="resource-card">
                     <h3>MEL Dashboard</h3>
                     <p>Monitoring, Evaluation & Learning. Real-time dashboard for tracking BIRD 2026–2035 implementation progress, KPI performance, investment approvals, and provincial economic indicators.</p>
-                    <a href="https://asilvainnovations.github.io/BIRD-2026-2035/public/dashboard.html" class="btn">Access Dashboard</a>
+                    <a href="https://bird-validation-survey.bolt.host/dashboard" class="btn">Access Dashboard</a>
                 </div>
                 
                 <div class="resource-card">
                     <h3>Contact & Investment Inquiries</h3>
                     <p>Connect with BOI-MTIT BARMM. Direct contact channels for investment facilitation, stakeholder engagement, and technical assistance from the Bureau of Investments – Ministry of Trade, Investments and Tourism.</p>
                     <a href="https://asilvainnovations.github.io/BIRD-2026-2035/public/contact.html" class="btn">Contact Us</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="video-library">
+            <h2>Video Resource Library</h2>
+            <p>Comprehensive video guides detailing the strategic frameworks, economic outlook, and systemic transformations driving the BIRD 2026–2035 initiative.</p>
+            
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <h3>Bangsamoro Investment Roadmap 2026‑2035 | Southeast Asia’s Hub for Ethical & Sustainable Growth</h3>
+                    <p><strong>Duration:</strong> 7 mins</p>
+                    <p>Discover how the Bangsamoro Investment Roadmap (BIRD) 2026‑2035 positions BARMM as Southeast Asia’s hub for resilient, ethical, and sustainable investments — highlighting its growth momentum, the risks ahead, and the frameworks driving transformation.</p>
+                    <a href="https://youtu.be/UCi2dVUmSbE" target="_blank" class="btn"><i class="fas fa-play-circle"></i> Watch Video</a>
+                </div>
+
+                <div class="resource-card">
+                    <h3>Regional Context and Outlook</h3>
+                    <p><strong>Duration:</strong> 6 mins</p>
+                    <p>This video offers a powerful deep dive into Bangsamoro’s evolving economic landscape, dynamic policy environment, and vibrant investment ecosystem—revealing the forces that will drive the region’s future growth and prosperity.</p>
+                    <a href="https://youtu.be/Li7lpyWWMcE" target="_blank" class="btn"><i class="fas fa-play-circle"></i> Watch Video</a>
+                </div>
+
+                <div class="resource-card">
+                    <h3>SWOT Analysis & Systems Mapping Explained</h3>
+                    <p><strong>Duration:</strong> 8 mins</p>
+                    <p>In this video, we break down the SWOT Analysis—examining Strengths, Weaknesses, Opportunities, and Threats—and use Systems Mapping to show how strategic investments can reshape the region. Through non-linear diagramming, we co-created narratives using tools like Causal Loop Diagrams and Systems Archetypes to reveal patterns of change and leverage points for transformation.</p>
+                    <a href="https://youtu.be/LSmBzwyX2uw" target="_blank" class="btn"><i class="fas fa-play-circle"></i> Watch Video</a>
+                </div>
+
+                <div class="resource-card">
+                    <h3>Strategic Options & Path to Growth</h3>
+                    <p><strong>Duration:</strong> 7 mins</p>
+                    <p>Discover the strategic choices shaping Bangsamoro’s Investment Roadmap 2026–2035. This video shows how well-crafted strategies and priorities can fuel inclusive growth, sustainability, and regional competitiveness in BARMM.</p>
+                    <a href="https://youtu.be/kb_snh8mo1k" target="_blank" class="btn"><i class="fas fa-play-circle"></i> Watch Video</a>
+                </div>
+
+                <div class="resource-card">
+                    <h3>Systems Thinking: Moving from Checklists to Interconnected Investment Ecosystem</h3>
+                    <p><strong>Duration:</strong> 4 mins</p>
+                    <p>Discover how the Bangsamoro Investment Roadmap (BIRD 2026–2035) turns fragmented efforts into a unified engine of growth. This video unpacks: Systems Thinking — shifting from checklists to interconnected strategies; Feedback Loops — cycles that amplify progress and stabilize change; Causal Loop Diagrams — visuals that expose traps and leverage points; and Leverage Strategies — small shifts sparking big gains in governance, infrastructure, and equity. From governance hurdles to resource equity, see how Bangsamoro can move beyond quick fixes toward lasting systemic solutions.</p>
+                    <a href="https://youtu.be/VBAHk0WYz_c?si=sbA9QhA4M791C1ET" target="_blank" class="btn"><i class="fas fa-play-circle"></i> Watch Video</a>
+                </div>
+
+                <div class="resource-card">
+                    <h3>Bangsamoro Economic & Investment Ecosystem (BEIE) Framework</h3>
+                    <p><strong>Duration:</strong> 3 mins</p>
+                    <p>Discover how the Bangsamoro Economic and Investment Ecosystem (BEIE) Framework is transforming BARMM into a resilient, ethical, and globally connected hub. This video explains the 2026‑2035 Investment Roadmap, highlighting how synchronized ecosystems—Foundations, Transformers, Enablers, Connectors, and Financiers—work together to drive unstoppable growth.</p>
+                    <a href="https://youtu.be/0J491Vqya_4" target="_blank" class="btn"><i class="fas fa-play-circle"></i> Watch Video</a>
                 </div>
             </div>
         </div>
@@ -400,25 +475,12 @@
                     <h3>BEIE Framework for Grade Six Pupils</h3>
                     <p>Educational resource for young learners. An age-appropriate introduction to the Bangsamoro Economic and Investment Ecosystem (BEIE) Framework, designed to educate Grade Six pupils about economic systems, investment concepts, and sustainable development in the Bangsamoro region.</p>
                     <a href="https://asilvainnovations.github.io/BIRD-2026-2035/public/student-guide.html" class="btn">Access Student Guide</a>
-                    <a href="https://youtu.be/0J491Vqya_4" class="btn">Watch BEIE Video Guide</a>
                 </div>
                 
                 <div class="resource-card">
                     <h3>Metrics Architecture for Benchmarking</h3>
                     <p>KPI framework & performance indicators. Comprehensive metrics architecture for benchmarking BIRD 2026–2035 performance, including Pareto KPIs, Balanced Scorecard indicators, and provincial economic metrics.</p>
                     <a href="https://asilvainnovations.github.io/BIRD-2026-2035/public/kpi.html" class="btn">View KPI Framework</a>
-                </div>
-                
-                <div class="resource-card">
-                    <h3>SWOT Analysis & Systems Mapping</h3>
-                    <p>Video guide on analytical methodologies. Comprehensive video tutorial on SWOT analysis integration with systems thinking, causal loop diagrams, and strategic mapping for investment planning.</p>
-                    <a href="https://youtu.be/LSmBzwyX2uw" class="btn">Watch Video Tutorial</a>
-                </div>
-                
-                <div class="resource-card">
-                    <h3>Breaking the Silos: Systems Thinking & the Bangsamoro Investment Roadmap</h3>
-                    <p>Discover how the Bangsamoro Investment Roadmap (BIRD 2026–2035) transforms fragmented, siloed development into a synchronized ecosystem of growth.</p>
-                    <a href="https://youtu.be/VBAHk0WYz_c?si=sbA9QhA4M791C1ET" class="btn">Watch Video</a>
                 </div>
             </div>
         </div>
@@ -445,12 +507,6 @@
                     <p>Priority actions for 2026. Detailed one-year action plan outlining priority programs, activities, and projects (PAPs) for 2026, with assigned lead agencies, budgets, timelines, and performance indicators.</p>
                     <a href="https://asilvainnovations.github.io/BIRD-2026-2035/public/action-plan.html" class="btn">View Action Plan</a>
                 </div>
-                
-                <div class="resource-card">
-                    <h3>Strategic Options & Roadmap Video</h3>
-                    <p>Comprehensive video guide. In-depth video exploration of the strategic pathways and implementation roadmap formulated to achieve BARMM's macroeconomic targets through 2035.</p>
-                    <a href="https://youtu.be/kb_snh8mo1k" class="btn">Watch Video Guide</a>
-                </div>
             </div>
         </div>
         
@@ -462,7 +518,7 @@
                 <div class="resource-card">
                     <h3>BIRD App</h3>
                     <p>Interactive web application. The dedicated BIRD web application for navigating the investment roadmap, exploring ecosystem data, accessing strategic pillars, and engaging with the comprehensive BIRD 2026–2035 platform.</p>
-                    <a href="#" class="btn">Launch BIRD App</a>
+                    <a href="https://bird-validation-survey.bolt.host" class="btn">Launch BIRD App</a>
                 </div>
                 
                 <div class="resource-card">
@@ -488,12 +544,6 @@
                     <h3>Validation Survey Instrument</h3>
                     <p>Stakeholder feedback platform. The official BIRD 2026–2035 Validation Survey instrument for collecting stakeholder feedback on strategic assumptions, BEIE cluster dynamics, systems archetypes, and investment priorities. Your insights directly shape the final roadmap.</p>
                     <a href="https://bird-validation-survey.bolt.host" class="btn">Take Validation Survey</a>
-                </div>
-                
-                <div class="resource-card">
-                    <h3>Overall Journey of BIRD</h3>
-                    <p>Comprehensive video overview. A comprehensive video introduction to the BIRD 2026–2035 initiative, detailing how it drives growth, ecosystem orchestration, and the decade-long strategic vision for the Bangsamoro.</p>
-                    <a href="https://youtu.be/UCi2dVUmSbE?si=2vRkydbDTvkKmKlh" class="btn">Watch Overall Journey Video</a>
                 </div>
             </div>
         </div>
@@ -522,11 +572,11 @@
         <div class="container">
             <p><strong>Platform</strong></p>
             <p>
-                <a href="https://bangsamoro-investment-roadmap.asilvainnovations.com">Home</a> | 
-                <a href="https://bird-dashboard.asilvainnovations.com">Dashboard</a> | 
-                <a href="https://bird-roadmap.asilvainnovations.com">Roadmap</a> | 
-                <a href="https://bird-resources.asilvainnovations.com">Resources</a> | 
-                <a href="https://bird-contact.asilvainnovations.com">Contact</a>
+                <a href="https://asilvainnovations.github.io/BIRD-2026-2035/public/index.html">Home</a> | 
+                <a href="https://bird-validation-survey.bolt.host/dashboard">Dashboard</a> | 
+                <a href="https://asilvainnovations.github.io/BIRD-2026-2035/public/roadmap.html">Roadmap</a> | 
+                <a href="https://bird-validation-survey.bolt.host">Validation Survey</a> | 
+                <a href="https://asilvainnovations.github.io/BIRD-2026-2035/public/contact.html">Contact</a>
             </p>
             <p style="margin-top: 20px;"><strong>Resources</strong></p>
             <p>
@@ -540,13 +590,12 @@
             <p style="margin-top: 20px;"><strong>Engagement</strong></p>
             <p>
                 <a href="https://bird-validation-survey.bolt.host/">Validation Survey</a> | 
-                <a href="https://bird-survey-orientation.asilvainnovations.com">Survey Orientation</a> | 
-                <a href="https://bird-app.bolt.host">BIRD App</a> | 
+                <a href="https://asilvainnovations.github.io/bird-validation-survey/public/survey-orientation.html">Survey Orientation</a> | 
                 <a href="https://bird-user-manual.asilvainnovations.com">User Manual</a>
             </p>
             <p style="margin-top: 20px;"><strong>Support</strong></p>
             <p>
-                <a href="contact.html">Contact Us</a> | 
+                <a href="https://asilvainnovations.github.io/BIRD-2026-2035/public/contact.html">Contact Us</a> | 
                 <a href="mailto:boi@bangsamoro.gov.ph">boi@bangsamoro.gov.ph</a> | 
                 <a href="tel:+639178343330">0917 834 3330</a>
             </p>
