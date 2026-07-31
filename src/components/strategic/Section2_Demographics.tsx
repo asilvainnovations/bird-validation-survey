@@ -13,6 +13,7 @@ import {
   MapPin,
   Building2,
   Mail,
+  Phone,
   Briefcase,
   GraduationCap,
   CheckSquare,
@@ -25,6 +26,7 @@ import { BIRD_IMAGES } from "@/lib/bird-urls";
 export interface Section2Data {
   demo_name: string;
   demo_email: string;
+  demo_contact_number: string;
   demo_organization: string;
   demo_position: string;
   demo_province: string;
@@ -165,6 +167,29 @@ const Section2_Demographics: React.FC<Section2Props> = ({
               <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
               A valid email is needed to send you a copy of your submission. It
               will never be published or shared publicly.
+            </p>
+          </div>
+
+          {/* Contact Number */}
+          <div>
+            <label className="block text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-1.5">
+              Contact Number
+            </label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748b]" />
+              <input
+                type="tel"
+                placeholder="e.g., +63 917 123 4567"
+                value={data.demo_contact_number}
+                onChange={(e) => update("demo_contact_number", e.target.value)}
+                className={cn(inputClass, "pl-10")}
+              />
+            </div>
+            <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mt-1.5 flex items-start gap-1.5">
+              <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+              Optional — for follow-up coordination on validation workshops
+              and consultations only. It will never be published or shared
+              publicly.
             </p>
           </div>
 
