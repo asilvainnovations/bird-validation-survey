@@ -18,7 +18,7 @@
  * returning visitors. See that script's header comment for the full history.
  */
 
-const CACHE_VERSION = 'bird-survey-1785481655951-16qbia';  // auto-generated at build time — do not hand-edit, see scripts/generate-service-worker-version.mjs
+const CACHE_VERSION = 'bird-survey-1785483861000-qf1cfk';  // auto-generated at build time — do not hand-edit, see scripts/generate-service-worker-version.mjs
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 const API_CACHE = `${CACHE_VERSION}-api`;

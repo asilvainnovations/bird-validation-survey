@@ -89,6 +89,7 @@ const SurveyWizard: React.FC = () => {
   const [s2, setS2] = useState<Section2Data>({
     demo_name: "",
     demo_email: "",
+    demo_contact_number: "",
     demo_organization: "",
     demo_position: "",
     demo_province: "",
@@ -633,6 +634,7 @@ const SurveyWizard: React.FC = () => {
         // ═══ Section 2 (translated: Section2Data has no q2_ prefix internally) ═══
         q2_demo_name: s2.demo_name || undefined,
         q2_demo_email: s2.demo_email || undefined,
+        q2_demo_contact_number: s2.demo_contact_number || undefined,
         q2_demo_organization: s2.demo_organization || undefined,
         q2_demo_position: s2.demo_position || undefined,
         q2_demo_province: s2.demo_province || undefined,
