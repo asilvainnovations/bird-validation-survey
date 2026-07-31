@@ -14,6 +14,7 @@ import {
 import { BIRD_IMAGES } from "@/lib/bird-urls";
 import { UNIVERSAL_QUESTIONS, universalFieldName } from "@/lib/universalQuestions";
 import { LikertScale } from "@/lib/primitives/LikertScale";
+import { REALISM_SCALE, MAGNITUDE_SCALE, LIKELIHOOD_SCALE } from "@/lib/scaleLabels";
 import {
   calculateStrengthRI,
   calculateWeaknessRisk,
@@ -74,20 +75,22 @@ export const Section8_Financiers: React.FC<Section8Props> = ({ data, onChange })
   ) => onChange({ ...data, [field]: value });
 
   const renderScale = (field: keyof Section8Data) => (
-    <div className="flex gap-2">
+    <div className="grid grid-cols-5 gap-1.5 max-w-md">
       {[1, 2, 3, 4, 5].map((v) => (
         <Button
           key={v}
           type="button"
           variant="outline"
-          size="icon"
           className={cn(
-            "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
+            "h-auto flex-col gap-1 py-2 px-1 rounded-lg border text-xs font-semibold transition-all",
             data[field] === v ? activeScale : inactiveScale
           )}
           onClick={() => update(field, v as any)}
         >
-          {v}
+          <span>{v}</span>
+          <span className="text-[9px] font-normal leading-tight text-center">
+            {REALISM_SCALE[v - 1].label}
+          </span>
         </Button>
       ))}
     </div>
@@ -151,22 +154,22 @@ export const Section8_Financiers: React.FC<Section8Props> = ({ data, onChange })
             <Label className="text-xs font-medium text-[#065f46] dark:text-[#ecfdf5]/70 mb-2 block">
               Impact (1–5)
             </Label>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-5 gap-1">
               {[1, 2, 3, 4, 5].map((v) => (
                 <Button
                   key={v}
                   type="button"
                   variant="outline"
-                  size="icon"
                   className={cn(
-                    "w-10 h-10 rounded-lg border text-sm font-semibold transition-all",
+                    "h-auto flex-col gap-0.5 py-1.5 px-1 rounded-lg border text-xs font-semibold transition-all",
                     impact === v
-                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
+                      ? "bg-[#C9A84C] text-white border-[#C9A84C]"
                       : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
                   )}
                   onClick={() => update(impactField, v as any)}
                 >
-                  {v}
+                  <span>{v}</span>
+                  <span className="text-[8px] font-normal leading-tight text-center">{MAGNITUDE_SCALE[v - 1].label}</span>
                 </Button>
               ))}
             </div>
@@ -175,22 +178,22 @@ export const Section8_Financiers: React.FC<Section8Props> = ({ data, onChange })
             <Label className="text-xs font-medium text-[#065f46] dark:text-[#ecfdf5]/70 mb-2 block">
               Likelihood (1–5)
             </Label>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-5 gap-1">
               {[1, 2, 3, 4, 5].map((v) => (
                 <Button
                   key={v}
                   type="button"
                   variant="outline"
-                  size="icon"
                   className={cn(
-                    "w-10 h-10 rounded-lg border text-sm font-semibold transition-all",
+                    "h-auto flex-col gap-0.5 py-1.5 px-1 rounded-lg border text-xs font-semibold transition-all",
                     likelihood === v
-                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
+                      ? "bg-[#C9A84C] text-white border-[#C9A84C]"
                       : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
                   )}
                   onClick={() => update(likelihoodField, v as any)}
                 >
-                  {v}
+                  <span>{v}</span>
+                  <span className="text-[8px] font-normal leading-tight text-center">{LIKELIHOOD_SCALE[v - 1].label}</span>
                 </Button>
               ))}
             </div>
