@@ -47,10 +47,10 @@ export const LikertScale: React.FC<LikertScaleProps> = ({
       {(label || description) && (
         <div className="space-y-1">
           {label && (
-            <label className="text-sm font-semibold text-[#ecfdf5]">{label}</label>
+            <label className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5]">{label}</label>
           )}
           {description && (
-            <p className="text-xs text-[#ecfdf5]/60">{description}</p>
+            <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">{description}</p>
           )}
         </div>
       )}
@@ -82,9 +82,19 @@ export const LikertScale: React.FC<LikertScaleProps> = ({
             title={points[n - 1]?.hint || undefined}
             className={cn(
               "flex flex-col items-center gap-1 py-2 px-1 rounded-lg border transition-all duration-200",
+              // BUG FIX (2026-07-31): this had zero light-mode variants —
+              // near-white text (#ecfdf5) and a dark, mostly-transparent
+              // background, both authored assuming a dark page background.
+              // In light theme this was low-to-unreadable contrast. Also
+              // standardized the selected-state color to gold (#C9A84C) to
+              // match every other scale control in the app — SWOT Impact/
+              // Likelihood buttons elsewhere used a different deep-green
+              // selected color, which made it hard to tell at a glance
+              // whether a question had been answered, since "selected"
+              // didn't mean the same color everywhere.
               value === n
-                ? "bg-[#C9A84C]/20 border-[#C9A84C] text-[#C9A84C] shadow-sm"
-                : "bg-[#022c22]/40 border-white/10 text-[#ecfdf5]/50 hover:border-[#C9A84C]/30 hover:text-[#ecfdf5]/80"
+                ? "bg-[#C9A84C]/20 border-[#C9A84C] text-[#022c22] dark:text-[#C9A84C] shadow-sm"
+                : "bg-white dark:bg-[#022c22]/40 border-[#C9A84C]/20 dark:border-white/10 text-[#022c22]/60 dark:text-[#ecfdf5]/50 hover:border-[#C9A84C]/50 hover:text-[#022c22] dark:hover:text-[#ecfdf5]/80"
             )}
           >
             <span className="text-xs font-semibold">{n}</span>
