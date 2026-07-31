@@ -1,7 +1,8 @@
 // src/components/strategic/FloatingAIAssistant.tsx
 // BIRD 2026-2035 · AI Strategy Assistant for Validation Survey
-// Wired to: https://lydsisparsmvextskevw.supabase.co/functions/v1/ai-strategy-assistant
-// Updated: 2026-07-23
+// Wired to: EDGE_FUNCTIONS.AI_STRATEGY_ASSISTANT (src/lib/supabase.ts) —
+// resolves against whichever Supabase project VITE_SUPABASE_URL points to.
+// Updated: 2026-07-31 (fixed hardcoded URL + missing auth headers)
 
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Sparkles, X, Send, Loader2, ChevronDown, ChevronUp, Brain, Target, BarChart3, Globe2, MessageCircle } from 'lucide-react';
@@ -10,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AIStrategistAvatar } from '@/components/branding/Logo';
+import { EDGE_FUNCTIONS, getEdgeFunctionHeaders } from '@/lib/supabase';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface Msg {
@@ -94,13 +96,17 @@ const FloatingAIAssistant: React.FC<FloatingAIAssistantProps> = ({
     setLoading(true);
 
     try {
-      const AI_ASSISTANT_URL = 'https://lydsisparsmvextskevw.supabase.co/functions/v1/ai-strategy-assistant';
-      
-      const response = await fetch(AI_ASSISTANT_URL, {
+      // BUG FIX (2026-07-31): this previously hardcoded a specific Supabase
+      // project URL directly, bypassing whatever project the app is actually
+      // configured for (VITE_SUPABASE_URL), and sent only Content-Type — no
+      // Authorization/apikey headers at all. Supabase's gateway rejects
+      // Edge Function requests missing those headers by default, which is
+      // why every message silently failed with "I had trouble reaching the
+      // AI service." Using the same EDGE_FUNCTIONS registry + header helper
+      // every other Edge Function call in this app already uses.
+      const response = await fetch(EDGE_FUNCTIONS.AI_STRATEGY_ASSISTANT, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getEdgeFunctionHeaders(),
         body: JSON.stringify({
           action: 'chat',
           data: {
