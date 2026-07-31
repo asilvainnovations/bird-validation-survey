@@ -94,7 +94,6 @@ const SurveyWizard: React.FC = () => {
     demo_province: "",
     demo_category: "",
     demo_expertise: [],
-    q2_network_accuracy: "",
   });
 
   // ── Section 3: BEIE & Systems Thinking ──
@@ -422,11 +421,20 @@ const SurveyWizard: React.FC = () => {
   // ═══════════════════════════════════════════════════════════════════════════
   // LOCALSTORAGE PERSISTENCE (LOAD)
   // ═══════════════════════════════════════════════════════════════════════════
+  const isRestoringDraft = useRef(false);
   useEffect(() => {
     try {
       const saved = localStorage.getItem(LOCALSTORAGE_KEY);
       if (saved) {
         const draft = JSON.parse(saved);
+        // BUG FIX (2026-07-31, part 2): flagged *before* the setters below so
+        // the SAVE effect (which fires again once these batched updates
+        // commit) can tell "this run is just reflecting an already-saved
+        // draft" apart from "the respondent just typed something new" — see
+        // the SAVE effect's comment for why this matters. Without this,
+        // simply reloading a page that already had prior progress saved was
+        // enough to re-arm the beforeunload warning, with zero new input.
+        isRestoringDraft.current = true;
         if (draft.step !== undefined) setStep(draft.step);
         if (draft.s0) setS0(draft.s0);
         if (draft.s1) setS1(draft.s1);
@@ -459,19 +467,23 @@ const SurveyWizard: React.FC = () => {
   // component's first mount — before any respondent has typed or clicked
   // anything. Without the isFirstSave guard below, that first run
   // immediately set hasUnsavedChanges to true, arming the beforeunload
-  // warning (see below) the instant the page loaded, with nothing actually
-  // unsaved yet. In a live browser this meant a real respondent who loaded
-  // the survey and immediately decided to leave got an unnecessary "are you
-  // sure?" dialog; in a dev/preview context (e.g. Bolt hot-reloading the
-  // preview after a code change) it meant *every single reload* threw up a
-  // blocking native "Leave site?" dialog that only a human click could
-  // dismiss — which is what made reloads appear to hang.
+  // warning the instant the page loaded, with nothing actually unsaved yet.
+  //
+  // Part 2: that alone wasn't enough. If a draft already existed in
+  // localStorage from earlier progress, the LOAD effect above restoring it
+  // triggers a *second* run of this effect — and that second run used to
+  // get treated as "the user changed something," re-arming the warning on
+  // every reload even with zero new input since the restore. isRestoringDraft
+  // (set by the LOAD effect above) lets this effect recognize and skip that
+  // specific run too, so the warning only arms on a genuinely new edit.
   const isFirstSave = useRef(true);
   useEffect(() => {
     const draft = { step, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, birdScores };
     localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(draft));
     if (isFirstSave.current) {
       isFirstSave.current = false;
+    } else if (isRestoringDraft.current) {
+      isRestoringDraft.current = false;
     } else {
       setHasUnsavedChanges(true);
     }
@@ -626,7 +638,6 @@ const SurveyWizard: React.FC = () => {
         q2_demo_province: s2.demo_province || undefined,
         q2_demo_category: s2.demo_category || undefined,
         q2_demo_expertise: s2.demo_expertise,
-        q2_network_accuracy: s2.q2_network_accuracy || undefined,
 
         // ═══ Section 3 ═══
         q3_1_beie_video_understanding: s3.q3_1_beie_video_understanding,
