@@ -30,7 +30,6 @@ export interface Section2Data {
   demo_province: string;
   demo_category: string;
   demo_expertise: string[];
-  q2_network_accuracy?: string;
 }
 
 interface Section2Props {
@@ -79,20 +78,13 @@ const EXPERTISE_AREAS = [
   "Education, Health & Human Capital",
 ];
 
-const NETWORK_ACCURACY_OPTIONS = [
-  "Strongly agree – the connections reflect actual relationships and influence.",
-  "Agree – mostly accurate, with minor adjustments needed.",
-  "Neutral – some connections are unclear or uncertain.",
-  "Disagree – several connections do not reflect reality.",
-  "Strongly disagree – the network misrepresents relationships.",
-];
-
 // ── Component ────────────────────────────────────────────────────────────────
 const Section2_Demographics: React.FC<Section2Props> = ({
   data,
   onChange,
 }) => {
   const [showCustomProvince, setShowCustomProvince] = useState(false);
+  const [showCustomCategory, setShowCustomCategory] = useState(false);
 
   const update = <K extends keyof Section2Data>(
     field: K,
@@ -303,34 +295,61 @@ const Section2_Demographics: React.FC<Section2Props> = ({
             This helps us segment responses and ensure all stakeholder voices are accurately represented in the consensus mapping.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => update("demo_category", cat)}
-                className={cn(
-                  "p-3.5 rounded-lg border text-sm text-left transition-all duration-200 flex items-start gap-3",
-                  data.demo_category === cat
-                    ? "bg-[#1B4D3E] text-white border-[#1B4D3E] shadow-md"
-                    : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10"
-                )}
-              >
-                <div
+            {CATEGORIES.map((cat) => {
+              const isOther = cat === "Other (please specify)";
+              const isActive = isOther ? showCustomCategory : data.demo_category === cat;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => {
+                    if (isOther) {
+                      setShowCustomCategory(true);
+                      update("demo_category", "");
+                    } else {
+                      setShowCustomCategory(false);
+                      update("demo_category", cat);
+                    }
+                  }}
                   className={cn(
-                    "w-4 h-4 rounded-full border flex-shrink-0 mt-0.5 transition-all",
-                    data.demo_category === cat
-                      ? "bg-[#C9A84C] border-[#C9A84C]"
-                      : "border-[#C9A84C]/50 bg-white dark:bg-[#022c22]"
+                    "p-3.5 rounded-lg border text-sm text-left transition-all duration-200 flex items-start gap-3",
+                    isActive
+                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E] shadow-md"
+                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10"
                   )}
                 >
-                  {data.demo_category === cat && (
-                    <div className="w-2 h-2 bg-[#022c22] rounded-full mx-auto mt-0.5" />
-                  )}
-                </div>
-                <span className="leading-tight">{cat}</span>
-              </button>
-            ))}
+                  <div
+                    className={cn(
+                      "w-4 h-4 rounded-full border flex-shrink-0 mt-0.5 transition-all",
+                      isActive
+                        ? "bg-[#C9A84C] border-[#C9A84C]"
+                        : "border-[#C9A84C]/50 bg-white dark:bg-[#022c22]"
+                    )}
+                  >
+                    {isActive && (
+                      <div className="w-2 h-2 bg-[#022c22] rounded-full mx-auto mt-0.5" />
+                    )}
+                  </div>
+                  <span className="leading-tight">{cat}</span>
+                </button>
+              );
+            })}
           </div>
+
+          {showCustomCategory && (
+            <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-200">
+              <label className="block text-sm font-medium text-[#022c22] dark:text-[#ecfdf5] mb-1.5">
+                Please specify your category:
+              </label>
+              <input
+                type="text"
+                placeholder="e.g., Media / Journalist, Religious Institution, Diaspora Representative"
+                value={data.demo_category}
+                onChange={(e) => update("demo_category", e.target.value)}
+                className={inputClass}
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -391,83 +410,6 @@ const Section2_Demographics: React.FC<Section2Props> = ({
                 </button>
               );
             })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* BARMM Value Network Visualization Card */}
-      <Card className="border-[#C9A84C]/20 bg-white/95 dark:bg-[#022c22]/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-[#022c22] dark:text-[#ecfdf5] flex items-center gap-2">
-            <Info className="w-5 h-5 text-[#C9A84C]" />
-            BARMM Value Network Validation
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-3">
-            <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
-              Below is an interactive visualization of the BARMM Value Network showing connections between key actors, institutions, and stakeholders in the investment ecosystem. Please review the network and provide your feedback on its accuracy.
-            </p>
-          </div>
-
-          {/* Flourish Network Visualization - Wide and Full View */}
-          <div className="w-full overflow-hidden rounded-lg border border-[#C9A84C]/20 bg-white dark:bg-[#022c22]/30">
-            <div 
-              className="flourish-embed flourish-network" 
-              data-src="visualisation/10095720"
-              style={{ width: "100%", minHeight: "600px" }}
-            >
-              <script src="https://public.flourish.studio/resources/embed.js"></script>
-              <noscript>
-                <img 
-                  src="https://public.flourish.studio/visualisation/10095720/thumbnail" 
-                  alt="BARMM Value Network visualization" 
-                  style={{ width: "100%", height: "auto" }}
-                />
-              </noscript>
-            </div>
-          </div>
-
-          {/* Network Accuracy Question */}
-          <div className="space-y-4 pt-4 border-t border-[#C9A84C]/20">
-            <label className="block text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5]">
-              Which of the following best describes the accuracy of the actor connections shown in the BARMM Value Network?
-              <span className="text-red-500 ml-1">*</span>
-            </label>
-            <div className="space-y-3">
-              {NETWORK_ACCURACY_OPTIONS.map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  onClick={() => update("q2_network_accuracy", option)}
-                  className={cn(
-                    "w-full p-4 rounded-lg border text-sm text-left transition-all duration-200",
-                    data.q2_network_accuracy === option
-                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E] shadow-md"
-                      : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C] hover:bg-[#ecfdf5]/30 dark:hover:bg-[#C9A84C]/10"
-                  )}
-                >
-                  <div className="flex items-start gap-3">
-                    <div
-                      className={cn(
-                        "w-4 h-4 rounded-full border flex-shrink-0 mt-0.5 transition-all",
-                        data.q2_network_accuracy === option
-                          ? "bg-[#C9A84C] border-[#C9A84C]"
-                          : "border-[#C9A84C]/50 bg-white dark:bg-[#022c22]"
-                      )}
-                    >
-                      {data.q2_network_accuracy === option && (
-                        <div className="w-2 h-2 bg-[#022c22] rounded-full mx-auto mt-0.5" />
-                      )}
-                    </div>
-                    <span className="leading-tight">{option}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 italic">
-              This feedback helps us validate and refine our stakeholder mapping to ensure the BIRD roadmap accurately reflects the real-world relationships and influence networks in BARMM.
-            </p>
           </div>
         </CardContent>
       </Card>
