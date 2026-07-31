@@ -170,6 +170,11 @@
   resolved "https://registry.npmjs.org/@date-fns/tz/-/tz-1.5.0.tgz"
   integrity sha512-lwYN/vDPeNRULcepoE/LO2Pgx+7/RV+S9ARfbc9lr2DtGkOD7pAiruHvbR1RX3Qyf6ja47EWJDMsNK5vK08DJg==
 
+"@ecies/ciphers@^0.2.6":
+  version "0.2.6"
+  resolved "https://registry.npmjs.org/@ecies/ciphers/-/ciphers-0.2.6.tgz"
+  integrity sha512-patgsRPKGkhhoBjETV4XxD0En4ui5fbX0hzayqI3M8tvNMGUoUvmyYAIWwlxBc1KX5cturfqByYdj5bYGRpN9g==
+
 "@esbuild/linux-x64@0.25.12":
   version "0.25.12"
   resolved "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.25.12.tgz"
@@ -334,6 +339,23 @@
   dependencies:
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
+
+"@noble/ciphers@^1.0.0", "@noble/ciphers@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.npmjs.org/@noble/ciphers/-/ciphers-1.3.0.tgz"
+  integrity sha512-2I0gnIVPtfnMw9ee9h1dJG7tp81+8Ob3OJb3Mv37rx5L40/b0i7djjCVvGOVqc9AEIQyvyu1i6ypKdFw8R8gQw==
+
+"@noble/curves@^1.9.7":
+  version "1.9.7"
+  resolved "https://registry.npmjs.org/@noble/curves/-/curves-1.9.7.tgz"
+  integrity sha512-gbKGcRUYIjA3/zCCNaWDciTMFI0dCkvou3TL8Zmy5Nc7sJ47a0jtOeZoTaMxkuqRo9cRhjOdZJXegxYE5FN/xw==
+  dependencies:
+    "@noble/hashes" "1.8.0"
+
+"@noble/hashes@^1.8.0", "@noble/hashes@1.8.0":
+  version "1.8.0"
+  resolved "https://registry.npmjs.org/@noble/hashes/-/hashes-1.8.0.tgz"
+  integrity sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -1792,6 +1814,16 @@ dlv@^1.1.3:
   resolved "https://registry.npmjs.org/dlv/-/dlv-1.1.3.tgz"
   integrity sha512-+HlytyjlPKnIG8XuRG8WvmBP8xs8P71y+SKKS6ZXWoEgLuePxtDoUEiH7WkdePWrQ5JBpE6aoVqfZfJUQkjXwA==
 
+eciesjs@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.npmjs.org/eciesjs/-/eciesjs-0.5.0.tgz"
+  integrity sha512-s0J9SEVYAEPg7J63GFMApLYzPH9VNIQIyC6s15JpnqVc0TqcKWdbgFlnAweEBRyMmko2dcs2sfC83Hj4J43tuA==
+  dependencies:
+    "@ecies/ciphers" "^0.2.6"
+    "@noble/ciphers" "^1.3.0"
+    "@noble/curves" "^1.9.7"
+    "@noble/hashes" "^1.8.0"
+
 electron-to-chromium@^1.5.376:
   version "1.5.385"
   resolved "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.385.tgz"
@@ -2219,7 +2251,7 @@ jiti@*, jiti@^1.21.7, jiti@>=1.21.0:
   resolved "https://registry.npmjs.org/jiti/-/jiti-1.21.7.tgz"
   integrity sha512-/imKNG4EbWNrVjoNC/1H5/9GFy+tqjGBHCaSsN+P2RnPqjsLmv6UD3Ej+Kj8nBWaRAwyk7kK5ZUc+OEatnTR3A==
 
-jose@^6.2.0:
+jose@^6.2.0, jose@^6.2.3:
   version "6.2.4"
   resolved "https://registry.npmjs.org/jose/-/jose-6.2.4.tgz"
   integrity sha512-N8acGzVsQy6M/fjFcxtysNc4Q379TcM5dM/qKkNtsHFji88yANnXTr7BLeP75iPnFwBfQzM/jg2BZ9+HZrHCZA==
@@ -2820,6 +2852,23 @@ sucrase@^3.35.0:
     pirates "^4.0.1"
     tinyglobby "^0.2.11"
     ts-interface-checker "^0.1.9"
+
+supabase@^2.111.0:
+  version "2.111.0"
+  resolved "https://registry.npmjs.org/supabase/-/supabase-2.111.0.tgz"
+  integrity sha512-0cjCRdYNV1h2XXa0wm04mdct7QuDU7sMul/NwETRJmN3+HCsdEu6u5n0oygL97fdf6sDrGmnAdBh8E4wsv1ayg==
+  dependencies:
+    eciesjs "^0.5.0"
+    jose "^6.2.3"
+  optionalDependencies:
+    "@supabase/cli-darwin-arm64" "2.111.0"
+    "@supabase/cli-darwin-x64" "2.111.0"
+    "@supabase/cli-linux-arm64" "2.111.0"
+    "@supabase/cli-linux-arm64-musl" "2.111.0"
+    "@supabase/cli-linux-x64" "2.111.0"
+    "@supabase/cli-linux-x64-musl" "2.111.0"
+    "@supabase/cli-windows-arm64" "2.111.0"
+    "@supabase/cli-windows-x64" "2.111.0"
 
 supports-color@^7.1.0:
   version "7.2.0"
