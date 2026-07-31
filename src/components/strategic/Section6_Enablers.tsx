@@ -153,32 +153,28 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
           </span>
         )}
       </Label>
-      <div className="flex gap-2 flex-wrap">
-        {[1, 2, 3, 4, 5].map((v) => (
-          <Button
-            key={v}
-            type="button"
-            variant="outline"
-            size="icon"
-            className={cn(
-              "w-12 h-12 rounded-lg border text-sm font-semibold transition-all",
-              data[field] === v
-                ? activeScale
-                : inactiveScale
-            )}
-            onClick={() => update(field, v as never)}
-          >
-            {v}
-          </Button>
-        ))}
-      </div>
-      <div className="flex justify-between mt-1 max-w-[272px]">
-        <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
-          {scaleLabels[0]}
-        </span>
-        <span className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60">
-          {scaleLabels[4]}
-        </span>
+      <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-5 gap-1.5 max-w-md">
+          {[1, 2, 3, 4, 5].map((v) => (
+            <Button
+              key={v}
+              type="button"
+              variant="outline"
+              className={cn(
+                "h-auto flex-col gap-1 py-2 px-1 rounded-lg border text-xs font-semibold transition-all",
+                data[field] === v
+                  ? activeScale
+                  : inactiveScale
+              )}
+              onClick={() => update(field, v as never)}
+            >
+              <span>{v}</span>
+              <span className="text-[9px] font-normal leading-tight text-center">
+                {scaleLabels[v - 1]}
+              </span>
+            </Button>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -253,7 +249,7 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
                   className={cn(
                     "h-auto flex-col gap-0.5 py-1.5 px-1 rounded-lg border text-xs font-semibold transition-all",
                     impact === v
-                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
+                      ? "bg-[#C9A84C] text-white border-[#C9A84C]"
                       : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
                   )}
                   onClick={() => update(impactField, v as never)}
@@ -277,7 +273,7 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
                   className={cn(
                     "h-auto flex-col gap-0.5 py-1.5 px-1 rounded-lg border text-xs font-semibold transition-all",
                     likelihood === v
-                      ? "bg-[#1B4D3E] text-white border-[#1B4D3E]"
+                      ? "bg-[#C9A84C] text-white border-[#C9A84C]"
                       : "bg-white dark:bg-[#022c22]/50 text-[#022c22] dark:text-[#ecfdf5] border-[#C9A84C]/30 hover:border-[#C9A84C]"
                   )}
                   onClick={() => update(likelihoodField, v as never)}
