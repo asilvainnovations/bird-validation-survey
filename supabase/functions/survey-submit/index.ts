@@ -103,9 +103,9 @@ serve(async (req) => {
     // ✅ FIX: Extract filtering columns and wrap the rest in response_data
     // This prevents Postgres from throwing "column does not exist" errors for the 150+ survey fields
     const dbRecord = {
-      // Handle schema key variations (q02_demo_province vs demo_province)
-      demo_province: payload.demo_province || payload.q02_demo_province || null,
-      demo_category: payload.demo_category || payload.q02_demo_category || null,
+      // Handle schema key variations (q2_demo_province vs bare demo_province)
+      demo_province: payload.demo_province || payload.q2_demo_province || null,
+      demo_category: payload.demo_category || payload.q2_demo_category || null,
       // Derived strictly from the validated consent answer above — never
       // trusted from the client's own consent_final field.
       consent_final: true,
