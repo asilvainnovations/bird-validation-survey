@@ -116,29 +116,29 @@ export const LIKELIHOOD_SCALE: ScaleLabelSet = [
 
 /** Generic low↔high scale, used where no more specific set applies. */
 export const LOW_HIGH_SCALE: ScaleLabelSet = [
-  { label: "Low", hint: "" },
-  { label: "Below average", hint: "" },
-  { label: "Moderate", hint: "" },
-  { label: "Above average", hint: "" },
-  { label: "High", hint: "" },
+  { label: "Low", hint: "Well below what would be needed." },
+  { label: "Below average", hint: "Somewhat short of what would be needed." },
+  { label: "Moderate", hint: "Roughly adequate, neither strong nor weak." },
+  { label: "Above average", hint: "Comfortably more than adequate." },
+  { label: "High", hint: "Well beyond what would be needed." },
 ];
 
 /** Agreement scale (e.g. "do you agree with this logic"). */
 export const AGREEMENT_SCALE: ScaleLabelSet = [
-  { label: "Strongly disagree", hint: "" },
-  { label: "Disagree", hint: "" },
-  { label: "Neutral", hint: "" },
-  { label: "Agree", hint: "" },
-  { label: "Strongly agree", hint: "" },
+  { label: "Strongly disagree", hint: "I don't believe this at all." },
+  { label: "Disagree", hint: "I lean toward not believing this." },
+  { label: "Neutral", hint: "I'm genuinely unsure either way." },
+  { label: "Agree", hint: "I lean toward believing this." },
+  { label: "Strongly agree", hint: "I fully believe this." },
 ];
 
 /** Priority/importance scale (e.g. KPI importance ratings). */
 export const IMPORTANCE_SCALE: ScaleLabelSet = [
-  { label: "Not important", hint: "" },
-  { label: "Slightly important", hint: "" },
-  { label: "Moderately important", hint: "" },
-  { label: "Very important", hint: "" },
-  { label: "Critical", hint: "" },
+  { label: "Not important", hint: "This could be dropped with no real loss." },
+  { label: "Slightly important", hint: "Nice to have, but easily deprioritized." },
+  { label: "Moderately important", hint: "Genuinely useful, but not a top priority." },
+  { label: "Very important", hint: "A high priority that should not be dropped." },
+  { label: "Critical", hint: "Essential — the effort fails without this." },
 ];
 
 /** "How ready is BARMM's institutional capacity to implement X" — distinct
