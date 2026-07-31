@@ -30,6 +30,12 @@ jobs:
         # NOTE: ratchet --max-warnings down to 0 once existing warnings are fixed
         run: npm run lint -- --max-warnings=15
 
+      - name: Dependency vulnerability audit (blocking, high+ only)
+        # Findings that are accepted rather than fixed must be documented in
+        # SECURITY-EXCEPTIONS.md. This step still fails CI on any *new*,
+        # undocumented high/critical finding.
+        run: npm audit --audit-level=high
+
       - name: Verify EDGE_FUNCTIONS registry matches supabase/functions/ (blocking)
         run: node scripts/check-edge-functions.mjs
 
@@ -53,6 +59,8 @@ jobs:
             supabase functions build email-notifications
             supabase functions build survey-submit
             supabase functions build survey-analytics
+            supabase functions build strategic-planner-sync
+            supabase functions build ai-strategy-assistant
           else
             echo "Supabase CLI not available — skipping Edge Function build verification"
           fi
