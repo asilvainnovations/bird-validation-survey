@@ -11,9 +11,6 @@
     },
     "notion": {
       "enabled": true
-    },
-    "bird_app": {
-      "enabled": true
     }
   }
 }
