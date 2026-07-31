@@ -78,6 +78,46 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
     { code: "IEDS", name: "Integrated Ecosystem Development Strategy", score: "8.93/10", grdp: "₱550B+", highlight: true },
   ];
 
+  // Exact criteria, wording, and weights from Chapter 4 (Strategic Options
+  // Evaluation Matrix). Keys match q10_matrix's shape as already initialized
+  // in SurveyWizard.tsx — each option scored 0–10 per criterion, same scale
+  // the original document's evaluation used, so respondent scores are
+  // directly comparable to the reference weighted totals below.
+  const EVALUATION_CRITERIA: { key: string; label: string; weight: number }[] = [
+    { key: "economic_impact", label: "Economic Impact", weight: 0.25 },
+    { key: "feasibility", label: "Feasibility", weight: 0.20 },
+    { key: "identity_alignment", label: "Alignment with BARMM Identity", weight: 0.15 },
+    { key: "systems_leverage", label: "Systems Leverage", weight: 0.15 },
+    { key: "risk_return", label: "Risk-Return Profile", weight: 0.10 },
+    { key: "inclusivity", label: "Inclusivity and Equity", weight: 0.10 },
+    { key: "sustainability", label: "Sustainability", weight: 0.05 },
+  ];
+
+  const OPTION_KEYS = ["heds", "gems", "ifes", "ieds"] as const;
+  type OptionKey = (typeof OPTION_KEYS)[number];
+
+  const weightedTotal = (optionKey: OptionKey): number => {
+    const scores = data.q10_matrix[optionKey];
+    return EVALUATION_CRITERIA.reduce(
+      (sum, c) => sum + (scores[c.key] ?? 0) * c.weight,
+      0
+    );
+  };
+
+  const updateMatrixScore = (optionKey: OptionKey, criterionKey: string, value: number) => {
+    update("q10_matrix", {
+      ...data.q10_matrix,
+      [optionKey]: { ...data.q10_matrix[optionKey], [criterionKey]: value },
+    });
+  };
+
+  const REFERENCE_TOTALS: Record<OptionKey, number> = {
+    heds: 7.61,
+    gems: 7.16,
+    ifes: 7.48,
+    ieds: 8.93,
+  };
+
   return (
     <div className="space-y-8">
       {/* ═══════════════════════════════════════════ HEADER */}
@@ -354,11 +394,81 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
             />
           </div>
           <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70">
-            Comparative evaluation across seven weighted criteria: Economic Impact (25%),
-            Systems Leverage (15%), Identity Alignment (15%), Inclusivity (10%),
-            Sustainability (5%), Feasibility (20%), and Risk-Return (10%).
+            Now score each option yourself. For each criterion below, rate all four strategic
+            options from 0 (weakest) to 10 (strongest) based on your own assessment — not
+            what you think the &quot;correct&quot; answer is. Your weighted total updates live as
+            you score, so you can see how your view compares to the roadmap&apos;s own
+            evaluation.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+
+          <div className="space-y-6">
+            {EVALUATION_CRITERIA.map((criterion) => (
+              <div key={criterion.key} className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm font-medium text-[#022c22] dark:text-[#ecfdf5]">
+                    {criterion.label}
+                  </Label>
+                  <Badge variant="outline" className="text-[10px]">
+                    {Math.round(criterion.weight * 100)}% weight
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {OPTION_KEYS.map((optionKey) => {
+                    const value = data.q10_matrix[optionKey][criterion.key] ?? 5;
+                    return (
+                      <div key={optionKey} className="flex items-center gap-3">
+                        <span className="text-xs font-semibold text-[#022c22] dark:text-[#ecfdf5] w-12 shrink-0 uppercase">
+                          {optionKey}
+                        </span>
+                        <input
+                          type="range"
+                          min={0}
+                          max={10}
+                          step={1}
+                          value={value}
+                          onChange={(e) =>
+                            updateMatrixScore(optionKey, criterion.key, Number(e.target.value))
+                          }
+                          className="flex-1 accent-[#C9A84C]"
+                          aria-label={`${optionKey.toUpperCase()} — ${criterion.label}`}
+                        />
+                        <span className="text-sm font-semibold text-[#022c22] dark:text-[#ecfdf5] w-6 text-right shrink-0">
+                          {value}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Live weighted totals — your scoring vs. the roadmap's own evaluation */}
+          <div className="pt-4 border-t border-[#C9A84C]/20">
+            <p className="text-xs font-semibold text-[#022c22] dark:text-[#ecfdf5] mb-3 uppercase tracking-wide">
+              Your Weighted Totals
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {OPTION_KEYS.map((optionKey) => (
+                <div
+                  key={optionKey}
+                  className="rounded-lg border border-[#C9A84C]/30 bg-[#ecfdf5]/40 dark:bg-[#022c22]/50 p-3 text-center"
+                >
+                  <p className="text-xs font-semibold text-[#022c22] dark:text-[#ecfdf5] uppercase">
+                    {optionKey}
+                  </p>
+                  <p className="text-lg font-bold text-[#C9A84C]">
+                    {weightedTotal(optionKey).toFixed(2)}
+                  </p>
+                  <p className="text-[10px] text-[#065f46] dark:text-[#ecfdf5]/50">
+                    roadmap: {REFERENCE_TOTALS[optionKey].toFixed(2)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
             {strategicOptions.map((opt) => (
               <Button
                 key={opt.code}
@@ -386,7 +496,7 @@ const Section10_IEDS: React.FC<Section10Props> = ({ data, onChange }) => {
                   </div>
                   <p className="text-sm font-semibold mt-1">{opt.name}</p>
                   <p className="text-xs text-[#065f46] dark:text-[#ecfdf5]/60 mt-1">
-                    Score: {opt.score} | GRDP: {opt.grdp}
+                    Roadmap score: {opt.score} | GRDP: {opt.grdp}
                   </p>
                 </div>
               </Button>
