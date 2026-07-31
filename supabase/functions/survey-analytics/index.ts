@@ -7,10 +7,36 @@ const ALLOWED_ORIGINS = [
   "https://bird-validation-survey.bolt.host", "https://asilvainnovations.com",
 ];
 
-const corsHeaders = (origin: string | null) => ({
-  "Access-Control-Allow-Origin": origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-});
+// This endpoint only ever returns aggregate, already-anonymized statistics
+// (see the consent_final + q1_consent_anonymize filtering below) — it never
+// exposes individual responses or PII. That makes it meaningfully lower-risk
+// than survey-submit or ai-strategy-assistant, and it's specifically meant to
+// power a *public* dashboard. WebContainer/bolt.new preview origins rotate
+// per session (e.g. https://abc123--3000--xyz.local-credentialless.
+// webcontainer-api.io) and can never be added to a static allowlist, so this
+// endpoint additionally accepts any *.webcontainer-api.io origin — a
+// deliberately scoped exception, not a blanket wildcard, and not applied to
+// any endpoint that writes data or costs money per call.
+function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return false;
+  if (ALLOWED_ORIGINS.includes(origin)) return true;
+  try {
+    const { hostname } = new URL(origin);
+    return hostname.endsWith(".webcontainer-api.io");
+  } catch {
+    return false;
+  }
+}
+
+const corsHeaders = (origin: string | null) => {
+  const headers: Record<string, string> = {
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  };
+  if (isAllowedOrigin(origin)) {
+    headers["Access-Control-Allow-Origin"] = origin as string;
+  }
+  return headers;
+};
 
 // BIRD Formulas (Deno compatible)
 const calcStrengthRI = (i: number, l: number) => (i * l) / 5;
