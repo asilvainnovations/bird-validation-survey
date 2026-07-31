@@ -127,7 +127,13 @@ serve(async (req) => {
     // needs its own bucket and its own "counts as accurate" rule (rating >= 4) rather than the
     // string comparison used below. This was previously missing entirely from this file, so the
     // "Moral Governance De-Risks Capital" question never appeared in the analytics dashboard.
-    const governanceScaleKeys = ['q9_arch_moral_governance_derisk'];
+    // NOTE (2026-07-31): q9_1_moral_governance_derisk is a standalone numeric
+    // scale question (see Section9Data), not an archetype-validation field —
+    // it has no _accuracy/_followup pair and doesn't belong in either bucket
+    // below. It was previously listed here as 'q9_arch_moral_governance_derisk',
+    // a field name that was removed from the schema entirely, so this bucket
+    // was silently matching nothing in any real submission.
+    const governanceScaleKeys: string[] = [];
 
     for (const row of responses || []) {
       const d = row.response_data || {};
