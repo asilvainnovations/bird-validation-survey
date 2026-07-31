@@ -93,6 +93,25 @@ for update
 to service_role
 using (true);
 
+-- 6a. SECURITY FIX (2026-07-31, Supabase Advisor: "Security Definer View"):
+-- required before survey_response_stats can safely be switched to
+-- security_invoker below. Without this policy, anon has zero SELECT access
+-- on this table at all (only the insert policy above exists for anon) — so
+-- flipping the view to security_invoker without this would make the public
+-- dashboard's direct anon-key view queries return nothing. This policy
+-- mirrors the view's own WHERE clause exactly, so the same rows that are
+-- visible today stay visible — but now genuinely enforced by RLS at the
+-- table level, not merely by the view's hardcoded filter.
+drop policy if exists "Anon can read consented, anonymized responses" on public.survey_responses;
+create policy "Anon can read consented, anonymized responses"
+on public.survey_responses
+for select
+to anon, authenticated
+using (
+  consent_final = true
+  and (response_data->>'q1_consent_anonymize')::boolean is true
+);
+
 -- 7. Drop existing view to prevent column order/name mismatch errors during replacement
 -- (This does NOT delete any data from the underlying survey_responses table)
 drop view if exists public.survey_response_stats cascade;
@@ -111,12 +130,21 @@ drop view if exists public.survey_response_stats cascade;
 -- from a fixed list, not free text) is lower-risk and retained.
 --
 -- Additionally, rows are now only exposed here if the respondent explicitly
--- consented to anonymized aggregate use (q01_consent_anonymize = true), not
--- merely to participating in the survey (consent_final / q01_consent_participate).
+-- consented to anonymized aggregate use (q1_consent_anonymize = true), not
+-- merely to participating in the survey (consent_final / q1_consent_participate).
 -- These are two distinct consent questions in survey-schema.ts and should not be
 -- conflated — a respondent can consent to participate without consenting to
 -- have their (even de-identified) answers appear in a public-facing dashboard.
-create view public.survey_response_stats as
+create view public.survey_response_stats
+-- SECURITY FIX (2026-07-31, Supabase Advisor: "Security Definer View"):
+-- without this, the view runs with the permissions of whoever created it
+-- (an elevated role), not the actual querying user — meaning any RLS meant
+-- to apply to the querying role is silently bypassed. security_invoker=true
+-- makes this view respect the real querying user's own RLS, same as if they
+-- queried survey_responses directly. Requires the companion "Anon can read
+-- consented, anonymized responses" policy above to keep working correctly.
+with (security_invoker = true)
+as
 select
   id,
   demo_province,
