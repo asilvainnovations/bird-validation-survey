@@ -14,13 +14,29 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const CORS = {
-  'Access-Control-Allow-Origin':  '*',
-  'Access-Control-Allow-Headers': 'authorization, content-type, x-client-info, apikey',
-  'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
-  'X-Content-Type-Options':       'nosniff',
-  'X-Frame-Options':              'DENY',
-} as const;
+const ALLOWED_ORIGINS = [
+  'http://localhost:5173', 'http://localhost:8080',
+  'https://bird-validation-survey.bolt.host', 'https://asilvainnovations.com',
+];
+function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return false;
+  if (ALLOWED_ORIGINS.includes(origin)) return true;
+  try {
+    return new URL(origin).hostname.endsWith('.webcontainer-api.io');
+  } catch {
+    return false;
+  }
+}
+function buildCors(origin: string | null): Record<string, string> {
+  const headers: Record<string, string> = {
+    'Access-Control-Allow-Headers': 'authorization, content-type, x-client-info, apikey',
+    'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+  if (isAllowedOrigin(origin)) headers['Access-Control-Allow-Origin'] = origin as string;
+  return headers;
+}
 
 const MAX_BODY_BYTES = 10 * 1024 * 1024; // 10 MB hard cap
 
@@ -30,17 +46,20 @@ async function sha256(text: string): Promise<string> {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
-const json = (data: unknown, status = 200, extra: Record<string,string> = {}) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { 'Content-Type': 'application/json', ...CORS, ...extra },
-  });
-
-const err = (error: string, status = 400, code = 'BAD_REQUEST') =>
-  json({ success: false, error, code }, status);
+// json/err are defined inside Deno.serve below, where the per-request origin
+// is available for buildCors().
 
 Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
+  const cors = buildCors(req.headers.get('Origin'));
+  const json = (data: unknown, status = 200, extra: Record<string,string> = {}) =>
+    new Response(JSON.stringify(data), {
+      status,
+      headers: { 'Content-Type': 'application/json', ...cors, ...extra },
+    });
+  const err = (error: string, status = 400, code = 'BAD_REQUEST') =>
+    json({ success: false, error, code }, status);
+
+  if (req.method === 'OPTIONS') return new Response(null, { headers: cors });
   if (req.method !== 'GET' && req.method !== 'POST' && req.method !== 'DELETE')
     return err('Method not allowed', 405, 'METHOD_NOT_ALLOWED');
 
@@ -86,7 +105,7 @@ async function handleGet(supabase: ReturnType<typeof createClient>, userId: stri
   if (data?.state) {
     // ETag caching — return 304 if client already has this version
     const etag = `"${data.checksum ?? data.version}"`;
-    if (clientEtag === etag) return new Response(null, { status: 304, headers: CORS });
+    if (clientEtag === etag) return new Response(null, { status: 304, headers: cors });
 
     return json(
       { ...data.state, _meta: { version: data.version, updatedAt: data.updated_at } },
