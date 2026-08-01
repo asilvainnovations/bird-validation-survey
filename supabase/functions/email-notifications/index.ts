@@ -5,6 +5,28 @@
 // works across dev / staging / production without code changes.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+
+// ── Rate limiting ──────────────────────────────────────────────────────────
+// Added 2026-08-01: this function is called directly from browser-side code
+// using the public anon key, with no other auth check — see the migration
+// file for the full reasoning. Backed by a DB table since Edge Functions are
+// stateless between invocations; same pattern as survey-submit's rate limit.
+const RATE_LIMIT_MAX_SENDS = 5;
+const RATE_LIMIT_WINDOW_MINUTES = 30;
+const IP_HASH_SALT = Deno.env.get("IP_HASH_SALT") ?? "bird-2026-2035-fallback-salt";
+
+async function hashIp(ip: string): Promise<string> {
+  const data = new TextEncoder().encode(`${IP_HASH_SALT}:${ip}`);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+const supabaseClient = createClient(
+  Deno.env.get("SUPABASE_URL") ?? "",
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+  { auth: { autoRefreshToken: false, persistSession: false } }
+);
 
 // ── Environment ─────────────────────────────────────────────────────────────
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
@@ -207,6 +229,37 @@ serve(async (req) => {
 
     if (!payload.email) {
       return json({ error: "Email is required" }, 400);
+    }
+
+    // Rate limiting: log this attempt first (so it counts even if the send
+    // itself later fails — otherwise someone could bypass the limit by
+    // deliberately causing failures), then check recent attempts from the
+    // same IP hash within the window.
+    const forwardedFor = req.headers.get("x-forwarded-for");
+    const clientIp = forwardedFor ? forwardedFor.split(",")[0].trim() : "unknown";
+    const ipHash = await hashIp(clientIp);
+
+    const { error: logError } = await supabaseClient
+      .from("email_notification_log")
+      .insert({ ip_hash: ipHash, email_type: payload.type ?? null });
+    if (logError) {
+      // Fail open on the logging step itself — a DB hiccup here shouldn't
+      // block a legitimate one-time email, but this should not happen
+      // under normal operation, so it's logged for visibility.
+      console.error("[email-notifications] Rate-limit log insert failed (failing open):", logError);
+    }
+
+    const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MINUTES * 60 * 1000).toISOString();
+    const { count: recentCount, error: rateLimitError } = await supabaseClient
+      .from("email_notification_log")
+      .select("id", { count: "exact", head: true })
+      .eq("ip_hash", ipHash)
+      .gte("created_at", windowStart);
+
+    if (rateLimitError) {
+      console.error("[email-notifications] Rate limit check error (failing open):", rateLimitError);
+    } else if ((recentCount ?? 0) > RATE_LIMIT_MAX_SENDS) {
+      return json({ error: "Too many email requests from this network. Please try again later." }, 429);
     }
 
     let result: { id?: string; error?: string };
