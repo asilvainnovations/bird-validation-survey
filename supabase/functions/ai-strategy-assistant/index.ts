@@ -1,4 +1,4 @@
-// ─── BIRD 2026-2035 — AI STRATEGY ASSISTANT EDGE FUNCTION v2.1 ───────────────
+// ─── BIRD 2026-2035 — AI STRATEGY ASSISTANT EDGE FUNCTION v2.2 ───────────────
 // Domain-expert AI for the Bangsamoro Investment Roadmap Development (BIRD)
 // 2026-2035 — investment, strategic thinking, systems thinking, BARMM context.
 // Deployed on: rgvteytgkugdqdodedxq.databasepad.com (Supabase Edge Runtime)
@@ -50,7 +50,7 @@ const DEFAULT_MODEL = 'claude-sonnet-5';
 
 // ─── Platform Constants ───────────────────────────────────────────────────────
 const PLATFORM_NAME = 'BIRD 2026-2035';
-const PLATFORM_LOGO = 'https://rgvteytgkugdqdodedxq.databasepad.com/storage/v1/object/public/bird-images/public/MTIT%20Logo.webp';
+const PLATFORM_LOGO = 'https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/MTIT%20Logo.png';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 async function fetchPlanFromDB(planId: string) {
@@ -97,7 +97,7 @@ const BIRD_CONTEXT = `
 ══════════════════════════════════════════════════════════════════════════════
 BIRD 2026-2035 — BANGSAMORO INVESTMENT ROADMAP (OFFICIAL KNOWLEDGE BASE)
 Published by: Bureau of Investments – Ministry of Trade, Investments and Tourism
-              (BOI-MTIT), Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)
+(BOI-MTIT), Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)
 ══════════════════════════════════════════════════════════════════════════════
 
 ▌REGIONAL PROFILE (Verified Data)
