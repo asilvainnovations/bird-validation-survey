@@ -156,35 +156,57 @@ function buildNotification(subject: string, message: string): { subject: string;
   };
 }
 
+// ── CORS ─────────────────────────────────────────────────────────────────────
+const ALLOWED_ORIGINS = [
+  "http://localhost:5173", "http://localhost:8080",
+  "https://bird-validation-survey.bolt.host", "https://asilvainnovations.com",
+];
+function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return false;
+  if (ALLOWED_ORIGINS.includes(origin)) return true;
+  try {
+    return new URL(origin).hostname.endsWith(".webcontainer-api.io");
+  } catch {
+    return false;
+  }
+}
+function buildCors(origin: string | null): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  };
+  if (isAllowedOrigin(origin)) headers["Access-Control-Allow-Origin"] = origin as string;
+  return headers;
+}
+
 // ── Request handler ─────────────────────────────────────────────────────────
 serve(async (req) => {
+  const cors = buildCors(req.headers.get("Origin"));
+  // BUG FIX (2026-08-01): every response below now consistently includes CORS
+  // headers. Several error paths here previously had none at all — not even
+  // a wildcard — which meant a browser-based caller would see those requests
+  // fail as an opaque network error, never actually reading the real error
+  // message the server sent back.
+  const json = (data: unknown, status = 200) =>
+    new Response(JSON.stringify(data), {
+      status,
+      headers: { "Content-Type": "application/json", ...cors },
+    });
+
   // CORS preflight
   if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-      },
-    });
+    return new Response(null, { status: 204, headers: cors });
   }
 
   if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers: { "Content-Type": "application/json" },
-    });
+    return json({ error: "Method not allowed" }, 405);
   }
 
   try {
     const payload = (await req.json()) as RequestPayload;
 
     if (!payload.email) {
-      return new Response(JSON.stringify({ error: "Email is required" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
+      return json({ error: "Email is required" }, 400);
     }
 
     let result: { id?: string; error?: string };
@@ -206,31 +228,16 @@ serve(async (req) => {
         break;
       }
       default:
-        return new Response(JSON.stringify({ error: "Unknown email type" }), {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        });
+        return json({ error: "Unknown email type" }, 400);
     }
 
     if (result.error) {
-      return new Response(JSON.stringify({ error: result.error }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      });
+      return json({ error: result.error }, 500);
     }
 
-    return new Response(JSON.stringify({ success: true, id: result.id }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
+    return json({ success: true, id: result.id }, 200);
   } catch (err) {
     console.error("[email-notifications] Unexpected error:", err);
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return json({ error: "Internal server error" }, 500);
   }
 });
