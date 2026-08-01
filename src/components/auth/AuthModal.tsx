@@ -122,7 +122,7 @@ export function AuthModal({ isOpen, onClose, defaultView = 'login' }: AuthModalP
         )}
 
         {/* ── Google OAuth ──
-            GOOGLE_OAUTH_CLIENT_ID / GOOGLE_OAUTH_CLIENT_SECRET are configured
+            GMAIL_OAUTH_CLIENT_ID / GMAIL_OAUTH_CLIENT_SECRET are configured
             in the Supabase Dashboard (Authentication → Providers → Google),
             not here — see the detailed comment in useAuth.ts's
             signInWithGoogle(). This button only triggers the redirect. */}
@@ -130,7 +130,7 @@ export function AuthModal({ isOpen, onClose, defaultView = 'login' }: AuthModalP
           <>
             <button
               type="button"
-              onClick={handleGoogleSignIn}
+              onClick={handleGmailSignIn}
               disabled={googleLoading}
               className="w-full flex items-center justify-center gap-2.5 py-2.5 rounded-lg border border-slate-300 dark:border-white/15 bg-white dark:bg-white/5 text-slate-700 dark:text-white/90 font-semibold text-sm hover:bg-slate-50 dark:hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -138,8 +138,8 @@ export function AuthModal({ isOpen, onClose, defaultView = 'login' }: AuthModalP
                 <span className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
               ) : (
                 <>
-                  <GoogleIcon />
-                  Continue with Google
+                  <GmailIcon />
+                  Continue with Gmail
                 </>
               )}
             </button>
