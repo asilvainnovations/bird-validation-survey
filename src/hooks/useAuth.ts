@@ -246,7 +246,7 @@ export const useAuth = () => {
   // The client only needs to call signInWithOAuth() below; Supabase redirects
   // to Google, Google redirects back to CALLBACK_URL, and Supabase completes
   // the session — which fires the onAuthStateChange listener above.
-  const signInWithGmail = async () => {
+  const signInWithGoogle = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
