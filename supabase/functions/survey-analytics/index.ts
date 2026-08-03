@@ -52,6 +52,23 @@ const getPair = (d: any, prefix: string) => {
   return null;
 };
 
+// ── Rate limiting (added 2026-08-04 audit) ──────────────────────────────────
+// This endpoint runs a full aggregation over survey_responses on every call
+// and had no abuse protection at all, unlike the other three Edge Functions
+// in this project. More generous than survey-submit/ai-strategy-assistant
+// since this is a read-only public dashboard endpoint where normal refresh
+// behavior is expected to be more frequent than a one-time submission or a
+// paid AI call.
+const RATE_LIMIT_MAX_CALLS = 60;
+const RATE_LIMIT_WINDOW_MINUTES = 10;
+const IP_HASH_SALT = Deno.env.get('IP_HASH_SALT') ?? 'bird-2026-2035-fallback-salt';
+
+async function hashIp(ip: string): Promise<string> {
+  const data = new TextEncoder().encode(`${IP_HASH_SALT}:${ip}`);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders(req.headers.get("Origin")) });
 
@@ -60,6 +77,33 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
+
+    const forwardedFor = req.headers.get('x-forwarded-for');
+    const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : 'unknown';
+    const ipHash = await hashIp(clientIp);
+
+    const { error: logError } = await supabase
+      .from('analytics_rate_limit_log')
+      .insert({ ip_hash: ipHash });
+    if (logError) {
+      console.error('[survey-analytics] rate-limit log insert failed (failing open):', logError.message);
+    }
+
+    const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MINUTES * 60 * 1000).toISOString();
+    const { count: recentCount, error: rateLimitError } = await supabase
+      .from('analytics_rate_limit_log')
+      .select('id', { count: 'exact', head: true })
+      .eq('ip_hash', ipHash)
+      .gte('created_at', windowStart);
+
+    if (rateLimitError) {
+      console.error('[survey-analytics] rate limit check error (failing open):', rateLimitError.message);
+    } else if ((recentCount ?? 0) > RATE_LIMIT_MAX_CALLS) {
+      return new Response(JSON.stringify({ error: 'Too many requests from this network. Please try again shortly.' }), {
+        status: 429,
+        headers: { ...corsHeaders(req.headers.get("Origin")), "Content-Type": "application/json" },
+      });
+    }
 
     // Defensive cap: this endpoint aggregates in application code rather than in SQL,
     // so an unbounded table scan would get slower (and costlier) as responses grow.
@@ -202,7 +246,17 @@ serve(async (req) => {
       headers: { ...corsHeaders(req.headers.get("Origin")), "Content-Type": "application/json" },
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: String(err) }), {
+    // BUG FIX (2026-08-04 audit): this file previously had zero server-side
+    // error logging at all, and returned raw error details (String(err))
+    // directly to the client — the opposite of the pattern correctly used
+    // elsewhere in this codebase (survey-submit, strategic-planner-sync),
+    // which log detail server-side only and return a generic client message.
+    // Combined, that meant no way to debug issues from Supabase's function
+    // logs, while whatever internal detail the error contained (e.g. a raw
+    // Postgres error naming tables/columns) was exposed externally instead.
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[survey-analytics] Unhandled error:', msg);
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { ...corsHeaders(req.headers.get("Origin")), "Content-Type": "application/json" },
     });
