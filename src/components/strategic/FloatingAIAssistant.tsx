@@ -5,7 +5,7 @@
 // Updated: 2026-07-31 (fixed hardcoded URL + missing auth headers)
 
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { Sparkles, X, Send, Loader2, ChevronDown, ChevronUp, Brain, Target, BarChart3, Globe2, MessageCircle } from 'lucide-react';
+import { Sparkles, X, Send, Loader as Loader2, ChevronDown, ChevronUp, Brain, Target, ChartBar as BarChart3, Globe as Globe2, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -104,26 +104,39 @@ const FloatingAIAssistant: React.FC<FloatingAIAssistantProps> = ({
       // why every message silently failed with "I had trouble reaching the
       // AI service." Using the same EDGE_FUNCTIONS registry + header helper
       // every other Edge Function call in this app already uses.
-      const response = await fetch(EDGE_FUNCTIONS.AI_STRATEGY_ASSISTANT, {
-        method: 'POST',
-        headers: getEdgeFunctionHeaders(),
-        body: JSON.stringify({
-          action: 'chat',
-          data: {
-            message: q,
-            activeView: activeView || 'survey',
-            messages: history,
-            surveyContext: {
-              currentSection: activeView,
-              totalSections: 16,
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 35000);
+
+      let response: Response;
+      try {
+        response = await fetch(EDGE_FUNCTIONS.AI_STRATEGY_ASSISTANT, {
+          method: 'POST',
+          headers: getEdgeFunctionHeaders(),
+          body: JSON.stringify({
+            action: 'chat',
+            data: {
+              message: q,
+              activeView: activeView || 'survey',
+              messages: history,
+              surveyContext: {
+                currentSection: activeView,
+                totalSections: 16,
+              },
             },
-          },
-          plan: plan ? {
-            name: plan.name,
-            organization: plan.organization,
-          } : null,
-        }),
-      });
+            plan: plan ? {
+              name: plan.name,
+              organization: plan.organization,
+            } : null,
+          }),
+          signal: controller.signal,
+        });
+      } catch (fetchErr) {
+        clearTimeout(timeoutId);
+        throw new Error(fetchErr instanceof DOMException && fetchErr.name === 'AbortError'
+          ? 'AI request timed out. Please try again.'
+          : 'Could not reach the AI service.');
+      }
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`AI service error: ${response.status}`);

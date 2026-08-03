@@ -591,15 +591,30 @@ Deno.serve(async (req: Request) => {
       temperature: (config as any).temperature,
     };
 
-    const aiRes = await fetch(ANTHROPIC_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': anthropicApiKey,
-        'anthropic-version': ANTHROPIC_VERSION,
-      },
-      body: JSON.stringify(payload),
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
+    let aiRes: Response;
+    try {
+      aiRes = await fetch(ANTHROPIC_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': anthropicApiKey,
+          'anthropic-version': ANTHROPIC_VERSION,
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+    } catch (fetchErr) {
+      clearTimeout(timeout);
+      const isTimeout = fetchErr instanceof DOMException && fetchErr.name === 'AbortError';
+      return errorResponse(
+        isTimeout ? 'AI service timed out. Please try again.' : 'Could not reach AI service.',
+        504,
+      );
+    }
+    clearTimeout(timeout);
 
     if (!aiRes.ok) {
       const errText = await aiRes.text().catch(() => 'unknown');

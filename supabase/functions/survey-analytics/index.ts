@@ -31,6 +31,7 @@ function isAllowedOrigin(origin: string | null): boolean {
 const corsHeaders = (origin: string | null) => {
   const headers: Record<string, string> = {
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
   };
   if (isAllowedOrigin(origin)) {
     headers["Access-Control-Allow-Origin"] = origin as string;
