@@ -66,7 +66,7 @@ serve(async (req) => {
     // an attacker could POST `{ consent_final: true }` with no real consent
     // answer and pass validation. The server must derive consent solely from
     // the actual consent question, never from a client-asserted derived flag.
-    if (payload.q01_consent_participate !== true) {
+    if (payload.q1_consent_participate !== true) {
       return new Response(
         JSON.stringify({ error: "Consent is required to submit the survey." }),
         { status: 400, headers: { ...corsHeaders(origin), "Content-Type": "application/json" } }

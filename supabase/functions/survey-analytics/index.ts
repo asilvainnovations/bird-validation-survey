@@ -98,14 +98,14 @@ serve(async (req) => {
       'q6_o1_tourism_recovery', 'q6_o2_digital_leapfrog',
       'q7_o1_global_halal', 'q7_o2_asean_halal', 'q7_o3_bimpeaga_integration', 'q7_o4_uae_corridor', 'q7_o5_landbridge',
       'q8_o1_islamic_ecosystem',
-      'q9_o1_postconflict',
+      'q9_o1_postconflict', 'q9_o2_climate_adaptation_finance',
     ];
     const weaknessKeys = [
       'q4_w1_land_tenure',
       'q5_w1_halal_cert', 'q5_w2_cold_chain', 'q5_w3_market_linkages',
-      'q6_w1_infra_deficits', 'q6_w2_poverty', 'q6_w3_literacy', 'q6_w4_malnutrition', 'q6_w5_skills_mismatch', 'q6_w6_tech_adoption', 'q6_w7_underspending',
+      'q6_w1_infra_deficits', 'q6_w2_poverty', 'q6_w3_literacy', 'q6_w4_malnutrition', 'q6_w5_skills_mismatch', 'q6_w6_tech_adoption', 'q6_w7_fragmented_data',
       'q8_w1_financial_penetration',
-      'q9_w1_fragmented_policy',
+      'q9_w1_fragmented_policy', 'q9_w2_underspending',
     ];
     const threatKeys = [
       'q4_t1_pestalotiopsis',
@@ -138,10 +138,10 @@ serve(async (req) => {
     for (const row of responses || []) {
       const d = row.response_data || {};
       
-      const prov = d.demo_province || d.q02_demo_province || "Unknown";
+      const prov = d.q2_demo_province || d.demo_province || "Unknown";
       provinces[prov] = (provinces[prov] || 0) + 1;
-      
-      const cat = d.demo_category || d.q02_demo_category || "Unknown";
+
+      const cat = d.q2_demo_category || d.demo_category || "Unknown";
       categories[cat] = (categories[cat] || 0) + 1;
 
       const iedsPref = d.q10_1_ieds_preference || d.q10_ieds_preference;

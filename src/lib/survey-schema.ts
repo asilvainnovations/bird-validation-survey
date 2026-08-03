@@ -103,6 +103,7 @@ export const surveySchema = z.object({
   q2_demo_email: z.string().email("Invalid email format").optional().or(z.literal("")),
   q2_demo_organization: optionalString,
   q2_demo_position: optionalString,
+  q2_demo_contact_number: optionalString,
 
   // Step 3
   q3_1_beie_video_understanding: optionalNumber,
