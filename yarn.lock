@@ -1101,16 +1101,6 @@
   resolved "https://registry.npmjs.org/@rolldown/pluginutils/-/pluginutils-1.0.0-beta.27.tgz"
   integrity sha512-+d0F4MKMCbeVUJwG96uQ4SgAznZNSq93I3V+9NHA4OpvqG8mRCpGdKmK8l/dl02h2CCDHwW2FqilnTyDcAnqjA==
 
-"@rollup/rollup-linux-x64-gnu@4.62.3":
-  version "4.62.3"
-  resolved "https://registry.npmjs.org/@rollup/rollup-linux-x64-gnu/-/rollup-linux-x64-gnu-4.62.3.tgz"
-  integrity sha512-V4KtWtQfAFMU7+9/A/VDps/VI8CHd3cYz0L8sgJzz8qK7eY7wI4ruFD82UYIYvW9Z4DtlTfhQcsl4XyPHW5uSg==
-
-"@rollup/rollup-linux-x64-musl@4.62.3":
-  version "4.62.3"
-  resolved "https://registry.npmjs.org/@rollup/rollup-linux-x64-musl/-/rollup-linux-x64-musl-4.62.3.tgz"
-  integrity sha512-LBx9LYXvj2CBkMkjLdNAWLwH0MLMin7do2VcVo9kVPibGLkY0BQQut2fv7NVqkXqZ/CrAu9LqDHVV1xHCMpCPw==
-
 "@sentry-internal/browser-utils@8.55.2":
   version "8.55.2"
   resolved "https://registry.npmjs.org/@sentry-internal/browser-utils/-/browser-utils-8.55.2.tgz"
@@ -1182,16 +1172,6 @@
   integrity sha512-8qAdObNQHKbSeVBLmf2WLNT7+bCE8zBofpCFiNUqGBAl5qw9VagSvcmPXlh78McAU7iHrGik1oeJxiB2A6B29w==
   dependencies:
     tslib "2.8.1"
-
-"@supabase/cli-linux-x64-musl@2.111.1-beta.2":
-  version "2.111.1-beta.2"
-  resolved "https://registry.npmjs.org/@supabase/cli-linux-x64-musl/-/cli-linux-x64-musl-2.111.1-beta.2.tgz"
-  integrity sha512-gdsEgQS3RlT8vsXiNVlc1FZJtmuoF2FdNKwOHIw0+o03ebsLtyhKfD2KYoVLaEQUsfkKQABcQ+MxoDEIyh77yA==
-
-"@supabase/cli-linux-x64@2.111.1-beta.2":
-  version "2.111.1-beta.2"
-  resolved "https://registry.npmjs.org/@supabase/cli-linux-x64/-/cli-linux-x64-2.111.1-beta.2.tgz"
-  integrity sha512-z9Edp6rwPpRwKFYXsWUYEViAFGw9j+9Tnpx6LlP3VxszXdJH2K52Yp/zQY9OvEYT7TH8CtKM2J7s1iYb1YIwdQ==
 
 "@supabase/functions-js@2.112.0":
   version "2.112.0"
