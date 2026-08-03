@@ -41,6 +41,24 @@ const SUPABASE_DATA_URL = 'https://lydsisparsmvextskevw.supabase.co';
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const supabase = createClient(SUPABASE_DATA_URL, supabaseServiceKey);
 
+// ─── Rate limiting ────────────────────────────────────────────────────────────
+// Re-applied 2026-08-03 — this was dropped from the file entirely at some
+// point after being verified working; see the audit report for details.
+// Proxies a PAID Anthropic API call on every request and is invoked directly
+// from browser-side code using the public anon key, with no other check on
+// who's asking. Backed by a DB table (ai_assistant_rate_limit_log,
+// migration 20260802000000) since Edge Functions are stateless between
+// invocations.
+const RATE_LIMIT_MAX_CALLS = 20;
+const RATE_LIMIT_WINDOW_MINUTES = 30;
+const IP_HASH_SALT = Deno.env.get('IP_HASH_SALT') ?? 'bird-2026-2035-fallback-salt';
+
+async function hashIp(ip: string): Promise<string> {
+  const data = new TextEncoder().encode(`${IP_HASH_SALT}:${ip}`);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 // ─── Anthropic Configuration ──────────────────────────────────────────────────
 // Migrated from OpenAI 2026-08-01 (OpenAI account hit insufficient_quota).
 // Env var name in Supabase secrets dashboard: ANTHROPIC_API_KEY
@@ -515,6 +533,31 @@ Deno.serve(async (req: Request) => {
 
     if (!action) return errorResponse('Missing required field: action', 400);
     if (!VALID_ACTIONS.has(action)) return errorResponse(`Invalid action: "${action}"`, 400);
+
+    // ── Rate limiting (re-applied 2026-08-03, see audit report) ──────────────
+    const forwardedFor = req.headers.get('x-forwarded-for');
+    const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : 'unknown';
+    const ipHash = await hashIp(clientIp);
+
+    const { error: logError } = await supabase
+      .from('ai_assistant_rate_limit_log')
+      .insert({ ip_hash: ipHash, action });
+    if (logError) {
+      console.error('BIRD AI: rate-limit log insert failed (failing open):', logError.message);
+    }
+
+    const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MINUTES * 60 * 1000).toISOString();
+    const { count: recentCount, error: rateLimitError } = await supabase
+      .from('ai_assistant_rate_limit_log')
+      .select('id', { count: 'exact', head: true })
+      .eq('ip_hash', ipHash)
+      .gte('created_at', windowStart);
+
+    if (rateLimitError) {
+      console.error('BIRD AI: rate limit check error (failing open):', rateLimitError.message);
+    } else if ((recentCount ?? 0) > RATE_LIMIT_MAX_CALLS) {
+      return errorResponse('Too many AI requests from this network. Please wait a while and try again.', 429);
+    }
 
     // ── Platform info (no AI call needed) ──────────────────────────────────
     if (action === 'get_platform_info') {
