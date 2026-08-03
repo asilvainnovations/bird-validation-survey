@@ -68,7 +68,7 @@ const DEFAULT_MODEL = 'claude-sonnet-5';
 
 // ─── Platform Constants ───────────────────────────────────────────────────────
 const PLATFORM_NAME = 'BIRD 2026-2035';
-const PLATFORM_LOGO = 'https://rgvteytgkugdqdodedxq.databasepad.com/storage/v1/object/public/bird-images/public/MTIT%20Logo.webp';
+const PLATFORM_LOGO = 'https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/MTIT%20Logo.png';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 async function fetchPlanFromDB(planId: string) {
