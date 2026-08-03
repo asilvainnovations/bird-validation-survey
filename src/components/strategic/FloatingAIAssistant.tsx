@@ -24,11 +24,6 @@ interface FloatingAIAssistantProps {
   plan?: any;
   activeView?: string;
   compact?: boolean;
-  /** When provided, forces the assistant open on mount and replaces the
-   * default welcome message with this one — used by RequireAuth to have
-   * BIRD AI proactively explain a sign-in requirement, rather than a
-   * respondent having to click the widget open themselves first. */
-  autoOpenWithMessage?: string;
 }
 
 // ─── BIRD AI System Prompt Context ──────────────────────────────────────────
@@ -70,28 +65,16 @@ const SURVEY_SUGGESTIONS = [
 const FloatingAIAssistant: React.FC<FloatingAIAssistantProps> = ({ 
   plan, 
   activeView = 'survey',
-  compact = false,
-  autoOpenWithMessage,
+  compact = false 
 }) => {
   const [messages, setMessages] = useState<Msg[]>([{
     role: 'assistant',
-    content: autoOpenWithMessage ?? 'As-salamu alaykum! I\'m the BIRD AI Assistant for the Validation Survey.\n\nI can help you:\n• Understand the BEIE Framework and survey sections\n• Clarify systems thinking concepts and archetypes\n• Explain SWOT scoring methodology\n• Navigate the survey effectively\n\nWhat would you like to know?',
+    content: 'As-salamu alaykum! I\'m the BIRD AI Assistant for the Validation Survey.\n\nI can help you:\n• Understand the BEIE Framework and survey sections\n• Clarify systems thinking concepts and archetypes\n• Explain SWOT scoring methodology\n• Navigate the survey effectively\n\nWhat would you like to know?',
     timestamp: Date.now(),
   }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(!compact || Boolean(autoOpenWithMessage));
-
-  // If autoOpenWithMessage changes after mount (e.g. RequireAuth redirects
-  // while the assistant is already rendered on the page), react to it rather
-  // than only reading it once as an initial-state value.
-  useEffect(() => {
-    if (autoOpenWithMessage) {
-      setIsOpen(true);
-      setMessages([{ role: 'assistant', content: autoOpenWithMessage, timestamp: Date.now() }]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoOpenWithMessage]);
+  const [isOpen, setIsOpen] = useState(!compact);
   
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);

@@ -1,47 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- CRITICAL: Domain-based redirect for static HTML files in /public -->
-    <script>
-      (function() {
-        const hostname = window.location.hostname;
-        
-        // Map branded subdomains to their corresponding static HTML files in the /public folder
-        const redirects = {
-          'bnagsamoro-investment-roadmap.asilvainnovations.com': '/dashboard.html',
-          'bird-roadmap.asilvainnovations.com': '/roadmap.html',
-          'bird-resources.asilvainnovations.com': '/resources.html',
-          'bird-privacy-policy.asilvainnovations.com': '/privacy-policy.html',
-          'bird-terms-of-service.asilvainnovations.com': '/terms-of-service.html',
-          'bird-action-plan.asilvainnovations.com': '/action-plan.html',
-          'bird-actors-value-map.asilvainnovations.com': '/actors-value-map.html',
-          'bird-contact.asilvainnovations.com': '/contact.html'
-        };
-        
-        if (redirects[hostname]) {
-          // Use replace() to prevent the redirect from cluttering browser history
-          // Preserves query parameters (e.g., ?utm_source=...) and hash fragments (#section)
-          window.location.replace(redirects[hostname] + window.location.search + window.location.hash);
-        } else {
-          // FALLBACK: If no redirect occurs (e.g., user visits the React app directly via localhost or an unmapped domain), 
-          // dynamically update SEO tags to match the current hostname for accurate indexing.
-          const currentUrl = window.location.origin + window.location.pathname;
-          
-          // Update Canonical URL
-          const canonical = document.querySelector('link[rel="canonical"]');
-          if (canonical && canonical.href.includes('%VITE_CANONICAL_DOMAIN%')) {
-            canonical.href = currentUrl;
-          }
-          
-          // Update Open Graph URL
-          const ogUrl = document.querySelector('meta[property="og:url"]');
-          if (ogUrl && ogUrl.content.includes('%VITE_CANONICAL_DOMAIN%')) {
-            ogUrl.content = currentUrl;
-          }
-        }
-      })();
-    </script>
-
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -59,7 +18,7 @@
     <meta name="theme-color" content="#0A1628" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
 
-    <!-- Canonical URL — substituted at build time from VITE_CANONICAL_DOMAIN, or dynamically updated by script above -->
+    <!-- Canonical URL — substituted at build time from VITE_CANONICAL_DOMAIN -->
     <link rel="canonical" href="%VITE_CANONICAL_DOMAIN%" />
 
     <!-- Favicon (MTIT official logo) -->
@@ -107,25 +66,6 @@
     />
   </head>
   <body>
-    <!-- Fallback for users with JavaScript disabled -->
-    <noscript>
-      <div style="text-align: center; padding: 2rem; font-family: 'Inter', sans-serif; color: #333; background: #f8fafc; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-        <h2 style="color: #0A1628; margin-bottom: 1rem;">JavaScript Required</h2>
-        <p style="max-width: 600px; margin-bottom: 1.5rem; line-height: 1.6;">
-          This platform requires JavaScript to route you to the correct section or load the interactive survey application.
-        </p>
-        <p style="margin-bottom: 1rem; font-weight: 600;">Please enable JavaScript in your browser settings, or navigate directly to:</p>
-        <ul style="list-style: none; padding: 0; text-align: left; display: inline-block;">
-          <li style="margin-bottom: 0.5rem;"><a href="https://bird-survey.asilvainnovations.com" style="color: #065f46; text-decoration: underline;">Validation Survey</a></li>
-          <li style="margin-bottom: 0.5rem;"><a href="https://bird-app.asilvainnovations.com" style="color: #065f46; text-decoration: underline;">BIRD App</a></li>
-          <li style="margin-bottom: 0.5rem;"><a href="https://bird-roadmap.asilvainnovations.com" style="color: #065f46; text-decoration: underline;">Roadmap</a></li>
-          <li style="margin-bottom: 0.5rem;"><a href="https://bird-resources.asilvainnovations.com" style="color: #065f46; text-decoration: underline;">Resources</a></li>
-          <li style="margin-bottom: 0.5rem;"><a href="/privacy-policy.html" style="color: #065f46; text-decoration: underline;">Privacy Policy</a></li>
-          <li><a href="/terms-of-service.html" style="color: #065f46; text-decoration: underline;">Terms of Service</a></li>
-        </ul>
-      </div>
-    </noscript>
-
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

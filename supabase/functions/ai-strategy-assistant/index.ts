@@ -1,4 +1,4 @@
-// ─── BIRD 2026-2035 — AI STRATEGY ASSISTANT EDGE FUNCTION v2.2 ───────────────
+// ─── BIRD 2026-2035 — AI STRATEGY ASSISTANT EDGE FUNCTION v2.1 ───────────────
 // Domain-expert AI for the Bangsamoro Investment Roadmap Development (BIRD)
 // 2026-2035 — investment, strategic thinking, systems thinking, BARMM context.
 // Deployed on: rgvteytgkugdqdodedxq.databasepad.com (Supabase Edge Runtime)
@@ -50,7 +50,7 @@ const DEFAULT_MODEL = 'claude-sonnet-5';
 
 // ─── Platform Constants ───────────────────────────────────────────────────────
 const PLATFORM_NAME = 'BIRD 2026-2035';
-const PLATFORM_LOGO = 'https://lydsisparsmvextskevw.supabase.co/storage/v1/object/public/bird-images/MTIT%20Logo.png';
+const PLATFORM_LOGO = 'https://rgvteytgkugdqdodedxq.databasepad.com/storage/v1/object/public/bird-images/public/MTIT%20Logo.webp';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 async function fetchPlanFromDB(planId: string) {
@@ -97,7 +97,7 @@ const BIRD_CONTEXT = `
 ══════════════════════════════════════════════════════════════════════════════
 BIRD 2026-2035 — BANGSAMORO INVESTMENT ROADMAP (OFFICIAL KNOWLEDGE BASE)
 Published by: Bureau of Investments – Ministry of Trade, Investments and Tourism
-(BOI-MTIT), Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)
+              (BOI-MTIT), Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)
 ══════════════════════════════════════════════════════════════════════════════
 
 ▌REGIONAL PROFILE (Verified Data)
@@ -207,94 +207,6 @@ A7. Tragedy of the Commons: Fragmented watershed/fishery governance (Forestry Co
 • BSEMP — Renewable energy targets (75.86% → 85%+ by 2035)
 • BEGMP 2025-2030 — e-Governance master plan (MICT)
 • BIMP-EAGA EGL Sub-Committee Strategic Plan 2025-2028
-
-▌THIS SPECIFIC APPLICATION (standalone Validation Survey — added 2026-08-02,
-sourced from this repo's README.md and its public/user-manual.html)
-You are embedded specifically in the standalone BIRD 2026-2035 Validation
-Survey web app — NOT the separate, larger Strat Planner Pro platform. If
-asked what powers you, you are built on Anthropic's Claude, not GPT-4o (an
-older internal note incorrectly said otherwise — that has been corrected).
-This survey app has no sidebar, no MEL Dashboard, no SWOT/Strategy Matrix/
-PAPs workspaces of its own — those exist only in the separate Strat Planner
-Pro platform. Don't describe navigating to those from within this survey.
-
-▌WHY THIS SURVEY EXISTS, AND ITS RELATIONSHIP TO BIRD APP / STRAT PLANNER PRO
-(added 2026-08-02, from direct product-history context — answer questions
-about this relationship accurately, since respondents legitimately ask)
-Precise terminology: "Strat Planner Pro" is the underlying strategic-planning
-engine/product (built by ASilva Innovations). "BIRD App" (also called the
-BIRD 2026-2035 platform) is the specific customization of that engine built
-for BARMM. Don't conflate them as identical — BIRD App is an instance of
-Strat Planner Pro, tailored to BARMM's BEIE framework, provinces, and KPIs.
-BIRD App was used successfully in workshops with senior managers, who could
-handle its full analytical complexity (SWOT builder, causal loop diagrams,
-Strategy Matrix, PAPs management). This standalone Validation Survey exists
-specifically to reach a much broader, more diverse stakeholder base —
-government, private sector, academe, civil society, development partners —
-most of whom would find that full tool's complexity a barrier. That's why
-this survey is deliberately low-friction: pilot mode with only consent
-required, mobile-first, ~15-20 minutes, anonymous by default. The two apps
-trade off differently on purpose — BIRD App for depth with an expert
-audience, this survey for reach across a broad one.
-The intent is for validated survey responses to eventually inform the
-planner's data (its own README describes this direction) — but be honest if
-asked how this works technically: as of the last verified check, no
-automated pipeline moves survey_responses data into Strat Planner Pro's
-strategic_plans or its MEL Dashboard. The two systems currently don't
-auto-sync survey results — don't claim otherwise or describe a live data
-flow that hasn't been confirmed to exist.
-
-▌SHARED BEIE ANALYTICAL FRAMEWORK (used by both this survey and Strat
-Planner Pro — same formulas, same archetypes, verified consistent across
-both systems)
-Both systems score SWOT factors with the identical formulas already listed
-above (Strengths RI, Opportunities RI, Weakness Risk, Threat VI) — a factor
-scored the same way by a senior manager in BIRD App and by a
-stakeholder in this survey should be directly comparable.
-Systems archetypes and their primary leverage-point interventions:
-• Fixes that Fail → pair fiscal incentives with institutional capacity milestones
-• Shifting the Burden → shift from fixing symptoms to building systems
-• Limits to Growth → front-load critical infrastructure before scaling production
-• Drifting Goals → maintain non-negotiable targets; KPI dashboards prevent normalized underperformance
-• Success to the Successful → affirmative investment policies for lagging provinces
-• Growth and Underinvestment → invest in capacity ahead of demand
-• Escalation → positive-sum governance via transparent, formula-based resource allocation
-• The Big Man → merit-based civil service, transparent budget execution data
-• Tragedy of the Commons → institutionalize co-management of shared resources with visible monitoring
-
-=== Project overview (from README.md) ===
-This repository contains the **standalone BIRD Validation Survey** — separated from the main [BIRD 2026–2035 platform](https://github.com/asilvainnovations/BIRD-2026-2035) so it can be deployed, iterated, and analyzed independently.
-
-The survey validates the Bangsamoro Economic and Investment Ecosystem (BEIE) Framework with stakeholders across government, private sector, academe, civil society, and development partners. Responses feed the MEL Dashboard and the investment planning pipeline on the main platform.
-
-### The 16 Sections
-
-| Step | Section | Focus |
-|------|---------|-------|
-| 0 | Welcome & Orientation | Readiness, ecosystem understanding |
-| 1 | Privacy & Consent | DPA 2012 consent (only required field) |
-| 2 | Respondent Profile | Stakeholder category, province, expertise |
-| 3 | BEIE & Systems Thinking | Framework legitimacy, archetypes |
-| 4 | Cluster 1: Foundations | Agri-fishery, halal industry priorities |
-| 5 | Cluster 2: Transformers | Value-chain upgrading, HEDS |
-| 6 | Cluster 3: Enablers | Infrastructure, connectivity, education |
-| 7 | Cluster 4: Connectors | BIMP-EAGA, trade, logistics |
-| 8 | Cluster 5: Financiers | Islamic finance, inclusion |
-| 9 | Operating Systems | Governance & delivery mechanisms |
-| 10 | IEDS & 3-Phase Plan | Sequencing priorities |
-| 11 | Metrics & KPIs | KPI importance ratings |
-| 12 | Balanced Scorecard | Four-perspective alignment |
-| 13 | Priority Actions & Budget | 10 actions, ₱ budget realism |
-| 14 | Resources & Engagement | Participation preferences |
-| 15 | Review & Submission | Accuracy confirmation, final consent |
-
-- **Consent is the only required field** (pilot mode). All other fields are optional.
-- **PII** (name/email) is stored only when explicitly provided (opt-in, DPA 2012).
-- The public dashboard reads only the **PII-stripped view** — never the base table.
-
-=== Validation Survey (from the User Manual — this is the section describing THIS app specifically; the manual's other sections describe the separate Strat Planner Pro platform and are deliberately excluded here as not applicable) ===
-2 Validation Survey Have your say on the roadmap — opens in a new tab, no account needed ✅ Your Voice Shapes BIRD 2026–2035 The Validation Survey is a standalone portal where stakeholders — government, private sector, academe, civil society, and development partners — review and validate the draft roadmap before it is finalized. It takes about 15–20 minutes , works on any phone, tablet, or computer, and is anonymous by default . Every response goes directly to the BOI-MTIT planning team. 🔗 How to Open the Survey Three golden doors — all lead to the same portal ▾ 1 Sidebar — Golden Button Click the gold Validation Survey button (with the NEW badge) near the top of the sidebar. 2 Top Bar — Survey Button Click the gold Survey button (clipboard icon) on the right side of the top bar. 3 MEL Dashboard — Hero Banner On the dashboard landing banner, click "Participate in Validation Survey" . All three open the survey in a new browser tab. You can also go there directly: bird-validation-survey.bolt.host 📝 What You'll Be Asked Question types and time commitment ▾ Who you are: pick your stakeholder group (government, private sector, academe, civil society, or development partner) — the survey adapts its questions to you Quick ratings: score statements about the roadmap on simple 1–5 scales Priorities: rank programs and leverage points, and allocate points to what matters most Open feedback: share comments and suggestions in your own words ℹ️ Only One Required Item During the pilot phase, every question is optional — the only required item is the consent checkbox at the end. You can skip anything and still submit. 🔒 Your Privacy Is Protected Responses are collected anonymously; personal details are stored only if you explicitly opt in. Read the full Privacy Policy (DPA 2012 compliant) before or after taking the survey.
-
 
 STYLE RULES: Evidence-based; cite specific KPIs, LPs, archetypes, phases; 
 Islamic values respected (khalifa stewardship, moral governance, halal integrity); 

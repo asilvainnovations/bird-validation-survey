@@ -227,14 +227,14 @@ export const useAuth = () => {
     return data;
   };
 
-  // ── Gmail OAuth ─────────────────────────────────────────────────────────
-  // IMPORTANT: GMAIL_OAUTH_CLIENT_ID / GMAIL_OAUTH_CLIENT_SECRET /
+  // ── Google OAuth ─────────────────────────────────────────────────────────
+  // IMPORTANT: GOOGLE_OAUTH_CLIENT_ID / GOOGLE_OAUTH_CLIENT_SECRET /
   // GOOGLE_REFRESH_TOKEN / CALLBACK_URL are NOT referenced anywhere in this
   // file, or anywhere in frontend code, on purpose. Supabase Auth handles the
-  // entire GMAIL OAuth handshake server-side:
+  // entire Google OAuth handshake server-side:
   //   Supabase Dashboard → Authentication → Providers → Google →
-  //     Client ID:     GMAIL_OAUTH_CLIENT_ID
-  //     Client Secret: GMAIL_OAUTH_CLIENT_SECRET
+  //     Client ID:     GOOGLE_OAUTH_CLIENT_ID
+  //     Client Secret: GOOGLE_OAUTH_CLIENT_SECRET
   //   (GOOGLE_REFRESH_TOKEN is not a Supabase Auth provider field — that's
   //   only needed if a server-side job calls Google APIs directly, e.g.
   //   sending mail via the Gmail API. It has no place in a login flow and

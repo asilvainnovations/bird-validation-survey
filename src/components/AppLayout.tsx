@@ -13,8 +13,8 @@
 //   3. Nav items wired to real destinations — see NAV_LINKS and the Sign In
 //      button notes below.
 
-import React, { useState, useMemo, useCallback, useEffect, lazy, Suspense } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useMemo, useCallback, lazy, Suspense } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useTheme } from '@/components/theme-provider';
 import { BIRD_SITES } from '@/lib/bird-urls';
@@ -86,33 +86,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const { user, profile, isAuthenticated, isLoading: authLoading, signOut } = useAuthContext();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-
-  // RequireAuth (src/components/auth/RequireAuth.tsx) redirects here with
-  // this state when a signed-out visitor hits a protected route, instead of
-  // navigating to a /login page that doesn't exist in this app's design —
-  // auth here is modal-based, not page-based. BIRD AI opens proactively to
-  // explain the situation conversationally rather than showing a bare
-  // "please sign in" page. Read once, then cleared immediately (via
-  // navigate replace with empty state) so it doesn't re-fire on every
-  // subsequent render or back/forward navigation.
-  const requireSignInState = location.state as { requireSignIn?: boolean; from?: { pathname?: string } } | null;
-  const [assistantAutoMessage, setAssistantAutoMessage] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    if (requireSignInState?.requireSignIn && !isAuthenticated) {
-      const fromPath = requireSignInState.from?.pathname;
-      setAssistantAutoMessage(
-        `As-salamu alaykum! The page you were trying to reach${fromPath ? ` (${fromPath})` : ''} needs you to be signed in first.\n\nYou can sign in using the **Sign In** button in the header above — I can wait right here while you do. Let me know if you'd like help with that, or if you have any questions in the meantime.`
-      );
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const userDisplayInfo = useMemo(() => {
     const email = user?.email || '';
@@ -335,7 +312,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       {/* ── Floating Elements — both restored: PlatformBadge was already
           here, FloatingAIAssistant was missing from the uploaded file. ── */}
       <PlatformBadge />
-      <FloatingAIAssistant plan={null} activeView="survey" compact={true} autoOpenWithMessage={assistantAutoMessage} />
+      <FloatingAIAssistant plan={null} activeView="survey" compact={true} />
 
       {/* ── Auth Modals ── */}
       <Suspense fallback={null}>
