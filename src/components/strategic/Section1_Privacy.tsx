@@ -79,7 +79,7 @@ const Section1_Privacy: React.FC<Section1Props> = ({ data, onChange }) => {
         <CardContent className="space-y-4">
           <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
             The Bangsamoro Investment Roadmap Development (BIRD) 2026-2035
-            validation survey is conducted by the Bangsamoro Board of
+            validation survey is conducted by Bureau of
             Investments - Ministry of Trade, Investment and Tourism (BOI-MTIT).
           </p>
           <p className="text-sm text-[#065f46] dark:text-[#ecfdf5]/70 leading-relaxed">
