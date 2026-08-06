@@ -168,24 +168,8 @@ const FloatingAIAssistant: React.FC<FloatingAIAssistantProps> = ({
     }
   };
 
-  // BUG FIX (2026-08-04 audit): `if (compact) return (...)` used to sit
-  // BEFORE the `if (!isOpen)` check and returned unconditionally — so once
-  // `compact` was true, clicking the button called setIsOpen(true), React
-  // re-rendered, hit this same `if (compact)` branch again (it never checked
-  // isOpen at all), and rendered the identical collapsed button. The panel
-  // below was structurally unreachable whenever compact=true. This is why
-  // AppLayout.tsx's global "BIRD AI" pill (compact={true}, no wrapping
-  // Dialog) took focus on click but never opened — confirmed against the
-  // screenshots showing the focus ring with no panel. ContextPanel.tsx's
-  // usage (compact={false}, wrapped in its own <Dialog>) worked because
-  // isOpen there starts true (`useState(!compact)`) and never hit this
-  // branch in the first place.
-  //
-  // Fix: `isOpen` alone now gates open vs. closed; `compact` only selects
-  // which closed-button style to show — restoring the two existing visual
-  // variants unchanged, just no longer bypassing isOpen.
-  if (!isOpen) {
-    return compact ? (
+  if (compact) {
+    return (
       <Button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 rounded-full px-5 py-3 bg-gradient-to-r from-[#C9A84C] via-[#B8942E] to-[#E8C560] text-white shadow-xl hover:scale-105 transition-all"
@@ -193,7 +177,11 @@ const FloatingAIAssistant: React.FC<FloatingAIAssistantProps> = ({
         <Sparkles className="w-5 h-5" />
         <span className="font-semibold text-sm">BIRD AI</span>
       </Button>
-    ) : (
+    );
+  }
+
+  if (!isOpen) {
+    return (
       <Button
         onClick={() => setIsOpen(true)}
         variant="outline"
@@ -205,26 +193,8 @@ const FloatingAIAssistant: React.FC<FloatingAIAssistantProps> = ({
     );
   }
 
-  // SECOND BUG FIX (2026-08-04 audit): even with isOpen correctly reachable
-  // above, this panel had no positioning or size of its own — just
-  // `h-full`, relying on a parent to size it. That's correct for
-  // ContextPanel.tsx's usage (parent is a shadcn <Dialog> sized
-  // `max-w-4xl h-[80vh]`), but AppLayout.tsx mounts this component directly
-  // with no sizing wrapper at all (compact={true}), so `h-full` had no
-  // ancestor height to resolve against and the panel would render
-  // collapsed/invisible even once reachable. When compact, the panel now
-  // supplies its own fixed position + explicit size, matching the
-  // collapsed pill's own `fixed bottom-5 right-5` positioning; when not
-  // compact, behavior is unchanged (fills whatever container it's given).
   return (
-    <div
-      className={cn(
-        "flex flex-col bg-[#011a12] rounded-lg border border-[#C9A84C]/20",
-        compact
-          ? "fixed bottom-5 right-5 z-50 w-[380px] max-w-[92vw] h-[600px] max-h-[80vh] shadow-2xl"
-          : "h-full"
-      )}
-    >
+    <div className="flex flex-col h-full bg-[#011a12] rounded-lg border border-[#C9A84C]/20">
       {/* Header */}
       <div className="flex items-center justify-between gap-2 px-4 py-3 bg-gradient-to-r from-[#B8942E] via-[#A08028] to-[#C9A84C] text-white flex-shrink-0 rounded-t-lg">
         <div className="flex items-center gap-2.5">
