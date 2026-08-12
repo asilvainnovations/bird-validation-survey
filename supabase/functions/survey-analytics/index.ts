@@ -50,29 +50,36 @@ const calcOpportunityRI = (i: number, l: number) => Math.sqrt(i * l);
 const calcWeaknessRisk = (i: number, l: number) => i * l;
 const calcThreatVI = (i: number, l: number) => (Math.pow(i, 2) * l) / 25;
 
-// Strategy Option Scoring (IEDS Matrix) — mirrors formulas.ts's
-// calculateStrategyOverallScore exactly (weights sum to 1.00).
+// Strategy Option Scoring (IEDS Matrix) — mirrors
+// src/components/strategic/Section10_IEDS.tsx's EVALUATION_CRITERIA, which
+// is itself the exact "7-Criteria Weighted Scoring Matrix" methodology
+// documented in the BIRD 2026-2035 Draft Report, Chapter 4, §A.6 "Strategic
+// Options Evaluation and Ranking" (source: Chapter4.html, verified
+// 2026-08-13) — the chapter explicitly cites this as "the Strat Planner Pro
+// architecture (Silva, 2026)."
 //
-// KNOWN DRIFT (flagged 2026-08-13, not fixed here — see PR notes): the live
-// survey question in src/components/strategic/Section10_IEDS.tsx computes
-// its own "Your Weighted Totals" using a DIFFERENT, locally-duplicated
-// weight set (economic_impact 0.25, feasibility 0.20, risk_return 0.10,
-// sustainability 0.05 — vs. the canonical values below). Both weight sets
-// independently sum to 1.00, so neither is arithmetically broken, but they
-// are two different methodologies computing "the same" score. This endpoint
-// deliberately uses the CANONICAL formulas.ts weights (per invariant #1:
-// formulas are single-source-of-truth, never reimplemented ad hoc), which
-// means respondentScores below will NOT exactly match what respondents saw
-// live during Section 10. Section10_IEDS.tsx's EVALUATION_CRITERIA should be
-// corrected to match formulas.ts, not the other way around.
+// CORRECTED FINDING (2026-08-13): an earlier version of this file used
+// src/lib/formulas.ts's calculateStrategyOverallScore weights instead
+// (economic_impact 0.20, feasibility 0.18, risk_return 0.16, sustainability
+// 0.06), on the assumption that formulas.ts was the single source of truth
+// and Section10_IEDS.tsx had drifted from it. Checking the actual Chapter 4
+// source document shows the opposite: Section10_IEDS.tsx's weights below are
+// the canonical, documented values (matching the chapter's evaluation table
+// row-for-row, including the 7.61/7.16/7.48/8.93 baseline totals and their
+// 2nd/4th/3rd/1st ranks). formulas.ts's calculateStrategyOverallScore is the
+// one that has drifted and needs correcting — in BOTH repos, since
+// formulas.ts is documented as byte-identical between BIRD-2026-2035 (Strat
+// Planner Pro) and bird-validation-survey. Not fixed here (out of scope for
+// this Edge Function / this repo's survey-analytics), but flagged as a
+// required follow-up for both repos' formulas.ts.
 const STRATEGY_WEIGHTS: Record<string, number> = {
-  economic_impact: 0.20,
-  feasibility: 0.18,
+  economic_impact: 0.25,
+  feasibility: 0.20,
   identity_alignment: 0.15,
   systems_leverage: 0.15,
-  risk_return: 0.16,
+  risk_return: 0.10,
   inclusivity: 0.10,
-  sustainability: 0.06,
+  sustainability: 0.05,
 };
 function calcStrategyScore(scores: Record<string, number> | undefined | null): number | null {
   if (!scores || typeof scores !== "object") return null;
@@ -84,12 +91,10 @@ function calcStrategyScore(scores: Record<string, number> | undefined | null): n
   }
   return sum;
 }
-// Reference: Section10_IEDS.tsx's PRE_COMPUTED_SCORES / REFERENCE_TOTALS
-// (the roadmap's own Chapter 4 evaluation of each strategic option, shown to
-// respondents as "roadmap: X.XX" next to their own live score). Provenance
-// of which weight set produced these specific numbers is not verifiable from
-// this repo alone — flagged for Alvin to confirm against the source Chapter
-// 4 document when auditing the weight-drift issue above.
+// Reference: BIRD 2026-2035 Draft Report, Chapter 4, §A.6's "Strategic
+// Option Evaluation Matrix — 7-Criteria Weighted Scoring" table (TOTAL
+// WEIGHTED SCORE row), verified directly against source 2026-08-13. Ranks:
+// IEDS 1st, HEDS 2nd, IFES 3rd, GEMS 4th.
 const BASELINE_SCORES: Record<string, number> = { heds: 7.61, gems: 7.16, ifes: 7.48, ieds: 8.93 };
 const STRATEGIC_OPTION_KEYS = ["heds", "gems", "ifes", "ieds"] as const;
 
