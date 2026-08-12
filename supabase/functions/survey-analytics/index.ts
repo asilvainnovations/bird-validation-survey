@@ -114,6 +114,46 @@ function addNum(acc: NumAcc, val: unknown) {
 }
 function avgOf(acc: NumAcc): number { return acc.n > 0 ? Number((acc.sum / acc.n).toFixed(2)) : 0; }
 
+// ── Analytical metadata (v2 contract, 2026-08-12) ──────────────────────────
+// WHY: avgOf() returns 0 when n === 0, which at the presentation layer is
+// indistinguishable from a genuine mean of 0. Every underlying Likert / SWOT
+// input is on a 1–5 scale, so a true mean can never actually be 0 — but the
+// dashboard should not have to rely on that inference to tell "nobody answered
+// this" apart from "everybody rated it terribly". So every scalar mean below
+// is ALSO emitted as { mean: number|null, n, missing }, where mean === null
+// means "no valid observations" and never "scored zero".
+//
+// This is purely ADDITIVE: every legacy scalar field (avgStrengthRI,
+// perspectives.financial, riskConcern.high, …) is retained byte-for-byte, so
+// an older frontend deploy keeps working unchanged. Consumers should prefer
+// the `*Meta` objects and fall back to the legacy scalars.
+interface Metric { mean: number | null; n: number; missing: number; }
+function metricOf(acc: NumAcc, denominator: number): Metric {
+  return {
+    mean: acc.n > 0 ? Number((acc.sum / acc.n).toFixed(2)) : null,
+    n: acc.n,
+    missing: Math.max(0, denominator - acc.n),
+  };
+}
+function metricsOf(accs: Record<string, NumAcc>, denominator: number): Record<string, Metric> {
+  return Object.fromEntries(Object.entries(accs).map(([k, a]) => [k, metricOf(a, denominator)]));
+}
+
+// SWOT families accumulate at ITEM level (respondent × item), so `n` there is
+// an observation count and `denominator - n` would be meaningless. These carry
+// both: `observations` (item-level, the denominator of the mean) and
+// `respondents` (how many people answered at least one item in the family,
+// which is what `missing` is computed against).
+interface ItemMetric { mean: number | null; observations: number; respondents: number; missing: number; }
+function itemMetric(sum: number, observations: number, respondents: number, denominator: number): ItemMetric {
+  return {
+    mean: observations > 0 ? Number((sum / observations).toFixed(2)) : null,
+    observations,
+    respondents,
+    missing: Math.max(0, denominator - respondents),
+  };
+}
+
 function addDist(dist: Record<string, number>, val: unknown) {
   if (typeof val === "string" && val.length > 0) dist[val] = (dist[val] || 0) + 1;
 }
@@ -177,6 +217,11 @@ serve(async (req) => {
     const archetypes: Record<string, { accurate: number; total: number }> = {};
 
     let sumS = 0, cntS = 0, sumO = 0, cntO = 0, sumW = 0, cntW = 0, sumT = 0, cntT = 0;
+
+    // Respondent-level coverage for the four SWOT families (see itemMetric()).
+    // cnt* above count observations; these count *people*, which is the only
+    // denominator against which "missing" is interpretable.
+    const respS = { n: 0 }, respO = { n: 0 }, respW = { n: 0 }, respT = { n: 0 };
 
     // Keys mirror src/lib/swot-content.ts exactly — this is a Deno edge function
     // and cannot import the TS module directly, so this list MUST be kept in
@@ -250,6 +295,10 @@ serve(async (req) => {
     const clusterAcc: Record<number, { sumS: number; cntS: number; sumO: number; cntO: number; sumW: number; cntW: number; sumT: number; cntT: number }> = {};
     for (const c of CLUSTER_SECTIONS) clusterAcc[c.section] = { sumS: 0, cntS: 0, sumO: 0, cntO: 0, sumW: 0, cntW: 0, sumT: 0, cntT: 0 };
 
+    // Per-cluster respondent-level coverage, same rationale as respS/respO/…
+    const clusterResp: Record<number, { s: number; o: number; w: number; t: number }> = {};
+    for (const c of CLUSTER_SECTIONS) clusterResp[c.section] = { s: 0, o: 0, w: 0, t: 0 };
+
     // Universal cross-cluster Likert (confidence/readiness/urgency), one per
     // cluster section — mirrors src/lib/universalQuestions.ts's
     // universalFieldName() naming (`q${n}_universal_${id}`).
@@ -321,26 +370,55 @@ serve(async (req) => {
       const iedsPref = d.q10_1_ieds_preference || d.q10_ieds_preference;
       if (iedsPref) ieds[iedsPref] = (ieds[iedsPref] || 0) + 1;
 
-      // Compute BIRD Scores — global (unchanged) + per-cluster (new)
+      // Compute BIRD Scores — global (unchanged) + per-cluster (unchanged).
+      // The `touched*` sets are new (v2 metadata only) and record which
+      // families / clusters THIS respondent contributed at least one valid
+      // item to, so respondent-level coverage can be reported alongside the
+      // observation-level means. They do not affect any legacy field.
+      let touchedS = false, touchedO = false, touchedW = false, touchedT = false;
+      const touchedCluster: Record<number, { s: boolean; o: boolean; w: boolean; t: boolean }> = {};
+      const markCluster = (sec: number | null, key: "s" | "o" | "w" | "t") => {
+        if (!sec || !clusterAcc[sec]) return;
+        if (!touchedCluster[sec]) touchedCluster[sec] = { s: false, o: false, w: false, t: false };
+        touchedCluster[sec][key] = true;
+      };
+
       for (const k of strengthKeys) {
         const p = getPair(d, k); if (!p) continue;
-        const v = calcStrengthRI(p.i, p.l); sumS += v; cntS++;
+        const v = calcStrengthRI(p.i, p.l); sumS += v; cntS++; touchedS = true;
         const sec = sectionOfField(k); if (sec && clusterAcc[sec]) { clusterAcc[sec].sumS += v; clusterAcc[sec].cntS++; }
+        markCluster(sec, "s");
       }
       for (const k of opportunityKeys) {
         const p = getPair(d, k); if (!p) continue;
-        const v = calcOpportunityRI(p.i, p.l); sumO += v; cntO++;
+        const v = calcOpportunityRI(p.i, p.l); sumO += v; cntO++; touchedO = true;
         const sec = sectionOfField(k); if (sec && clusterAcc[sec]) { clusterAcc[sec].sumO += v; clusterAcc[sec].cntO++; }
+        markCluster(sec, "o");
       }
       for (const k of weaknessKeys) {
         const p = getPair(d, k); if (!p) continue;
-        const v = calcWeaknessRisk(p.i, p.l); sumW += v; cntW++;
+        const v = calcWeaknessRisk(p.i, p.l); sumW += v; cntW++; touchedW = true;
         const sec = sectionOfField(k); if (sec && clusterAcc[sec]) { clusterAcc[sec].sumW += v; clusterAcc[sec].cntW++; }
+        markCluster(sec, "w");
       }
       for (const k of threatKeys) {
         const p = getPair(d, k); if (!p) continue;
-        const v = calcThreatVI(p.i, p.l); sumT += v; cntT++;
+        const v = calcThreatVI(p.i, p.l); sumT += v; cntT++; touchedT = true;
         const sec = sectionOfField(k); if (sec && clusterAcc[sec]) { clusterAcc[sec].sumT += v; clusterAcc[sec].cntT++; }
+        markCluster(sec, "t");
+      }
+
+      if (touchedS) respS.n++;
+      if (touchedO) respO.n++;
+      if (touchedW) respW.n++;
+      if (touchedT) respT.n++;
+      for (const [sec, flags] of Object.entries(touchedCluster)) {
+        const cr = clusterResp[Number(sec)];
+        if (!cr) continue;
+        if (flags.s) cr.s++;
+        if (flags.o) cr.o++;
+        if (flags.w) cr.w++;
+        if (flags.t) cr.t++;
       }
 
       // Archetype Consensus — string-typed ("Very/Somewhat accurately")
@@ -419,9 +497,12 @@ serve(async (req) => {
       const cT = a.cntT > 0 ? a.sumT / a.cntT : 0;
       const cSbi = ((cS + cO) / 2) - ((cW + cT) / 2) + 50;
       const u = universalAcc[c.section];
+      const r = clusterResp[c.section];
+      const observed = a.cntS + a.cntO + a.cntW + a.cntT;
       return [c.slug, {
         section: c.section,
         label: c.label,
+        // ── Legacy fields (unchanged) ──────────────────────────────────────
         avgStrengthRI: Number(cS.toFixed(2)),
         avgOpportunityRI: Number(cO.toFixed(2)),
         avgWeaknessRisk: Number(cW.toFixed(2)),
@@ -431,6 +512,24 @@ serve(async (req) => {
           confidence: avgOf(u.confidence),
           readiness: avgOf(u.readiness),
           urgency: avgOf(u.urgency),
+        },
+        // ── v2 metadata ────────────────────────────────────────────────────
+        // NOTE on strategicBalanceIndex: the formula has a +50 constant, so a
+        // cluster with ZERO observations still yields exactly 50 — a plausible-
+        // looking mid-range score computed from nothing at all. `metrics.sbi`
+        // is null in that case so the dashboard can suppress it rather than
+        // plot a phantom bar at 50.
+        metrics: {
+          strengthRI: itemMetric(a.sumS, a.cntS, r.s, total),
+          opportunityRI: itemMetric(a.sumO, a.cntO, r.o, total),
+          weaknessRisk: itemMetric(a.sumW, a.cntW, r.w, total),
+          threatVI: itemMetric(a.sumT, a.cntT, r.t, total),
+          sbi: observed > 0 ? Number(cSbi.toFixed(2)) : null,
+          universal: {
+            confidence: metricOf(u.confidence, total),
+            readiness: metricOf(u.readiness, total),
+            urgency: metricOf(u.urgency, total),
+          },
         },
       }];
     }));
@@ -448,9 +547,19 @@ serve(async (req) => {
         icebergModel: avgOf(leverageLikertAcc.q10_iceberg_model),
         collaborativeGovernance: avgOf(leverageLikertAcc.q10_collaborative_governance),
       },
+      // v2: same five Likerts with mean/n/missing, keyed by raw field name.
+      leverageLikertsMeta: metricsOf(leverageLikertAcc, total),
+      // v2: respondentScores[k].avg is 0 when n === 0; mean is null instead.
+      respondentScoresMeta: Object.fromEntries(
+        STRATEGIC_OPTION_KEYS.map((k) => [k, metricOf(strategyAcc[k], total)])
+      ),
     };
 
     const payload = {
+      // Bumped when the analytical contract gains fields. Consumers use this
+      // to decide whether the `*Meta` / `metrics` objects can be relied on, so
+      // frontend and Edge Function deploys don't have to ship atomically.
+      analyticsVersion: 2,
       totalResponses: total,
       lastUpdated: new Date().toISOString(),
       demographics: { provinces, categories },
@@ -461,6 +570,22 @@ serve(async (req) => {
         avgThreatVI: Number(avgT.toFixed(2)),
         strategicBalanceIndex: Number(sbi.toFixed(2)),
       },
+      // v2 metadata for the four BIRD families. `scale` is emitted explicitly
+      // because the four formulas do NOT share a range — Strength (i·l)/5 and
+      // Opportunity √(i·l) land ~0.2–5, Weakness i·l lands 1–25, and Threat
+      // (i²·l)/25 lands ~0.04–5. The dashboard must not present these four as
+      // directly comparable, and now has the ranges to say so.
+      birdScoresMeta: {
+        strengthRI: { ...itemMetric(sumS, cntS, respS.n, total), scale: { min: 0.2, max: 5, formula: "(impact × likelihood) / 5" } },
+        opportunityRI: { ...itemMetric(sumO, cntO, respO.n, total), scale: { min: 1, max: 5, formula: "√(impact × likelihood)" } },
+        weaknessRisk: { ...itemMetric(sumW, cntW, respW.n, total), scale: { min: 1, max: 25, formula: "impact × likelihood" } },
+        threatVI: { ...itemMetric(sumT, cntT, respT.n, total), scale: { min: 0.04, max: 5, formula: "(impact² × likelihood) / 25" } },
+        strategicBalanceIndex: {
+          // Same +50-constant caveat as the per-cluster SBI above.
+          mean: (cntS + cntO + cntW + cntT) > 0 ? Number(sbi.toFixed(2)) : null,
+          formula: "((S̄ + Ō) / 2) − ((W̄ + T̄) / 2) + 50",
+        },
+      },
       archetypes: Object.fromEntries(
         Object.entries(archetypes).map(([k, v]) => [k, { ...v, consensus: v.total > 0 ? Math.round((v.accurate / v.total) * 100) : 0 }])
       ),
@@ -470,6 +595,7 @@ serve(async (req) => {
       systemsThinking: {
         valueAvg: avgOf(stValue),
         valueN: stValue.n,
+        valueMeta: metricOf(stValue, total),
         readyDistribution: stReadyDist,
         comprehension: {
           cldPolarity: { correctPct: cldN > 0 ? Math.round((cldCorrect / cldN) * 100) : 0, n: cldN },
@@ -478,7 +604,12 @@ serve(async (req) => {
         },
       },
       beieUnderstanding: Object.fromEntries(
-        beieFields.map((f) => [f.field, { avg: avgOf(beieAcc[f.field]), n: beieAcc[f.field].n, label: f.label }])
+        // `avg` retained for compatibility; `mean` is null (not 0) at n === 0.
+        beieFields.map((f) => [f.field, {
+          ...metricOf(beieAcc[f.field], total),
+          avg: avgOf(beieAcc[f.field]),
+          label: f.label,
+        }])
       ),
       clusterHealth,
       strategicOptions,
@@ -496,15 +627,24 @@ serve(async (req) => {
           bscUseful: avgOf(bscAcc.q12_9_bsc_useful),
         },
         strongestPathwayDistribution: strongestPathwayDist,
+        // v2: mean/n/missing keyed by raw field name for both groups.
+        perspectivesMeta: metricsOf(Object.fromEntries(bscPerspectiveFields.map((f) => [f, bscAcc[f]])), total),
+        visionMeta: metricsOf(Object.fromEntries(bscVisionFields.map((f) => [f, bscAcc[f]])), total),
       },
       budgetAndRisk: {
         fundingMixFair: avgOf(budgetRiskAcc.q13_1_funding_mix_fair),
         targetsRealistic: avgOf(budgetRiskAcc.q13_2_targets_realistic),
+        // IMPORTANT: these three are Likert MEANS on a 1–5 concern scale, not
+        // counts of respondents. They must never be rendered as a distribution
+        // or divided by totalResponses to make a percentage — the three values
+        // are independent ratings and do not sum to the sample.
         riskConcern: {
           high: avgOf(budgetRiskAcc.q13_3_high_risk_concern),
           medium: avgOf(budgetRiskAcc.q13_4_medium_risk_concern),
           low: avgOf(budgetRiskAcc.q13_5_low_risk_concern),
         },
+        riskConcernKind: "likert_mean_1_5",
+        meta: metricsOf(budgetRiskAcc, total),
         budgetPriorityClusterDistribution: budgetPriorityClusterDist,
         blendedFinanceDistribution: blendedFinanceDist,
       },
