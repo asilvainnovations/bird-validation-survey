@@ -459,7 +459,7 @@ export const Section6_Enablers: React.FC<Section6Props> = ({ data, onChange }) =
           </p>
           {renderSwotPair(
             "O1 — Tourism Recovery",
-            "Isabela City Tourism Champion (2024) and Lake Lanao eco-tourism potential.",
+            " Lake Lanao eco-tourism potential.",
             "q6_o1_tourism_recovery_impact",
             "q6_o1_tourism_recovery_likelihood",
             "opportunity"
