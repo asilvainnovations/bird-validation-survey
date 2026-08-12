@@ -5,81 +5,193 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   1. BASE LAYER (Variables, Resets, Inputs)
+   BIRD 2026–2035
+   Global Design System
+   Production-ready theme, accessibility, overlays, dashboard UI and
+   responsive presentation layer.
+
+   Primary brand:
+     Deep Green  #022c22
+     Emerald     #064e3b
+     Gold        #C9A84C
+     Gold Light  #E8C560
+
+   Design principles:
+     1. Semantic color tokens over hard-coded colors where possible.
+     2. Explicit overlay colors for tooltips/popovers/dropdowns.
+     3. WCAG-oriented text contrast.
+     4. Dark mode must never depend on broad element selectors.
+     5. Glass effects are decorative; readability always takes priority.
+     6. Chart tooltips receive explicit readable surfaces.
    ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1. BASE LAYER
+   Variables, themes, resets, typography and form controls
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 @layer base {
+
   :root {
-    /* Core Colors */
+
+    /* ─────────────────────────────────────────────────────────────────────
+       Core semantic colors
+       ───────────────────────────────────────────────────────────────────── */
+
     --background: 210 40% 98%;
     --foreground: 222.2 84% 4.9%;
 
-    /* Glass Material Colors */
-    --glass-background: 0 0% 100%;
-    --glass-background-alpha: 0.7;
-    --glass-border: 0 0% 100%;
-    --glass-border-alpha: 0.2;
-
-    /* Card */
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
 
-    /* Popover */
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* Primary */
     --primary: 221 83% 53%;
     --primary-foreground: 210 40% 98%;
 
-    /* Secondary */
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
-    /* Muted */
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    /* Accent */
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
-    /* Destructive */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    /* Borders & Inputs */
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 221 83% 53%;
 
-    /* Radius */
+
+    /* ─────────────────────────────────────────────────────────────────────
+       BIRD brand colors
+       ───────────────────────────────────────────────────────────────────── */
+
+    --bird-deep-green: 157 87% 9%;
+    --bird-green: 158 88% 16%;
+    --bird-emerald: 158 94% 25%;
+
+    --bird-gold: 43 54% 54%;
+    --bird-gold-light: 44 68% 64%;
+    --bird-gold-dark: 42 50% 40%;
+
+    --bird-cream: 48 33% 96%;
+    --bird-white: 0 0% 100%;
+
+
+    /* ─────────────────────────────────────────────────────────────────────
+       Dedicated overlay system
+
+       IMPORTANT:
+       Tooltips, chart tooltips and transient overlays intentionally do NOT
+       inherit the normal card surface.
+
+       This prevents white-on-white and low-contrast tooltip failures.
+       ───────────────────────────────────────────────────────────────────── */
+
+    --tooltip-background: 157 87% 9%;
+    --tooltip-foreground: 0 0% 100%;
+    --tooltip-muted: 150 20% 88%;
+    --tooltip-border: 43 54% 54%;
+
+    --overlay-background: 0 0% 100%;
+    --overlay-foreground: 222.2 84% 4.9%;
+    --overlay-border: 214.3 31.8% 84%;
+
+    --chart-tooltip-background: 157 87% 9%;
+    --chart-tooltip-foreground: 0 0% 100%;
+    --chart-tooltip-muted: 150 20% 88%;
+    --chart-tooltip-border: 43 54% 54%;
+
+
+    /* ─────────────────────────────────────────────────────────────────────
+       Glass material
+       ───────────────────────────────────────────────────────────────────── */
+
+    --glass-background: 0 0% 100%;
+    --glass-background-alpha: 0.7;
+
+    --glass-border: 0 0% 100%;
+    --glass-border-alpha: 0.2;
+
+
+    /* ─────────────────────────────────────────────────────────────────────
+       Radius
+       ───────────────────────────────────────────────────────────────────── */
+
     --radius: 0.75rem;
     --radius-sm: 0.5rem;
     --radius-md: 0.75rem;
     --radius-lg: 1rem;
     --radius-xl: 1.5rem;
 
-    /* Shadows - Liquid Glass depth */
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
 
-    /* Blur values */
+    /* ─────────────────────────────────────────────────────────────────────
+       Shadows
+       ───────────────────────────────────────────────────────────────────── */
+
+    --shadow-sm:
+      0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+    --shadow-md:
+      0 4px 6px -1px rgb(0 0 0 / 0.10),
+      0 2px 4px -2px rgb(0 0 0 / 0.10);
+
+    --shadow-lg:
+      0 10px 15px -3px rgb(0 0 0 / 0.10),
+      0 4px 6px -4px rgb(0 0 0 / 0.10);
+
+    --shadow-xl:
+      0 20px 25px -5px rgb(0 0 0 / 0.10),
+      0 8px 10px -6px rgb(0 0 0 / 0.10);
+
+    --shadow-2xl:
+      0 25px 50px -12px rgb(0 0 0 / 0.25);
+
+    --shadow-glass:
+      0 8px 32px 0 rgb(31 38 135 / 0.15);
+
+    --shadow-overlay:
+      0 14px 30px rgb(0 0 0 / 0.18),
+      0 6px 12px rgb(0 0 0 / 0.10);
+
+
+    /* ─────────────────────────────────────────────────────────────────────
+       Blur
+       ───────────────────────────────────────────────────────────────────── */
+
     --blur-sm: 4px;
     --blur-md: 12px;
     --blur-lg: 16px;
     --blur-xl: 24px;
 
-    /* Transitions */
-    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 
-    /* Sidebar */
+    /* ─────────────────────────────────────────────────────────────────────
+       Motion
+       ───────────────────────────────────────────────────────────────────── */
+
+    --transition-fast:
+      150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    --transition-base:
+      200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    --transition-slow:
+      300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    --transition-spring:
+      500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+
+    /* ─────────────────────────────────────────────────────────────────────
+       Sidebar
+       ───────────────────────────────────────────────────────────────────── */
+
     --sidebar-background: 220 23% 95%;
     --sidebar-foreground: 215 25% 27%;
     --sidebar-primary: 221 83% 53%;
@@ -90,59 +202,97 @@
     --sidebar-ring: 221 83% 53%;
   }
 
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     DARK THEME
+     ═══════════════════════════════════════════════════════════════════════ */
+
   .dark {
-    /* Core Colors */
+
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 
-    /* Glass Material Colors */
-    --glass-background: 222.2 84% 8%;
-    --glass-background-alpha: 0.6;
-    --glass-border: 210 40% 98%;
-    --glass-border-alpha: 0.1;
-
-    /* Card */
-    --card: 222.2 84% 4.9%;
+    --card: 222.2 84% 6.5%;
     --card-foreground: 210 40% 98%;
 
-    /* Popover */
-    --popover: 222.2 84% 4.9%;
+    --popover: 222.2 84% 7%;
     --popover-foreground: 210 40% 98%;
 
-    /* Primary */
     --primary: 217.2 91.2% 59.8%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
-    /* Secondary */
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
 
-    /* Muted */
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    /* Accent */
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
 
-    /* Destructive */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    /* Borders & Inputs */
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
 
-    /* Shadows - Enhanced for dark mode */
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.6), 0 8px 10px -6px rgb(0 0 0 / 0.5);
-    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.7);
-    --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+
+    /* Glass */
+    --glass-background: 222.2 84% 8%;
+    --glass-background-alpha: 0.6;
+
+    --glass-border: 210 40% 98%;
+    --glass-border-alpha: 0.1;
+
+
+    /* Dark overlay surfaces */
+
+    --tooltip-background: 157 87% 9%;
+    --tooltip-foreground: 0 0% 100%;
+    --tooltip-muted: 150 20% 88%;
+    --tooltip-border: 43 68% 64%;
+
+    --overlay-background: 222.2 84% 7%;
+    --overlay-foreground: 210 40% 98%;
+    --overlay-border: 217.2 32.6% 25%;
+
+    --chart-tooltip-background: 157 87% 9%;
+    --chart-tooltip-foreground: 0 0% 100%;
+    --chart-tooltip-muted: 150 20% 88%;
+    --chart-tooltip-border: 43 68% 64%;
+
+
+    /* Dark shadows */
+
+    --shadow-sm:
+      0 1px 2px 0 rgb(0 0 0 / 0.30);
+
+    --shadow-md:
+      0 4px 6px -1px rgb(0 0 0 / 0.40),
+      0 2px 4px -2px rgb(0 0 0 / 0.30);
+
+    --shadow-lg:
+      0 10px 15px -3px rgb(0 0 0 / 0.50),
+      0 4px 6px -4px rgb(0 0 0 / 0.40);
+
+    --shadow-xl:
+      0 20px 25px -5px rgb(0 0 0 / 0.60),
+      0 8px 10px -6px rgb(0 0 0 / 0.50);
+
+    --shadow-2xl:
+      0 25px 50px -12px rgb(0 0 0 / 0.70);
+
+    --shadow-glass:
+      0 8px 32px 0 rgb(0 0 0 / 0.40);
+
+    --shadow-overlay:
+      0 20px 40px rgb(0 0 0 / 0.45),
+      0 8px 18px rgb(0 0 0 / 0.30);
+
 
     /* Sidebar */
+
     --sidebar-background: 215 28% 17%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 217.2 91.2% 59.8%;
@@ -153,30 +303,52 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Global reset
+     ───────────────────────────────────────────────────────────────────── */
+
   * {
     @apply border-border;
   }
 
-  body {
-    @apply bg-background text-foreground font-sans antialiased;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    transition: background-color var(--transition-base), color var(--transition-base);
-  }
-
-  pre, code {
-    @apply font-mono text-foreground;
-  }
 
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
+
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+
+    min-width: 320px;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    transition:
+      background-color var(--transition-base),
+      color var(--transition-base);
+  }
+
+
+  pre,
+  code {
+    @apply font-mono text-foreground;
+  }
+
 
   ::selection {
     @apply bg-primary/20 text-foreground;
   }
 
-  /* 🔧 FIX: Ensure all text inputs have visible text color */
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Form controls
+     ───────────────────────────────────────────────────────────────────── */
+
   input,
   textarea,
   select,
@@ -188,28 +360,29 @@
   .monaco-editor,
   .ace_editor {
     @apply text-foreground;
+
     caret-color: hsl(var(--primary));
   }
+
 
   input::placeholder,
   textarea::placeholder {
     @apply text-muted-foreground;
+    opacity: 1;
   }
+
 
   input:-ms-input-placeholder,
   textarea:-ms-input-placeholder {
     @apply text-muted-foreground;
   }
 
+
   input::-ms-input-placeholder,
   textarea::-ms-input-placeholder {
     @apply text-muted-foreground;
   }
 
-  .markdown-editor {
-    @apply text-foreground !important;
-    color: hsl(var(--foreground)) !important;
-  }
 
   input[type="text"],
   input[type="email"],
@@ -227,96 +400,260 @@
     @apply bg-background text-foreground border-border placeholder:text-muted-foreground;
   }
 
+
   input:disabled,
   textarea:disabled,
   input[readonly],
   textarea[readonly] {
     @apply opacity-70 text-foreground;
   }
+
+
+  .markdown-editor {
+    @apply text-foreground !important;
+
+    color: hsl(var(--foreground)) !important;
+  }
+
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Accessible focus indicator
+     ───────────────────────────────────────────────────────────────────── */
+
+  :focus-visible {
+    outline: none;
+
+    box-shadow:
+      0 0 0 2px hsl(var(--background)),
+      0 0 0 4px hsl(var(--primary) / 0.65);
+
+    border-radius: var(--radius-sm);
+  }
 }
 
+
 /* ═══════════════════════════════════════════════════════════════════════════
-   2. COMPONENTS LAYER (Glass, Materials, UI Elements)
+   2. COMPONENTS
+   Glass materials, cards, controls and overlays
    ═══════════════════════════════════════════════════════════════════════════ */
+
 @layer components {
-  /* Liquid Glass Surface */
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Liquid Glass
+     ───────────────────────────────────────────────────────────────────── */
+
   .glass {
-    background: hsla(var(--glass-background) / var(--glass-background-alpha));
-    backdrop-filter: blur(var(--blur-lg)) saturate(180%);
-    -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(180%);
-    border: 1px solid hsla(var(--glass-border) / var(--glass-border-alpha));
+    background:
+      hsla(
+        var(--glass-background) /
+        var(--glass-background-alpha)
+      );
+
+    backdrop-filter:
+      blur(var(--blur-lg))
+      saturate(180%);
+
+    -webkit-backdrop-filter:
+      blur(var(--blur-lg))
+      saturate(180%);
+
+    border:
+      1px solid
+      hsla(
+        var(--glass-border) /
+        var(--glass-border-alpha)
+      );
+
     box-shadow: var(--shadow-glass);
   }
 
+
   .glass-sm {
-    background: hsla(var(--glass-background) / calc(var(--glass-background-alpha) - 0.1));
-    backdrop-filter: blur(var(--blur-sm)) saturate(150%);
-    -webkit-backdrop-filter: blur(var(--blur-sm)) saturate(150%);
-    border: 1px solid hsla(var(--glass-border) / var(--glass-border-alpha));
+    background:
+      hsla(
+        var(--glass-background) /
+        calc(var(--glass-background-alpha) - 0.1)
+      );
+
+    backdrop-filter:
+      blur(var(--blur-sm))
+      saturate(150%);
+
+    -webkit-backdrop-filter:
+      blur(var(--blur-sm))
+      saturate(150%);
+
+    border:
+      1px solid
+      hsla(
+        var(--glass-border) /
+        var(--glass-border-alpha)
+      );
   }
 
+
   .glass-md {
-    background: hsla(var(--glass-background) / var(--glass-background-alpha));
-    backdrop-filter: blur(var(--blur-md)) saturate(160%);
-    -webkit-backdrop-filter: blur(var(--blur-md)) saturate(160%);
-    border: 1px solid hsla(var(--glass-border) / var(--glass-border-alpha));
+    background:
+      hsla(
+        var(--glass-background) /
+        var(--glass-background-alpha)
+      );
+
+    backdrop-filter:
+      blur(var(--blur-md))
+      saturate(160%);
+
+    -webkit-backdrop-filter:
+      blur(var(--blur-md))
+      saturate(160%);
+
+    border:
+      1px solid
+      hsla(
+        var(--glass-border) /
+        var(--glass-border-alpha)
+      );
+
     box-shadow: var(--shadow-md);
   }
 
+
   .glass-lg {
-    background: hsla(var(--glass-background) / var(--glass-background-alpha));
-    backdrop-filter: blur(var(--blur-xl)) saturate(200%);
-    -webkit-backdrop-filter: blur(var(--blur-xl)) saturate(200%);
-    border: 1px solid hsla(var(--glass-border) / var(--glass-border-alpha));
+    background:
+      hsla(
+        var(--glass-background) /
+        var(--glass-background-alpha)
+      );
+
+    backdrop-filter:
+      blur(var(--blur-xl))
+      saturate(200%);
+
+    -webkit-backdrop-filter:
+      blur(var(--blur-xl))
+      saturate(200%);
+
+    border:
+      1px solid
+      hsla(
+        var(--glass-border) /
+        var(--glass-border-alpha)
+      );
+
     box-shadow: var(--shadow-xl);
   }
+
 
   .glass-card {
     @apply glass rounded-[--radius-lg] p-6 transition-all duration-300;
   }
+
 
   .glass-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-xl);
   }
 
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Elevation
+     ───────────────────────────────────────────────────────────────────── */
+
+  .layer-1 {
+    box-shadow: var(--shadow-sm);
+    z-index: 1;
+  }
+
+  .layer-2 {
+    box-shadow: var(--shadow-md);
+    z-index: 2;
+  }
+
+  .layer-3 {
+    box-shadow: var(--shadow-lg);
+    z-index: 3;
+  }
+
+  .layer-4 {
+    box-shadow: var(--shadow-xl);
+    z-index: 4;
+  }
+
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Vibrancy
+     ───────────────────────────────────────────────────────────────────── */
+
   .vibrancy {
     position: relative;
     overflow: hidden;
   }
 
+
   .vibrancy::before {
     content: '';
+
     position: absolute;
     inset: 0;
-    background: radial-gradient(
-      circle at center,
-      hsla(var(--primary) / 0.05) 0%,
-      transparent 70%
-    );
+
+    background:
+      radial-gradient(
+        circle at center,
+        hsl(var(--primary) / 0.05) 0%,
+        transparent 70%
+      );
+
     pointer-events: none;
+
     opacity: 0;
-    transition: opacity var(--transition-base);
+
+    transition:
+      opacity var(--transition-base);
   }
+
 
   .vibrancy:hover::before {
     opacity: 1;
   }
 
-  .layer-1 { box-shadow: var(--shadow-sm); z-index: 1; }
-  .layer-2 { box-shadow: var(--shadow-md); z-index: 2; }
-  .layer-3 { box-shadow: var(--shadow-lg); z-index: 3; }
-  .layer-4 { box-shadow: var(--shadow-xl); z-index: 4; }
 
-  .transition-smooth { transition: all var(--transition-base); }
-  .transition-spring { transition: all var(--transition-spring); }
+  /* ─────────────────────────────────────────────────────────────────────
+     Interaction
+     ───────────────────────────────────────────────────────────────────── */
 
   .interactive {
     @apply cursor-pointer transition-all duration-200;
-    will-change: transform, box-shadow;
+
+    will-change:
+      transform,
+      box-shadow;
   }
-  .interactive:hover { transform: scale(1.02); }
-  .interactive:active { transform: scale(0.98); }
+
+
+  .interactive:hover {
+    transform: scale(1.02);
+  }
+
+
+  .interactive:active {
+    transform: scale(0.98);
+  }
+
+
+  .transition-smooth {
+    transition: all var(--transition-base);
+  }
+
+
+  .transition-spring {
+    transition: all var(--transition-spring);
+  }
+
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Glass buttons
+     ───────────────────────────────────────────────────────────────────── */
 
   .btn-glass {
     @apply glass-md px-6 py-3 rounded-[--radius-md] font-medium;
@@ -324,235 +661,1071 @@
     @apply hover:shadow-lg active:scale-95;
   }
 
+
   .btn-glass-primary {
     @apply btn-glass bg-primary/80 text-primary-foreground;
     @apply hover:bg-primary/90;
   }
 
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Materials
+     ───────────────────────────────────────────────────────────────────── */
+
   .material {
     @apply bg-card rounded-[--radius-lg] shadow-md;
     @apply border border-border/50;
-    transition: all var(--transition-base);
+
+    transition:
+      all var(--transition-base);
   }
+
+
   .material:hover {
     @apply shadow-lg border-border;
   }
 
+
   .elevated {
     @apply bg-card rounded-[--radius-lg];
+
     box-shadow: var(--shadow-lg);
+
     transform: translateZ(0);
-    will-change: transform, box-shadow;
+
+    will-change:
+      transform,
+      box-shadow;
   }
+
+
   .elevated:hover {
     box-shadow: var(--shadow-xl);
-    transform: translateY(-4px) translateZ(0);
+
+    transform:
+      translateY(-4px)
+      translateZ(0);
+  }
+
+
+  /* ─────────────────────────────────────────────────────────────────────
+     TOOLTIP SYSTEM
+     ─────────────────────────────────────────────────────────────────────
+
+     These rules are deliberately explicit.
+
+     The dashboard contains analytical tooltips and they must remain
+     readable regardless of parent text styles, dark mode, glass surfaces,
+     or inherited typography.
+     ───────────────────────────────────────────────────────────────────── */
+
+  [data-radix-tooltip-content],
+  [data-radix-tooltip-content][data-state] {
+    background-color: hsl(var(--tooltip-background)) !important;
+
+    color: hsl(var(--tooltip-foreground)) !important;
+
+    border:
+      1px solid
+      hsl(var(--tooltip-border) / 0.55) !important;
+
+    border-radius:
+      var(--radius-sm) !important;
+
+    padding:
+      0.625rem
+      0.75rem !important;
+
+    max-width:
+      min(320px, calc(100vw - 2rem));
+
+    min-width:
+      max-content;
+
+    font-family:
+      'Poppins',
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      sans-serif;
+
+    font-size:
+      0.8125rem;
+
+    font-weight:
+      400;
+
+    line-height:
+      1.45;
+
+    letter-spacing:
+      0;
+
+    text-align:
+      left;
+
+    white-space:
+      normal;
+
+    overflow-wrap:
+      anywhere;
+
+    word-break:
+      normal;
+
+    box-shadow:
+      var(--shadow-overlay) !important;
+
+    opacity:
+      1 !important;
+
+    backdrop-filter:
+      none !important;
+
+    -webkit-backdrop-filter:
+      none !important;
+
+    z-index:
+      9999;
+  }
+
+
+  [data-radix-tooltip-content] p,
+  [data-radix-tooltip-content] span,
+  [data-radix-tooltip-content] div,
+  [data-radix-tooltip-content] strong,
+  [data-radix-tooltip-content] small {
+    color:
+      inherit !important;
+  }
+
+
+  [data-radix-tooltip-content] strong {
+    font-weight:
+      600;
+  }
+
+
+  [data-radix-tooltip-content] small {
+    color:
+      hsl(var(--tooltip-muted)) !important;
+
+    font-size:
+      0.75rem;
+  }
+
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Generic tooltip classes
+
+     Useful if the application has custom tooltip implementations rather
+     than Radix Tooltip.
+     ───────────────────────────────────────────────────────────────────── */
+
+  .tooltip,
+  .tooltip-content,
+  [role="tooltip"] {
+    background-color:
+      hsl(var(--tooltip-background));
+
+    color:
+      hsl(var(--tooltip-foreground));
+
+    border:
+      1px solid
+      hsl(var(--tooltip-border) / 0.55);
+
+    border-radius:
+      var(--radius-sm);
+
+    box-shadow:
+      var(--shadow-overlay);
+
+    font-size:
+      0.8125rem;
+
+    line-height:
+      1.45;
+
+    max-width:
+      min(320px, calc(100vw - 2rem));
+
+    padding:
+      0.625rem
+      0.75rem;
+
+    white-space:
+      normal;
+
+    overflow-wrap:
+      anywhere;
+
+    z-index:
+      9999;
+  }
+
+
+  .tooltip *,
+  .tooltip-content *,
+  [role="tooltip"] * {
+    color:
+      inherit;
+  }
+
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Recharts tooltip
+     ───────────────────────────────────────────────────────────────────── */
+
+  .recharts-tooltip-wrapper {
+    z-index: 9999 !important;
+  }
+
+
+  .recharts-default-tooltip {
+    background-color:
+      hsl(var(--chart-tooltip-background)) !important;
+
+    color:
+      hsl(var(--chart-tooltip-foreground)) !important;
+
+    border:
+      1px solid
+      hsl(var(--chart-tooltip-border) / 0.60) !important;
+
+    border-radius:
+      var(--radius-sm) !important;
+
+    box-shadow:
+      var(--shadow-overlay) !important;
+
+    padding:
+      0.625rem 0.75rem !important;
+
+    min-width:
+      150px;
+
+    font-family:
+      'Poppins',
+      system-ui,
+      sans-serif;
+
+    font-size:
+      0.8125rem !important;
+
+    line-height:
+      1.45 !important;
+  }
+
+
+  .recharts-default-tooltip,
+  .recharts-default-tooltip *,
+  .recharts-tooltip-label,
+  .recharts-tooltip-item,
+  .recharts-tooltip-item-list {
+    color:
+      hsl(var(--chart-tooltip-foreground)) !important;
+  }
+
+
+  .recharts-tooltip-label {
+    font-weight:
+      600 !important;
+
+    margin-bottom:
+      0.25rem !important;
+  }
+
+
+  .recharts-tooltip-item {
+    padding:
+      0.125rem 0 !important;
+  }
+
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Dropdowns, selects and popovers
+     ───────────────────────────────────────────────────────────────────── */
+
+  [data-radix-popper-content-wrapper] [role="menu"],
+  [data-radix-popper-content-wrapper] [role="listbox"],
+  [data-radix-popper-content-wrapper] [data-radix-menu-content],
+  [data-radix-popper-content-wrapper] [data-radix-select-content],
+  [data-radix-popper-content-wrapper] [data-radix-popover-content] {
+    background-color:
+      hsl(var(--overlay-background));
+
+    color:
+      hsl(var(--overlay-foreground));
+
+    border-color:
+      hsl(var(--overlay-border));
+  }
+
+
+  /* Explicit Radix popover */
+
+  [data-radix-popover-content] {
+    background-color:
+      hsl(var(--overlay-background)) !important;
+
+    color:
+      hsl(var(--overlay-foreground)) !important;
+
+    border-color:
+      hsl(var(--overlay-border)) !important;
+
+    box-shadow:
+      var(--shadow-overlay);
+  }
+
+
+  [data-radix-popover-content] p,
+  [data-radix-popover-content] span,
+  [data-radix-popover-content] div,
+  [data-radix-popover-content] label {
+    color:
+      inherit;
+  }
+
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Dialog / modal content
+     ───────────────────────────────────────────────────────────────────── */
+
+  [role="dialog"] {
+    color:
+      hsl(var(--foreground));
+  }
+
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Disabled state
+     ───────────────────────────────────────────────────────────────────── */
+
+  button:disabled,
+  [role="button"][aria-disabled="true"] {
+    cursor:
+      not-allowed;
+
+    opacity:
+      0.6;
   }
 }
 
+
 /* ═══════════════════════════════════════════════════════════════════════════
-   3. UTILITIES LAYER
+   3. UTILITIES
    ═══════════════════════════════════════════════════════════════════════════ */
+
 @layer utilities {
-  .blur-glass { backdrop-filter: blur(var(--blur-lg)); -webkit-backdrop-filter: blur(var(--blur-lg)); }
-  .blur-glass-sm { backdrop-filter: blur(var(--blur-sm)); -webkit-backdrop-filter: blur(var(--blur-sm)); }
-  .blur-glass-md { backdrop-filter: blur(var(--blur-md)); -webkit-backdrop-filter: blur(var(--blur-md)); }
-  .blur-glass-xl { backdrop-filter: blur(var(--blur-xl)); -webkit-backdrop-filter: blur(var(--blur-xl)); }
 
-  .scroll-smooth { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+  .blur-glass {
+    backdrop-filter:
+      blur(var(--blur-lg));
 
-  .safe-top { padding-top: env(safe-area-inset-top); }
-  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
-  .safe-left { padding-left: env(safe-area-inset-left); }
-  .safe-right { padding-right: env(safe-area-inset-right); }
+    -webkit-backdrop-filter:
+      blur(var(--blur-lg));
+  }
+
+
+  .blur-glass-sm {
+    backdrop-filter:
+      blur(var(--blur-sm));
+
+    -webkit-backdrop-filter:
+      blur(var(--blur-sm));
+  }
+
+
+  .blur-glass-md {
+    backdrop-filter:
+      blur(var(--blur-md));
+
+    -webkit-backdrop-filter:
+      blur(var(--blur-md));
+  }
+
+
+  .blur-glass-xl {
+    backdrop-filter:
+      blur(var(--blur-xl));
+
+    -webkit-backdrop-filter:
+      blur(var(--blur-xl));
+  }
+
+
+  .scroll-smooth {
+    scroll-behavior:
+      smooth;
+
+    -webkit-overflow-scrolling:
+      touch;
+  }
+
+
+  .safe-top {
+    padding-top:
+      env(safe-area-inset-top);
+  }
+
+
+  .safe-bottom {
+    padding-bottom:
+      env(safe-area-inset-bottom);
+  }
+
+
+  .safe-left {
+    padding-left:
+      env(safe-area-inset-left);
+  }
+
+
+  .safe-right {
+    padding-right:
+      env(safe-area-inset-right);
+  }
+
+
+  /* Screen-reader-only utility */
+
+  .sr-only {
+    position:
+      absolute;
+
+    width:
+      1px;
+
+    height:
+      1px;
+
+    padding:
+      0;
+
+    margin:
+      -1px;
+
+    overflow:
+      hidden;
+
+    clip:
+      rect(0, 0, 0, 0);
+
+    white-space:
+      nowrap;
+
+    border:
+      0;
+  }
 }
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   4. MARKDOWN, ANIMATIONS & ACCESSIBILITY
+   4. BIRD THEME-AWARE COMPONENT UTILITIES
    ═══════════════════════════════════════════════════════════════════════════ */
-.markdown-editor {
-  @apply font-mono text-base leading-relaxed;
-  @apply bg-transparent p-4 rounded-[--radius-md];
-  @apply border border-border/50 focus:border-primary/50;
-  @apply transition-all duration-200;
-  @apply focus:outline-none focus:ring-2 focus:ring-primary/20;
+
+.surface-base {
+  @apply bg-white dark:bg-[#022c22];
 }
 
-.markdown-preview {
-  @apply prose max-w-none prose-blue dark:prose-invert;
-  @apply prose-headings:font-sans prose-headings:font-semibold;
-  @apply prose-a:text-primary prose-a:no-underline hover:prose-a:underline;
-  @apply prose-code:text-primary prose-code:bg-secondary/50;
-  @apply prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded;
-  @apply prose-code:before:content-none prose-code:after:content-none;
+
+.surface-raised {
+  @apply bg-white dark:bg-[#022c22]/60;
 }
 
-.markdown-preview pre {
-  @apply glass-md p-4 rounded-[--radius-md] overflow-x-auto;
-  @apply text-sm leading-relaxed;
+
+.surface-sunken {
+  @apply bg-[#ecfdf5]/5 dark:bg-[#011a12];
 }
 
-.markdown-preview code { @apply font-mono text-sm; }
 
-.markdown-preview h1, .markdown-preview h2, .markdown-preview h3,
-.markdown-preview h4, .markdown-preview h5, .markdown-preview h6 {
-  @apply font-sans font-semibold text-foreground scroll-mt-20;
+.surface-panel {
+  @apply bg-[#064e3b]/10 dark:bg-[#022c22]/40
+         border border-[#C9A84C]/20;
 }
 
-.markdown-preview ul, .markdown-preview ol { @apply my-4 ml-6; }
 
-.markdown-preview blockquote {
-  @apply border-l-4 border-primary/30 pl-4 italic;
-  @apply bg-secondary/30 py-2 pr-4 rounded-r-[--radius-sm];
+.text-primary-content {
+  @apply text-[#022c22] dark:text-[#E8C560];
 }
 
-.markdown-preview table { @apply w-full border-collapse; }
-.markdown-preview th { @apply bg-secondary/50 font-semibold text-left p-3 border-b-2 border-border; }
-.markdown-preview td { @apply p-3 border-b border-border/50; }
 
-.markdown-preview img {
-  @apply rounded-[--radius-md] shadow-md transition-transform duration-300;
-}
-.markdown-preview img:hover { @apply scale-[1.02] shadow-lg; }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-.animate-fade-in { animation: fadeIn var(--transition-base) ease-out; }
-.animate-slide-in { animation: slideIn var(--transition-base) ease-out; }
-.animate-scale-in { animation: scaleIn var(--transition-base) ease-out; }
-
-:focus-visible {
-  @apply outline-none ring-2 ring-primary/50 ring-offset-2 ring-offset-background rounded-[--radius-sm];
+.text-secondary-content {
+  @apply text-[#064e3b] dark:text-[#ecfdf5]/80;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+
+.text-tertiary-content {
+  @apply text-[#64748b] dark:text-[#94a3b8];
 }
 
-@media (prefers-contrast: high) {
-  .glass, .glass-sm, .glass-md, .glass-lg {
-    border-width: 2px;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background: hsl(var(--card));
-  }
+
+.border-subtle {
+  @apply border-[#C9A84C]/20 dark:border-[#C9A84C]/15;
 }
 
-@media print {
-  .glass, .glass-sm, .glass-md, .glass-lg {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background: white;
-    border: 1px solid #e5e7eb;
-  }
+
+.border-strong {
+  @apply border-[#C9A84C]/30 dark:border-[#C9A84C]/25;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   5. BIRD THEME-AWARE COMPONENT UTILITIES
-   ═══════════════════════════════════════════════════════════════════════════ */
-.surface-base   { @apply bg-white dark:bg-[#022c22]; }
-.surface-raised { @apply bg-white dark:bg-[#022c22]/60; }
-.surface-sunken { @apply bg-[#ecfdf5]/5 dark:bg-[#011a12]; }
-.surface-panel  { @apply bg-[#064e3b]/10 dark:bg-[#022c22]/40 border border-[#C9A84C]/20; }
 
-.text-primary-content   { @apply text-[#022c22] dark:text-[#E8C560]; }
-.text-secondary-content { @apply text-[#064e3b] dark:text-[#ecfdf5]/80; }
-.text-tertiary-content  { @apply text-[#64748b] dark:text-[#64748b]/80; }
-
-.border-subtle  { @apply border-[#C9A84C]/20 dark:border-[#C9A84C]/15; }
-.border-strong  { @apply border-[#C9A84C]/30 dark:border-[#C9A84C]/25; }
+/* ─────────────────────────────────────────────────────────────────────
+   Form field
+   ───────────────────────────────────────────────────────────────────── */
 
 .input-field {
   @apply bg-white dark:bg-[#022c22]/60
          text-slate-900 dark:text-[#ecfdf5]
          border-[#C9A84C]/30 dark:border-[#C9A84C]/20
-         placeholder:text-[#64748b] dark:placeholder:text-[#64748b]/60
-         focus:ring-[#C9A84C] focus:border-[#C9A84C];
+         placeholder:text-[#64748b]
+         dark:placeholder:text-[#94a3b8]
+         focus:ring-[#C9A84C]
+         focus:border-[#C9A84C];
 }
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   Cards
+   ───────────────────────────────────────────────────────────────────── */
 
 .card-surface {
   @apply bg-white dark:bg-[#022c22]/40
-         border border-[#C9A84C]/20 dark:border-[#C9A84C]/15
+         border border-[#C9A84C]/20
+         dark:border-[#C9A84C]/15
          rounded-xl shadow-sm;
 }
 
-.tab-bar { @apply bg-[#064e3b]/10 dark:bg-[#022c22]/60 rounded-xl p-1 border border-[#C9A84C]/20; }
-.tab-item { @apply text-[#64748b] dark:text-[#64748b] hover:text-[#C9A84C] dark:hover:text-[#E8C560]; }
-.tab-item-active { @apply bg-[#C9A84C]/20 shadow-sm text-[#022c22] dark:text-[#E8C560] ring-1 ring-[#C9A84C]/30; }
 
-.badge-neutral { @apply bg-[#064e3b]/10 dark:bg-[#022c22]/60 text-[#64748b] dark:text-[#64748b]; }
+/* ─────────────────────────────────────────────────────────────────────
+   Tabs
+   ───────────────────────────────────────────────────────────────────── */
 
-.cld-canvas-bg {
-  @apply bg-gradient-to-br from-[#ecfdf5]/5 via-[#022c22]/20 to-[#064e3b]/10
-         dark:from-[#011a12] dark:via-[#022c22] dark:to-[#064e3b]/20
-         border border-[#C9A84C]/20 dark:border-[#C9A84C]/15;
+.tab-bar {
+  @apply bg-[#064e3b]/10
+         dark:bg-[#022c22]/60
+         rounded-xl
+         p-1
+         border border-[#C9A84C]/20;
 }
 
+
+.tab-item {
+  @apply text-[#64748b]
+         dark:text-[#cbd5e1]
+         hover:text-[#C9A84C]
+         dark:hover:text-[#E8C560];
+}
+
+
+.tab-item-active {
+  @apply bg-[#C9A84C]/20
+         shadow-sm
+         text-[#022c22]
+         dark:text-[#E8C560]
+         ring-1
+         ring-[#C9A84C]/30;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   Neutral badge
+   ───────────────────────────────────────────────────────────────────── */
+
+.badge-neutral {
+  @apply bg-[#064e3b]/10
+         dark:bg-[#022c22]/60
+         text-[#475569]
+         dark:text-[#cbd5e1];
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   CLD canvas
+   ───────────────────────────────────────────────────────────────────── */
+
+.cld-canvas-bg {
+  @apply bg-gradient-to-br
+         from-[#ecfdf5]/5
+         via-[#022c22]/20
+         to-[#064e3b]/10
+         dark:from-[#011a12]
+         dark:via-[#022c22]
+         dark:to-[#064e3b]/20
+         border border-[#C9A84C]/20
+         dark:border-[#C9A84C]/15;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   Panel overlay
+   ───────────────────────────────────────────────────────────────────── */
+
 .panel-overlay {
-  @apply bg-white dark:bg-[#022c22]
-         border border-[#C9A84C]/20 dark:border-[#C9A84C]/15
+  @apply bg-white
+         dark:bg-[#022c22]
+         border border-[#C9A84C]/20
+         dark:border-[#C9A84C]/15
          shadow-xl;
 }
 
+
+/* ─────────────────────────────────────────────────────────────────────
+   Section header
+   ───────────────────────────────────────────────────────────────────── */
+
 .section-header {
-  @apply bg-gradient-to-r from-[#064e3b]/5 to-[#064e3b]/10
-         dark:from-[#022c22] dark:to-[#011a12]
-         border-b border-[#C9A84C]/20 dark:border-[#C9A84C]/15;
+  @apply bg-gradient-to-r
+         from-[#064e3b]/5
+         to-[#064e3b]/10
+         dark:from-[#022c22]
+         dark:to-[#011a12]
+         border-b
+         border-[#C9A84C]/20
+         dark:border-[#C9A84C]/15;
 }
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   6. PLATFORM BADGES
+   5. TYPOGRAPHY HELPERS
    ═══════════════════════════════════════════════════════════════════════════ */
-#bolt-badge, .bolt-badge, [data-bolt-badge], 
-[id*="bolt"][id*="badge"], [class*="bolt"][class*="badge"],
-iframe[src*="bolt"], iframe[src*="badge"], iframe[title*="bolt"], 
-iframe[title*="badge"], iframe[data-bolt], iframe.badge,
-[style*="position: fixed"][style*="bottom"], [style*="position:fixed"][style*="bottom"],
-div[style*="z-index: 999"], div[style*="z-index:999"], div[style*="z-index: 9999"],
-a[href*="bolt.new"], a[href*="bolt.diy"],
-[data-badge="bolt"], [data-platform="bolt"], [data-branding="bolt"],
-.platform-badge, .builder-badge, .powered-by-badge,
-[class*="made-in"], [class*="powered-by"], [class*="built-with"],
-body > div:last-child[style*="position: fixed"], body > div:last-child[style*="position:fixed"],
-body > a:last-child[style*="position: fixed"], body > a:last-child[style*="position:fixed"],
-svg[data-badge], svg[class*="badge"], svg[id*="badge"],
-[data-watermark], [data-attribution], .watermark, .attribution {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  position: absolute !important;
-  left: -9999px !important;
-  top: -9999px !important;
-  height: 0 !important;
-  width: 0 !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
+
+.font-display {
+  font-family:
+    'Montserrat',
+    system-ui,
+    sans-serif;
 }
+
+
+.font-body {
+  font-family:
+    'Poppins',
+    system-ui,
+    sans-serif;
+}
+
+
+.font-condensed {
+  font-family:
+    'Roboto Condensed',
+    system-ui,
+    sans-serif;
+}
+
+
+.font-data {
+  font-family:
+    'JetBrains Mono',
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+}
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   7. DARK MODE TEXT READABILITY FALLBACKS
-   (Unlayered to ensure highest cascade priority. Automatically flips 
-   hardcoded dark text colors to light when dark mode is active, 
-   preventing invisible text if dark: classes were omitted in TSX).
+   6. MARKDOWN
    ═══════════════════════════════════════════════════════════════════════════ */
-.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
-  color: hsl(150 10% 95%);
+
+.markdown-editor {
+  @apply font-mono text-base leading-relaxed;
+  @apply bg-transparent p-4 rounded-[--radius-md];
+  @apply border border-border/50;
+  @apply focus:border-primary/50;
+  @apply transition-all duration-200;
+  @apply focus:outline-none focus:ring-2 focus:ring-primary/20;
+
+  color:
+    hsl(var(--foreground));
 }
 
-.dark p, .dark span, .dark label, .dark li, .dark td, .dark th {
-  color: hsl(150 10% 90%);
+
+.markdown-preview {
+  @apply prose max-w-none prose-blue dark:prose-invert;
+
+  @apply prose-headings:font-sans
+         prose-headings:font-semibold;
+
+  @apply prose-a:text-primary
+         prose-a:no-underline
+         hover:prose-a:underline;
+
+  @apply prose-code:text-primary
+         prose-code:bg-secondary/50;
+
+  @apply prose-code:px-1.5
+         prose-code:py-0.5
+         prose-code:rounded;
+
+  @apply prose-code:before:content-none
+         prose-code:after:content-none;
 }
 
-/* Override hardcoded dark text colors that become invisible on dark backgrounds */
+
+.markdown-preview pre {
+  @apply glass-md
+         p-4
+         rounded-[--radius-md]
+         overflow-x-auto;
+
+  @apply text-sm
+         leading-relaxed;
+}
+
+
+.markdown-preview code {
+  @apply font-mono text-sm;
+}
+
+
+.markdown-preview h1,
+.markdown-preview h2,
+.markdown-preview h3,
+.markdown-preview h4,
+.markdown-preview h5,
+.markdown-preview h6 {
+  @apply font-sans
+         font-semibold
+         text-foreground
+         scroll-mt-20;
+}
+
+
+.markdown-preview ul,
+.markdown-preview ol {
+  @apply my-4 ml-6;
+}
+
+
+.markdown-preview blockquote {
+  @apply border-l-4
+         border-primary/30
+         pl-4
+         italic;
+
+  @apply bg-secondary/30
+         py-2
+         pr-4
+         rounded-r-[--radius-sm];
+}
+
+
+.markdown-preview table {
+  @apply w-full border-collapse;
+}
+
+
+.markdown-preview th {
+  @apply bg-secondary/50
+         font-semibold
+         text-left
+         p-3
+         border-b-2
+         border-border;
+}
+
+
+.markdown-preview td {
+  @apply p-3
+         border-b
+         border-border/50;
+}
+
+
+.markdown-preview img {
+  @apply rounded-[--radius-md]
+         shadow-md
+         transition-transform
+         duration-300;
+}
+
+
+.markdown-preview img:hover {
+  @apply scale-[1.02]
+         shadow-lg;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   7. ANIMATIONS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+.animate-fade-in {
+  animation:
+    fadeIn
+    var(--transition-base)
+    ease-out;
+}
+
+
+.animate-slide-in {
+  animation:
+    slideIn
+    var(--transition-base)
+    ease-out;
+}
+
+
+.animate-scale-in {
+  animation:
+    scaleIn
+    var(--transition-base)
+    ease-out;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   8. ACCESSIBILITY
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  html {
+    scroll-behavior:
+      auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration:
+      0.01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+
+    transition-duration:
+      0.01ms !important;
+
+    scroll-behavior:
+      auto !important;
+  }
+}
+
+
+@media (prefers-contrast: high) {
+
+  .glass,
+  .glass-sm,
+  .glass-md,
+  .glass-lg {
+    border-width:
+      2px;
+
+    backdrop-filter:
+      none;
+
+    -webkit-backdrop-filter:
+      none;
+
+    background:
+      hsl(var(--card));
+  }
+
+
+  [data-radix-tooltip-content],
+  [role="tooltip"],
+  .tooltip,
+  .tooltip-content {
+    border:
+      2px solid
+      currentColor !important;
+
+    box-shadow:
+      none !important;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   9. RESPONSIVE TYPOGRAPHY / MOBILE SAFETY
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 640px) {
+
+  [data-radix-tooltip-content],
+  [role="tooltip"],
+  .tooltip,
+  .tooltip-content {
+    max-width:
+      calc(100vw - 1.5rem);
+
+    font-size:
+      0.75rem;
+
+    line-height:
+      1.45;
+
+    padding:
+      0.55rem
+      0.65rem;
+  }
+
+
+  .glass-card {
+    @apply p-4;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   10. PRINT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media print {
+
+  *,
+  *::before,
+  *::after {
+    box-shadow:
+      none !important;
+
+    text-shadow:
+      none !important;
+  }
+
+
+  body {
+    background:
+      white !important;
+
+    color:
+      black !important;
+  }
+
+
+  .glass,
+  .glass-sm,
+  .glass-md,
+  .glass-lg {
+    backdrop-filter:
+      none;
+
+    -webkit-backdrop-filter:
+      none;
+
+    background:
+      white !important;
+
+    border:
+      1px solid #e5e7eb;
+
+    box-shadow:
+      none !important;
+  }
+
+
+  [data-radix-tooltip-content],
+  [role="tooltip"],
+  .tooltip,
+  .tooltip-content {
+    display:
+      none !important;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   11. BOLT / PLATFORM BADGES
+   ═══════════════════════════════════════════════════════════════════════════
+
+#bolt-badge,
+.bolt-badge,
+[data-bolt-badge],
+[id*="bolt"][id*="badge"],
+[class*="bolt"][class*="badge"],
+iframe[src*="bolt.new"],
+iframe[src*="bolt.diy"],
+iframe[title*="bolt"],
+[data-badge="bolt"],
+[data-platform="bolt"],
+[data-branding="bolt"],
+.platform-badge,
+.builder-badge,
+.powered-by-badge,
+[data-watermark],
+[data-attribution],
+.watermark,
+.attribution {
+  display:
+    none !important;
+
+  visibility:
+    hidden !important;
+
+  opacity:
+    0 !important;
+
+  pointer-events:
+    none !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   12. SAFE DARK-MODE READABILITY FALLBACKS
+   ═══════════════════════════════════════════════════════════════════════════
+
+   IMPORTANT:
+   The previous stylesheet used:
+
+     .dark p,
+     .dark span,
+     .dark label,
+     .dark li,
+     .dark td,
+     .dark th
+
+   which is too broad and can override tooltip, chart, popover and component
+   styling.
+
+   These replacements target only known hard-coded utility classes.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 .dark .text-\[\#022c22\],
 .dark .text-\[\#065f46\],
 .dark .text-\[\#064e3b\],
@@ -562,19 +1735,94 @@ svg[data-badge], svg[class*="badge"], svg[id*="badge"],
 .dark .text-black,
 .dark .text-slate-800,
 .dark .text-gray-800 {
-  color: hsl(150 10% 95%) !important; /* Light emerald/cream */
+  color:
+    hsl(150 10% 95%) !important;
 }
 
-/* Override hardcoded muted text colors for better contrast */
+
 .dark .text-\[\#64748b\],
 .dark .text-slate-500,
 .dark .text-gray-500,
 .dark .text-slate-600,
 .dark .text-gray-600 {
-  color: hsl(215 20.2% 65.1%) !important; /* slate-400 equivalent */
+  color:
+    hsl(215 20.2% 70%) !important;
 }
 
-/* Ensure links are visible */
-.dark a {
-  color: hsl(150 10% 95%);
+
+/* Links */
+
+.dark a:not(
+  [data-radix-tooltip-content] a,
+  [role="tooltip"] a
+) {
+  color:
+    hsl(150 10% 95%);
+}
+
+
+.dark a:hover {
+  color:
+    hsl(var(--bird-gold-light));
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   13. FINAL OVERLAY SAFETY NET
+   ═══════════════════════════════════════════════════════════════════════════
+
+   This section intentionally sits outside Tailwind layers so it has strong
+   cascade priority against third-party component defaults.
+
+   It is the final defense against white-on-white tooltip text.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[data-radix-tooltip-content] {
+  background:
+    hsl(var(--tooltip-background)) !important;
+
+  color:
+    hsl(var(--tooltip-foreground)) !important;
+}
+
+
+[data-radix-tooltip-content] *,
+[role="tooltip"] *,
+.tooltip *,
+.tooltip-content * {
+  color:
+    inherit !important;
+}
+
+
+/* Keep muted explanatory text readable inside tooltips */
+
+[data-radix-tooltip-content] .text-muted-foreground,
+[role="tooltip"] .text-muted-foreground,
+.tooltip .text-muted-foreground,
+.tooltip-content .text-muted-foreground {
+  color:
+    hsl(var(--tooltip-muted)) !important;
+}
+
+
+/* Recharts final safety net */
+
+.recharts-default-tooltip {
+  background:
+    hsl(var(--chart-tooltip-background)) !important;
+
+  color:
+    hsl(var(--chart-tooltip-foreground)) !important;
+
+  border-color:
+    hsl(var(--chart-tooltip-border) / 0.6) !important;
+}
+
+
+.recharts-default-tooltip *,
+.recharts-tooltip-label,
+.recharts-tooltip-item {
+  color:
+    hsl(var(--chart-tooltip-foreground)) !important;
 }
