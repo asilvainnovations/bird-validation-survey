@@ -39,18 +39,109 @@ const corsHeaders = (origin: string | null) => {
   return headers;
 };
 
-// BIRD Formulas (Deno compatible)
+// ── BIRD Formulas (Deno compatible) ────────────────────────────────────────
+// Mirror src/lib/formulas.ts exactly (Deno can't import the TS module
+// directly — see the archetype/SWOT key-list comment below for the same
+// documented exception). Any change here MUST be mirrored there, and vice
+// versa; a silent divergence here is the "Opportunity RI always zero"
+// bug class described in formulas-and-invariants.md.
 const calcStrengthRI = (i: number, l: number) => (i * l) / 5;
 const calcOpportunityRI = (i: number, l: number) => Math.sqrt(i * l);
 const calcWeaknessRisk = (i: number, l: number) => i * l;
 const calcThreatVI = (i: number, l: number) => (Math.pow(i, 2) * l) / 25;
 
+// Strategy Option Scoring (IEDS Matrix) — mirrors formulas.ts's
+// calculateStrategyOverallScore exactly (weights sum to 1.00).
+//
+// KNOWN DRIFT (flagged 2026-08-13, not fixed here — see PR notes): the live
+// survey question in src/components/strategic/Section10_IEDS.tsx computes
+// its own "Your Weighted Totals" using a DIFFERENT, locally-duplicated
+// weight set (economic_impact 0.25, feasibility 0.20, risk_return 0.10,
+// sustainability 0.05 — vs. the canonical values below). Both weight sets
+// independently sum to 1.00, so neither is arithmetically broken, but they
+// are two different methodologies computing "the same" score. This endpoint
+// deliberately uses the CANONICAL formulas.ts weights (per invariant #1:
+// formulas are single-source-of-truth, never reimplemented ad hoc), which
+// means respondentScores below will NOT exactly match what respondents saw
+// live during Section 10. Section10_IEDS.tsx's EVALUATION_CRITERIA should be
+// corrected to match formulas.ts, not the other way around.
+const STRATEGY_WEIGHTS: Record<string, number> = {
+  economic_impact: 0.20,
+  feasibility: 0.18,
+  identity_alignment: 0.15,
+  systems_leverage: 0.15,
+  risk_return: 0.16,
+  inclusivity: 0.10,
+  sustainability: 0.06,
+};
+function calcStrategyScore(scores: Record<string, number> | undefined | null): number | null {
+  if (!scores || typeof scores !== "object") return null;
+  let sum = 0;
+  for (const [key, weight] of Object.entries(STRATEGY_WEIGHTS)) {
+    const v = scores[key];
+    if (typeof v !== "number") return null;
+    sum += v * weight;
+  }
+  return sum;
+}
+// Reference: Section10_IEDS.tsx's PRE_COMPUTED_SCORES / REFERENCE_TOTALS
+// (the roadmap's own Chapter 4 evaluation of each strategic option, shown to
+// respondents as "roadmap: X.XX" next to their own live score). Provenance
+// of which weight set produced these specific numbers is not verifiable from
+// this repo alone — flagged for Alvin to confirm against the source Chapter
+// 4 document when auditing the weight-drift issue above.
+const BASELINE_SCORES: Record<string, number> = { heds: 7.61, gems: 7.16, ifes: 7.48, ieds: 8.93 };
+const STRATEGIC_OPTION_KEYS = ["heds", "gems", "ifes", "ieds"] as const;
+
 const getPair = (d: any, prefix: string) => {
   const i = d[`${prefix}_impact`];
   const l = d[`${prefix}_likelihood`];
-  if (typeof i === 'number' && typeof l === 'number') return { i, l };
+  if (typeof i === "number" && typeof l === "number") return { i, l };
   return null;
 };
+
+// Small accumulator helpers used throughout — kept intentionally simple
+// (no external stats library) since Deno edge functions want minimal
+// dependencies and this is plain mean/count/tally arithmetic.
+interface NumAcc { sum: number; n: number; }
+function addNum(acc: NumAcc, val: unknown) {
+  if (typeof val === "number") { acc.sum += val; acc.n++; }
+}
+function avgOf(acc: NumAcc): number { return acc.n > 0 ? Number((acc.sum / acc.n).toFixed(2)) : 0; }
+
+function addDist(dist: Record<string, number>, val: unknown) {
+  if (typeof val === "string" && val.length > 0) dist[val] = (dist[val] || 0) + 1;
+}
+function addMultiDist(dist: Record<string, number>, val: unknown) {
+  if (Array.isArray(val)) for (const v of val) if (typeof v === "string" && v.length > 0) dist[v] = (dist[v] || 0) + 1;
+}
+
+// ── Section 0 comprehension quiz — correct answers ─────────────────────────
+// Mirrors the option arrays in src/components/strategic/Section0_Orientation.tsx
+// (cldPolarityOptions[0], reinforcingLoopOptions[1], leveragePointOptions[2]).
+const CORRECT_CLD_POLARITY = "Same-direction relationship (both variables move together)";
+const CORRECT_REINFORCING_LOOP = "A loop that amplifies change in the same direction";
+const CORRECT_LEVERAGE_POINT = "Transforming the paradigm or mindset";
+
+// ── BEIE cluster sections (4–9) — mirrors src/lib/bird-urls.ts's Section
+// N: Cluster M headers and src/lib/universalQuestions.ts's
+// UNIVERSAL_QUESTION_SECTIONS. Section 9 is "Operating Systems"
+// (cross-cutting: Moral Governance, Peace, Resilience), not a 6th BEIE
+// cluster proper, but it's scored with the same SWOT + universal-Likert
+// machinery as the 5 clusters, so it's included here for consistency.
+const CLUSTER_SECTIONS: { section: number; slug: string; label: string }[] = [
+  { section: 4, slug: "foundations", label: "Foundations" },
+  { section: 5, slug: "transformers", label: "Transformers" },
+  { section: 6, slug: "enablers", label: "Enablers" },
+  { section: 7, slug: "connectors", label: "Connectors" },
+  { section: 8, slug: "financiers", label: "Financiers" },
+  { section: 9, slug: "operatingSystems", label: "Operating Systems" },
+];
+
+function sectionOfField(field: string): number | null {
+  const m = /^q(\d+)_/.exec(field);
+  return m ? Number(m[1]) : null;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders(req.headers.get("Origin")) });
@@ -74,7 +165,7 @@ serve(async (req) => {
 
     if (error) throw error;
 
-    let total = responses?.length || 0;
+    const total = responses?.length || 0;
     const provinces: Record<string, number> = {};
     const categories: Record<string, number> = {};
     const ieds: Record<string, number> = {};
@@ -116,8 +207,15 @@ serve(async (req) => {
       'q9_t1_climate_change', 'q9_t2_drifting_goals', 'q9_t3_security_incidents', 'q9_t4_political_transition', 'q9_t5_natl_coordination', 'q9_t6_fragmented_mandates',
     ];
     // String-typed archetype/CLD "accuracy" questions ("Very accurately" / "Somewhat
-    // accurately" / "Needs revision" / "Not accurate").
+    // accurately" / "Needs revision" / "Not accurate"). Extended (2026-08-13) to
+    // include the two Section 3 CLD-loop comprehension questions
+    // (q3_cld1_investment_development, q3_cld2_governance_confidence), which are
+    // "cld-loop" type per ARCHETYPES_BY_SECTION[3] — same optionalString shape as
+    // the "swot-archetype" questions, so they slot into the same aggregation loop.
+    // Previously these two were the only ARCHETYPES_BY_SECTION entries not
+    // aggregated anywhere in this endpoint.
     const archetypeKeys = [
+      'q3_cld1_investment_development', 'q3_cld2_governance_confidence',
       'q4_arch_tragedy_commons', 'q5_arch_growth_underinvest', 'q6_arch_limits_growth',
       'q7_arch_success_successful', 'q8_arch_shifting_burden',
       'q9_arch_fixes_fail', 'q9_arch_escalation', 'q9_arch_big_man',
@@ -126,19 +224,89 @@ serve(async (req) => {
     // Numeric-typed (1–5) "governance-scale" question — q9_arch_moral_governance_derisk_accuracy
     // is a number per survey-schema.ts's archetypeFieldsFor(), not a string like the rest, so it
     // needs its own bucket and its own "counts as accurate" rule (rating >= 4) rather than the
-    // string comparison used below. This was previously missing entirely from this file, so the
-    // "Moral Governance De-Risks Capital" question never appeared in the analytics dashboard.
-    // NOTE (2026-07-31): q9_1_moral_governance_derisk is a standalone numeric
-    // scale question (see Section9Data), not an archetype-validation field —
-    // it has no _accuracy/_followup pair and doesn't belong in either bucket
-    // below. It was previously listed here as 'q9_arch_moral_governance_derisk',
-    // a field name that was removed from the schema entirely, so this bucket
-    // was silently matching nothing in any real submission.
+    // string comparison used below.
+    // NOTE (2026-07-31, re-verified 2026-08-13): swot-content.ts's
+    // ARCHETYPES_BY_SECTION[9] still declares this question (id 8,
+    // "moral_governance_derisks_capital"), but
+    // src/components/strategic/Section9_OperatingSystems.tsx never actually
+    // renders it — the component only renders the unrelated
+    // q9_1_moral_governance_derisk numeric scale question (no _accuracy/
+    // _followup pair). So this bucket is correctly empty: there is no UI
+    // path that ever writes q9_arch_moral_governance_derisk_accuracy to a
+    // real submission. Left empty deliberately, not a bug — but if Section 9
+    // is ever extended to render this question, add
+    // 'q9_arch_moral_governance_derisk' here.
     const governanceScaleKeys: string[] = [];
+
+    // ── New (2026-08-13): per-cluster SWOT accumulators ───────────────────
+    // Same formulas as the global sums above, bucketed by BEIE cluster
+    // section so the dashboard can show "cluster health" instead of only a
+    // single BARMM-wide average.
+    const clusterAcc: Record<number, { sumS: number; cntS: number; sumO: number; cntO: number; sumW: number; cntW: number; sumT: number; cntT: number }> = {};
+    for (const c of CLUSTER_SECTIONS) clusterAcc[c.section] = { sumS: 0, cntS: 0, sumO: 0, cntO: 0, sumW: 0, cntW: 0, sumT: 0, cntT: 0 };
+
+    // Universal cross-cluster Likert (confidence/readiness/urgency), one per
+    // cluster section — mirrors src/lib/universalQuestions.ts's
+    // universalFieldName() naming (`q${n}_universal_${id}`).
+    const universalAcc: Record<number, { confidence: NumAcc; readiness: NumAcc; urgency: NumAcc }> = {};
+    for (const c of CLUSTER_SECTIONS) universalAcc[c.section] = { confidence: { sum: 0, n: 0 }, readiness: { sum: 0, n: 0 }, urgency: { sum: 0, n: 0 } };
+
+    // ── New: Systems Thinking appreciation (Section 0) ────────────────────
+    const stValue: NumAcc = { sum: 0, n: 0 };
+    const stReadyDist: Record<string, number> = {};
+    let cldCorrect = 0, cldN = 0;
+    let loopCorrect = 0, loopN = 0;
+    let leverageCorrect = 0, leverageN = 0;
+
+    // ── New: BEIE understanding (Section 3) ────────────────────────────────
+    const beieFields: { field: string; label: string }[] = [
+      { field: "q3_1_beie_video_understanding", label: "BEIE video explanation quality" },
+      { field: "q3_2_systems_reframing_accuracy", label: "Systems-based reframing accuracy" },
+      { field: "q3_3_sector_to_ecosystem_shift", label: "Sector-to-ecosystem mental model shift" },
+      { field: "q3_4_beie_framework_clarity", label: "BEIE Framework diagram clarity" },
+      { field: "q3_5_operating_systems_understanding", label: "Moral Governance as 'operating system'" },
+      { field: "q3_6_five_clusters_understanding", label: "Understanding of the five clusters" },
+    ];
+    const beieAcc: Record<string, NumAcc> = {};
+    for (const f of beieFields) beieAcc[f.field] = { sum: 0, n: 0 };
+
+    // ── New: Strategic Options — Section 10 IEDS scoring matrix ───────────
+    const strategyAcc: Record<string, NumAcc> = {};
+    for (const k of STRATEGIC_OPTION_KEYS) strategyAcc[k] = { sum: 0, n: 0 };
+    const strategicRankingDist: Record<string, number> = {};
+    const leverageLikertFields = [
+      "q10_leverage_points_clarity", "q10_activating_leverage", "q10_capacity_traps",
+      "q10_iceberg_model", "q10_collaborative_governance",
+    ];
+    const leverageLikertAcc: Record<string, NumAcc> = {};
+    for (const f of leverageLikertFields) leverageLikertAcc[f] = { sum: 0, n: 0 };
+
+    // ── New: Balanced Scorecard validation (Section 12) ────────────────────
+    const bscPerspectiveFields = [
+      "q12_1_learning_growth_alignment", "q12_2_internal_process_alignment",
+      "q12_3_stakeholder_alignment", "q12_4_financial_alignment",
+    ];
+    const bscVisionFields = ["q12_6_vision_clarity", "q12_7_vision_achievable", "q12_8_mission_alignment", "q12_9_bsc_useful"];
+    const bscAcc: Record<string, NumAcc> = {};
+    for (const f of [...bscPerspectiveFields, ...bscVisionFields]) bscAcc[f] = { sum: 0, n: 0 };
+    const strongestPathwayDist: Record<string, number> = {};
+
+    // ── New: Budget & Risk (Section 13) ────────────────────────────────────
+    const budgetRiskFields = [
+      "q13_1_funding_mix_fair", "q13_2_targets_realistic",
+      "q13_3_high_risk_concern", "q13_4_medium_risk_concern", "q13_5_low_risk_concern",
+    ];
+    const budgetRiskAcc: Record<string, NumAcc> = {};
+    for (const f of budgetRiskFields) budgetRiskAcc[f] = { sum: 0, n: 0 };
+    const budgetPriorityClusterDist: Record<string, number> = {};
+    const blendedFinanceDist: Record<string, number> = {};
+
+    // ── New: Post-survey engagement interest (Section 14, multi-select) ───
+    const engagementDist: Record<string, number> = {};
 
     for (const row of responses || []) {
       const d = row.response_data || {};
-      
+
       const prov = d.q2_demo_province || d.demo_province || "Unknown";
       provinces[prov] = (provinces[prov] || 0) + 1;
 
@@ -148,11 +316,27 @@ serve(async (req) => {
       const iedsPref = d.q10_1_ieds_preference || d.q10_ieds_preference;
       if (iedsPref) ieds[iedsPref] = (ieds[iedsPref] || 0) + 1;
 
-      // Compute BIRD Scores
-      for (const k of strengthKeys) { const p = getPair(d, k); if (p) { sumS += calcStrengthRI(p.i, p.l); cntS++; } }
-      for (const k of opportunityKeys) { const p = getPair(d, k); if (p) { sumO += calcOpportunityRI(p.i, p.l); cntO++; } }
-      for (const k of weaknessKeys) { const p = getPair(d, k); if (p) { sumW += calcWeaknessRisk(p.i, p.l); cntW++; } }
-      for (const k of threatKeys) { const p = getPair(d, k); if (p) { sumT += calcThreatVI(p.i, p.l); cntT++; } }
+      // Compute BIRD Scores — global (unchanged) + per-cluster (new)
+      for (const k of strengthKeys) {
+        const p = getPair(d, k); if (!p) continue;
+        const v = calcStrengthRI(p.i, p.l); sumS += v; cntS++;
+        const sec = sectionOfField(k); if (sec && clusterAcc[sec]) { clusterAcc[sec].sumS += v; clusterAcc[sec].cntS++; }
+      }
+      for (const k of opportunityKeys) {
+        const p = getPair(d, k); if (!p) continue;
+        const v = calcOpportunityRI(p.i, p.l); sumO += v; cntO++;
+        const sec = sectionOfField(k); if (sec && clusterAcc[sec]) { clusterAcc[sec].sumO += v; clusterAcc[sec].cntO++; }
+      }
+      for (const k of weaknessKeys) {
+        const p = getPair(d, k); if (!p) continue;
+        const v = calcWeaknessRisk(p.i, p.l); sumW += v; cntW++;
+        const sec = sectionOfField(k); if (sec && clusterAcc[sec]) { clusterAcc[sec].sumW += v; clusterAcc[sec].cntW++; }
+      }
+      for (const k of threatKeys) {
+        const p = getPair(d, k); if (!p) continue;
+        const v = calcThreatVI(p.i, p.l); sumT += v; cntT++;
+        const sec = sectionOfField(k); if (sec && clusterAcc[sec]) { clusterAcc[sec].sumT += v; clusterAcc[sec].cntT++; }
+      }
 
       // Archetype Consensus — string-typed ("Very/Somewhat accurately")
       for (const a of archetypeKeys) {
@@ -173,6 +357,46 @@ serve(async (req) => {
           if (val >= 4) archetypes[a].accurate++;
         }
       }
+
+      // Universal cross-cluster Likert
+      for (const c of CLUSTER_SECTIONS) {
+        addNum(universalAcc[c.section].confidence, d[`q${c.section}_universal_confidence`]);
+        addNum(universalAcc[c.section].readiness, d[`q${c.section}_universal_readiness`]);
+        addNum(universalAcc[c.section].urgency, d[`q${c.section}_universal_urgency`]);
+      }
+
+      // Systems Thinking appreciation (Section 0)
+      addNum(stValue, d.q0_3_systems_thinking_value);
+      addDist(stReadyDist, d.q0_1_ready);
+      if (typeof d.q0_4_cld_understanding === "string") { cldN++; if (d.q0_4_cld_understanding === CORRECT_CLD_POLARITY) cldCorrect++; }
+      if (typeof d.q0_5_feedback_loops_understanding === "string") { loopN++; if (d.q0_5_feedback_loops_understanding === CORRECT_REINFORCING_LOOP) loopCorrect++; }
+      if (typeof d.q0_6_leverage_points_understanding === "string") { leverageN++; if (d.q0_6_leverage_points_understanding === CORRECT_LEVERAGE_POINT) leverageCorrect++; }
+
+      // BEIE understanding (Section 3)
+      for (const f of beieFields) addNum(beieAcc[f.field], d[f.field]);
+
+      // Strategic Options scoring matrix (Section 10)
+      const matrix = d.q10_matrix;
+      if (matrix && typeof matrix === "object") {
+        for (const k of STRATEGIC_OPTION_KEYS) {
+          const score = calcStrategyScore(matrix[k]);
+          if (score !== null) { strategyAcc[k].sum += score; strategyAcc[k].n++; }
+        }
+      }
+      addDist(strategicRankingDist, d.q10_strategic_ranking);
+      for (const f of leverageLikertFields) addNum(leverageLikertAcc[f], d[f]);
+
+      // Balanced Scorecard (Section 12)
+      for (const f of [...bscPerspectiveFields, ...bscVisionFields]) addNum(bscAcc[f], d[f]);
+      addDist(strongestPathwayDist, d.q12_5_strongest_pathway);
+
+      // Budget & Risk (Section 13)
+      for (const f of budgetRiskFields) addNum(budgetRiskAcc[f], d[f]);
+      addDist(budgetPriorityClusterDist, d.q13_7_budget_priority_cluster);
+      addDist(blendedFinanceDist, d.q13_8_blended_finance_opinion);
+
+      // Post-survey engagement interest (Section 14, multi-select)
+      addMultiDist(engagementDist, d.q14_1_engagement_type);
     }
 
     const avgS = cntS > 0 ? sumS / cntS : 0;
@@ -180,6 +404,46 @@ serve(async (req) => {
     const avgW = cntW > 0 ? sumW / cntW : 0;
     const avgT = cntT > 0 ? sumT / cntT : 0;
     const sbi = ((avgS + avgO) / 2) - ((avgW + avgT) / 2) + 50;
+
+    // Per-cluster Strategic Balance Index, same formula, scoped per section.
+    const clusterHealth = Object.fromEntries(CLUSTER_SECTIONS.map((c) => {
+      const a = clusterAcc[c.section];
+      const cS = a.cntS > 0 ? a.sumS / a.cntS : 0;
+      const cO = a.cntO > 0 ? a.sumO / a.cntO : 0;
+      const cW = a.cntW > 0 ? a.sumW / a.cntW : 0;
+      const cT = a.cntT > 0 ? a.sumT / a.cntT : 0;
+      const cSbi = ((cS + cO) / 2) - ((cW + cT) / 2) + 50;
+      const u = universalAcc[c.section];
+      return [c.slug, {
+        section: c.section,
+        label: c.label,
+        avgStrengthRI: Number(cS.toFixed(2)),
+        avgOpportunityRI: Number(cO.toFixed(2)),
+        avgWeaknessRisk: Number(cW.toFixed(2)),
+        avgThreatVI: Number(cT.toFixed(2)),
+        strategicBalanceIndex: Number(cSbi.toFixed(2)),
+        universal: {
+          confidence: avgOf(u.confidence),
+          readiness: avgOf(u.readiness),
+          urgency: avgOf(u.urgency),
+        },
+      }];
+    }));
+
+    const strategicOptions = {
+      respondentScores: Object.fromEntries(
+        STRATEGIC_OPTION_KEYS.map((k) => [k, { avg: strategyAcc[k].n > 0 ? Number((strategyAcc[k].sum / strategyAcc[k].n).toFixed(2)) : 0, n: strategyAcc[k].n }])
+      ),
+      baselineScores: BASELINE_SCORES,
+      strategicRankingDistribution: strategicRankingDist,
+      leverageLikerts: {
+        leveragePointsClarity: avgOf(leverageLikertAcc.q10_leverage_points_clarity),
+        activatingLeverage: avgOf(leverageLikertAcc.q10_activating_leverage),
+        capacityTraps: avgOf(leverageLikertAcc.q10_capacity_traps),
+        icebergModel: avgOf(leverageLikertAcc.q10_iceberg_model),
+        collaborativeGovernance: avgOf(leverageLikertAcc.q10_collaborative_governance),
+      },
+    };
 
     const payload = {
       totalResponses: total,
@@ -196,6 +460,50 @@ serve(async (req) => {
         Object.entries(archetypes).map(([k, v]) => [k, { ...v, consensus: v.total > 0 ? Math.round((v.accurate / v.total) * 100) : 0 }])
       ),
       iedsPreferences: ieds,
+
+      // ── New sections (2026-08-13) ────────────────────────────────────────
+      systemsThinking: {
+        valueAvg: avgOf(stValue),
+        valueN: stValue.n,
+        readyDistribution: stReadyDist,
+        comprehension: {
+          cldPolarity: { correctPct: cldN > 0 ? Math.round((cldCorrect / cldN) * 100) : 0, n: cldN },
+          reinforcingLoop: { correctPct: loopN > 0 ? Math.round((loopCorrect / loopN) * 100) : 0, n: loopN },
+          leveragePoint: { correctPct: leverageN > 0 ? Math.round((leverageCorrect / leverageN) * 100) : 0, n: leverageN },
+        },
+      },
+      beieUnderstanding: Object.fromEntries(
+        beieFields.map((f) => [f.field, { avg: avgOf(beieAcc[f.field]), n: beieAcc[f.field].n, label: f.label }])
+      ),
+      clusterHealth,
+      strategicOptions,
+      balancedScorecard: {
+        perspectives: {
+          learningGrowth: avgOf(bscAcc.q12_1_learning_growth_alignment),
+          internalProcess: avgOf(bscAcc.q12_2_internal_process_alignment),
+          stakeholder: avgOf(bscAcc.q12_3_stakeholder_alignment),
+          financial: avgOf(bscAcc.q12_4_financial_alignment),
+        },
+        vision: {
+          clarity: avgOf(bscAcc.q12_6_vision_clarity),
+          achievable: avgOf(bscAcc.q12_7_vision_achievable),
+          missionAlignment: avgOf(bscAcc.q12_8_mission_alignment),
+          bscUseful: avgOf(bscAcc.q12_9_bsc_useful),
+        },
+        strongestPathwayDistribution: strongestPathwayDist,
+      },
+      budgetAndRisk: {
+        fundingMixFair: avgOf(budgetRiskAcc.q13_1_funding_mix_fair),
+        targetsRealistic: avgOf(budgetRiskAcc.q13_2_targets_realistic),
+        riskConcern: {
+          high: avgOf(budgetRiskAcc.q13_3_high_risk_concern),
+          medium: avgOf(budgetRiskAcc.q13_4_medium_risk_concern),
+          low: avgOf(budgetRiskAcc.q13_5_low_risk_concern),
+        },
+        budgetPriorityClusterDistribution: budgetPriorityClusterDist,
+        blendedFinanceDistribution: blendedFinanceDist,
+      },
+      engagementDistribution: engagementDist,
     };
 
     return new Response(JSON.stringify(payload), {
